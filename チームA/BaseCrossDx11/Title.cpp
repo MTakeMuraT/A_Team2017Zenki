@@ -2,16 +2,6 @@
 #include "Project.h"
 
 namespace basecross {
-
-	void Title::CreateResourses()
-	{
-		wstring DataDir;
-		App::GetApp()->GetDataDirectory(DataDir);
-		wstring strTexture = DataDir + L"Title.png";
-		App::GetApp()->RegisterTexture(L"TITLE_TX", strTexture);
-
-	}
-
 	//ビューとライトの作成
 	void Title::CreateViewLight() {
 		
@@ -33,8 +23,6 @@ namespace basecross {
 
 	void Title::OnCreate() {
 		try {
-			//リソースの作成
-			CreateResourses();
 			//ビューとライトの作成
 			CreateViewLight();
 		}

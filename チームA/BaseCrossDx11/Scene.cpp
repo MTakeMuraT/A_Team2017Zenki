@@ -15,6 +15,8 @@ namespace basecross{
 
 	void Scene::OnCreate(){
 		try {
+			ObjectFactory::Create<GameMedia>();
+
 			//最初のアクティブステージの設定
 			ResetActiveStage<Title>();
 		}

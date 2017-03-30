@@ -13,14 +13,6 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 
 
-	//リソースの作成
-	void GameStage::CreateResourses() {
-		wstring DataDir;
-		App::GetApp()->GetDataDirectory(DataDir);
-		wstring strTexture = DataDir + L"trace.png";
-		App::GetApp()->RegisterTexture(L"TRACE_TX", strTexture);
-
-	}
 
 	//ビューとライトの作成
 	void GameStage::CreateViewLight() {
@@ -52,8 +44,6 @@ namespace basecross {
 	
 	void GameStage::OnCreate() {
 		try {
-			//リソースの作成
-			CreateResourses();
 
 			//ビューとライトの作成
 			CreateViewLight();

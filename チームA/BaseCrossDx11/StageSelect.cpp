@@ -2,14 +2,6 @@
 #include "Project.h"
 
 namespace basecross {
-	void StageSelect::CreateResourses()
-	{
-		wstring DataDir;
-		App::GetApp()->GetDataDirectory(DataDir);
-		wstring strTexture = DataDir + L"StageSelectLogo.png";
-		App::GetApp()->RegisterTexture(L"STAGESELECTLOGO_TX", strTexture);
-
-	}
 
 	void StageSelect::CreateViewLight()
 	{
@@ -33,8 +25,6 @@ namespace basecross {
 	{
 		try 
 		{
-			//リソースの作成
-			CreateResourses();
 			//ビューとライトの作成
 			CreateViewLight();
 

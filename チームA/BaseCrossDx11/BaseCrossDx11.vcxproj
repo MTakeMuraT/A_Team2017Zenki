@@ -115,6 +115,7 @@
     <ClInclude Include="Common\Rigidbody.h" />
     <ClInclude Include="Common\SharedResources.h" />
     <ClInclude Include="Common\StringComponents.h" />
+    <ClInclude Include="GameMedia.h" />
     <ClInclude Include="GameStage.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Project.h" />
@@ -141,6 +142,7 @@
     <ClCompile Include="Common\Rigidbody.cpp" />
     <ClCompile Include="Common\SharedResources.cpp" />
     <ClCompile Include="Common\StringComponents.cpp" />
+    <ClCompile Include="GameMedia.cpp" />
     <ClCompile Include="GameStage.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Scene.cpp" />
