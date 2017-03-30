@@ -19,10 +19,6 @@
 #include <d3d10.h>
 #endif
 
-#ifndef IID_GRAPHICS_PPV_ARGS
-#define IID_GRAPHICS_PPV_ARGS(x) IID_PPV_ARGS(x)
-#endif
-
 using Microsoft::WRL::ComPtr;
 
 namespace DirectX
@@ -47,7 +43,7 @@ static HRESULT _Capture( _In_ ID3D11DeviceContext* pContext, _In_ ID3D11Resource
             return hr;
 
         ComPtr<ID3D11DeviceContextX> d3dContextX;
-        hr = pContext->QueryInterface( IID_GRAPHICS_PPV_ARGS( d3dContextX.GetAddressOf() ) );
+        hr = pContext->QueryInterface( __uuidof(ID3D11DeviceContextX), reinterpret_cast<void**>( d3dContextX.GetAddressOf() ) );
         if ( FAILED(hr) )
             return hr;
 
@@ -611,7 +607,8 @@ HRESULT CreateShaderResourceViewEx( ID3D11Device* pDevice, const Image* srcImage
 
     assert( resource );
 
-    D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc = {};
+    D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc;
+    memset( &SRVDesc, 0, sizeof(SRVDesc) );
     if ( forceSRGB )
         SRVDesc.Format = MakeSRGB( metadata.format );
     else
@@ -701,7 +698,7 @@ HRESULT CaptureTexture( ID3D11Device* pDevice, ID3D11DeviceContext* pContext, ID
     case D3D11_RESOURCE_DIMENSION_TEXTURE1D:
         {
             ComPtr<ID3D11Texture1D> pTexture;
-            hr = pSource->QueryInterface( IID_GRAPHICS_PPV_ARGS( pTexture.GetAddressOf() ) );
+            hr = pSource->QueryInterface( __uuidof(ID3D11Texture1D), reinterpret_cast<void**>( pTexture.GetAddressOf() ) );
             if ( FAILED(hr) )
                 break;
 
@@ -745,7 +742,7 @@ HRESULT CaptureTexture( ID3D11Device* pDevice, ID3D11DeviceContext* pContext, ID
     case D3D11_RESOURCE_DIMENSION_TEXTURE2D:
         {
             ComPtr<ID3D11Texture2D> pTexture;
-            hr = pSource->QueryInterface( IID_GRAPHICS_PPV_ARGS( pTexture.GetAddressOf() ) );
+            hr = pSource->QueryInterface( __uuidof(ID3D11Texture2D), reinterpret_cast<void**>( pTexture.GetAddressOf() ) );
             if ( FAILED(hr) )
                 break;
 
@@ -846,7 +843,7 @@ HRESULT CaptureTexture( ID3D11Device* pDevice, ID3D11DeviceContext* pContext, ID
     case D3D11_RESOURCE_DIMENSION_TEXTURE3D:
         {
             ComPtr<ID3D11Texture3D> pTexture;
-            hr = pSource->QueryInterface( IID_GRAPHICS_PPV_ARGS( pTexture.GetAddressOf() ) );
+            hr = pSource->QueryInterface( __uuidof(ID3D11Texture3D), reinterpret_cast<void**>( pTexture.GetAddressOf() ) );
             if ( FAILED(hr) )
                 break;
 

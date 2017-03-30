@@ -15,17 +15,13 @@
 
 #pragma once
 
-#pragma warning(push)
-#pragma warning(disable : 4005)
+#if !defined(WIN32_LEAN_AND_MEAN)
 #define WIN32_LEAN_AND_MEAN
+#endif
+
+#if !defined(NOMINMAX)
 #define NOMINMAX
-#define NODRAWTEXT
-#define NOGDI
-#define NOBITMAP
-#define NOMCX
-#define NOSERVICE
-#define NOHELP
-#pragma warning(pop)
+#endif
 
 #ifndef _WIN32_WINNT_WIN10
 #define _WIN32_WINNT_WIN10 0x0A00
@@ -48,7 +44,12 @@
 
 #include "directxtex.h"
 
+// VS 2010's stdint.h conflicts with intsafe.h
+#pragma warning(push)
+#pragma warning(disable : 4005)
 #include <wincodec.h>
+#include <intsafe.h>
+#pragma warning(pop)
 
 #include <wrl\client.h>
 
