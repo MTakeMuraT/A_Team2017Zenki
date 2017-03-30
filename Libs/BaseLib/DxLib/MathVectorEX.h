@@ -2,7 +2,7 @@
 @file MathVectorEX.h
 @brief ベクトルののnamespaceによる計算<br />
 XNAMATH のラッピング関数群
-@copyright Copyright (c) 2017 WiZ Tamura Hiroki,Yamanoi Yasushi.
+@copyright Copyright (c) 2016 WiZ Tamura Hiroki,Yamanoi Yasushi.
 */
 
 #pragma once
@@ -396,7 +396,6 @@ namespace basecross{
 		*this = XMVector3Transform(XMVECTOR(*this), XMMATRIX(m));
 	}
 
-
 	//--------------------------------------------------------------------------------------
 	///	Vector3EX（3次元ベクトル）ネームスペース
 	//--------------------------------------------------------------------------------------
@@ -749,23 +748,6 @@ namespace basecross{
 		inline  Vector3 RefractV(const Vector3& Vec, const Vector3& Normal, const Vector3& RefractionIndex) {
 			return (Vector3)XMVector3RefractV(XMVECTOR(Vec), XMVECTOR(Normal),
 				XMVECTOR(RefractionIndex));
-		}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	ベクトルと法線ベクトルからスライドするベクトルを得る。
-		@param[in]	Vec	ベクトル
-		@param[in]	Normal	法線ベクトル
-		@param[in]	RefractionIndex	屈折率
-		@return	スライドさせたベクトル
-		*/
-		//--------------------------------------------------------------------------------------
-		inline  Vector3 Slide(const Vector3& Vec, const Vector3& Norm) {
-			//thisと法線から直行線の長さ（内積で求める）
-			float Len = Dot(Vec,Norm);
-			//その長さに伸ばす
-			Vector3 Contact = Norm * Len;
-			//スライドする方向は現在のベクトルから引き算
-			return (Vec - Contact);
 		}
 		//--------------------------------------------------------------------------------------
 		/*!
@@ -1179,27 +1161,6 @@ namespace basecross{
 
 	};
 	//end Vector4EX
-
-	void Vector3::WorldToSCreen(const Matrix4X4& m, float ViewWidth, float ViewHeight) {
-		Vector4 Pos4 = *this;
-		Pos4.w = 1.0f;
-		//座標変換
-		Pos4.Transform(m);
-		//遠近
-		Pos4.x /= Pos4.w;
-		Pos4.y /= Pos4.w;
-		Pos4.z /= Pos4.w;
-		//座標単位の修正
-		Pos4.x += 1.0f;
-		Pos4.y += 1.0f;
-		Pos4.y = 2.0f - Pos4.y;
-		//ビューポート変換
-		Pos4.x *= (ViewWidth * 0.5f);
-		Pos4.y *= (ViewHeight * 0.5f);
-		*this = XMVECTOR(Pos4);
-	}
-
-
 
 
 }

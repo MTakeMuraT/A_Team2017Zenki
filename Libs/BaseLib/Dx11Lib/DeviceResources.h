@@ -1,7 +1,7 @@
 /*!
 @file DeviceResources.h
 @brief テクスチャ、メッシュ、Dx11デバイスリソース
-@copyright Copyright (c) 2017 WiZ Tamura Hiroki,Yamanoi Yasushi.
+@copyright Copyright (c) 2016 WiZ Tamura Hiroki,Yamanoi Yasushi.
 */
 
 #pragma once
@@ -731,13 +731,7 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	struct SoundItem {
 		weak_ptr<AudioResource> m_AudioResource;
-//		ComPtr<IXAudio2SourceVoice> m_SourceVoice;
-		IXAudio2SourceVoice* m_SourceVoice;
-		SoundItem() :
-			m_SourceVoice(nullptr)
-		{}
-		~SoundItem() {
-		}
+		IXAudio2SourceVoice* m_pSourceVoice;
 	};
 
 	//--------------------------------------------------------------------------------------
@@ -1948,24 +1942,42 @@ namespace basecross {
 
 	//これより個別シェーダー
 	//コンスタントバッファ宣言用マクロ
-#define DECLARE_DX11_CONSTANT_BUFFER(CBName,CBStruct) class CBName : public ConstantBuffer<CBName,CBStruct> { public: };
+#define DECLARE_DX11_CONSTANT_BUFFER(CBName,CBStruct) class CBName : public ConstantBuffer<CBName,CBStruct> { \
+public: \
+			};
 
 	//シェーダ宣言用マクロ
-#define DECLARE_DX11_VERTEX_SHADER(ShaderName,VertexType) class ShaderName : public VertexShader<ShaderName,VertexType>{ public: ShaderName(); };
+#define DECLARE_DX11_VERTEX_SHADER(ShaderName,VertexType) class ShaderName : public VertexShader<ShaderName,VertexType>{ \
+	public: \
+		ShaderName(); \
+			};
 
-#define DECLARE_DX11_PIXEL_SHADER(ShaderName) class ShaderName : public PixelShader<ShaderName>{ public: ShaderName(); };
+#define DECLARE_DX11_PIXEL_SHADER(ShaderName) class ShaderName : public PixelShader<ShaderName>{ \
+	public: \
+		ShaderName(); \
+			};
 
-#define DECLARE_DX11_GEOMETRY_SHADER(ShaderName) class ShaderName : public GeometryShader<ShaderName>{ public: ShaderName(); };
+#define DECLARE_DX11_GEOMETRY_SHADER(ShaderName) class ShaderName : public GeometryShader<ShaderName>{ \
+	public: \
+		ShaderName(); \
+		};
 
-	//コンスタントバッファ実体用マク
+
+	//コンスタントバッファ実体用マクロ
 #define IMPLEMENT_DX11_CONSTANT_BUFFER(CBName) unique_ptr<CBName, CBName::Deleter> CBName::m_Ptr;
 
 	//シェーダ実体用マクロ
-#define IMPLEMENT_DX11_VERTEX_SHADER(ShaderName,CsoFilename) unique_ptr<ShaderName, ShaderName::Deleter> ShaderName::m_Ptr; ShaderName::ShaderName() : VertexShader(CsoFilename){}
+#define IMPLEMENT_DX11_VERTEX_SHADER(ShaderName,CsoFilename) unique_ptr<ShaderName, ShaderName::Deleter> ShaderName::m_Ptr; \
+	ShaderName::ShaderName() : \
+	VertexShader(CsoFilename){}
 
-#define IMPLEMENT_DX11_PIXEL_SHADER(ShaderName,CsoFilename) unique_ptr<ShaderName, ShaderName::Deleter> ShaderName::m_Ptr; ShaderName::ShaderName() : PixelShader(CsoFilename){}
+#define IMPLEMENT_DX11_PIXEL_SHADER(ShaderName,CsoFilename) unique_ptr<ShaderName, ShaderName::Deleter> ShaderName::m_Ptr; \
+	ShaderName::ShaderName() : \
+	PixelShader(CsoFilename){}
 
-#define IMPLEMENT_DX11_GEOMETRY_SHADER(ShaderName,CsoFilename)	unique_ptr<ShaderName, ShaderName::Deleter> ShaderName::m_Ptr; ShaderName::ShaderName() : GeometryShader(CsoFilename){}
+#define IMPLEMENT_DX11_GEOMETRY_SHADER(ShaderName,CsoFilename)	unique_ptr<ShaderName, ShaderName::Deleter> ShaderName::m_Ptr; \
+	ShaderName::ShaderName() : \
+	GeometryShader(CsoFilename){}
 
 
 

@@ -1,7 +1,7 @@
 /*!
 @file Components.cpp
 @brief コンポーネント実体
-@copyright Copyright (c) 2017 WiZ Tamura Hiroki,Yamanoi Yasushi.
+@copyright Copyright (c) 2016 WiZ Tamura Hiroki,Yamanoi Yasushi.
 */
 #include "stdafx.h"
 
@@ -86,27 +86,15 @@ namespace basecross {
 		Vector3 m_BeforePivot;
 		Quaternion m_BeforeQuaternion;
 		Vector3 m_BeforePosition;
-		//再計算抑制用変数
-		bool m_BeforeChangeed;
-		Matrix4X4 m_BeforeWorldMatrix;
 		//現在の変数
 		Vector3 m_Scale;
 		Vector3 m_Pivot;
 		Quaternion m_Quaternion;
 		Vector3 m_Position;
-		//再計算抑制用変数
-		bool m_Changeed;
-		Matrix4X4 m_WorldMatrix;
-		//親オブジェクト
-		weak_ptr<GameObject> m_Parent;
-		//子供オブジェクトの配列
-		vector<weak_ptr<GameObject>> m_ChildVec;
 		Impl():
 			//スケールのみ初期化（他はデフォルト処理でよい）
 			m_BeforeScale(1.0f,1.0f,1.0f),
-			m_Scale(1.0f, 1.0f, 1.0f),
-			m_BeforeChangeed(true),
-			m_Changeed(true)
+			m_Scale(1.0f, 1.0f, 1.0f)
 		{}
 		~Impl() {}
 	};
@@ -143,28 +131,14 @@ namespace basecross {
 		return pImpl->m_BeforePosition;
 	}
 
-	bool Transform::IsSameBeforeWorldMatrix(const Matrix4X4& mat) const {
-		return mat.EqualInt(GetBeforeWorldMatrix());
-	}
-
-
-	const Matrix4X4& Transform::GetBeforeWorldMatrix() const{
-		auto ParPtr = GetParent();
-		if (pImpl->m_BeforeChangeed || ParPtr) {
-			pImpl->m_BeforeWorldMatrix.AffineTransformation(
-				pImpl->m_BeforeScale,
-				pImpl->m_BeforePivot,
-				pImpl->m_BeforeQuaternion,
-				pImpl->m_BeforePosition
-			);
-			pImpl->m_BeforeChangeed = false;
-			if (ParPtr) {
-				auto ParBeforeWorld = ParPtr->GetComponent<Transform>()->GetBeforeWorldMatrix();
-				ParBeforeWorld.ScaleIdentity();
-				pImpl->m_BeforeWorldMatrix = pImpl->m_BeforeWorldMatrix * ParBeforeWorld;
-			}
-		}
-		return pImpl->m_BeforeWorldMatrix;
+	Matrix4X4 Transform::GetBeforeWorldMatrix() const{
+		Matrix4X4 mat;
+		mat.AffineTransformation(pImpl->m_BeforeScale,
+			pImpl->m_BeforePivot, 
+			pImpl->m_BeforeQuaternion, 
+			pImpl->m_BeforePosition
+		);
+		return mat;
 	}
 
 
@@ -175,7 +149,6 @@ namespace basecross {
 	}
 
 	void Transform::SetScale(const Vector3& Scale) {
-		pImpl->m_Changeed = true;
 		pImpl->m_Scale = Scale;
 	}
 	void Transform::SetScale(float x, float y, float z) {
@@ -186,7 +159,6 @@ namespace basecross {
 		return pImpl->m_Pivot;
 	}
 	void Transform::SetPivot(const Vector3& Pivot) {
-		pImpl->m_Changeed = true;
 		pImpl->m_Pivot = Pivot;
 	}
 	void Transform::SetPivot(float x, float y, float z) {
@@ -197,7 +169,6 @@ namespace basecross {
 		return pImpl->m_Quaternion;
 	}
 	void Transform::SetQuaternion(const Quaternion& quaternion) {
-		pImpl->m_Changeed = true;
 		pImpl->m_Quaternion = quaternion;
 		pImpl->m_Quaternion.Normalize();
 	}
@@ -206,7 +177,6 @@ namespace basecross {
 	}
 
 	void Transform::SetRotation(const Vector3& Rot) {
-		pImpl->m_Changeed = true;
 		Quaternion Qt;
 		Qt.RotationRollPitchYawFromVector(Rot);
 		SetQuaternion(Qt);
@@ -220,7 +190,6 @@ namespace basecross {
 	}
 
 	void Transform::SetPosition(const Vector3& Position) {
-		pImpl->m_Changeed = true;
 		pImpl->m_Position = Position;
 	}
 	void Transform::SetPosition(float x, float y, float z) {
@@ -228,148 +197,21 @@ namespace basecross {
 	}
 
 	void Transform::ResetPosition(const Vector3& Position) {
-		pImpl->m_BeforeChangeed = true;
 		pImpl->m_BeforePosition = Position;
-		pImpl->m_Changeed = true;
 		pImpl->m_Position = Position;
 	}
 
-	Vector3 Transform::GetWorldPosition() const {
-		return GetWorldMatrix().PosInMatrixSt();
-	}
-	void Transform::SetWorldPosition(const Vector3& Position) {
-		auto SetPos = Position;
-		auto ParPtr = GetParent();
-		if (ParPtr) {
-			auto ParWorldPos = ParPtr->GetComponent<Transform>()->GetWorldMatrix().PosInMatrixSt();
-			SetPos -= ParWorldPos;
-		}
-		SetPosition(SetPos);
-	}
-	void Transform::ResetWorldPosition(const Vector3& Position) {
-		auto SetPos = Position;
-		auto ParPtr = GetParent();
-		if (ParPtr) {
-			auto ParWorldPos = ParPtr->GetComponent<Transform>()->GetWorldMatrix().PosInMatrixSt();
-			SetPos -= ParWorldPos;
-		}
-		ResetPosition(SetPos);
-	}
 
-	bool Transform::IsSameWorldMatrix(const Matrix4X4& mat) const {
-		return mat.EqualInt(GetWorldMatrix());
+	Matrix4X4 Transform::GetWorldMatrix() const{
+		Matrix4X4 mat;
+		mat.AffineTransformation(
+			pImpl->m_Scale,
+			pImpl->m_Pivot,
+			pImpl->m_Quaternion,
+			pImpl->m_Position
+		);
+		return mat;
 	}
-
-
-	const Matrix4X4& Transform::GetWorldMatrix() const{
-		auto ParPtr = GetParent();
-		if (pImpl->m_Changeed || ParPtr) {
-			pImpl->m_WorldMatrix.AffineTransformation(
-				pImpl->m_Scale,
-				pImpl->m_Pivot,
-				pImpl->m_Quaternion,
-				pImpl->m_Position
-			);
-			pImpl->m_Changeed = false;
-			if (ParPtr) {
-				auto ParWorld = ParPtr->GetComponent<Transform>()->GetWorldMatrix();
-				ParWorld.ScaleIdentity();
-				pImpl->m_WorldMatrix = pImpl->m_WorldMatrix * ParWorld;
-			}
-		}
-		return pImpl->m_WorldMatrix;
-	}
-
-	const shared_ptr<GameObject> Transform::GetParent()const {
-		auto ShPtr = pImpl->m_Parent.lock();
-		if (ShPtr) {
-			return ShPtr;
-		}
-		return nullptr;
-	}
-	void Transform::SetParent(const shared_ptr<GameObject>& Obj) {
-		if (GetParent() == Obj) {
-			return;
-		}
-		if (Obj) {
-			pImpl->m_Parent = Obj;
-			auto ParWorld = Obj->GetComponent<Transform>()->GetWorldMatrix();
-			auto PosSpan = GetPosition() - ParWorld.PosInMatrixSt();
-			auto ParInv = ParWorld;
-			ParInv.ScaleIdentity();
-			Vector4 Temp;
-			ParInv.Inverse(Temp);
-			Matrix4X4 Mat = GetWorldMatrix() * ParInv;
-			Vector3 Scale, Pos;
-			Quaternion Qt;
-			Mat.Decompose(Scale, Qt, Pos);
-			SetScale(Scale);
-			SetQuaternion(Qt);
-			SetPosition(PosSpan);
-			SetToBefore();
-			Obj->GetComponent<Transform>()->AddChild(GetGameObject());
-		}
-		else {
-			//nullptrが渡された
-			ClearParent();
-		}
-	}
-
-	void Transform::ClearParent() {
-		if (GetParent()) {
-			//今親がいる
-			auto Pos = GetWorldPosition();
-			SetPosition(Pos);
-			SetToBefore();
-		}
-		pImpl->m_Parent.reset();
-	}
-
-
-	vector<weak_ptr<GameObject>>& Transform::GetChildVec() {
-		return pImpl->m_ChildVec;
-	}
-	bool Transform::FindChild(const shared_ptr<GameObject>& Obj) {
-		for (auto& v : pImpl->m_ChildVec) {
-			auto shptr = v.lock();
-			if (shptr && shptr == Obj) {
-				return true;
-			}
-		}
-		return false;
-	}
-	void Transform::ClearChild(const shared_ptr<GameObject>& Obj) {
-		for (auto it = pImpl->m_ChildVec.begin(); it != pImpl->m_ChildVec.end(); ++it) {
-			auto shptr = (*it).lock();
-			if (shptr && shptr == Obj) {
-				auto PtrTrans = Obj->GetComponent<Transform>();
-				PtrTrans->ClearParent();
-				pImpl->m_ChildVec.erase(it);
-				break;
-			}
-		}
-	}
-	void Transform::AddChild(const shared_ptr<GameObject>& Obj) {
-		if (FindChild(Obj)) {
-			return;
-		}
-		pImpl->m_ChildVec.push_back(Obj);
-		auto PtrTrans = Obj->GetComponent<Transform>();
-		PtrTrans->SetParent(GetGameObject());
-	}
-	void Transform::ClearAllChild() {
-		for (auto& v : pImpl->m_ChildVec) {
-			auto shptr = v.lock();
-			if (shptr) {
-				auto PtrTrans = shptr->GetComponent<Transform>();
-				PtrTrans->ClearParent();
-			}
-		}
-		pImpl->m_ChildVec.clear();
-	}
-
-
-
 
 	Vector3 Transform::GetVelocity() const {
 		//前回のターンからの時間
@@ -381,22 +223,10 @@ namespace basecross {
 
 
 	void Transform::SetToBefore() {
-		if (pImpl->m_BeforeScale != pImpl->m_Scale) {
-			pImpl->m_BeforeChangeed = true;
-			pImpl->m_BeforeScale = pImpl->m_Scale;
-		}
-		if (pImpl->m_BeforePivot != pImpl->m_Pivot) {
-			pImpl->m_BeforeChangeed = true;
-			pImpl->m_BeforePivot = pImpl->m_Pivot;
-		}
-		if (pImpl->m_BeforeQuaternion != pImpl->m_Quaternion) {
-			pImpl->m_BeforeChangeed = true;
-			pImpl->m_BeforeQuaternion = pImpl->m_Quaternion;
-		}
-		if (pImpl->m_BeforePosition != pImpl->m_Position) {
-			pImpl->m_BeforeChangeed = true;
-			pImpl->m_BeforePosition = pImpl->m_Position;
-		}
+		pImpl->m_BeforeScale = pImpl->m_Scale;
+		pImpl->m_BeforePivot = pImpl->m_Pivot;
+		pImpl->m_BeforeQuaternion = pImpl->m_Quaternion;
+		pImpl->m_BeforePosition = pImpl->m_Position;
 	}
 
 	//操作
@@ -734,7 +564,7 @@ namespace basecross {
 	};
 
 	void MultiSoundEffect::Impl::Start(const SoundItem* pItem, const XAUDIO2_BUFFER& Buffer, float Volume) {
-		if (!pItem->m_SourceVoice) {
+		if (!pItem->m_pSourceVoice) {
 			throw BaseException(
 				L"サウンドボイスが不定です",
 				L"if (!pItem->m_pSourceVoice)",
@@ -742,13 +572,13 @@ namespace basecross {
 			);
 		}
 		ThrowIfFailed(
-			pItem->m_SourceVoice->Stop(),
+			pItem->m_pSourceVoice->Stop(),
 			L"サウンドエフェクト用サウンドボイスの停止に失敗しました",
 			L"pItem->m_pSourceVoice->Stop()",
 			L"MultiSoundEffect::Impl::Start()"
 		);
 		ThrowIfFailed(
-			pItem->m_SourceVoice->FlushSourceBuffers(),
+			pItem->m_pSourceVoice->FlushSourceBuffers(),
 			L"サウンドエフェクト用サウンドボイスのバッファのフラッシュに失敗しました",
 			L"pItem->m_pSourceVoice->FlushSourceBuffers()",
 			L"MultiSoundEffect::Impl::Start()"
@@ -761,21 +591,21 @@ namespace basecross {
 			);
 		}
 		ThrowIfFailed(
-			pItem->m_SourceVoice->SetVolume(Volume),
+			pItem->m_pSourceVoice->SetVolume(Volume),
 			L"サウンドエフェクト用サウンドのボリューム設定に失敗しました",
 			L"pItem->m_pSourceVoice->SetVolume()",
 			L"MultiSoundEffect::Impl::Start()"
 		);
 
 		ThrowIfFailed(
-			pItem->m_SourceVoice->SubmitSourceBuffer(&Buffer),
+			pItem->m_pSourceVoice->SubmitSourceBuffer(&Buffer),
 			L"サウンドエフェクト用サウンドのソースバッファ設定に失敗しました",
 			L"pItem->m_pSourceVoice->SubmitSourceBuffer(&buffer)",
 			L"MultiSoundEffect::Impl::Start()"
 		);
 
 		ThrowIfFailed(
-			pItem->m_SourceVoice->Start(),
+			pItem->m_pSourceVoice->Start(),
 			L"サウンドエフェクト用サウンドのスタートに失敗しました",
 			L"pItem->m_pSourceVoice->Start()",
 			L"MultiSoundEffect::Impl::Start()"
@@ -783,7 +613,7 @@ namespace basecross {
 	}
 
 	void MultiSoundEffect::Impl::Stop(const SoundItem* pItem) {
-		if (!pItem->m_SourceVoice) {
+		if (!pItem->m_pSourceVoice) {
 			throw BaseException(
 				L"サウンドボイスが不定です",
 				L"if (!pItem->m_pSourceVoice)",
@@ -791,18 +621,19 @@ namespace basecross {
 			);
 		}
 		ThrowIfFailed(
-			pItem->m_SourceVoice->Stop(),
+			pItem->m_pSourceVoice->Stop(),
 			L"サウンドエフェクト用サウンドボイスの停止に失敗しました",
 			L"pItem->m_pSourceVoice->Stop()",
 			L"MultiSoundEffect::Impl::Stop()"
 		);
 		ThrowIfFailed(
-			pItem->m_SourceVoice->FlushSourceBuffers(),
+			pItem->m_pSourceVoice->FlushSourceBuffers(),
 			L"サウンドエフェクト用サウンドボイスのバッファのフラッシュに失敗しました",
 			L"pItem->m_pSourceVoice->FlushSourceBuffers()",
 			L"MultiSoundEffect::Impl::Stop()"
 		);
 	}
+
 
 
 	//--------------------------------------------------------------------------------------
@@ -845,7 +676,7 @@ namespace basecross {
 			Item.m_AudioResource = SoundRes;
 			auto Engine = App::GetApp()->GetAudioManager()->GetSoundEffectEngine();
 			ThrowIfFailed(
-				Engine->CreateSourceVoice(&Item.m_SourceVoice, SoundRes->GetOutputWaveFormatEx()),
+				Engine->CreateSourceVoice(&Item.m_pSourceVoice, SoundRes->GetOutputWaveFormatEx()),
 				L"サウンドエフェクト用サウンドボイスの作成に失敗しました",
 				L"Engine->CreateSourceVoice(&pImpl->m_pSourceVoice, SountRes->GetOutputWaveFormatEx())",
 				L"MultiSoundEffect::AddAudioResource()"
@@ -965,313 +796,6 @@ namespace basecross {
 	}
 
 
-	struct CellNode {
-		int x;
-		int z;
-		int px;
-		int pz;
-		int cost;
-		int heuristic;
-		int score;
-	};
-
-
-	//--------------------------------------------------------------------------------------
-	//	struct PathSearch::Impl;
-	//	用途: コンポーネントImplクラス
-	//--------------------------------------------------------------------------------------
-	struct PathSearch::Impl {
-		weak_ptr<StageCellMap> m_StageCellMap;
-		//目標のセルインデックス
-		CellIndex m_TargetIndex;
-		//こちら側のセルインデックス
-		CellIndex m_BaseIndex;
-		vector<CellNode> m_OpenVec;
-		vector<CellNode> m_CloseVec;
-		vector<vector<int>> m_WayArr = {
-			{ -1, -1 },
-			{ 0, -1 },
-			{ 1, -1 },
-			{ 1,  0 },
-			{ 1,  1 },
-			{ 0,  1 },
-			{ -1,  1 },
-			{ -1,  0 },
-		};
-
-		static bool NodeAsc(const CellNode& left, const CellNode& right) {
-			return left.score < right.score;
-		}
-		bool IsInOpen(const CellIndex& Chk);
-		bool AddOpenNode(const CellIndex& Base, const CellIndex& Target);
-		int GetHeuristic(const CellIndex& Base, const CellIndex& Target);
-		bool IsInVector(const CellIndex& Base, const vector<CellNode>& vec, CellNode& retNode);
-		void InOpenScore(const CellIndex& Base, vector<CellNode>& retvec);
-		bool SearchCellBase(const CellIndex& Start, const CellIndex& Target);
-		shared_ptr<StageCellMap> GetStageCellMap() const;
-
-
-		Impl()
-		{}
-		~Impl() {}
-	};
-
-	int PathSearch::Impl::GetHeuristic(const CellIndex& Base, const CellIndex& Target) {
-		int spanX = abs((int)Base.x - (int)Target.x);
-		int spanZ = abs((int)Base.z - (int)Target.z);
-		//どちらか長いほうを返す
-		return (spanX >= spanZ) ? spanX : spanZ;
-	}
-
-	bool PathSearch::Impl::IsInVector(const CellIndex& Base, const vector<CellNode>& vec, CellNode& retNode) {
-		for (auto& v : vec) {
-			if (Base.x == v.x && Base.z == v.z) {
-				retNode = v;
-				return true;
-			}
-		}
-		return false;
-	}
-
-	bool PathSearch::Impl::IsInOpen(const CellIndex& Chk) {
-		auto it = m_OpenVec.begin();
-		while (it != m_OpenVec.end()) {
-			if (it->x == Chk.x && it->z == Chk.z) {
-				return true;
-			}
-			it++;
-		}
-		return false;
-	}
-
-	void PathSearch::Impl::InOpenScore(const CellIndex& Base, vector<CellNode>& retvec) {
-		for (size_t i = 0; i < m_WayArr.size(); i++) {
-			int posx = Base.x + m_WayArr[i][0];
-			int posz = Base.z + m_WayArr[i][1];
-			CellNode Node;
-			if (IsInVector(CellIndex(posx, posz), m_OpenVec, Node)) {
-				retvec.push_back(Node);
-			}
-		}
-		if (!retvec.empty()) {
-			std::sort(retvec.begin(), retvec.end(), NodeAsc);
-		}
-	}
-
-	bool PathSearch::Impl::AddOpenNode(const CellIndex& Base, const CellIndex& Target) {
-		//Openリストから指定のNodeを取り出す
-		auto it = m_OpenVec.begin();
-		CellNode TempNode;
-		bool find = false;
-		while (it != m_OpenVec.end()) {
-			if (it->x == Base.x && it->z == Base.z) {
-				//取り出したらeraseしCloseリストに追加
-				TempNode = *it;
-				m_CloseVec.push_back(TempNode);
-				m_OpenVec.erase(it);
-				find = true;
-				break;
-			}
-			it++;
-		}
-		if (!find) {
-			return false;
-		}
-		auto ShCellMap = m_StageCellMap.lock();
-		if (!ShCellMap) {
-			//セルマップがない
-			throw BaseException(
-				L"セルマップが指定されてません",
-				L"if (!ShCellMap)",
-				L"PathFindSteering::AddOpenNode()"
-			);
-		}
-
-		auto& CellVec = ShCellMap->GetCellVec();
-		for (size_t i = 0; i < m_WayArr.size(); i++) {
-			int posx = TempNode.x + m_WayArr[i][0];
-			int posz = TempNode.z + m_WayArr[i][1];
-			if (posx >= 0 && posx < (int)CellVec.size() &&
-				posz >= 0 && posz < (int)CellVec[posx].size()) {
-				//posx,poszがセルマップの範囲内
-				if (CellVec[posx][posz].m_Cost == -1) {
-					//コストが-1ではない
-					continue;
-				}
-				CellNode ret;
-				if (IsInVector(CellIndex(posx, posz), m_OpenVec, ret)) {
-					//OpenVecにあった
-					continue;
-				}
-				if (IsInVector(CellIndex(posx, posz), m_CloseVec, ret)) {
-					//CloseVecにあった
-					continue;
-				}
-				//現在オープンリストにない
-				//OpenVecに追加
-				CellIndex BaseIndex(posx, posz);
-				CellNode Node;
-				Node.x = posx;
-				Node.z = posz;
-				Node.px = TempNode.x;
-				Node.pz = TempNode.z;
-				Node.cost = TempNode.cost + CellVec[posx][posz].m_Cost;
-				Node.heuristic = GetHeuristic(BaseIndex, Target);
-				Node.score = Node.cost + Node.heuristic;
-				m_OpenVec.push_back(Node);
-			}
-		}
-		return true;
-	}
-
-	bool PathSearch::Impl::SearchCellBase(const CellIndex& Start, const CellIndex& Target) {
-		if (Start == Target) {
-			//たどり着いた
-			return true;
-		}
-		if (!AddOpenNode(Start, Target)) {
-			return false;
-		}
-		//隣接するOpenなNodeを取得
-		vector<CellNode> adjacentvec;
-		InOpenScore(Start, adjacentvec);
-		if (!adjacentvec.empty()) {
-			//隣接する有効なNodeを順番に検証
-			for (auto& v : adjacentvec) {
-				CellIndex Index;
-				Index.x = v.x;
-				Index.z = v.z;
-				if (SearchCellBase(Index, Target)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-
-	shared_ptr<StageCellMap> PathSearch::Impl::GetStageCellMap() const {
-		auto ShCellMap = m_StageCellMap.lock();
-		if (!ShCellMap) {
-			//セルマップがない
-			throw BaseException(
-				L"セルマップが指定されてません",
-				L"if (!ShCellMap)",
-				L"PathSearch::Impl::GetStageCellMap()"
-			);
-		}
-		return ShCellMap;
-	}
-
-
-
-
-
-
-
-
-	//--------------------------------------------------------------------------------------
-	///	 経路検索操舵コンポーネント
-	//--------------------------------------------------------------------------------------
-	PathSearch::PathSearch(const shared_ptr<GameObject>& GameObjectPtr,
-		const shared_ptr<StageCellMap>& StageCellMapPtr) :
-		Component(GameObjectPtr),
-		pImpl(new Impl())
-	{
-		pImpl->m_StageCellMap = StageCellMapPtr;
-	}
-
-	PathSearch::~PathSearch() {}
-
-
-	bool PathSearch::SearchCell(const Vector3& TargetPosition, vector<CellIndex>& RetCellIndexVec) {
-		//オープン・クローズリストのクリア
-		pImpl->m_OpenVec.clear();
-		pImpl->m_CloseVec.clear();
-		RetCellIndexVec.clear();
-		auto ShCellMap = pImpl->GetStageCellMap();
-		//ターゲットのインデックスを取得
-		if (!ShCellMap->FindCell(TargetPosition, pImpl->m_TargetIndex)) {
-			//無かったらリターン
-			return false;
-		}
-		auto Pos = GetGameObject()->GetComponent<Transform>()->GetWorldPosition();
-		//自分自身のインデックスを取得
-		if (!ShCellMap->FindCell(Pos, pImpl->m_BaseIndex)) {
-			//無かったらリターン
-			return false;
-		}
-		//最初のNodeを設定
-		auto& CellVec = ShCellMap->GetCellVec();
-		CellNode Node;
-		Node.x = pImpl->m_BaseIndex.x;
-		Node.z = pImpl->m_BaseIndex.z;
-		Node.px = -1;
-		Node.pz = -1;
-		Node.cost = CellVec[pImpl->m_BaseIndex.x][pImpl->m_BaseIndex.z].m_Cost;
-		Node.heuristic = pImpl->GetHeuristic(pImpl->m_BaseIndex, pImpl->m_TargetIndex);
-		Node.score = Node.cost + Node.heuristic;
-		if (Node.cost == -1) {
-			//最初の場所が行けない場所だった
-			return false;
-		}
-		bool DirectHit = false;
-		for (UINT x = 0; x < CellVec.size(); x++) {
-			for (UINT z = 0; z < CellVec[x].size(); z++) {
-				if (CellVec[x][z].m_Cost == -1) {
-					//障害物があった
-					if (HitTest::SEGMENT_AABB(Pos, TargetPosition, CellVec[x][z].m_PieceRange)) {
-						//障害物とレイがヒットしている
-						DirectHit = true;
-						break;
-					}
-				}
-			}
-			if (DirectHit) {
-				break;
-			}
-		}
-		if (!DirectHit) {
-			//どの障害物ともヒットしてない
-			//直接ターゲットに行ける
-			//まず自分自身
-			RetCellIndexVec.push_back(pImpl->m_BaseIndex);
-			if (pImpl->m_BaseIndex != pImpl->m_TargetIndex) {
-				//続いてターゲット
-				RetCellIndexVec.push_back(pImpl->m_TargetIndex);
-			}
-			//成功
-			return true;
-		}
-		pImpl->m_OpenVec.push_back(Node);
-		if (pImpl->SearchCellBase(pImpl->m_BaseIndex, pImpl->m_TargetIndex)) {
-			//経路が見つかった
-			CellNode TempNode;
-			CellIndex TempCellIndex;
-			//最初のNodeはOpenリストにある
-			pImpl->IsInVector(pImpl->m_TargetIndex, pImpl->m_OpenVec, TempNode);
-			TempCellIndex.x = TempNode.x;
-			TempCellIndex.z = TempNode.z;
-			RetCellIndexVec.push_back(TempCellIndex);
-			while (pImpl->m_BaseIndex != TempCellIndex) {
-				//2番目以降はCloseリストにある
-				TempCellIndex.x = TempNode.px;
-				TempCellIndex.z = TempNode.pz;
-				if (!pImpl->IsInVector(TempCellIndex, pImpl->m_CloseVec, TempNode)) {
-					break;
-				}
-				RetCellIndexVec.push_back(TempCellIndex);
-				TempCellIndex.x = TempNode.x;
-				TempCellIndex.z = TempNode.z;
-			}
-			//逆順にして終了
-			std::reverse(RetCellIndexVec.begin(), RetCellIndexVec.end());
-			return true;
-		}
-		//経路が見つからなかった
-		return false;
-
-	}
 
 }
 //end basecross

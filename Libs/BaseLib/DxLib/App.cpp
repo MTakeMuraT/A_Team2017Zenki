@@ -1,7 +1,7 @@
 /*!
 @file App.cpp
 @brief アプリケーションクラス。入力機器等実体
-@copyright Copyright (c) 2017 WiZ Tamura Hiroki,Yamanoi Yasushi.
+@copyright Copyright (c) 2016 WiZ Tamura Hiroki,Yamanoi Yasushi.
 */
 #include "stdafx.h"
 
@@ -19,9 +19,7 @@ namespace basecross {
 		IXAudio2MasteringVoice* m_musicMasteringVoice;
 		IXAudio2MasteringVoice* m_soundEffectMasteringVoice;
 		Impl() :
-			m_audioAvailable{ false },
-			m_musicMasteringVoice(nullptr),
-			m_soundEffectMasteringVoice(nullptr)
+			m_audioAvailable{ false }
 		{}
 		~Impl() {}
 	};
@@ -35,16 +33,7 @@ namespace basecross {
 		pImpl(new Impl)
 	{
 	}
-	AudioManager::~AudioManager() {
-		if (pImpl->m_soundEffectEngine) {
-			pImpl->m_soundEffectEngine->StopEngine();
-			pImpl->m_soundEffectEngine = nullptr;
-		}
-		if (pImpl->m_musicEngine) {
-			pImpl->m_musicEngine->StopEngine();
-			pImpl->m_musicEngine = nullptr;
-		}
-	}
+	AudioManager::~AudioManager() {}
 
 	void AudioManager::CreateDeviceIndependentResources()
 	{
@@ -477,8 +466,7 @@ namespace basecross {
 		m_FullScreen{ FullScreen },
 		m_GameWidth{ Width },
 		m_GameHeight{ Height },
-		m_Timer(),
-		m_ScriptsDirActive(false)
+		m_Timer()
 	{
 		try {
 			//基準ディレクトリの設定
@@ -548,54 +536,6 @@ namespace basecross {
 			}
 			m_wstrShadersPath = m_wstrDataPath + L"Shaders\\";
 			m_wstrRelativeShadersPath = m_wstrRelativeDataPath + L"Shaders\\";
-
-			//Scriptsディレクトリを探す
-			m_wstrScriptsPath = m_wstrDir;
-			m_wstrScriptsPath += L"scripts";
-			//まず、実行ファイルと同じディレクトリを探す
-			RetCode = GetFileAttributes(m_wstrScriptsPath.c_str());
-			if (RetCode == 0xFFFFFFFF) {
-				//失敗した
-				m_wstrScriptsPath = m_wstrDir;
-				m_wstrScriptsPath += L"..\\scripts";
-				RetCode = GetFileAttributes(m_wstrDataPath.c_str());
-				if (RetCode == 0xFFFFFFFF) {
-					//再び失敗した
-					//Scriptsディレクトリは必須ではないので再び
-					//実行ファイルと同じディレクトリに設定
-					m_ScriptsDirActive = false;
-					m_wstrScriptsPath = L"";
-					m_wstrScriptsPath += L"";
-				}
-				else {
-					m_ScriptsDirActive = true;
-					m_wstrScriptsPath += L"\\";
-					//相対パスの設定
-					m_wstrRelativeScriptsPath = L"..\\scripts\\";
-				}
-			}
-			else {
-				m_ScriptsDirActive = true;
-				m_wstrScriptsPath += L"\\";
-				//相対パスの設定
-				m_wstrRelativeScriptsPath = L"scripts\\";
-			}
-
-			//Assetsディレクトリを探す
-			m_wstrRelativeAssetsPath = m_wstrDir;
-			m_wstrRelativeAssetsPath += L"..\\..\\Assets";
-			//相対ディレクトリを探す
-			RetCode = GetFileAttributes(m_wstrRelativeAssetsPath.c_str());
-			if (RetCode == 0xFFFFFFFF) {
-				//失敗した
-				//アセットディレクトリをメディアディレクトリにする
-				m_wstrRelativeAssetsPath = m_wstrRelativeDataPath;
-			}
-			else {
-				//成功した
-				m_wstrRelativeAssetsPath += L"\\";
-			}
-
 
 
 			////デバイスリソースの構築

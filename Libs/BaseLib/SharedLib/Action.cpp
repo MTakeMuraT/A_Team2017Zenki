@@ -1,7 +1,7 @@
 /*!
 @file Action.cpp
 @brief アクション系コンポーネント実体
-@copyright Copyright (c) 2017 WiZ Tamura Hiroki,Yamanoi Yasushi.
+@copyright Copyright (c) 2016 WiZ Tamura Hiroki,Yamanoi Yasushi.
 */
 #include "stdafx.h"
 
@@ -697,13 +697,13 @@ namespace basecross {
 	//操作
 	void MoveComponent::Run() {
 		auto TransPtr = GetGameObject()->GetComponent<Transform>();
-		pImpl->m_StartPosition = TransPtr->GetWorldPosition();
+		pImpl->m_StartPosition = TransPtr->GetPosition();
 		SetNowTime(0);
 		SetRun(true);
 		SetArrived(false);
 		if (GetTotalTime() <= 0) {
 			//トータルタイムが0以下なら、すでに到着していることになる
-			TransPtr->SetWorldPosition(pImpl->m_TargetPosition);
+			TransPtr->SetPosition(pImpl->m_TargetPosition);
 			SetTotalTime(0);
 			SetNowTime(0);
 			SetRun(false);
@@ -753,12 +753,12 @@ namespace basecross {
 						pImpl->m_RateZ
 						);
 				}
-				PtrTrans->SetWorldPosition(Pos);
+				PtrTrans->SetPosition(Pos);
 			}
 			else {
 				if (GetTotalTime() <= 0) {
 					//トータルタイムが0以下なら、すでに到着していることになる
-					PtrTrans->SetWorldPosition(pImpl->m_TargetPosition);
+					PtrTrans->SetPosition(pImpl->m_TargetPosition);
 					SetTotalTime(0);
 					SetNowTime(0);
 					SetRun(false);
@@ -885,7 +885,7 @@ namespace basecross {
 	//操作
 	void MoveBy::Run() {
 		auto PtrTrans = GetGameObject()->GetComponent<Transform>();
-		Vector3 Pos = PtrTrans->GetWorldPosition();
+		Vector3 Pos = PtrTrans->GetPosition();
 		Vector3 Target = Pos + pImpl->m_LocalVector;
 		SetTargetPosition(Target);
 		MoveComponent::Run();

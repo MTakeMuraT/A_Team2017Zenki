@@ -2,7 +2,7 @@
 @file MathVector.h
 @brief ベクトル計算の計算クラス<br />
 XNAMATH のラッピング関数群
-@copyright Copyright (c) 2017 WiZ Tamura Hiroki,Yamanoi Yasushi.
+@copyright Copyright (c) 2016 WiZ Tamura Hiroki,Yamanoi Yasushi.
 */
 
 #pragma once
@@ -44,16 +44,6 @@ namespace basecross{
 		*/
 		//--------------------------------------------------------------------------------------
 		Vector2(const XMVECTOR& other) :XMFLOAT2() {
-			XMVECTOR temp = other;
-			XMStoreFloat2(this, temp);
-		}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	コンストラクタ
-		@param[in]	other	XMVECTORF32
-		*/
-		//--------------------------------------------------------------------------------------
-		Vector2(const XMVECTORF32& other) :XMFLOAT2() {
 			XMVECTOR temp = other;
 			XMStoreFloat2(this, temp);
 		}
@@ -758,16 +748,6 @@ namespace basecross{
 		}
 		//--------------------------------------------------------------------------------------
 		/*!
-		@brief	コンストラクタ
-		@param[in]	other	XMVECTORF32
-		*/
-		//--------------------------------------------------------------------------------------
-		Vector3(const XMVECTORF32& other) :XMFLOAT3() {
-			XMVECTOR temp = other;
-			XMStoreFloat3(this, temp);
-		}
-		//--------------------------------------------------------------------------------------
-		/*!
 		@brief	コンストラクタ（値セット）
 		@param[in]	x	X値
 		@param[in]	y	Y値
@@ -1437,63 +1417,6 @@ namespace basecross{
 		}
 		//--------------------------------------------------------------------------------------
 		/*!
-		@brief	現在のベクトルと法線ベクトルからスライドするベクトルを得てthisに設定する。
-		@param[in]	Normal	法線ベクトル
-		@param[in]	RefractionIndex	屈折率
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		void Slide(const Vector3& Norm) {
-			//thisと法線から直行線の長さ（内積で求める）
-			float Len = Dot(Norm);
-			//その長さに伸ばす
-			Vector3 Contact = Norm * Len;
-			//スライドする方向は現在のベクトルから引き算
-			*this = (*this - Contact);
-		}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	スクリーン座標のthisをパラメータによって３D空間に射影する。
-		@param[in]	ViewportX	ビューポートの左
-		@param[in]	ViewportY	ビューポートの上
-		@param[in]	ViewportWidth	ビューポートの幅
-		@param[in]	ViewportHeight	ビューポートの高さ
-		@param[in]	ViewportMinZ	ビューポートの奥行最小値
-		@param[in]	ViewportMaxZ	ビューポートの奥行最大値
-		@param[in]	Projection	射影行列
-		@param[in]	View	ビュー行列
-		@param[in]	World	ワールド行列
-		@return	なし（thisに結果を代入する）
-		*/
-		//--------------------------------------------------------------------------------------
-		void Unproject(float ViewportX,float ViewportY,float ViewportWidth,float ViewportHeight,
-			float ViewportMinZ,float ViewportMaxZ,
-			const XMMATRIX& Projection, const XMMATRIX& View, const XMMATRIX& World
-			) {
-			*this = XMVector3Unproject(XMVECTOR(*this),
-				ViewportX,
-				ViewportY,
-				ViewportWidth,
-				ViewportHeight,
-				ViewportMinZ,
-				ViewportMaxZ,
-				Projection,
-				View,
-				World
-			);
-		}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	3D位置のthisを左上原点のスクリーン座標に変換する(結果のzは、NearとFarの範囲外の値は不定になるので注意)
-		@param[in]	m	トランスフォームする行列(world,view,projを掛けたもの)
-		@param[in]	ViewWidth	ビューポート幅
-		@param[in]	ViewHeight	ビューポート高さ
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		inline void WorldToSCreen(const Matrix4X4& m, float ViewWidth, float ViewHeight);
-		//--------------------------------------------------------------------------------------
-		/*!
 		@brief	thisをmによってトランスフォームされたベクトルを設定する(XMMATRIX版)。
 		@param[in]	m	トランスフォームする行列
 		@return	なし
@@ -1546,17 +1469,6 @@ namespace basecross{
 			XMVECTOR temp = other;
 			XMStoreFloat4(this, temp);
 		}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	コンストラクタ
-		@param[in]	other	XMVECTORF32
-		*/
-		//--------------------------------------------------------------------------------------
-		Vector4(const XMVECTORF32& other) :XMFLOAT4() {
-			XMVECTOR temp = other;
-			XMStoreFloat4(this, temp);
-		}
-
 		//--------------------------------------------------------------------------------------
 		/*!
 		@brief	コンストラクタ（値セット）
@@ -2351,16 +2263,6 @@ namespace basecross{
 		}
 		//--------------------------------------------------------------------------------------
 		/*!
-		@brief	コンストラクタ（値セット）
-		@param[in]	all	all値
-		*/
-		//--------------------------------------------------------------------------------------
-		XMVector(float all) :
-			XMFLOAT4(all, all, all, all) {
-		}
-
-		//--------------------------------------------------------------------------------------
-		/*!
 		@brief	コピーコンストラクタ
 		@param[in]	other	コピー元
 		*/
@@ -2759,39 +2661,6 @@ namespace basecross{
 		//--------------------------------------------------------------------------------------
 		void Ceiling(const XMVector& other) {
 			*this = XMVectorCeiling(XMVECTOR(other));
-		}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	各要素の指定された最大値と最小値の範囲にクランプする
-		@param[in]	min	最小値
-		@param[in]	max	最大値
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		void Clamp(const XMVector& min, const XMVector& max) {
-			*this = XMVectorClamp(XMVECTOR(*this), XMVECTOR(min), XMVECTOR(max));
-		}
-
-
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	thisの平方根を計算し、設定する
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		void Sqrt() {
-			*this = XMVectorSqrt(XMVECTOR(*this));
-		}
-
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	累乗を計算し、設定する
-		@param[in]	other	相手（何乗か）
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		void Pow(const XMVector& other) {
-			*this = XMVectorPow(XMVECTOR(*this),XMVECTOR(other));
 		}
 
 

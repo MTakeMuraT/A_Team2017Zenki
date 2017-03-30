@@ -1,20 +1,13 @@
 /*!
 @file DrawComponents.h
 @brief 描画コンポーネント
-@copyright Copyright (c) 2017 WiZ Tamura Hiroki,Yamanoi Yasushi.
+@copyright Copyright (c) 2016 WiZ Tamura Hiroki,Yamanoi Yasushi.
 */
 #pragma once
 #include "stdafx.h"
 
 namespace basecross {
-
-	//--------------------------------------------------------------------------------------
-	/*!
-	@brief	ビューポートとシサー矩形設定
-	@param[in]	vp	ビューポート
-	@return	なし
-	*/
-	//--------------------------------------------------------------------------------------
+	//ビューポート設定
 	inline void RsSetViewport(const Viewport& vp) {
 		auto Dev = App::GetApp()->GetDeviceResources();
 		auto pID3D11DeviceContext = Dev->GetD3DDeviceContext();
@@ -37,19 +30,13 @@ namespace basecross {
 
 
 
-	//--------------------------------------------------------------------------------------
-	///	Shadowコンスタントバッファ構造体
-	//--------------------------------------------------------------------------------------
+	//Shadow
 	struct ShadowConstantBuffer
 	{
-		/// ワールド行列
 		XMMATRIX mWorld;
-		/// ビュー行列
 		XMMATRIX mView;
-		/// 射影行列
 		XMMATRIX mProj;
-		/// Bone用
-		XMVECTOR Bones[3 * 72];
+		XMVECTOR Bones[3 * 72];	//Bone用
 		ShadowConstantBuffer() {
 			memset(this, 0, sizeof(ShadowConstantBuffer));
 		};
@@ -59,16 +46,11 @@ namespace basecross {
 	DECLARE_DX11_VERTEX_SHADER(VSShadowmapBone, VertexPositionNormalTextureSkinning)
 
 
-	//--------------------------------------------------------------------------------------
-	///	スプライト用コンスタントバッファ構造体
-	//--------------------------------------------------------------------------------------
+	//スプライト用コンスタントバッファ構造体
 	struct SpriteConstantBuffer
 	{
-		/// ワールド行列
 		Matrix4X4 World;
-		/// エミッシブ色
 		Color4 Emissive;
-		/// デフューズ色
 		Color4 Diffuse;
 		SpriteConstantBuffer() {
 			memset(this, 0, sizeof(SpriteConstantBuffer));
@@ -87,20 +69,13 @@ namespace basecross {
 	DECLARE_DX11_PIXEL_SHADER(PSPCTSprite)
 
 
-	//--------------------------------------------------------------------------------------
-	///	static系コンスタントバッファ構造体
-	//--------------------------------------------------------------------------------------
+	// static系コンスタントバッファ
 	struct StaticConstantBuffer
 	{
-		/// ワールド行列
 		Matrix4X4 World;
-		/// ビュー行列
 		Matrix4X4 View;
-		/// 射影行列
 		Matrix4X4 Projection;
-		/// エミッシブ色
 		Color4 Emissive;
-		/// デフューズ色
 		Color4 Diffuse;
 		StaticConstantBuffer() {
 			memset(this, 0, sizeof(StaticConstantBuffer));
@@ -119,22 +94,16 @@ namespace basecross {
 	DECLARE_DX11_VERTEX_SHADER(VSPCTStatic, VertexPositionColorTexture)
 	DECLARE_DX11_PIXEL_SHADER(PSPCTStatic)
 
-	//--------------------------------------------------------------------------------------
-	///	ライティングを使用するstatic系コンスタントバッファ構造体
-	//--------------------------------------------------------------------------------------
+
+
+	//ライティングを使用する static系コンスタントバッファ
 	struct StaticLightingConstantBuffer
 	{
-		/// ワールド行列
 		Matrix4X4 World;
-		/// ビュー行列
 		Matrix4X4 View;
-		/// 射影行列
 		Matrix4X4 Projection;
-		/// ライイト方向
 		Vector4 LightDir;
-		/// エミッシブ色
 		Color4 Emissive;
-		/// デフューズ色
 		Color4 Diffuse;
 		StaticLightingConstantBuffer() {
 			memset(this, 0, sizeof(StaticLightingConstantBuffer));
@@ -152,24 +121,15 @@ namespace basecross {
 	DECLARE_DX11_PIXEL_SHADER(PSPNTStaticMidium)
 	DECLARE_DX11_PIXEL_SHADER(PSPNTStaticMidiumNoTex)
 
-	//--------------------------------------------------------------------------------------
-	///	リアルライティングを使用するstatic系コンスタントバッファ構造体
-	//--------------------------------------------------------------------------------------
+	//リアルライティングを使用する static系コンスタントバッファ
 	struct StaticRealLightingConstantBuffer
 	{
-		/// ワールド行列
 		Matrix4X4 World;
-		/// ビュー行列
 		Matrix4X4 View;
-		/// 射影行列
 		Matrix4X4 Projection;
-		/// ライイト方向
 		Vector4 LightDir;
-		/// エミッシブ色
 		Color4 Emissive;
-		/// デフューズ色
 		Color4 Diffuse;
-		/// Eyeの位置
 		Vector4 EyePosition;
 		StaticRealLightingConstantBuffer() {
 			memset(this, 0, sizeof(StaticRealLightingConstantBuffer));
@@ -183,32 +143,18 @@ namespace basecross {
 
 
 
-	//--------------------------------------------------------------------------------------
-	///	影付きstatic系コンスタントバッファ構造体
-	//--------------------------------------------------------------------------------------
 	struct PNTStaticShadowConstantBuffer
 	{
-		/// ワールド行列
 		Matrix4X4 World;
-		/// ビュー行列
 		Matrix4X4 View;
-		/// 射影行列
 		Matrix4X4 Projection;
-		/// ライイト方向
 		Vector4 LightDir;
-		/// エミッシブ色
 		Color4 Emissive;
-		/// デフューズ色
 		Color4 Diffuse;
-		/// ライト位置
 		Vector4 LightPos;
-		/// Eyeの位置
 		Vector4 EyePos;
-		/// 汎用フラグ
-		XMUINT4 ActiveFlg;
-		/// ライトビュー行列
+		XMUINT4 ActiveFlg;			//汎用フラグ
 		Matrix4X4 LightView;
-		/// ライト射影行列
 		Matrix4X4 LightProjection;
 		PNTStaticShadowConstantBuffer() {
 			memset(this, 0, sizeof(PNTStaticShadowConstantBuffer));
@@ -221,24 +167,15 @@ namespace basecross {
 	DECLARE_DX11_PIXEL_SHADER(PSPNTStaticShadow2)
 
 
-	//--------------------------------------------------------------------------------------
-	///	Bone付コンスタントバッファ構造体
-	//--------------------------------------------------------------------------------------
+	//PNTBone
 	struct PNTBoneConstantBuffer
 	{
-		/// ワールド行列
 		Matrix4X4 World;
-		/// ビュー行列
 		Matrix4X4 View;
-		/// 射影行列
 		Matrix4X4 Projection;
-		/// ライイト方向
 		Vector4 LightDir;
-		/// エミッシブ色
 		Color4 Emissive;
-		/// デフューズ色
 		Color4 Diffuse;
-		/// Bone配列
 		XMVECTOR Bones[3 * 72];
 		PNTBoneConstantBuffer() {
 			memset(this, 0, sizeof(PNTBoneConstantBuffer));
@@ -249,26 +186,17 @@ namespace basecross {
 	DECLARE_DX11_VERTEX_SHADER(VSPNTBone, VertexPositionNormalTextureSkinning)
 	DECLARE_DX11_VERTEX_SHADER(VSPNTBoneMidium, VertexPositionNormalTextureSkinning)
 
-	//--------------------------------------------------------------------------------------
-	///	リアルライティングを使用するBone付コンスタントバッファ構造体
-	//--------------------------------------------------------------------------------------
+
+	//リアルライティングを使用する static系コンスタントバッファ
 	struct PNTBoneRealLightingConstantBuffer
 	{
-		/// ワールド行列
 		Matrix4X4 World;
-		/// ビュー行列
 		Matrix4X4 View;
-		/// 射影行列
 		Matrix4X4 Projection;
-		/// ライイト方向
 		Vector4 LightDir;
-		/// エミッシブ色
 		Color4 Emissive;
-		/// デフューズ色
 		Color4 Diffuse;
-		/// Eyeの位置
 		Vector4 EyePosition;
-		/// Bone配列
 		XMVECTOR Bones[3 * 72];
 		PNTBoneRealLightingConstantBuffer() {
 			memset(this, 0, sizeof(PNTBoneRealLightingConstantBuffer));
@@ -280,34 +208,19 @@ namespace basecross {
 
 
 
-	//--------------------------------------------------------------------------------------
-	///	影とBone付コンスタントバッファ構造体
-	//--------------------------------------------------------------------------------------
 	struct PNTBoneShadowConstantBuffer
 	{
-		/// ワールド行列
 		Matrix4X4 World;
-		/// ビュー行列
 		Matrix4X4 View;
-		/// 射影行列
 		Matrix4X4 Projection;
-		/// ライイト方向
 		Vector4 LightDir;
-		/// エミッシブ色
 		Color4 Emissive;
-		/// デフューズ色
 		Color4 Diffuse;
-		/// ライト位置
 		Vector4 LightPos;
-		/// Eyeの位置
 		Vector4 EyePos;
-		/// テクスチャ=xがアクティブかどうか
-		XMUINT4 ActiveFlg;
-		/// ライトビュー行列
+		XMUINT4 ActiveFlg;			//テクスチャ=xがアクティブかどうか
 		Matrix4X4 LightView;
-		/// ライト射影行列
 		Matrix4X4 LightProjection;
-		/// Bone配列
 		XMVECTOR Bones[3 * 72];
 		PNTBoneShadowConstantBuffer() {
 			memset(this, 0, sizeof(PNTBoneShadowConstantBuffer));
@@ -375,12 +288,6 @@ namespace basecross {
 		*/
 		//--------------------------------------------------------------------------------------
 		void SetBlendState(const BlendState state);
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	ブレンドステートのデバイスへの設定。
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
 		void SetDeviceBlendState();
 		//--------------------------------------------------------------------------------------
 		/*!
@@ -390,12 +297,6 @@ namespace basecross {
 		*/
 		//--------------------------------------------------------------------------------------
 		void SetDepthStencilState(const DepthStencilState state);
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	デプスステンシルステートのデバイスへの設定
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
 		void SetDeviceDepthStencilState();
 		//--------------------------------------------------------------------------------------
 		/*!
@@ -405,12 +306,6 @@ namespace basecross {
 		*/
 		//--------------------------------------------------------------------------------------
 		void SetRasterizerState(const RasterizerState state);
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	ラスタライザステートのデバイスへの設定
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
 		void SetDeviceRasterizerState();
 		//--------------------------------------------------------------------------------------
 		/*!
@@ -420,12 +315,6 @@ namespace basecross {
 		*/
 		//--------------------------------------------------------------------------------------
 		void SetSamplerState(const SamplerState state);
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	サンプラーステートのデバイスへの設定
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
 		void SetDeviceSamplerState();
 		//--------------------------------------------------------------------------------------
 		/*!
@@ -462,145 +351,34 @@ namespace basecross {
 	};
 
 	//--------------------------------------------------------------------------------------
-	///	シャドウマップコンポーネント（前処理用）
+	//	シャドウマップコンポーネント（前処理用）
 	//--------------------------------------------------------------------------------------
 	class Shadowmap : public DrawComponent {
 	public:
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	コンストラクタ
-		@param[in]	GameObjectPtr	ゲームオブジェクト
-		*/
-		//--------------------------------------------------------------------------------------
 		explicit Shadowmap(const shared_ptr<GameObject>& GameObjectPtr);
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	デストラクタ
-		*/
-		//--------------------------------------------------------------------------------------
 		virtual ~Shadowmap();
 		//アクセサ
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	ライトの高さを得る
-		@return	ライトの高さ
-		*/
-		//--------------------------------------------------------------------------------------
 		static float GetLightHeight();
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	ライトのNear値を得る
-		@return	ライトのNear値
-		*/
-		//--------------------------------------------------------------------------------------
 		static float GetLightNear();
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	ライトのFar値を得る
-		@return	ライトのFar値
-		*/
-		//--------------------------------------------------------------------------------------
 		static float GetLightFar();
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	ビューの幅を得る
-		@return	ビューの幅
-		*/
-		//--------------------------------------------------------------------------------------
 		static float GetViewWidth();
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	ビューの高さを得る
-		@return	ビューの高さ
-		*/
-		//--------------------------------------------------------------------------------------
 		static float GetViewHeight();
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	ライトの高さを設定する
-		@param[in]	f	高さ
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
+
 		static void SetLightHeight(float f);
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	ライトのNear値を設定する
-		@param[in]	f	Near値
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
 		static void SetLightNear(float f);
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	ライトのFar値を設定する
-		@param[in]	f	Far値
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
 		static void SetLightFar(float f);
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	ビューの幅を設定する
-		@param[in]	f	ビューの幅
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
 		static void SetViewWidth(float f);
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	ビューの高さを設定する
-		@param[in]	f	ビューの高さ
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
 		static void SetViewHeight(float f);
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	ビューの幅及び高さを同じ値に設定する
-		@param[in]	f	ビューの幅及び高さ（同値）
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
 		static void SetViewSize(float f);
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	メッシュリソースを得る
-		@param[in]	ExceptionActive	エラー時に例外が発生するかどうか
-		@return	メッシュリソース
-		*/
-		//--------------------------------------------------------------------------------------
+
+
 		shared_ptr<MeshResource> GetMeshResource(bool ExceptionActive = true) const;
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	メッシュリソースを設定する
-		@param[in]	ResKey	メッシュリソースのキー
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
 		void SetMeshResource(const wstring& ResKey);
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	メッシュリソースを設定する
-		@param[in]	MeshResourcePtr	メッシュリソース
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
 		void SetMeshResource(const shared_ptr<MeshResource>& MeshResourcePtr);
+
+
 		//操作
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	更新処理。（空関数）
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
 		virtual void OnUpdate()override {}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	描画処理。
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
 		virtual void OnDraw()override;
 	private:
 		// pImplイディオム
@@ -620,10 +398,9 @@ namespace basecross {
 		@brief	コンストラクタ
 		@param[in]	GameObjectPtr	ゲームオブジェクト
 		@param[in]	MaxInstance	パーティクル数上限
-		@param[in]	AddType	加算処理するかどうか
 		*/
 		//--------------------------------------------------------------------------------------
-		explicit PCTParticleDraw(const shared_ptr<GameObject>& GameObjectPtr, size_t MaxInstance,bool AddType = false);
+		explicit PCTParticleDraw(const shared_ptr<GameObject>& GameObjectPtr, size_t MaxInstance);
 		//--------------------------------------------------------------------------------------
 		/*!
 		@brief	デストラクタ
@@ -637,13 +414,10 @@ namespace basecross {
 		@param[in]	ToCaneraLength	カメラまでの距離
 		@param[in]	WorldMatrix	ワールド行列
 		@param[in]	TextureRes	テクスチャ
-		@param[in]	TextureRes	テクスチャ
-		@param[in]	Diffuse   Diffuseカラー
 		@return	なし
 		*/
 		//--------------------------------------------------------------------------------------
-		void AddParticle(float ToCaneraLength, const Matrix4X4& WorldMatrix, 
-			const shared_ptr<TextureResource>& TextureRes,const Color4& Diffuse = Color4(1,1,1,1));
+		void AddParticle(float ToCaneraLength, const Matrix4X4& WorldMatrix, const shared_ptr<TextureResource>& TextureRes);
 		//--------------------------------------------------------------------------------------
 		/*!
 		@brief	OnCreate処理
@@ -1787,49 +1561,16 @@ namespace basecross {
 		*/
 		//--------------------------------------------------------------------------------------
 		void SetLighting(ShaderLighting Lighting);
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	影を描画するかどうか得る
-		@return	影を描画すればtrue
-		*/
-		//--------------------------------------------------------------------------------------
+
+
+
 		bool GetOwnShadowActive() const;
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	影を描画するかどうか得る
-		@return	影を描画すればtrue
-		*/
-		//--------------------------------------------------------------------------------------
 		bool IsOwnShadowActive() const;
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	影を描画するかどうか設定する
-		@param[in]	b		影を描画するかどうか
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
 		void SetOwnShadowActive(bool b);
+
 		//操作
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	OnCreate処理
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
 		virtual void OnCreate()override;
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	OnUpdate処理（空関数）
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
 		virtual void OnUpdate()override {}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	OnDraw処理
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
 		virtual void OnDraw()override;
 	private:
 		// pImplイディオム
@@ -1845,15 +1586,15 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	struct	AnimationData
 	{
-		///	スタートサンプル
+		//!	スタートサンプル
 		UINT	m_StartSample;
-		///	サンプルの長さ
+		//!	サンプルの長さ
 		UINT	m_SampleLength;
-		///	ループするかどうか
+		//!	ループするかどうか
 		bool	m_IsLoop;
-		///	アニメが終了したかどうか
+		//!	アニメが終了したかどうか
 		bool	m_IsAnimeEnd;
-		///	1秒当たりのフレーム
+		//!	1秒当たりのフレーム
 		float	m_SamplesParSecond;
 		//--------------------------------------------------------------------------------------
 		/*!
@@ -2079,16 +1820,12 @@ namespace basecross {
 		@brief	ワイアフレーム描画処理
 		@param[in]	GameObj	ゲームオブジェクト
 		@param[in]	Mesh	PCメッシュ
-
 		@return	なし
 		*/
 		//--------------------------------------------------------------------------------------
 		void DrawWireFrame(const shared_ptr<GameObject>& GameObj,
-			const shared_ptr<MeshResource>& Mesh,const Matrix4X4& MeshToTransformMatrix = Matrix4X4());
+			const shared_ptr<MeshResource>& Mesh);
 	};
-
-
-
 
 }
 //end basecross

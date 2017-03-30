@@ -1,7 +1,7 @@
 /*!
 @file VertexHelper.h
 @brief 頂点定義、等
-@copyright Copyright (c) 2017 WiZ Tamura Hiroki,Yamanoi Yasushi.
+@copyright Copyright (c) 2016 WiZ Tamura Hiroki,Yamanoi Yasushi.
 */
 #pragma once
 
@@ -402,60 +402,6 @@ namespace basecross{
 			return  ARRAYSIZE( VertexPositionNormalColorTextureLayout );
 		}
 	};
-
-	//--------------------------------------------------------------------------------------
-	/// 位置と法線とタンジェントとテクスチャを持つ入力レイアウトの定義
-	//--------------------------------------------------------------------------------------
-	const D3D11_INPUT_ELEMENT_DESC VertexPositionNormalTangentTextureLayout[] =
-	{
-		{ "SV_Position", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "NORMAL",      0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TANGENT",     0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD",    0, DXGI_FORMAT_R32G32_FLOAT,       0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	};
-
-	//--------------------------------------------------------------------------------------
-	/// 位置と法線とタンジェントとテクスチャを持つ頂点の定義
-	//--------------------------------------------------------------------------------------
-	struct VertexPositionNormalTangentTexture
-	{
-		VertexPositionNormalTangentTexture()
-		{ }
-
-
-		VertexPositionNormalTangentTexture(XMFLOAT3 const& pos, XMFLOAT3 const& norm, XMFLOAT4 const& tan, XMFLOAT2 const& tex)
-			: position(pos),
-			normal(norm),
-			tangent(tan),
-			textureCoordinate(tex)
-		{
-		}
-
-		VertexPositionNormalTangentTexture(FXMVECTOR pos, FXMVECTOR norm, FXMVECTOR tan, CXMVECTOR tex)
-			: position(pos),
-			normal(norm),
-			tangent(tan),
-			textureCoordinate(tex)
-		{
-		}
-
-
-		Vector3 position;
-		Vector3 normal;
-		Vector4 tangent;
-		Vector2 textureCoordinate;
-
-
-		static const D3D11_INPUT_ELEMENT_DESC* GetVertexElement() {
-			return VertexPositionNormalTangentTextureLayout;
-		}
-		static UINT GetNumElements() {
-			return  ARRAYSIZE(VertexPositionNormalTangentTextureLayout);
-		}
-	};
-
-
-
 
 	//--------------------------------------------------------------------------------------
 	/// 位置と法線とタンジェントと色とテクスチャを持つ入力レイアウトの定義

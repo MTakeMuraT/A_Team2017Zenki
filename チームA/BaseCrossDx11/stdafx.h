@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include "targetver.h"
 
 #define WIN32_LEAN_AND_MEAN             // Windows ヘッダーから使用されていない部分を除外します。
 // Windows ヘッダー ファイル:
@@ -129,6 +128,5 @@ using namespace Microsoft::WRL::Details;
 #include "../../Libs/BaseLib/Dx11Lib/Common.h"
 #include "../../Libs/BaseLib/Dx11FullLib/FullCommon.h"
 
-#include "resource.h"
 
 

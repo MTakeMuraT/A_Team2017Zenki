@@ -1,7 +1,7 @@
 /*!
 @file App.h
 @brief アプリケーションクラス。入力機器等
-@copyright Copyright (c) 2017 WiZ Tamura Hiroki,Yamanoi Yasushi.
+@copyright Copyright (c) 2016 WiZ Tamura Hiroki,Yamanoi Yasushi.
 */
 #pragma once
 #include "stdafx.h"
@@ -633,34 +633,20 @@ namespace basecross {
 		{
 			void operator()(App *p) { delete p; }
 		};
-		static unique_ptr<App, AppDeleter> m_App;		///< Singletonで利用する自分自身のポインタ
-		HINSTANCE m_hInstance;							///< モジュールのインスタンス
-		HWND m_hWnd;									///< メインウインドウのハンドル
-		bool m_FullScreen;								///< フルスクリーンかどうか
-		UINT m_GameWidth;								///< ゲーム盤幅(ピクセル)
-		UINT m_GameHeight;								///< ゲーム盤高さ(ピクセル)
-		shared_ptr<DeviceResources> m_DeviceResources;	///< デバイス
-		shared_ptr<SceneInterface> m_SceneInterface;	///< シーン
-		shared_ptr<EventDispatcher> m_EventDispatcher;	///< イベント送信オブジェクト
+		static unique_ptr<App, AppDeleter> m_App;		// Singletonで利用する自分自身のポインタ
+		HINSTANCE m_hInstance;							// モジュールのインスタンス
+		HWND m_hWnd;									// メインウインドウのハンドル
+		bool m_FullScreen;								// フルスクリーンかどうか
+		UINT m_GameWidth;								// ゲーム盤幅(ピクセル)
+		UINT m_GameHeight;								// ゲーム盤高さ(ピクセル)
+		shared_ptr<DeviceResources> m_DeviceResources;	// デバイス
+		shared_ptr<SceneInterface> m_SceneInterface;	// シーン
+		shared_ptr<EventDispatcher> m_EventDispatcher;	// イベント送信オブジェクト
 
-		map<wstring, shared_ptr<BaseResource> > m_ResMap;		///< キーとリソースを結び付けるマップ
-		StepTimer m_Timer;										///< タイマー
-		InputDevice m_InputDevice;					///< 入力機器
-		unique_ptr<AudioManager> m_AudioManager;	///< オーディオマネージャ
-
-		wstring		m_wstrModulePath;		///< モジュール名フルパス
-		wstring		m_wstrDir;				///< モジュールがあるディレクトリ
-		wstring		m_wstrDataPath;			///< 絶対パスのメディアディレクトリ
-		wstring		m_wstrShadersPath;		///< 絶対パスのシェーダディレクトリ
-		wstring		m_wstrRelativeDataPath;	///< 相対パスのメディアディレクトリ
-		wstring		m_wstrRelativeShadersPath;	///< 相対パスのシェーダディレクトリ
-
-		bool m_ScriptsDirActive;				///<スクリプトディレクトリが有効かどうか
-		wstring		m_wstrScriptsPath;			///< 絶対パスのスクリプトディレクトリ
-		wstring		m_wstrRelativeScriptsPath;	///< 相対パスのスクリプトディレクトリ
-
-		wstring		m_wstrRelativeAssetsPath;	///< 相対パスのアセットディレクトリ
-
+		map<wstring, shared_ptr<BaseResource> > m_ResMap;		// キーとリソースを結び付けるマップ
+		StepTimer m_Timer;										// タイマー
+		InputDevice m_InputDevice;					// 入力機器
+		unique_ptr<AudioManager> m_AudioManager;	// オーディオマネージャ
 		App(HINSTANCE hInstance, HWND hWnd, bool FullScreen, UINT Width, UINT Height);
 		virtual ~App() {}
 	public:
@@ -1089,17 +1075,6 @@ namespace basecross {
 		}
 		//--------------------------------------------------------------------------------------
 		/*!
-		@brief モジュールディレクトリの取得
-		@param[out]	Dir 取得する文字列
-		@return	なし（Dirに相対パスが入る）
-		*/
-		//--------------------------------------------------------------------------------------
-		void GetModuleDirectory(wstring& Dir) {
-			Dir = m_wstrDir;
-		}
-
-		//--------------------------------------------------------------------------------------
-		/*!
 		@brief データディレクトリの取得
 		@param[out]	Dir 取得する文字列
 		@return	なし（Dirに相対パスが入る）
@@ -1108,16 +1083,6 @@ namespace basecross {
 		void GetDataDirectory(wstring& Dir) {
 			Dir = m_wstrRelativeDataPath;
 		}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief データディレクトリの取得（文字列の参照を取得）
-		@return	データディレクトリの相対パス
-		*/
-		//--------------------------------------------------------------------------------------
-		const wstring& GetDataDirWString()const {
-			return m_wstrRelativeDataPath;
-		}
-
 		//--------------------------------------------------------------------------------------
 		/*!
 		@brief シェーダディレクトリの取得
@@ -1130,69 +1095,6 @@ namespace basecross {
 		}
 		//--------------------------------------------------------------------------------------
 		/*!
-		@brief シェーダディレクトリの取得（文字列の参照を取得）
-		@return	シェーダディレクトリの相対パス
-		*/
-		//--------------------------------------------------------------------------------------
-		const wstring& GetShadersPath()const {
-			return m_wstrRelativeShadersPath;
-		}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief スクリプトディレクトリが有効かどうか
-		@return	有効ならtrue
-		*/
-		//--------------------------------------------------------------------------------------
-		bool IsScriptsDirActive() const {
-			return m_ScriptsDirActive;
-		}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief スクリプトディレクトリの取得
-		@param[out]	Dir 取得する文字列
-		@return	なし（Dirに相対パスが入る）
-		*/
-		//--------------------------------------------------------------------------------------
-		void GetScriptsDirectory(wstring& Dir) {
-			if (!m_ScriptsDirActive) {
-				throw BaseException(
-					L"スクリプトが有効ではありません。",
-					L"if (!m_ScriptsDirActive)",
-					L"App::GetScriptsDirectory()"
-				);
-			}
-			Dir = m_wstrRelativeScriptsPath;
-		}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief スクリプトの絶対ディレクトリの取得
-		@param[out]	Dir 取得する文字列
-		@return	なし（Dirに相対パスが入る）
-		*/
-		//--------------------------------------------------------------------------------------
-		void GetScriptsFullDirectory(wstring& Dir) {
-			if (!m_ScriptsDirActive) {
-				throw BaseException(
-					L"スクリプトが有効ではありません。",
-					L"if (!m_ScriptsDirActive)",
-					L"App::GetScriptsFullDirectory()"
-				);
-			}
-			Dir = m_wstrScriptsPath;
-		}
-
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief アセットディレクトリの取得
-		@param[out]	Dir 取得する文字列
-		@return	なし（Dirに相対パスが入る）
-		*/
-		//--------------------------------------------------------------------------------------
-		void GetAssetsDirectory(wstring& Dir) {
-			Dir = m_wstrRelativeAssetsPath;
-		}
-		//--------------------------------------------------------------------------------------
-		/*!
 		@brief ウインドウメッセージ
 		@param[in]	message	メッセージ
 		@param[in]	wParam	第1パラメータ
@@ -1201,6 +1103,15 @@ namespace basecross {
 		*/
 		//--------------------------------------------------------------------------------------
 		void OnMessage(UINT message, WPARAM wParam, LPARAM lParam);
+		//--------------------------------------------------------------------------------------
+		//	公開変数
+		//--------------------------------------------------------------------------------------
+		wstring		m_wstrModulePath;		///< モジュール名フルパス
+		wstring		m_wstrDir;				///< モジュールがあるディレクトリ
+		wstring		m_wstrDataPath;			///< 絶対パスのメディアディレクトリ
+		wstring		m_wstrShadersPath;		///< 絶対パスのシェーダディレクトリ
+		wstring		m_wstrRelativeDataPath;	///< 相対パスのメディアディレクトリ
+		wstring		m_wstrRelativeShadersPath;	///< 相対パスのシェーダディレクトリ
 		map<wstring, wstring> m_ConfigMap;		///< 汎用マップ（各アプリケションで使用できる）
 	private:
 		//コピー禁止

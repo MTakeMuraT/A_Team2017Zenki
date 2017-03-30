@@ -1,7 +1,7 @@
 /*!
 @file MeshHelper.h
 @brief プリミティブ作成関数等
-@copyright Copyright (c) 2017 WiZ Tamura Hiroki,Yamanoi Yasushi.
+@copyright Copyright (c) 2016 WiZ Tamura Hiroki,Yamanoi Yasushi.
 */
 #pragma once
 #include "stdafx.h"
@@ -226,16 +226,6 @@ namespace basecross {
 		//--------------------------------------------------------------------------------------
 		static void CreateIcosahedron(float size,
 			vector<VertexPositionNormalTexture>& vertices, vector<uint16_t>& indices);
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	VertexPositionNormalTangentTextureフォーマットのメッシュのタンジェントを追加する
-		@param[inout]	vertices	頂点の配列
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		static void SetNormalTangent(vector<VertexPositionNormalTangentTexture>& vertices);
-
-
 	};
 
 

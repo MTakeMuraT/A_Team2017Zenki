@@ -2,7 +2,7 @@
 /*!
 @file SpriteStudio5.cpp
 @brief スプライトスタジオ実体
-@copyright Copyright (c) 2017 WiZ Tamura Hiroki,Yamanoi Yasushi.
+@copyright Copyright (c) 2016 WiZ Tamura Hiroki,Yamanoi Yasushi.
 */
 #include "stdafx.h"
 
@@ -1744,7 +1744,7 @@ namespace basecross {
 		auto PtrT = GetComponent<Transform>();
 		PtrT->SetScale(ret.ScaleInMatrix());
 		PtrT->SetQuaternion(ret.QtInMatrix());
-		PtrT->SetWorldPosition(ret.PosInMatrix());
+		PtrT->SetPosition(ret.PosInMatrix());
 		//子供の行列を計算する
 		for (auto ptr : pImpl->m_Childlen){
 			ptr->CaluclateMatrix();
@@ -2111,13 +2111,13 @@ namespace basecross {
 			float count = 0;
 			for (auto ptr : PartVec){
 				auto PtrT = ptr->GetComponent<Transform>();
-				auto TempPos = PtrT->GetWorldPosition();
-				auto Pos = PtrT->GetWorldPosition();
+				auto TempPos = PtrT->GetPosition();
+				auto Pos = PtrT->GetPosition();
 				Vector3 Z(0, 0, count);
 				Pos += Z;
-				PtrT->SetWorldPosition(Pos);
+				PtrT->SetPosition(Pos);
 				ptr->OnDraw();
-				PtrT->SetWorldPosition(TempPos);
+				PtrT->SetPosition(TempPos);
 				count -= 0.001f;
 			}
 		}

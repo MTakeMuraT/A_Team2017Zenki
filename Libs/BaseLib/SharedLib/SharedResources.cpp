@@ -1,7 +1,7 @@
 /*!
 @file SharedResources.cpp
 @brief 共有のリソース（ビュー、カメラ、ライトなど）実体
-@copyright Copyright (c) 2017 WiZ Tamura Hiroki,Yamanoi Yasushi.
+@copyright Copyright (c) 2016 WiZ Tamura Hiroki,Yamanoi Yasushi.
 */
 #include "stdafx.h"
 
@@ -177,7 +177,7 @@ namespace basecross {
 		if (auto ShPtr = pImpl->m_CameraObject.lock()) {
 			auto TransPtr = ShPtr->GetComponent<Transform>();
 			if (TransPtr) {
-				pImpl->m_Eye = TransPtr->GetWorldPosition();
+				pImpl->m_Eye = TransPtr->GetPosition();
 				pImpl->m_ViewMatrix.LookAtLH(pImpl->m_Eye, pImpl->m_At, pImpl->m_Up);
 				if (pImpl->m_Pers) {
 					pImpl->m_ProjMatrix.PerspectiveFovLH(pImpl->m_FovY, pImpl->m_Aspect, pImpl->m_Near, pImpl->m_Far);
@@ -407,7 +407,7 @@ namespace basecross {
 			auto TargetPtr = GetTargetObject();
 			if (TargetPtr) {
 				//目指したい場所
-				Vector3 ToAt = TargetPtr->GetComponent<Transform>()->GetWorldMatrix().PosInMatrixSt();
+				Vector3 ToAt = TargetPtr->GetComponent<Transform>()->GetPosition();
 				ToAt += pImpl->m_TargetToAt;
 				NewAt = Lerp::CalculateLerp(GetAt(), ToAt, 0, 1.0f, 1.0, Lerp::Linear);
 			}
@@ -433,6 +433,7 @@ namespace basecross {
 			////目指したい場所にアームの値と腕ベクトルでEyeを調整
 			Vector3 ToEye = NewAt + ArmVec * pImpl->m_ArmLen;
 			NewEye = Lerp::CalculateLerp(GetEye(), ToEye, 0, 1.0f, pImpl->m_ToTargetLerp, Lerp::Linear);
+//			NewEye = NewAt + ArmVec * ArmLen;
 		}
 		SetAt(NewAt);
 		SetEye(NewEye);
@@ -468,15 +469,13 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	struct ViewBase::Impl {
 		weak_ptr<Stage> m_Stage;
-		bool m_UpdateActive;
 		explicit Impl(const shared_ptr<Stage>& StagePtr) :
-			m_Stage(StagePtr),
-			m_UpdateActive(true)
+			m_Stage(StagePtr)
 		{}
 		~Impl() {}
 	};
 	//--------------------------------------------------------------------------------------
-	///	ビュー（親）
+	///	ビューコンポーネント（親）
 	//--------------------------------------------------------------------------------------
 	ViewBase::ViewBase(const shared_ptr<Stage>& StagePtr) :
 		ObjectInterface(),
@@ -486,12 +485,6 @@ namespace basecross {
 	}
 
 	ViewBase::~ViewBase() {}
-
-	//アクセサ
-	bool ViewBase::IsUpdateActive() const { return pImpl->m_UpdateActive; }
-	bool ViewBase::GetUpdateActive() const { return pImpl->m_UpdateActive; }
-	void ViewBase::SetUpdateActive(bool b) { pImpl->m_UpdateActive = b; }
-
 
 	//--------------------------------------------------------------------------------------
 	///	struct SingleView::Impl;
@@ -679,10 +672,8 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	struct LightBase::Impl {
 		weak_ptr<Stage> m_Stage;
-		Color4 m_AmbientLightColor;
 		explicit Impl(const shared_ptr<Stage>& StagePtr) :
-			m_Stage(StagePtr),
-			m_AmbientLightColor(0, 0, 0, 0)
+			m_Stage(StagePtr)
 		{}
 		~Impl() {}
 	};
@@ -696,163 +687,6 @@ namespace basecross {
 	}
 
 	LightBase::~LightBase() {}
-
-	Color4 LightBase::GetAmbientLightColor()const {
-		return pImpl->m_AmbientLightColor;
-	}
-
-	void LightBase::SetAmbientLightColor(const Color4& value) {
-		pImpl->m_AmbientLightColor = value;
-	}
-
-
-	//--------------------------------------------------------------------------------------
-	///	struct SingleLight::Impl;
-	//--------------------------------------------------------------------------------------
-	struct SingleLight::Impl {
-		Light m_Light;
-		Impl() 
-		{
-		}
-		~Impl() {}
-	};
-
-	//--------------------------------------------------------------------------------------
-	///	シングルライト
-	//--------------------------------------------------------------------------------------
-	SingleLight::SingleLight(const shared_ptr<Stage>& StagePtr) :
-		LightBase(StagePtr),
-		pImpl(new Impl())
-	{}
-
-	SingleLight::~SingleLight() {}
-
-	void SingleLight::SetLight(const Light& l) {
-		pImpl->m_Light = l;
-	}
-
-	const Light& SingleLight::GetLight()const {
-		return pImpl->m_Light;
-	}
-
-	Light& SingleLight::GetLight() {
-		return pImpl->m_Light;
-	}
-
-	const Light& SingleLight::GetTargetLight() const {
-		return pImpl->m_Light;
-	}
-
-
-	//--------------------------------------------------------------------------------------
-	///	struct MultiLight::Impl;
-	//--------------------------------------------------------------------------------------
-	struct MultiLight::Impl {
-		vector<Light> m_LightVec;
-		size_t m_MainIndex;
-		Impl():
-			m_MainIndex(0)
-		{
-			m_LightVec.resize(3);
-			for (auto& v : m_LightVec) {
-				v.m_Directional = Vector3(0, -1, 0);
-				v.m_DiffuseColor = Color4(1, 1, 1, 1);
-				v.m_SpecularColor = Color4(1, 1, 1, 1);
-			}
-		}
-		~Impl() {}
-	};
-
-
-
-	//--------------------------------------------------------------------------------------
-	///	マルチライト
-	//--------------------------------------------------------------------------------------
-
-	void MultiLight::ValidateLightIndex(size_t index)const
-	{
-		if (index >= 3)
-		{
-			throw BaseException(
-				L"ライトのインデックスが範囲外です。0から2の間で指定してください。",
-				L"if (index >= 3)",
-				L"MultiLight::ValidateLightIndex()"
-			);
-		}
-	}
-
-	MultiLight::MultiLight(const shared_ptr<Stage>& StagePtr) :
-		LightBase(StagePtr),
-		pImpl(new Impl())
-	{
-	}
-
-	MultiLight::~MultiLight() {}
-
-	void MultiLight::SetMainIndex(size_t index) {
-		ValidateLightIndex(index);
-		pImpl->m_MainIndex = index;
-	}
-
-	size_t  MultiLight::GetMainIndex()const {
-		return pImpl->m_MainIndex;
-	}
-
-	void  MultiLight::SetLight(size_t index, const Light& l) {
-		ValidateLightIndex(index);
-		pImpl->m_LightVec[index] = l;
-	}
-
-	const Light& MultiLight::GetLight(size_t index)const {
-		ValidateLightIndex(index);
-		return pImpl->m_LightVec[index];
-	}
-
-	Light&  MultiLight::GetLight(size_t index) {
-		ValidateLightIndex(index);
-		return pImpl->m_LightVec[index];
-	}
-
-	void MultiLight::SetDefaultLighting() {
-		static const Vector3 defaultDirections[3] =
-		{
-			{ -0.5265408f, -0.5735765f, -0.6275069f },
-			{ 0.7198464f,  0.3420201f,  0.6040227f },
-			{ 0.4545195f, -0.7660444f,  0.4545195f },
-		};
-
-		static const Color4 defaultDiffuse[3] =
-		{
-			{ 1.0000000f, 0.9607844f, 0.8078432f,0.0f },
-			{ 0.9647059f, 0.7607844f, 0.4078432f,0.0f },
-			{ 0.3231373f, 0.3607844f, 0.3937255f,0.0f },
-		};
-
-		static const Color4 defaultSpecular[3] =
-		{
-			{ 1.0000000f, 0.9607844f, 0.8078432f,0.0f },
-			{ 0.0000000f, 0.0000000f, 0.0000000f,0.0f },
-			{ 0.3231373f, 0.3607844f, 0.3937255f,0.0f },
-		};
-		static const Color4 defaultAmbient = { 0.05333332f, 0.09882354f, 0.1819608f ,0.0f };
-		for (size_t i = 0; i < 3; i++) {
-			pImpl->m_LightVec[i].m_Directional = defaultDirections[i];
-			pImpl->m_LightVec[i].m_DiffuseColor = defaultDiffuse[i];
-			pImpl->m_LightVec[i].m_SpecularColor = defaultSpecular[i];
-		}
-		SetAmbientLightColor(defaultAmbient);
-		pImpl->m_MainIndex = 2;
-	}
-
-	const Light& MultiLight::GetTargetLight() const {
-		return pImpl->m_LightVec[pImpl->m_MainIndex];
-	}
-
-
-
-
-
-
 
 
 	//--------------------------------------------------------------------------------------
@@ -942,14 +776,9 @@ namespace basecross {
 		);
 		WanderTarget.Normalize();
 		WanderTarget *= WanderRadius;
-		Vector3 target_Local = WanderTarget + Vector3(0, 0, WanderDistance);
-		Vector3 Scale,  Pos;
-		Quaternion Qt;
-		Matrix.Decompose(Scale, Qt, Pos);
-		Matrix4X4 mat;
-		mat.AffineTransformation(Scale, target_Local, Qt, Pos);
-		target_Local.Transform(Matrix);
-		return target_Local - Matrix.PosInMatrix();
+		Vector3 wander_target = WanderTarget + Vector3(WanderDistance, 0, 0);
+		wander_target.Transform(Matrix);
+		return wander_target - Matrix.PosInMatrix();
 	}
 
 	struct ObstacleAvoidanceSphere {
@@ -1078,8 +907,8 @@ namespace basecross {
 				if (PtrObj != MyObj) {
 					PtrObj->GetComponent<Transform>();
 					Vector3 ToAgent
-						= MyObj->GetComponent<Transform>()->GetWorldPosition()
-						- PtrObj->GetComponent<Transform>()->GetWorldPosition();
+						= MyObj->GetComponent<Transform>()->GetPosition()
+						- PtrObj->GetComponent<Transform>()->GetPosition();
 					SteeringForce += Vector3EX::Normalize(ToAgent) / ToAgent.Length();
 				}
 			}
@@ -1142,7 +971,7 @@ namespace basecross {
 				auto PtrObj = Ptr.lock();
 				if (PtrObj != MyObj) {
 					auto PtrT = PtrObj->GetComponent<Transform>();
-					CenterOfMass += PtrT->GetWorldPosition();
+					CenterOfMass += PtrT->GetPosition();
 					count++;
 				}
 			}
@@ -1150,7 +979,7 @@ namespace basecross {
 		if (count > 0) {
 			CenterOfMass /= (float)count;
 			auto PtrT = MyObj->GetComponent<Transform>();
-			SteeringForce = Seek(Velocity, CenterOfMass, PtrT->GetWorldPosition(), MaxSpeed);
+			SteeringForce = Seek(Velocity, CenterOfMass, PtrT->GetPosition(), MaxSpeed);
 			SteeringForce.Normalize();
 		}
 		return SteeringForce;

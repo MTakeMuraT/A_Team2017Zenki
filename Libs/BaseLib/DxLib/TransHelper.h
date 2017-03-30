@@ -1,7 +1,7 @@
 /*!
 @file TransHelper.h
 @brief 衝突判定、補間処理用ユーティリティ
-@copyright Copyright (c) 2017 WiZ Tamura Hiroki,Yamanoi Yasushi.
+@copyright Copyright (c) 2016 WiZ Tamura Hiroki,Yamanoi Yasushi.
 */
 
 #pragma once
@@ -67,379 +67,18 @@ namespace basecross{
 		}
 	};
 
+
 	//--------------------------------------------------------------------------------------
-	///	XZポイント(Z方向プラスの点)
+	///	衝突判定ボリュームの基底クラス
 	//--------------------------------------------------------------------------------------
-	struct POINT_XZ {
-		float m_X;
-		float m_Z;
-		POINT_XZ() :
-			m_X(0.0f), m_Z(0.0f)
-		{}
-		POINT_XZ(float x,float z) :
-			m_X(x), m_Z(z)
-		{}
-		POINT_XZ(const POINT_XZ& other) :
-			m_X(other.m_X),
-			m_Z(other.m_Z)
-		{}
-		POINT_XZ(const Vector2& other) :
-			m_X(other.x),
-			m_Z(other.y)
-		{}
-		POINT_XZ(const Vector3& other) :
-			m_X(other.x),
-			m_Z(other.z)
-		{}
-		operator Vector2() {
-			return Vector2(m_X,m_Z);
-		}
-		POINT_XZ& operator=(const POINT_XZ& other) {
-			//自己代入の抑制
-			if (this != &other) {
-				m_X = other.m_X;
-				m_Z = other.m_Z;
-			}
-			return *this;
-		}
-		POINT_XZ& operator=(const Vector2& other) {
-			m_X = other.x;
-			m_Z = other.y;
-			return *this;
-		}
-		POINT_XZ& operator=(const Vector3& other) {
-			m_X = other.x;
-			m_Z = other.z;
-			return *this;
-		}
+	struct CollisionVolume{
+		CollisionVolume(){}
+		virtual ~CollisionVolume(){}
 	};
-
-	//--------------------------------------------------------------------------------------
-	///	XZ方向のセルに使用するインデックス
-	//--------------------------------------------------------------------------------------
-	struct CellIndex {
-		int x;
-		int z;
-		CellIndex() :
-			//無効値で初期化
-			x(-1), z(-1)
-		{}
-		CellIndex(int xx, int zz) :
-			x(xx), z(zz)
-		{
-		}
-		bool operator==(const CellIndex& other)const {
-			return (x == other.x && z == other.z);
-		}
-		bool operator!=(const CellIndex& other)const {
-			return ((x != other.x) || (z != other.z));
-		}
-		static int GetHeuristic(const CellIndex& Cell1, const CellIndex& Cell2) {
-			int spanX = abs(Cell1.x - Cell2.x);
-			int spanZ = abs(Cell1.z - Cell2.z);
-			//どちらか長いほうを返す
-			return (spanX >= spanZ) ? spanX : spanZ;
-		}
-	};
-
-
-	//--------------------------------------------------------------------------------------
-	///	XZ矩形(Z方向プラスの矩形)
-	//--------------------------------------------------------------------------------------
-	struct RECT_XZ {
-		float m_Left;
-		float m_Near;
-		float m_Right;
-		float m_Far;
-		RECT_XZ() :
-			m_Left(0.0f), m_Near(0.0f),
-			m_Right(0.0f), m_Far(0.0f)
-		{}
-		RECT_XZ(float l,float n,float r,float f) :
-			m_Left(l), m_Near(n),
-			m_Right(r), m_Far(f)
-		{}
-
-		POINT_XZ CenterPoint() const{
-			return POINT_XZ((m_Left + m_Right) / 2.0f, (m_Near + m_Far) / 2.0f);
-		}
-		void operator+=(const POINT_XZ& point){
-			m_Left += point.m_X;
-			m_Right += point.m_X;
-			m_Near += point.m_Z;
-			m_Far += point.m_Z;
-		}
-		RECT_XZ operator+(const POINT_XZ& point) const {
-			RECT_XZ rect(*this);
-			rect += point;
-			return rect;
-		}
-		void operator-=(const POINT_XZ& point) {
-			m_Left -= point.m_X;
-			m_Right -= point.m_X;
-			m_Near -= point.m_Z;
-			m_Far -= point.m_Z;
-		}
-		RECT_XZ operator-(const POINT_XZ& point) const {
-			RECT_XZ rect(*this);
-			rect -= point;
-			return rect;
-		}
-		bool IsRectEmpty()const{
-			if (m_Left >= m_Right || m_Near >= m_Far) {
-				return true;
-			}
-			return false;
-		}
-		bool PtInRect(const POINT_XZ& point) const{
-			if (point.m_X >= m_Left && point.m_X < m_Right
-				&& point.m_Z >= m_Near && point.m_Z < m_Far) {
-				return true;
-			}
-			return false;
-		}
-		bool PtInRect(const Vector2& point) const {
-			POINT_XZ p(point);
-			return PtInRect(p);
-		}
-		bool Intersect(const RECT_XZ& rect2) const{
-			if (IsRectEmpty() || rect2.IsRectEmpty()) {
-				//どちらかが空の場合はfalse
-				return false;
-			}
-			if (m_Left > rect2.m_Right) {
-				return false;
-			}
-			if (m_Right < rect2.m_Left) {
-				return false;
-			}
-			if (m_Near > rect2.m_Far) {
-				return false;
-			}
-			if (m_Far < rect2.m_Near) {
-				return false;
-			}
-			return true;
-		}
-
-
-		RECT_XZ UnionRect(const RECT_XZ& rect1, const RECT_XZ& rect2) const{
-			RECT_XZ ret;
-			ret.m_Left = (rect1.m_Left <= rect2.m_Left) ? rect1.m_Left : rect2.m_Left;
-			ret.m_Right = (rect1.m_Right >= rect2.m_Right) ? rect1.m_Right : rect2.m_Right;
-			ret.m_Near = (rect1.m_Near <= rect2.m_Near) ? rect1.m_Near : rect2.m_Near;
-			ret.m_Far = (rect1.m_Far >= rect2.m_Far) ? rect1.m_Far : rect2.m_Far;
-			return ret;
-		}
-		RECT_XZ UnionRect(const RECT_XZ& other){
-			RECT_XZ ret;
-			ret.m_Left = (m_Left <= other.m_Left) ? m_Left : other.m_Left;
-			ret.m_Right = (m_Right >= other.m_Right) ? m_Right : other.m_Right;
-			ret.m_Near = (m_Near <= other.m_Near) ? m_Near : other.m_Near;
-			ret.m_Far = (m_Far >= other.m_Far) ? m_Far : other.m_Far;
-			*this = ret;
-			return ret;
-		}
-		RECT_XZ operator|=(const RECT_XZ& other) {
-			return UnionRect(other);
-		}
-		RECT_XZ operator|(const RECT_XZ& other) const{
-			return UnionRect(*this,other);
-		}
-		float Width()const{
-			return abs(m_Right - m_Left);
-		}
-		float Dipth()const{
-			return abs(m_Far - m_Near);
-		}
-	};
-
-	struct SPHERE;
-
-	//--------------------------------------------------------------------------------------
-	///	AABBボリューム境界
-	//--------------------------------------------------------------------------------------
-	struct AABB {
-		Vector3 m_Min;     ///< 小さいほうの座標
-		Vector3 m_Max;     ///< 大きいほうの座標
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	コンストラクタ
-		*/
-		//--------------------------------------------------------------------------------------
-		AABB():
-			m_Min(0,0,0),
-			m_Max(0, 0, 0){}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	コンストラクタ
-		@param[in]	Min	小さいほうの座標
-		@param[in]	Max	大きいほうの座標
-		*/
-		//--------------------------------------------------------------------------------------
-		AABB(const Vector3& Min, const Vector3& Max)
-			:m_Min(Min), m_Max(Max) {}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	コンストラクタ
-		@param[in]	Center	中心
-		@param[in]	XSize	X方向サイズ
-		@param[in]	YSize	Y方向サイズ
-		@param[in]	ZSize	Z方向サイズ
-		*/
-		//--------------------------------------------------------------------------------------
-		AABB(const Vector3& Center, float XSize, float YSize, float ZSize) {
-			float xh = XSize / 2.0f;
-			float yh = YSize / 2.0f;
-			float zh = ZSize / 2.0f;
-
-			m_Min.x = Center.x - xh;
-			m_Max.x = Center.x + xh;
-
-			m_Min.y = Center.y - yh;
-			m_Max.y = Center.y + yh;
-
-			m_Min.z = Center.z - zh;
-			m_Max.z = Center.z + zh;
-		}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	中心を得る
-		@param[out]	Pos	中心が代入されるベクトル
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		void GetCenter(Vector3& Pos)const {
-			Pos.x = (m_Min.x + m_Max.x) / 2.0f;
-			Pos.y = (m_Min.y + m_Max.y) / 2.0f;
-			Pos.z = (m_Min.z + m_Max.z) / 2.0f;
-		}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	中心を得る
-		@return	中心のベクトル
-		*/
-		//--------------------------------------------------------------------------------------
-		Vector3 GetCenter() const{
-			Vector3 ret;
-			ret.x = (m_Min.x + m_Max.x) / 2.0f;
-			ret.y = (m_Min.y + m_Max.y) / 2.0f;
-			ret.z = (m_Min.z + m_Max.z) / 2.0f;
-			return ret;
-		}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	移動する
-		@param[in]	MoveVec	移動ベクトル
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		void Move(const Vector3& MoveVec) {
-			m_Min += MoveVec;
-			m_Max += MoveVec;
-		}
-		bool PtInAABB(const Vector3& point) {
-			if (
-				point.x >= m_Min.x && point.x < m_Max.x
-				&&
-				point.y >= m_Min.y && point.y < m_Max.y
-				&&
-				point.z >= m_Min.z && point.z < m_Max.z
-				) {
-				return true;
-			}
-			return false;
-		}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	包み込むXZ矩形を得る
-		@return	XZ矩形
-		*/
-		//--------------------------------------------------------------------------------------
-		RECT_XZ GetWrappedRECT_XZ() const {
-			return RECT_XZ(m_Min.x, m_Min.z, m_Max.x, m_Max.z);
-		}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	包み込むSPHEREを得る
-		@return	SPHERE
-		*/
-		//--------------------------------------------------------------------------------------
-		SPHERE GetWrappedSPHERE() const;
-
-	};
-
-
-
-	//--------------------------------------------------------------------------------------
-	///	球ボリューム境界
-	//--------------------------------------------------------------------------------------
-	struct SPHERE {
-		Vector3 m_Center;	///< 中心点の座標
-		float m_Radius;			///< 半径
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	コンストラクタ
-		*/
-		//--------------------------------------------------------------------------------------
-		SPHERE() {}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	コンストラクタ
-		@param[in]	Center	中心
-		@param[in]	Radius	半径
-		*/
-		//--------------------------------------------------------------------------------------
-		SPHERE(const Vector3& Center, float Radius) :
-			m_Center(Center),
-			m_Radius(Radius) {}
-		AABB GetWrappedAABB() const {
-			AABB ret;
-			ret.m_Min = Vector3(m_Center.x - m_Radius, m_Center.y - m_Radius, m_Center.z - m_Radius);
-			ret.m_Max = Vector3(m_Center.x + m_Radius, m_Center.y + m_Radius, m_Center.z + m_Radius);
-			return ret;
-		}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	包み込むXZ矩形を得る
-		@return	XZ矩形
-		*/
-		//--------------------------------------------------------------------------------------
-		RECT_XZ GetWrappedRECT_XZ() const {
-			RECT_XZ ret;
-			ret.m_Left = m_Center.x - m_Radius;
-			ret.m_Near = m_Center.z - m_Radius;
-			ret.m_Right = m_Center.x + m_Radius;
-			ret.m_Far = m_Center.z + m_Radius;
-			return ret;
-		}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	包み込むSPHEREを得る
-		@return	SPHERE
-		*/
-		//--------------------------------------------------------------------------------------
-		SPHERE GetWrappedSPHERE() const {
-			return *this;
-		}
-
-	};
-
-	inline SPHERE AABB::GetWrappedSPHERE() const {
-		SPHERE sp;
-		auto Size = m_Max - m_Min;
-		Size *= 0.5f;
-		sp.m_Radius = Size.Length();
-		sp.m_Center = GetCenter();
-		return sp;
-	}
-
-
-
 	//--------------------------------------------------------------------------------------
 	///	OBBボリューム境界
 	//--------------------------------------------------------------------------------------
-	struct OBB{
+	struct OBB : public CollisionVolume{
 		Vector3 m_Center;     ///< 中心点の座標
 		Vector3 m_Rot[3];  ///< XYZ の各座標軸の傾きを表す方向ベクトル
 		Vector3 m_Size;     ///< OBB の各座標軸に沿った長さの半分（中心点から面までの長さ）
@@ -562,7 +201,7 @@ namespace basecross{
 		@return	回転行列
 		*/
 		//--------------------------------------------------------------------------------------
-		Matrix4X4 GetRotMatrix()const{
+		Matrix4X4 GetRotMatrix(){
 			Matrix4X4 ret;
 			ret._11 = m_Rot[0].x;
 			ret._12 = m_Rot[0].y;
@@ -577,61 +216,19 @@ namespace basecross{
 		}
 		//--------------------------------------------------------------------------------------
 		/*!
-		@brief	行列を得る
-		@return	ワールド行列
-		*/
-		//--------------------------------------------------------------------------------------
-		Matrix4X4 GetWorldMatrix()const {
-			Matrix4X4 ret,Pos;
-			ret.Identity();
-			ret.Scaling(m_Size.x * 2.0f, m_Size.y * 2.0f, m_Size.z * 2.0f);
-			ret *= GetRotMatrix();
-			Pos.Translation(m_Center.x, m_Center.y, m_Center.z);
-			ret *= Pos;
-			return ret;
-		}
-
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	一番大きい辺の半分長さを得る
-		@return	一番大きい辺の半分の長さ
-		*/
-		//--------------------------------------------------------------------------------------
-		float GetMaxHalfSize()const {
-			float ret = m_Size.x;
-			if (ret < m_Size.y) {
-				ret = m_Size.y;
-			}
-			if (ret < m_Size.z) {
-				ret = m_Size.z;
-			}
-			return ret;
-		}
-		//--------------------------------------------------------------------------------------
-		/*!
 		@brief	一番大きい辺の長さを得る
 		@return	一番大きい辺の長さ
 		*/
 		//--------------------------------------------------------------------------------------
-		float GetMaxSize()const {
-			return GetMaxHalfSize() * 2.0f;
-		}
-
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	一番小さい辺の長さ半分を得る
-		@return	一番小さい辺の長さの半分
-		*/
-		//--------------------------------------------------------------------------------------
-		float GetMinHalfSize() const {
+		float GetMaxSize(){
 			float ret = m_Size.x;
-			if (ret > m_Size.y) {
+			if(ret < m_Size.y){
 				ret = m_Size.y;
 			}
-			if (ret > m_Size.z) {
+			if(ret < m_Size.z){
 				ret = m_Size.z;
 			}
-			return ret;
+			return ret * 2.0f;
 		}
 		//--------------------------------------------------------------------------------------
 		/*!
@@ -639,10 +236,16 @@ namespace basecross{
 		@return	一番小さい辺の長さ
 		*/
 		//--------------------------------------------------------------------------------------
-		float GetMinSize() const {
-			return  GetMinHalfSize() * 2.0f;
+		float GetMinSize(){
+			float ret = m_Size.x;
+			if(ret > m_Size.y){
+				ret = m_Size.y;
+			}
+			if(ret > m_Size.z){
+				ret = m_Size.z;
+			}
+			return ret;
 		}
-
 		//--------------------------------------------------------------------------------------
 		/*!
 		@brief	ベクトルに一番近い回転を得る
@@ -676,102 +279,127 @@ namespace basecross{
 			}
 			return false;
 		}
+	};
+
+	//--------------------------------------------------------------------------------------
+	///	AABBボリューム境界
+	//--------------------------------------------------------------------------------------
+	struct AABB : public CollisionVolume{
+		Vector3 m_Min;     ///< 小さいほうの座標
+		Vector3 m_Max;     ///< 大きいほうの座標
 		//--------------------------------------------------------------------------------------
 		/*!
-		@brief	包み込むXZ矩形を得る
-		@return	XZ矩形
+		@brief	コンストラクタ
 		*/
 		//--------------------------------------------------------------------------------------
-		RECT_XZ GetWrappedRECT_XZ() const {
-			RECT_XZ ret;
-			SPHERE sp;
-			sp.m_Radius = m_Size.Length();
-			sp.m_Center = m_Center;
-			return sp.GetWrappedRECT_XZ();
+		AABB(){}
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	コンストラクタ
+		@param[in]	Min	小さいほうの座標
+		@param[in]	Max	大きいほうの座標
+		*/
+		//--------------------------------------------------------------------------------------
+		AABB(const Vector3& Min,const Vector3& Max)
+			:m_Min(Min),m_Max(Max){}
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	コンストラクタ
+		@param[in]	Center	中心
+		@param[in]	XSize	X方向サイズ
+		@param[in]	YSize	Y方向サイズ
+		@param[in]	ZSize	Z方向サイズ
+		*/
+		//--------------------------------------------------------------------------------------
+		AABB(const Vector3& Center,float XSize,float YSize,float ZSize){
+			float xh = XSize / 2.0f;
+			float yh = YSize / 2.0f;
+			float zh = ZSize / 2.0f;
+
+			m_Min.x = Center.x - xh;
+			m_Max.x = Center.x + xh;
+
+			m_Min.y = Center.y - yh;
+			m_Max.y = Center.y + yh;
+
+			m_Min.z = Center.z - zh;
+			m_Max.z = Center.z + zh;
 		}
 		//--------------------------------------------------------------------------------------
 		/*!
-		@brief	包み込むSPHEREを得る
-		@return	SPHERE
+		@brief	中心を得る
+		@param[out]	Pos	中心が代入されるベクトル
+		@return	なし
 		*/
 		//--------------------------------------------------------------------------------------
-		SPHERE GetWrappedSPHERE() const {
-			SPHERE sp;
-			sp.m_Radius = m_Size.Length();
-			sp.m_Center = m_Center;
-			return sp;
+		void GetCenter(Vector3& Pos){
+			Pos.x = (m_Min.x + m_Max.x) / 2.0f;
+			Pos.y = (m_Min.y + m_Max.y) / 2.0f;
+			Pos.z = (m_Min.z + m_Max.z) / 2.0f;
 		}
-
 		//--------------------------------------------------------------------------------------
 		/*!
-		@brief	包み込むAABBを得る
-		@return	AABB
+		@brief	中心を得る
+		@return	中心のベクトル
 		*/
 		//--------------------------------------------------------------------------------------
-		AABB GetWrappedAABB() const {
-			float Half = 0.5f;
-			Vector3 Vec[] = {
-				Vector3(-Half,-Half,-Half),
-				Vector3(Half,-Half,-Half),
-				Vector3(Half,-Half,Half),
-				Vector3(-Half,-Half,Half),
-
-				Vector3(-Half,Half,-Half),
-				Vector3(Half,Half,-Half),
-				Vector3(Half,Half,Half),
-				Vector3(-Half,Half,Half),
-			};
-			bool First = true;
-			AABB ret;
-			auto m = GetWorldMatrix();
-			for (auto& v : Vec) {
-				v.Transform(m);
-				if (First) {
-					ret.m_Min = v;
-					ret.m_Max = v;
-					First = false;
-				}
-				else {
-					if (ret.m_Min.x > v.x) {
-						ret.m_Min.x = v.x;
-					}
-					if (ret.m_Max.x < v.x) {
-						ret.m_Max.x = v.x;
-					}
-
-					if (ret.m_Min.y > v.y) {
-						ret.m_Min.y = v.y;
-					}
-					if (ret.m_Max.y < v.y) {
-						ret.m_Max.y = v.y;
-					}
-
-					if (ret.m_Min.z > v.z) {
-						ret.m_Min.z = v.z;
-					}
-					if (ret.m_Max.z < v.z) {
-						ret.m_Max.z = v.z;
-					}
-				}
-			}
+		Vector3 GetCenter(){
+			Vector3 ret;
+			ret.x = (m_Min.x + m_Max.x) / 2.0f;
+			ret.y = (m_Min.y + m_Max.y) / 2.0f;
+			ret.z = (m_Min.z + m_Max.z) / 2.0f;
 			return ret;
 		}
-
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	移動する
+		@param[in]	MoveVec	移動ベクトル
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
+		void Move(const Vector3& MoveVec){
+			m_Min += MoveVec;
+			m_Max += MoveVec;
+		}
 	};
 
 
+	//--------------------------------------------------------------------------------------
+	///	球ボリューム境界
+	//--------------------------------------------------------------------------------------
+	struct SPHERE : public CollisionVolume
+	{
+		Vector3 m_Center;	///< 中心点の座標
+		float m_Radius;			///< 半径
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	コンストラクタ
+		*/
+		//--------------------------------------------------------------------------------------
+		SPHERE(){}
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	コンストラクタ
+		@param[in]	Center	中心
+		@param[in]	Radius	半径
+		*/
+		//--------------------------------------------------------------------------------------
+		SPHERE(const Vector3& Center,float Radius):
+			m_Center(Center),
+			m_Radius(Radius){}
+	};
 
 	//--------------------------------------------------------------------------------------
 	///	球配列データ
 	//--------------------------------------------------------------------------------------
-	struct SPHERE_ARR{
+	struct SPHERE_ARR : public CollisionVolume{
 		vector<SPHERE> m_SphereArr;
 	};
 
 	//--------------------------------------------------------------------------------------
 	///	平面
 	//--------------------------------------------------------------------------------------
-	struct PLANE{
+	struct PLANE : public CollisionVolume{
 		Vector3 m_Normal;	///< 法線
 		float m_DotValue;	///< 内積値
 		//--------------------------------------------------------------------------------------
@@ -822,7 +450,7 @@ namespace basecross{
 	//--------------------------------------------------------------------------------------
 	///	カプセルボリューム境界
 	//--------------------------------------------------------------------------------------
-	struct CAPSULE {
+	struct CAPSULE  : public CollisionVolume{
 		float m_Radius;			///< 半径
 		Vector3 m_PointBottom;		///< 中間部線分の開始点
 		Vector3 m_PointTop;		///< 中間部線分の終了点
@@ -904,130 +532,6 @@ namespace basecross{
 			PointLen += m_Radius;
 			return PointLen;
 		}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	包み込むXZ矩形を得る
-		@return	XZ矩形
-		*/
-		//--------------------------------------------------------------------------------------
-		RECT_XZ GetWrappedRECT_XZ() const {
-			RECT_XZ ret;
-			POINT_XZ P1(m_PointBottom);
-			POINT_XZ P2(m_PointTop);
-			if (Vector2(P1).Length() <= Vector2(P2).Length()) {
-				ret.m_Left = P1.m_X - m_Radius;
-				ret.m_Right = P2.m_X + m_Radius;
-				ret.m_Near = P1.m_Z - m_Radius;
-				ret.m_Far = P2.m_Z + m_Radius;
-			}
-			else {
-				ret.m_Left = P2.m_X - m_Radius;
-				ret.m_Right = P1.m_X + m_Radius;
-				ret.m_Near = P2.m_Z - m_Radius;
-				ret.m_Far = P1.m_Z + m_Radius;
-			}
-			return ret;
-		}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	包み込むSPHEREを得る
-		@return	SPHERE
-		*/
-		//--------------------------------------------------------------------------------------
-		SPHERE GetWrappedSPHERE() const {
-			SPHERE sp;
-			auto Size = (m_PointTop - m_PointBottom).Length();
-			Size *= 0.5f;
-			Size += m_Radius;
-			sp.m_Radius = Size;
-			sp.m_Center = GetCenter();
-			return sp;
-		}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	包み込むAABBを得る
-		@return	AABB
-		*/
-		//--------------------------------------------------------------------------------------
-		AABB GetWrappedAABB() const;
-	};
-
-	//--------------------------------------------------------------------------------------
-	///	衝突判定に使用する三角形（時計回り）
-	//--------------------------------------------------------------------------------------
-	struct TRIANGLE{
-		Vector3 m_A;
-		Vector3 m_B;
-		Vector3 m_C;
-		void Set(const Vector3& baseA, const Vector3& baseB, const Vector3& baseC,
-			const Matrix4X4& m) {
-			m_A = Vector3EX::Transform(baseA, m);
-			m_B = Vector3EX::Transform(baseB, m);
-			m_C = Vector3EX::Transform(baseC, m);
-		}
-		TRIANGLE(){}
-		TRIANGLE(const Vector3& baseA, const Vector3& baseB, const Vector3& baseC,
-			const Matrix4X4& m) {
-			Set(baseA,baseB,baseC,m);
-		}
-		Vector3 GetNormal()const {
-			Vector3 Ret =
-				Vector3EX::Cross(
-					m_B - m_A,
-					m_C - m_A
-				);
-			return Ret;
-		}
-		PLANE GetPLANE() const {
-			//3点を使って面を作成
-			PLANE ret(m_A, m_B, m_C);
-			return ret;
-		}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	包み込むXZ矩形を得る
-		@return	XZ矩形
-		*/
-		//--------------------------------------------------------------------------------------
-		RECT_XZ GetWrappedRECT_XZ() const {
-			RECT_XZ ret;
-			POINT_XZ P1(m_A);
-			POINT_XZ P2(m_B);
-			POINT_XZ P3(m_C);
-
-			ret.m_Left = P1.m_X;
-			if (ret.m_Left < P2.m_X) {
-				ret.m_Left = P2.m_X;
-			}
-			if (ret.m_Left < P3.m_X) {
-				ret.m_Left = P3.m_X;
-			}
-
-			ret.m_Right = P1.m_X;
-			if (ret.m_Right > P2.m_X) {
-				ret.m_Right = P2.m_X;
-			}
-			if (ret.m_Right > P3.m_X) {
-				ret.m_Right = P3.m_X;
-			}
-
-			ret.m_Near = P1.m_Z;
-			if (ret.m_Near < P2.m_Z) {
-				ret.m_Near = P2.m_Z;
-			}
-			if (ret.m_Near < P3.m_Z) {
-				ret.m_Near = P3.m_Z;
-			}
-
-			ret.m_Far = P1.m_Z;
-			if (ret.m_Far > P2.m_Z) {
-				ret.m_Far = P2.m_Z;
-			}
-			if (ret.m_Far > P3.m_Z) {
-				ret.m_Far = P3.m_Z;
-			}
-			return ret;
-		}
 	};
 
 
@@ -1041,7 +545,6 @@ namespace basecross{
 		float m_BaseXSize;	//制作時のサイズX（各種計算に使う）
 		float m_BaseYSize;	//制作時のサイズY（各種計算に使う）
 		Matrix4X4 m_Matrix;	//行列（各種計算に使う）
-		Vector3 m_Vertex[4];	//行列によって変換された頂点(各種計算に使う)
 		//--------------------------------------------------------------------------------------
 		/*!
 		@brief	コンストラクタ<br />
@@ -1067,17 +570,6 @@ namespace basecross{
 			//回転を得る
 			m_Rot[0] = Vector3EX::Normalize(VecX);
 			m_Rot[1] = Vector3EX::Normalize(VecY);
-
-			//頂点の設定
-			float HalfX = m_BaseXSize * 0.5f;
-			float HalfY = m_BaseYSize * 0.5f;
-			m_Vertex[0] = Vector3(-HalfX, HalfY, 0);
-			m_Vertex[1] = Vector3(HalfX, HalfY, 0);
-			m_Vertex[2] = Vector3(-HalfX, -HalfY, 0);
-			m_Vertex[3] = Vector3(HalfX, -HalfY, 0);
-			for (auto& v : m_Vertex) {
-				v.Transform(m_Matrix);
-			}
 		}
 		PLANE GetPLANE() const {
 			//表面上に3つの点を使ってPLANEを作成
@@ -1095,117 +587,8 @@ namespace basecross{
 			PLANE ret(Point0, Point1, Point2);
 			return ret;
 		}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	包み込むXZ矩形を得る
-		@return	XZ矩形
-		*/
-		//--------------------------------------------------------------------------------------
-		RECT_XZ GetWrappedRECT_XZ() const {
-			RECT_XZ ret;
-
-			POINT_XZ P1(m_Vertex[0].x, m_Vertex[0].z);
-			POINT_XZ P2(m_Vertex[1].x, m_Vertex[1].z);
-			POINT_XZ P3(m_Vertex[2].x, m_Vertex[2].z);
-			POINT_XZ P4(m_Vertex[3].x, m_Vertex[3].z);
-
-			ret.m_Left = P1.m_X;
-			if (ret.m_Left < P2.m_X) {
-				ret.m_Left = P2.m_X;
-			}
-			if (ret.m_Left < P3.m_X) {
-				ret.m_Left = P3.m_X;
-			}
-			if (ret.m_Left < P4.m_X) {
-				ret.m_Left = P4.m_X;
-			}
 
 
-			ret.m_Right = P1.m_X;
-			if (ret.m_Right > P2.m_X) {
-				ret.m_Right = P2.m_X;
-			}
-			if (ret.m_Right > P3.m_X) {
-				ret.m_Right = P3.m_X;
-			}
-			if (ret.m_Right > P4.m_X) {
-				ret.m_Right = P4.m_X;
-			}
-
-
-			ret.m_Near = P1.m_Z;
-			if (ret.m_Near < P2.m_Z) {
-				ret.m_Near = P2.m_Z;
-			}
-			if (ret.m_Near < P3.m_Z) {
-				ret.m_Near = P3.m_Z;
-			}
-			if (ret.m_Near < P4.m_Z) {
-				ret.m_Near = P4.m_Z;
-			}
-
-			ret.m_Far = P1.m_Z;
-			if (ret.m_Far > P2.m_Z) {
-				ret.m_Far = P2.m_Z;
-			}
-			if (ret.m_Far > P3.m_Z) {
-				ret.m_Far = P3.m_Z;
-			}
-			if (ret.m_Far > P4.m_Z) {
-				ret.m_Far = P4.m_Z;
-			}
-			return ret;
-		}
-
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	包み込むSPHEREを得る
-		@return	SPHERE
-		*/
-		//--------------------------------------------------------------------------------------
-		SPHERE GetWrappedSPHERE() const {
-			SPHERE sp;
-			auto Size = (m_Vertex[1] - m_Vertex[2]).Length();
-			Size *= 0.5f;
-			sp.m_Radius = Size;
-			sp.m_Center = m_Center;
-			return sp;
-		}
-
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	包み込むAABBを得る
-		@return	AABB
-		*/
-		//--------------------------------------------------------------------------------------
-		AABB GetWrappedAABB() const {
-			AABB ret;
-			ret.m_Min = m_Vertex[0];
-			ret.m_Max = m_Vertex[0];
-			for (int i = 1; i < 4; i++) {
-				if (ret.m_Min.x > m_Vertex[i].x) {
-					ret.m_Min.x = m_Vertex[i].x;
-				}
-				if (ret.m_Max.x < m_Vertex[i].x) {
-					ret.m_Max.x = m_Vertex[i].x;
-				}
-
-				if (ret.m_Min.y > m_Vertex[i].y) {
-					ret.m_Min.y = m_Vertex[i].y;
-				}
-				if (ret.m_Max.y < m_Vertex[i].y) {
-					ret.m_Max.y = m_Vertex[i].y;
-				}
-
-				if (ret.m_Min.z > m_Vertex[i].z) {
-					ret.m_Min.z = m_Vertex[i].z;
-				}
-				if (ret.m_Max.z < m_Vertex[i].z) {
-					ret.m_Max.z = m_Vertex[i].z;
-				}
-			}
-			return ret;
-		}
 	};
 
 	//--------------------------------------------------------------------------------------
@@ -1228,36 +611,6 @@ namespace basecross{
 			if(n > max) return max;
 			return n;
 		}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	chkをmin_vおよびmax_vと比較して最小または最大のベクトルを設定する
-		@param[in]	chk	チェックするベクトル
-		@param[in,out]	min_v	比較して最小値を設定するベクトル
-		@param[in,out]	max_v	比較して最大値を設定するベクトル
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		static void ChkSetMinMax(const Vector3& chk, Vector3& min_v, Vector3& max_v) {
-			if (min_v.x > chk.x) {
-				min_v.x = chk.x;
-			}
-			if (max_v.x < chk.x) {
-				max_v.x = chk.x;
-			}
-			if (min_v.y > chk.y) {
-				min_v.y = chk.y;
-			}
-			if (max_v.y < chk.y) {
-				max_v.y = chk.y;
-			}
-			if (min_v.z > chk.z) {
-				min_v.z = chk.z;
-			}
-			if (max_v.z < chk.z) {
-				max_v.z = chk.z;
-			}
-		}
-
 		//--------------------------------------------------------------------------------------
 		/*!
 		@brief	点が面の裏側にあるかどうか判定
@@ -1383,37 +736,6 @@ namespace basecross{
 			}
 			d = a + (ab * t);
 		}
-
-		static SPHERE SphereEnclosingSphere(const SPHERE& s0, const SPHERE& s1) {
-			const float EPSILON = 1.175494e-37f;
-			SPHERE s;
-			Vector3 d = s1.m_Center - s0.m_Center;
-			float dist2 = d.Dot(d);
-			float f = s1.m_Radius - s0.m_Radius;
-			XMVector vec0(f);
-			vec0.Pow(2.0f);
-			if (vec0.x >= dist2) {
-				if (s1.m_Radius >= s0.m_Radius) {
-					s = s1;
-				}
-				else {
-					s = s0;
-				}
-			}
-			else {
-				XMVector vec(dist2);
-				vec.Sqrt();
-				float dist = vec.x;
-				s.m_Radius = (dist + s0.m_Radius + s1.m_Radius) * 0.5f;
-				s.m_Center = s0.m_Center;
-				if (dist > EPSILON) {
-					s.m_Center += ((s.m_Radius - s0.m_Radius) / dist) * d;
-				}
-
-			}
-			return s;
-		}
-
 		//--------------------------------------------------------------------------------------
 		/*!
 		@brief	球とカプセルとの衝突判定
@@ -1459,66 +781,6 @@ namespace basecross{
 				s,t,retvec1,retvec2);
 			float radius = cap1.m_Radius + cap2.m_Radius;
 			return dist2 <= radius * radius;
-		}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	pointから見た三角形の最近接点を得る
-		@param[in]	point	基準点
-		@param[in]	t	三角形
-		@param[out]	retvec	最近接点を返す参照
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		static void ClosestPtPointTriangle(const Vector3& point,const TRIANGLE& t,Vector3& retvec) {
-			Vector3 ab = t.m_B - t.m_A;
-			Vector3 ac = t.m_C - t.m_A;
-			Vector3 ap = point - t.m_A;
-			float d1 = ab.Dot(ap);
-			float d2 = ac.Dot(ap);
-			if (d1 <= 0.0f && d2 <= 0.0f) {
-				retvec = t.m_A;
-				return;
-			}
-
-			Vector3 bp = point - t.m_B;
-			float d3 = ab.Dot(bp);
-			float d4 = ac.Dot(bp);
-			if (d3 >= 0.0f && d4 <= d3) {
-				retvec = t.m_B;
-				return;
-			}
-			float vc = d1 * d4 - d3 * d2;
-			if (vc <= 0.0f && d1 >= 0.0f && d3 <= 0.0f) {
-				float v = d1 / (d1 - d3);
-				retvec = v * ab + t.m_A;
-				return;
-			}
-
-			Vector3 cp = point - t.m_C;
-			float d5 = ab.Dot(cp);
-			float d6 = ac.Dot(cp);
-			if (d6 >= 0.0f && d5 <= d6) {
-				retvec = t.m_C;
-				return;
-			}
-			float vb = d5 * d2 - d1 * d6;
-
-			if (vb <= 0.0f && d2 >= 0.0f && d6 <= 0.0f) {
-				float w = d2 / (d2 - d6);
-				retvec = w * ac + t.m_A;
-				return;
-			}
-
-			float va = d3 * d6 - d5 * d4;
-			if (va <= 0.0f && (d4 - d3) >= 0.0f && (d5 - d6) >= 0.0f) {
-				float w = (d4 - d3) / ((d4 - d3) + (d5 -d6));
-				retvec = w * (t.m_C - t.m_B) + t.m_B;
-				return;
-			}
-			float denon = 1.0f / (va + vb + vc);
-			float v = vb * denon;
-			float w = vc * denon;
-			retvec = ab * v + ac * w + t.m_A;
 		}
 		//--------------------------------------------------------------------------------------
 		/*!
@@ -1686,24 +948,6 @@ namespace basecross{
 		}
 		//--------------------------------------------------------------------------------------
 		/*!
-		@brief	AABBとAABBとの衝突判定(minもしくはmaxが同じ値だったら衝突してない)
-		@param[in]	a	AABB1
-		@param[in]	b	AABB2
-		@return	衝突していればtrue
-		*/
-		//--------------------------------------------------------------------------------------
-		static bool AABB_AABB_NOT_EQUAL(const AABB& a, const AABB& b) {
-			if (a.m_Max.x <= b.m_Min.x || a.m_Min.x >= b.m_Max.x)
-				return false;
-			if (a.m_Max.y <= b.m_Min.y || a.m_Min.y >= b.m_Max.y)
-				return false;
-			if (a.m_Max.z <= b.m_Min.z || a.m_Min.z >= b.m_Max.z)
-				return false;
-			return true;
-		}
-
-		//--------------------------------------------------------------------------------------
-		/*!
 		@brief	AABB aがAABB ｂに完全に含まれるか判定
 		@param[in]	a	AABB1
 		@param[in]	b	AABB2
@@ -1719,27 +963,6 @@ namespace basecross{
 				return false;
 			return true;
 		}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	AABB aとAABB ｂを包むAABBを返す
-		@param[in]	a	AABB1
-		@param[in]	b	AABB2
-		@return	完全に含まれればtrue
-		*/
-		//--------------------------------------------------------------------------------------
-		static AABB AABB_OR_AABB(const AABB& a, const AABB& b) {
-			AABB ret;
-			ret.m_Min.x = (a.m_Min.x <= b.m_Min.x) ? a.m_Min.x : b.m_Min.x;
-			ret.m_Min.y = (a.m_Min.y <= b.m_Min.y) ? a.m_Min.y : b.m_Min.y;
-			ret.m_Min.z = (a.m_Min.z <= b.m_Min.z) ? a.m_Min.z : b.m_Min.z;
-
-			ret.m_Max.x = (a.m_Max.x >= b.m_Max.x) ? a.m_Max.x : b.m_Max.x;
-			ret.m_Max.y = (a.m_Max.y >= b.m_Max.y) ? a.m_Max.y : b.m_Max.y;
-			ret.m_Max.z = (a.m_Max.z >= b.m_Max.z) ? a.m_Max.z : b.m_Max.z;
-
-			return ret;
-		}
-
 		//--------------------------------------------------------------------------------------
 		/*!
 		@brief	球とOBBとの衝突判定
@@ -2021,7 +1244,6 @@ namespace basecross{
 			return CollisionTestSphereRect(SrcSp, SrcVelocity, DestRect, mid, EndTime, HitTime);
 		}
 
-
 		//--------------------------------------------------------------------------------------
 		/*!
 		@brief	OBBとPLANEとの衝突判定
@@ -2055,56 +1277,6 @@ namespace basecross{
 			}
 			return false;
 		}
-
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	SPHEREとTRIANGLEとの衝突判定
-		@param[in]	sp	SPHERE
-		@param[in]	tri	TRIANGLE
-		@return	衝突していればtrue
-		*/
-		//--------------------------------------------------------------------------------------
-		static bool SPHERE_TRIANGLE(const SPHERE& sp, const TRIANGLE& tri, Vector3& retvec) {
-			ClosestPtPointTriangle(sp.m_Center, tri, retvec);
-			Vector3 v = retvec - sp.m_Center;
-			return v.Dot(v) <= sp.m_Radius * sp.m_Radius;
-		}
-
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	Sphereと動かないTriangleの衝突判定
-		@param[in]	SrcSp	Srcの球
-		@param[in]	SrcVelocity	ソース速度
-		@param[in]	DestRect	Dest矩形
-		@param[in]	StartTime	開始時間
-		@param[in]	EndTime	終了時間
-		@param[out]	HitTime	ヒット時間
-		@return	衝突していればtrue
-		*/
-		//--------------------------------------------------------------------------------------
-		static bool CollisionTestSphereTriangle(const SPHERE& SrcSp, const Vector3& SrcVelocity,
-			const TRIANGLE& DestTri, float StartTime, float EndTime, float& HitTime) {
-			const float m_EPSILON = 0.005f;
-			SPHERE SrcSp2;
-			float mid = (StartTime + EndTime) * 0.5f;
-			SrcSp2.m_Center = SrcSp.m_Center + SrcVelocity * mid;
-			SrcSp2.m_Radius = (mid - StartTime) * SrcVelocity.Length() + SrcSp.m_Radius;
-			Vector3 RetVec;
-			if (!HitTest::SPHERE_TRIANGLE(SrcSp2, DestTri, RetVec)) {
-				return false;
-			}
-			if (EndTime - StartTime < m_EPSILON) {
-				HitTime = StartTime;
-				return true;
-			}
-			if (CollisionTestSphereTriangle(SrcSp, SrcVelocity, DestTri, StartTime, mid, HitTime)) {
-				return true;
-			}
-			return CollisionTestSphereTriangle(SrcSp, SrcVelocity, DestTri, mid, EndTime, HitTime);
-		}
-
-
-
 
 		//--------------------------------------------------------------------------------------
 		/*!
@@ -2368,131 +1540,6 @@ namespace basecross{
 			flg = 0;
 			return retvec;
 		}
-
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	カプセルとAabbの最近接点を得る
-		@param[in]	cp	カプセル
-		@param[in]	aabb	AABB
-		@param[out]	flg	位置関係
-		@return	最近接点
-		*/
-		//--------------------------------------------------------------------------------------
-		static Vector3 ClosestPtCapsuleAABB(const CAPSULE& cp, const AABB& aabb, int& flg) {
-			SPHERE Sp;
-			Sp.m_Center = cp.m_PointBottom;
-			Sp.m_Radius = cp.m_Radius;
-			Vector3 retvec;
-			//スタート位置で最近接点を得る
-			HitTest::SPHERE_AABB(Sp, aabb, retvec);
-			//内積を図る
-			Vector3 Base = cp.m_PointTop - cp.m_PointBottom;
-			Base.Normalize();
-			Vector3 Dest = retvec - cp.m_PointBottom;
-			float dot = Base.Dot(Dest);
-			if (dot < 0) {
-				//スタート位置の球体の外側
-				//retvecは有効
-				flg = -1;
-				return retvec;
-			}
-			float  size = Vector3EX::Length(cp.m_PointTop - cp.m_PointBottom);
-			if (dot > size) {
-				//終点より先にある
-				Sp.m_Center = cp.m_PointTop;
-				HitTest::SPHERE_AABB(Sp, aabb, retvec);
-				//終点で最近接点をとる
-				flg = 1;
-				return retvec;
-			}
-			//中心とaabbの最近接点を得る
-			HitTest::ClosestPtPointAABB(cp.GetCenter(), aabb, retvec);
-			float t;
-			Vector3 SegPoint;
-			HitTest::ClosetPtPointSegment(retvec, cp.m_PointBottom, cp.m_PointTop, t, SegPoint);
-			Vector3 Span = retvec - SegPoint;
-			Span.Normalize();
-			Span *= cp.m_Radius;
-			SegPoint += Span;
-			retvec = SegPoint;
-			flg = 0;
-			return retvec;
-		}
-
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	カプセルとAABBの衝突判定
-		@param[in]	cp	カプセル
-		@param[in]	aabb	AABB
-		@param[out]	retvec	最近接点
-		@return	衝突していればtrue
-		*/
-		//--------------------------------------------------------------------------------------
-		static bool CAPSULE_AABB(const CAPSULE& cp, const AABB& aabb, Vector3& retvec) {
-			//スィープさせる球
-			SPHERE StartSp, EndSp;
-			StartSp.m_Center = cp.m_PointBottom;
-			StartSp.m_Radius = cp.m_Radius;
-			EndSp.m_Center = cp.m_PointTop;
-			EndSp.m_Radius = cp.m_Radius;
-			//各点とaabbの最近接点を得る
-			//カプセルとAABBの最近接点を得る（衝突してるかどうかは関係ない）
-			int flg;
-			retvec = ClosestPtCapsuleAABB(cp, aabb, flg);
-			float HitTime;
-			Vector3 Velocity = EndSp.m_Center - StartSp.m_Center;
-			if (CollisionTestSphereAabb(StartSp, Velocity, aabb, 0, 1.0f, HitTime)) {
-				return true;
-			}
-			return false;
-		}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	カプセルと動かないAABBの衝突判定
-		@param[in]	SrcCapsule	Srcのカプセル
-		@param[in]	SrcVelocity	ソース速度
-		@param[in]	DestAabb	DestのAABB
-		@param[in]	StartTime	開始時間
-		@param[in]	EndTime	終了時間
-		@param[out]	HitTime	ヒット時間
-		@return	衝突していればtrue
-		*/
-		//--------------------------------------------------------------------------------------
-		static bool CollisionTestCapsuleAabb(const CAPSULE& SrcCapsule, const Vector3& SrcVelocity,
-			const AABB& DestAabb, float StartTime, float EndTime, float& HitTime) {
-			const float m_EPSILON = 0.005f;
-			CAPSULE SrcCapsule2 = SrcCapsule;
-			float mid = (StartTime + EndTime) * 0.5f;
-			SrcCapsule2.m_Radius = (mid - StartTime) * SrcVelocity.Length() + SrcCapsule.m_Radius;
-			float Scale = SrcCapsule2.m_Radius / SrcCapsule.m_Radius;
-			//中心が原点の元のカプセルを作成
-			CAPSULE SrcBaseCapsule = SrcCapsule;
-			SrcBaseCapsule.SetCenter(Vector3(0, 0, 0));
-			//原点カプセルでスケーリング
-			//スケーリング行列の作成
-			Matrix4X4 ScalMat;
-			ScalMat.Scaling(Scale, Scale, Scale);
-			//各頂点をスケーリング
-			SrcCapsule2.m_PointBottom = Vector3EX::Transform(SrcBaseCapsule.m_PointBottom, ScalMat);
-			SrcCapsule2.m_PointTop = Vector3EX::Transform(SrcBaseCapsule.m_PointTop, ScalMat);
-			//中心を移動
-			SrcCapsule2.SetCenter(SrcCapsule.GetCenter() + SrcVelocity * mid);
-			Vector3 RetVec;
-			if (!HitTest::CAPSULE_AABB(SrcCapsule2, DestAabb, RetVec)) {
-				return false;
-			}
-			if (EndTime - StartTime < m_EPSILON) {
-				HitTime = StartTime;
-				return true;
-			}
-			if (CollisionTestCapsuleAabb(SrcCapsule, SrcVelocity, DestAabb, StartTime, mid, HitTime)) {
-				return true;
-			}
-			return CollisionTestCapsuleAabb(SrcCapsule, SrcVelocity, DestAabb, mid, EndTime, HitTime);
-		}
-
-
-
 		//--------------------------------------------------------------------------------------
 		/*!
 		@brief	カプセルとObbの衝突判定
@@ -2515,7 +1562,7 @@ namespace basecross{
 			retvec = ClosestPtCapsuleOBB(cp, obb,flg);
 			float HitTime;
 			Vector3 Velocity = EndSp.m_Center - StartSp.m_Center;
-			if (CollisionTestSphereObb(StartSp, Velocity,obb, 0,1.0f, HitTime)){
+			if (CollisionTestSphereObb(StartSp, Velocity,obb, 0, 1.0f, HitTime)){
 				return true;
 			}
 			return false;
@@ -2563,186 +1610,6 @@ namespace basecross{
 				return true;
 			}
 			return CollisionTestCapsuleObb(SrcCapsule, SrcVelocity, DestObb, mid, EndTime, HitTime);
-		}
-
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	CAPSULEとTRIANGLEとの衝突判定
-		@param[in]	cp	CAPSULE
-		@param[in]	rect	COLRECT
-		@param[in]	retvec	最近接点
-		@return	衝突していればtrue
-		*/
-		//--------------------------------------------------------------------------------------
-		static bool CAPSULE_TRIANGLE(const CAPSULE& cp, const TRIANGLE& tri, Vector3& retvec) {
-			//スィープさせる球
-			SPHERE StartSp, EndSp;
-			//下から上
-			StartSp.m_Center = cp.m_PointBottom;
-			StartSp.m_Radius = cp.m_Radius;
-			EndSp.m_Center = cp.m_PointTop;
-			EndSp.m_Radius = cp.m_Radius;
-
-			PLANE p = tri.GetPLANE();
-			float t;
-			Vector3 q;
-			SEGMENT_PLANE(StartSp.m_Center, EndSp.m_Center, p, t, q);
-			//仮に下の点で初期化
-			Vector3 Centor = StartSp.m_Center;
-			if (t <= 0) {
-				Centor = StartSp.m_Center;
-			}
-			else if (t >= 1.0f) {
-				Centor = EndSp.m_Center;
-			}
-			else {
-				Centor = q;
-			}
-			//Centerは、線上の面との最近接点
-			//点とTRIANGLEの最近接点を得る（衝突してるかどうかは関係ない）
-			ClosestPtPointTriangle(Centor, tri, retvec);
-			float HitTime;
-			Vector3 Velocity = EndSp.m_Center - StartSp.m_Center;
-			if (CollisionTestSphereTriangle(StartSp, Velocity, tri, 0, 1.0f, HitTime)) {
-				return true;
-			}
-			return false;
-		}
-
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	Capsuleと動かないTriangleの衝突判定
-		@param[in]	SrcCapsule	Srcのカプセル
-		@param[in]	SrcVelocity	ソース速度
-		@param[in]	DestTri		Dest三角形
-		@param[in]	StartTime	開始時間
-		@param[in]	EndTime	終了時間
-		@param[out]	HitTime	ヒット時間
-		@return	衝突していればtrue
-		*/
-		//--------------------------------------------------------------------------------------
-		static bool CollisionTestCapsuleTriangle(const CAPSULE& SrcCapsule, const Vector3& SrcVelocity,
-			const TRIANGLE& DestTri, float StartTime, float EndTime, float& HitTime) {
-			const float m_EPSILON = 0.005f;
-			CAPSULE SrcCapsule2 = SrcCapsule;
-			float mid = (StartTime + EndTime) * 0.5f;
-			SrcCapsule2.m_Radius = (mid - StartTime) * SrcVelocity.Length() + SrcCapsule.m_Radius;
-			float Scale = SrcCapsule2.m_Radius / SrcCapsule.m_Radius;
-			//中心が原点の元のカプセルを作成
-			CAPSULE SrcBaseCapsule = SrcCapsule;
-			SrcBaseCapsule.SetCenter(Vector3(0, 0, 0));
-			//原点カプセルでスケーリング
-			//スケーリング行列の作成
-			Matrix4X4 ScalMat;
-			ScalMat.Scaling(Scale, Scale, Scale);
-			//各頂点をスケーリング
-			SrcCapsule2.m_PointBottom = Vector3EX::Transform(SrcBaseCapsule.m_PointBottom, ScalMat);
-			SrcCapsule2.m_PointTop = Vector3EX::Transform(SrcBaseCapsule.m_PointTop, ScalMat);
-			//中心を移動
-			SrcCapsule2.SetCenter(SrcCapsule.GetCenter() + SrcVelocity * mid);
-			Vector3 RetVec;
-			if (!HitTest::CAPSULE_TRIANGLE(SrcCapsule2, DestTri, RetVec)) {
-				return false;
-			}
-			if (EndTime - StartTime < m_EPSILON) {
-				HitTime = StartTime;
-				return true;
-			}
-			if (CollisionTestCapsuleTriangle(SrcCapsule, SrcVelocity, DestTri, StartTime, mid, HitTime)) {
-				return true;
-			}
-			return CollisionTestCapsuleTriangle(SrcCapsule, SrcVelocity, DestTri, mid, EndTime, HitTime);
-		}
-
-
-
-
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	CAPSULEとCOLRECTとの衝突判定
-		@param[in]	cp	CAPSULE
-		@param[in]	rect	COLRECT
-		@param[in]	retvec	最近接点
-		@return	衝突していればtrue
-		*/
-		//--------------------------------------------------------------------------------------
-		static bool CAPSULE_COLRECT(const CAPSULE& cp, const COLRECT& rect, Vector3& retvec) {
-			//スィープさせる球
-			SPHERE StartSp, EndSp;
-			//下から上
-			StartSp.m_Center = cp.m_PointBottom;
-			StartSp.m_Radius = cp.m_Radius;
-			EndSp.m_Center = cp.m_PointTop;
-			EndSp.m_Radius = cp.m_Radius;
-
-			PLANE p = rect.GetPLANE();
-			float t;
-			Vector3 q;
-			SEGMENT_PLANE(StartSp.m_Center, EndSp.m_Center, p, t, q);
-			//仮に下の点で初期化
-			Vector3 Centor = StartSp.m_Center;
-			if (t <= 0) {
-				Centor = StartSp.m_Center;
-			}
-			else if (t >= 1.0f) {
-				Centor = EndSp.m_Center;
-			}
-			else {
-				Centor = q;
-			}
-			//Centerは、線上の面との最近接点
-			//球ととCOLRECTの最近接点を得る（衝突してるかどうかは関係ない）
-			ClosestPtPointCOLRECT(Centor, rect, retvec);
-			float HitTime;
-			Vector3 Velocity = EndSp.m_Center - StartSp.m_Center;
-			if (CollisionTestSphereRect(StartSp, Velocity, rect, 0, 1.0f, HitTime)) {
-				return true;
-			}
-			return false;
-		}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	Capsuleと動かないRectの衝突判定
-		@param[in]	SrcCapsule	Srcの球
-		@param[in]	SrcVelocity	ソース速度
-		@param[in]	DestRect	Dest矩形
-		@param[in]	StartTime	開始時間
-		@param[in]	EndTime	終了時間
-		@param[out]	HitTime	ヒット時間
-		@return	衝突していればtrue
-		*/
-		//--------------------------------------------------------------------------------------
-		static bool CollisionTestCapsuleRect(const CAPSULE& SrcCapsule, const Vector3& SrcVelocity,
-			const COLRECT& DestRect, float StartTime, float EndTime, float& HitTime) {
-			const float m_EPSILON = 0.005f;
-			CAPSULE SrcCapsule2 = SrcCapsule;
-			float mid = (StartTime + EndTime) * 0.5f;
-			SrcCapsule2.m_Radius = (mid - StartTime) * SrcVelocity.Length() + SrcCapsule.m_Radius;
-			float Scale = SrcCapsule2.m_Radius / SrcCapsule.m_Radius;
-			//中心が原点の元のカプセルを作成
-			CAPSULE SrcBaseCapsule = SrcCapsule;
-			SrcBaseCapsule.SetCenter(Vector3(0, 0, 0));
-			//原点カプセルでスケーリング
-			//スケーリング行列の作成
-			Matrix4X4 ScalMat;
-			ScalMat.Scaling(Scale, Scale, Scale);
-			//各頂点をスケーリング
-			SrcCapsule2.m_PointBottom = Vector3EX::Transform(SrcBaseCapsule.m_PointBottom, ScalMat);
-			SrcCapsule2.m_PointTop = Vector3EX::Transform(SrcBaseCapsule.m_PointTop, ScalMat);
-			//中心を移動
-			SrcCapsule2.SetCenter(SrcCapsule.GetCenter() + SrcVelocity * mid);
-			Vector3 RetVec;
-			if (!HitTest::CAPSULE_COLRECT(SrcCapsule2, DestRect, RetVec)) {
-				return false;
-			}
-			if (EndTime - StartTime < m_EPSILON) {
-				HitTime = StartTime;
-				return true;
-			}
-			if (CollisionTestCapsuleRect(SrcCapsule, SrcVelocity, DestRect, StartTime, mid, HitTime)) {
-				return true;
-			}
-			return CollisionTestCapsuleRect(SrcCapsule, SrcVelocity, DestRect, mid, EndTime, HitTime);
 		}
 		//--------------------------------------------------------------------------------------
 		/*!
@@ -2804,16 +1671,6 @@ namespace basecross{
 			return CollisionTestObbObbSub(SrcObb, SrcVelocity,DestObb, StartTime, EndTime,HitTime);
 		}
 	};
-
-	inline AABB CAPSULE::GetWrappedAABB() const {
-		SPHERE sp_bottom, sp_top;
-		sp_bottom.m_Center = m_PointBottom;
-		sp_bottom.m_Radius = m_Radius;
-		sp_top.m_Center = m_PointBottom;
-		sp_top.m_Radius = m_Radius;
-		return HitTest::AABB_OR_AABB(sp_bottom.GetWrappedAABB(), sp_top.GetWrappedAABB());
-
-	}
 
 
 }
