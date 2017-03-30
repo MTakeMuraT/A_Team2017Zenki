@@ -6,19 +6,11 @@
 #pragma once
 
 #include "resource.h"
-
-#include "ProjectBehavior.h"
-#include "GameMedia.h"
-#include "Scene.h"
-//ステージ関係
+//シーン
 #include "GameStage.h"
+#include "Scene.h"
+#include "StageSelect.h"
+#include "Title.h"
+//!シーン
 #include "Character.h"
-#include "TitleScene.h"
-//オブジェクト関係
 #include "Player.h"
-
-
-
-
-
-

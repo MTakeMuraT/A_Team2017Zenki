@@ -9,8 +9,8 @@ using namespace basecross;
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 
 //定数
-const wchar_t* pClassName = L"BaseCrossFullClass";
-const wchar_t* pWndTitle = L"BaseCrossFullSample";
+const wchar_t* pClassName = L"BaseCrossDx11Class";
+const wchar_t* pWndTitle = L"MagicTwins";
 
 
 //--------------------------------------------------------------------------------------
@@ -54,7 +54,6 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 //--------------------------------------------------------------------------------------
 HWND InitInstance(HINSTANCE hInstance, int nCmdShow, bool isFullScreen, int iClientWidth, int iClientHeight)
 {
-
 	HWND hWnd = 0;
 	// ウィンドウの作成
 	if (isFullScreen) { // フルスクリーン
@@ -128,6 +127,7 @@ int MainLoop(HINSTANCE hInstance, HWND hWnd, bool isFullScreen, int iClientWidth
 	ZeroMemory(&WinInfo, sizeof(WinInfo));
 	//例外処理開始
 	try {
+		::ShowCursor(false);
 		//COMの初期化
 		//サウンドで使用する
 		if (FAILED(CoInitializeEx(nullptr, COINIT_MULTITHREADED))) {
@@ -143,9 +143,7 @@ int MainLoop(HINSTANCE hInstance, HWND hWnd, bool isFullScreen, int iClientWidth
 		MSG msg = { 0 };
 		//キーボード入力用
 		//ここに設定したキーボード入力を得る
-		vector<DWORD> UseKeyVec = {
-		'A',
-		};
+		vector<DWORD> UseKeyVec = {VK_DOWN,VK_RIGHT,VK_LEFT,VK_UP , 'S',VK_TAB,VK_SPACE,'Q'};
 		while (WM_QUIT != msg.message) {
 			if (!App::GetApp()->ResetInputState(hWnd, UseKeyVec)) {
 				//キー状態が何もなければウインドウメッセージを得る
@@ -210,6 +208,8 @@ int MainLoop(HINSTANCE hInstance, HWND hWnd, bool isFullScreen, int iClientWidth
 	//例外処理終了
 	//COMのリリース
 	::CoUninitialize();
+	::ShowCursor(true);
+
 	return RetCode;
 }
 

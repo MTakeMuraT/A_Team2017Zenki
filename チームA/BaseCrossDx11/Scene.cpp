@@ -15,33 +15,33 @@ namespace basecross{
 
 	void Scene::OnCreate(){
 		try {
-			//こいつが呼ばれてからステージが呼ばれる
-			m_GameMedia = ObjectFactory::Create<GameMedia>();
-
 			//最初のアクティブステージの設定
-			ResetActiveStage<TitleScene>();
+			ResetActiveStage<Title>();
 		}
 		catch (...) {
 			throw;
 		}
 	}
+
+
 	void Scene::OnEvent(const shared_ptr<Event>& event) {
 		//タイトル
-		if (event->m_MsgStr == L"ToTitleScene") {
-			auto TitleScenePtr = dynamic_pointer_cast<TitleScene>(GetActiveStage());
-			if (!TitleScenePtr) {
-				ResetActiveStage<TitleScene>();
-			}
+		if (event->m_MsgStr == L"Title")
+		{
+			ResetActiveStage<Title>();
 		}
-		//ゲームステージ（仮）
-		if (event->m_MsgStr == L"ToGameScene") {
-			auto TitleScenePtr = dynamic_pointer_cast<GameStage>(GetActiveStage());
-			if (!TitleScenePtr) {
-				ResetActiveStage<GameStage>();
-			}
+		//ステージセレクト
+		else if (event->m_MsgStr == L"StageSelect")
+		{
+			ResetActiveStage<StageSelect>();
 		}
-
+		//ゲーム中
+		else if (event->m_MsgStr == L"GameStage")
+		{
+			ResetActiveStage<GameStage>();
+		}
 	}
+
 
 }
 //end basecross

@@ -7,10 +7,28 @@
 
 #pragma once
 
-
 #define WIN32_LEAN_AND_MEAN             // Windows ヘッダーから使用されていない部分を除外します。
 // Windows ヘッダー ファイル:
 #include <windows.h>
+
+//魔法の種類
+enum MagicType
+{
+	None,
+	Fire,
+	IceFog,
+	Wind
+};
+
+//突撃エネミー(EnemyRush)の状態
+enum EnemyState
+{
+	Stop,
+	Target,
+	Attack,
+	Damage,
+	Delete,
+};
 
 // C ランタイム ヘッダー ファイル
 #include <stdio.h>
@@ -79,8 +97,6 @@ using namespace std;
 #include <DirectXColors.h>
 #include <DirectXCollision.h>
 #include <DirectXTex.h>
-//#define FBXSDK_NEW_API
-//#include <fbxsdk.h>
 
 // XInput includes
 #include <xinput.h>
@@ -126,7 +142,4 @@ using namespace Microsoft::WRL::Details;
 
 
 #include "../../Libs/BaseLib/Dx11Lib/Common.h"
-#include "../../Libs/BaseLib/Dx11FullLib/FullCommon.h"
-
-
-
+#include "Common/Common.h"
