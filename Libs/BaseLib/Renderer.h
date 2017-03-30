@@ -3,8 +3,6 @@
 
 namespace basedx11{
 
-
-
 	//--------------------------------------------------------------------------------------
 	//	class RenderState;
 	//	用途: レンダリングステートクラス
@@ -110,7 +108,7 @@ namespace basedx11{
 	class ShadowMapRenderTarget : public RenderTarget{
 	public:
 		//構築と破棄
-		ShadowMapRenderTarget(float ShadowMapDimension);
+		ShadowMapRenderTarget();
 		virtual ~ShadowMapRenderTarget();
 
 		//アクセサ

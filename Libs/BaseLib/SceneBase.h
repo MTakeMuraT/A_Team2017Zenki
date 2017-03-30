@@ -13,7 +13,6 @@ namespace basedx11{
 		shared_ptr<Component> SearchComponent(type_index TypeIndex)const;
 		shared_ptr<Rigidbody> GetRigidbody()const;
 		shared_ptr<Gravity> GetGravity()const;
-		shared_ptr<TransformMatrix> GetTransformMatrix()const;
 		shared_ptr<Transform> GetTransform()const;
 		shared_ptr<Collision> GetCollision()const;
 		shared_ptr<CollisionSphere> GetCollisionSphere()const;
@@ -26,7 +25,6 @@ namespace basedx11{
 		void SetCollisionSphere(const shared_ptr<CollisionSphere>& Ptr);
 		void SetCollisionCapsule(const shared_ptr<CollisionCapsule>& Ptr);
 		void SetCollisionObb(const shared_ptr<CollisionObb>& Ptr);
-		void SetTransformMatrix(const shared_ptr<TransformMatrix>& Ptr);
 		void SetTransform(const shared_ptr<Transform>& Ptr);
 		void AddMakedComponent(type_index TypeIndex, const shared_ptr<Component>& Ptr);
 		template<typename T>
@@ -331,55 +329,19 @@ namespace basedx11{
 			return Ptr;
 		}
 
-		//TransformMatrix特殊化
-		template <>
-		shared_ptr<TransformMatrix> GetComponent<TransformMatrix>(bool ExceptionActive)const {
-			auto Ptr = GetTransformMatrix();
-			if (!Ptr) {
-				if (ExceptionActive) {
-					throw BaseMBException(
-						"コンポーネントが見つかりません",
-						"TransformMatrix",
-						"GameObject::GetComponent<TransformMatrix>()"
-						);
-				}
-				else {
-					return nullptr;
-				}
-			}
-			return Ptr;
-		}
-		//DynamicTransform
-		template <typename T>
-		shared_ptr<T> GetDynamicTransformMatrix(bool ExceptionActive = true)const {
-			auto Ptr = dynamic_pointer_cast<T>(GetTransformMatrix());
-			if (!Ptr) {
-				if (ExceptionActive) {
-					throw BaseMBException(
-						"指定の型へはTransformからキャストできません",
-						typeid(T).name(),
-						"GameObject::GetDynamicTransformMatrix<T>()"
-						);
-				}
-				else {
-					return nullptr;
-				}
-			}
-			return Ptr;
-		}
 		//Transform特殊化
 		template <>
-		shared_ptr<Transform> GetComponent<Transform>(bool ExceptionActive)const {
+		shared_ptr<Transform> GetComponent<Transform>(bool ExceptionActive)const{
 			auto Ptr = GetTransform();
-			if (!Ptr) {
-				if (ExceptionActive) {
+			if (!Ptr){
+				if (ExceptionActive){
 					throw BaseMBException(
 						"コンポーネントが見つかりません",
 						"Transform",
 						"GameObject::GetComponent<Transform>()"
 						);
 				}
-				else {
+				else{
 					return nullptr;
 				}
 			}
@@ -387,17 +349,17 @@ namespace basedx11{
 		}
 		//DynamicTransform
 		template <typename T>
-		shared_ptr<T> GetDynamicTransform(bool ExceptionActive = true)const {
+		shared_ptr<T> GetDynamicTransform(bool ExceptionActive = true)const{
 			auto Ptr = dynamic_pointer_cast<T>(GetTransform());
-			if (!Ptr) {
-				if (ExceptionActive) {
+			if (!Ptr){
+				if (ExceptionActive){
 					throw BaseMBException(
 						"指定の型へはTransformからキャストできません",
 						typeid(T).name(),
 						"GameObject::GetDynamicTransform<T>()"
 						);
 				}
-				else {
+				else{
 					return nullptr;
 				}
 			}
@@ -446,7 +408,7 @@ namespace basedx11{
 			}
 			else{
 				//見つからない。新たに作成する
-				shared_ptr<T> newPtr = ObjectFactory::Create<T>(GetThis<GameObject>(), params...);
+				shared_ptr<T> newPtr = Object::CreateObject<T>(GetThis<GameObject>(), params...);
 				AddMakedComponent(type_index(typeid(T)), newPtr);
 				return newPtr;
 			}
@@ -460,7 +422,7 @@ namespace basedx11{
 			}
 			else{
 				//無ければ新たに制作する
-				auto RigidbodyPtr = ObjectFactory::Create<Rigidbody>(GetThis<GameObject>());
+				auto RigidbodyPtr = Object::CreateObject<Rigidbody>(GetThis<GameObject>());
 				SetRigidbody(RigidbodyPtr);
 				return RigidbodyPtr;
 			}
@@ -470,7 +432,7 @@ namespace basedx11{
 		template<typename T, typename... Ts>
 		shared_ptr<T> AddDynamicRigidbody(Ts&&... params){
 			//現在の検索は行わず、そのままセットする
-			shared_ptr<T> newPtr = ObjectFactory::Create<T>(GetThis<GameObject>(), params...);
+			shared_ptr<T> newPtr = Object::CreateObject<T>(GetThis<GameObject>(), params...);
 			//Rigidbodyにキャストしてみる
 			auto RetPtr = dynamic_pointer_cast<Rigidbody>(newPtr);
 			if (!RetPtr){
@@ -493,7 +455,7 @@ namespace basedx11{
 			}
 			else{
 				//無ければ新たに制作する
-				auto GravityPtr = ObjectFactory::Create<Gravity>(GetThis<GameObject>());
+				auto GravityPtr = Object::CreateObject<Gravity>(GetThis<GameObject>());
 				SetGravity(GravityPtr);
 				return GravityPtr;
 			}
@@ -503,7 +465,7 @@ namespace basedx11{
 		template<typename T, typename... Ts>
 		shared_ptr<T> AddDynamicGravity(Ts&&... params){
 			//現在の検索は行わず、そのままセットする
-			shared_ptr<T> newPtr = ObjectFactory::Create<T>(GetThis<GameObject>(), params...);
+			shared_ptr<T> newPtr = Object::CreateObject<T>(GetThis<GameObject>(), params...);
 			//Gravityにキャストしてみる
 			auto RetPtr = dynamic_pointer_cast<Gravity>(newPtr);
 			if (!RetPtr){
@@ -539,7 +501,7 @@ namespace basedx11{
 		template<typename T, typename... Ts>
 		shared_ptr<T> AddDynamicCollision(Ts&&... params){
 			//現在の検索は行わず、そのままセットする
-			shared_ptr<T> newPtr = ObjectFactory::Create<T>(GetThis<GameObject>(), params...);
+			shared_ptr<T> newPtr = Object::CreateObject<T>(GetThis<GameObject>(), params...);
 			//Collisionにキャストしてみる
 			auto RetPtr = dynamic_pointer_cast<Collision>(newPtr);
 			if (!RetPtr){
@@ -563,7 +525,7 @@ namespace basedx11{
 			}
 			else{
 				//無ければ新たに制作する
-				auto CollisionSpherePtr = ObjectFactory::Create<CollisionSphere>(GetThis<GameObject>());
+				auto CollisionSpherePtr = Object::CreateObject<CollisionSphere>(GetThis<GameObject>());
 				SetCollisionSphere(CollisionSpherePtr);
 				return CollisionSpherePtr;
 			}
@@ -573,7 +535,7 @@ namespace basedx11{
 		template<typename T, typename... Ts>
 		shared_ptr<T> AddDynamicCollisionSphere(Ts&&... params){
 			//現在の検索は行わず、そのままセットする
-			shared_ptr<T> newPtr = ObjectFactory::Create<T>(GetThis<GameObject>(), params...);
+			shared_ptr<T> newPtr = Object::CreateObject<T>(GetThis<GameObject>(), params...);
 			//CollisionSphereにキャストしてみる
 			auto RetPtr = dynamic_pointer_cast<CollisionSphere>(newPtr);
 			if (!RetPtr){
@@ -597,7 +559,7 @@ namespace basedx11{
 			}
 			else{
 				//無ければ新たに制作する
-				auto CollisionCapsulePtr = ObjectFactory::Create<CollisionCapsule>(GetThis<GameObject>());
+				auto CollisionCapsulePtr = Object::CreateObject<CollisionCapsule>(GetThis<GameObject>());
 				SetCollisionCapsule(CollisionCapsulePtr);
 				return CollisionCapsulePtr;
 			}
@@ -607,7 +569,7 @@ namespace basedx11{
 		template<typename T, typename... Ts>
 		shared_ptr<T> AddDynamicCollisionCapsule(Ts&&... params){
 			//現在の検索は行わず、そのままセットする
-			shared_ptr<T> newPtr = ObjectFactory::Create<T>(GetThis<GameObject>(), params...);
+			shared_ptr<T> newPtr = Object::CreateObject<T>(GetThis<GameObject>(), params...);
 			//CollisionCapsuleにキャストしてみる
 			auto RetPtr = dynamic_pointer_cast<CollisionCapsule>(newPtr);
 			if (!RetPtr){
@@ -633,7 +595,7 @@ namespace basedx11{
 			}
 			else{
 				//無ければ新たに制作する
-				auto CollisionObbPtr = ObjectFactory::Create<CollisionObb>(GetThis<GameObject>());
+				auto CollisionObbPtr = Object::CreateObject<CollisionObb>(GetThis<GameObject>());
 				SetCollisionObb(CollisionObbPtr);
 				return CollisionObbPtr;
 			}
@@ -643,7 +605,7 @@ namespace basedx11{
 		template<typename T, typename... Ts>
 		shared_ptr<T> AddDynamicCollisionObb(Ts&&... params){
 			//現在の検索は行わず、そのままセットする
-			shared_ptr<T> newPtr = ObjectFactory::Create<T>(GetThis<GameObject>(), params...);
+			shared_ptr<T> newPtr = Object::CreateObject<T>(GetThis<GameObject>(), params...);
 			//CollisionObbにキャストしてみる
 			auto RetPtr = dynamic_pointer_cast<CollisionObb>(newPtr);
 			if (!RetPtr){
@@ -657,64 +619,16 @@ namespace basedx11{
 			SetCollisionObb(newPtr);
 			return newPtr;
 		}
-
-
-		//TransformMatrix特殊化
-		template <>
-		shared_ptr<TransformMatrix> AddComponent<TransformMatrix>() {
-			auto Ptr = GetTransformMatrix();
-			auto Ptr2 = GetTransform();
-			if (Ptr) {
-				if (!Ptr2){
-					return Ptr;
-				}
-				else{
-					throw BaseException(
-						L"すでにTransformコンポーネントが実装されています",
-						L"TransformMatrixとして設定できません",
-						L"GameObject::AddComponent<TransformMatrix>()"
-						);
-				}
-			}
-			else {
-				//無ければ新たに制作する
-				auto TransformMatrixPtr = ObjectFactory::Create<TransformMatrix>(GetThis<GameObject>());
-				SetTransformMatrix(TransformMatrixPtr);
-				return TransformMatrixPtr;
-			}
-		}
-		//DynamicTransformMatrix
-		//TransformMatrixの派生クラスをTransformMatrixにセットする
-		template<typename T, typename... Ts>
-		shared_ptr<T> AddDynamicTransformMatrix(Ts&&... params) {
-			//現在の検索は行わず、そのままセットする
-			shared_ptr<T> newPtr = ObjectFactory::Create<T>(GetThis<GameObject>(), params...);
-			//TransformMatrixにキャストしてみる
-			auto RetPtr = dynamic_pointer_cast<TransformMatrix>(newPtr);
-			if (!RetPtr) {
-				//キャストできない
-				throw BaseMBException(
-					"そのコンポーネントはTransformMatrixにキャストできません。",
-					typeid(T).name(),
-					"GameObject::AddDynamicTransformMatrix<T>()"
-					);
-			}
-			SetTransformMatrix(newPtr);
-			return newPtr;
-		}
-
-
-
 		//Transform特殊化
 		template <>
-		shared_ptr<Transform> AddComponent<Transform>() {
+		shared_ptr<Transform> AddComponent<Transform>(){
 			auto Ptr = GetTransform();
-			if (Ptr) {
+			if (Ptr){
 				return Ptr;
 			}
-			else {
+			else{
 				//無ければ新たに制作する
-				auto TransformPtr = ObjectFactory::Create<Transform>(GetThis<GameObject>());
+				auto TransformPtr = Object::CreateObject<Transform>(GetThis<GameObject>());
 				SetTransform(TransformPtr);
 				return TransformPtr;
 			}
@@ -722,12 +636,12 @@ namespace basedx11{
 		//DynamicTransform
 		//Transformの派生クラスをTransformにセットする
 		template<typename T, typename... Ts>
-		shared_ptr<T> AddDynamicTransform(Ts&&... params) {
+		shared_ptr<T> AddDynamicTransform(Ts&&... params){
 			//現在の検索は行わず、そのままセットする
-			shared_ptr<T> newPtr = ObjectFactory::Create<T>(GetThis<GameObject>(), params...);
+			shared_ptr<T> newPtr = Object::CreateObject<T>(GetThis<GameObject>(), params...);
 			//Transformにキャストしてみる
 			auto RetPtr = dynamic_pointer_cast<Transform>(newPtr);
-			if (!RetPtr) {
+			if (!RetPtr){
 				//キャストできない
 				throw BaseMBException(
 					"そのコンポーネントはTransformにキャストできません。",
@@ -848,31 +762,6 @@ namespace basedx11{
 			}
 			SetCollisionObb(SetPtr);
 		}
-
-
-		//TransformMatrix特殊化
-		template <>
-		void SetComponent<TransformMatrix>(const shared_ptr<TransformMatrix>& SetPtr){
-			SetTransformMatrix(SetPtr);
-		}
-		//DynamicTransformMatrix
-		//TransformMatrixの派生クラスをTransformMatrixにセットする
-		template <typename T>
-		void SetDynamicTransformMatrix(const shared_ptr<T>& SetPtr){
-			//TransformMatrixにキャストしてみる
-			auto RetPtr = dynamic_pointer_cast<TransformMatrix>(SetPtr);
-			if (!RetPtr){
-				//キャストできない
-				throw BaseMBException(
-					"そのコンポーネントはTransformMatrixにキャストできません。",
-					typeid(T).name(),
-					"GameObject::SetDynamicTransform<T>()"
-					);
-			}
-			SetTransformMatrix(SetPtr);
-		}
-
-
 		//Transform特殊化
 		template <>
 		void SetComponent<Transform>(const shared_ptr<Transform>& SetPtr){
@@ -968,7 +857,7 @@ namespace basedx11{
 			//例外が出なければnull初期化
 			SetCollisionObb(nullptr);
 		}
-		//RemoveComponentはTransformとTransformMatrix特殊化は用意しない
+		//RemoveComponentはTransform特殊化は用意しない
 		//もしTransformが削除されようとしても
 		//RemoveComponentが参照するリストには
 		//Transformは存在しないので安全である
@@ -976,19 +865,16 @@ namespace basedx11{
 		//コンポーネント操作
 		void ComponentUpdate();
 		void ComponentUpdate2();
-		void CollisionReset();
 		void DrawShadowmap();
 		void ComponentDraw();
 
 		//仮想関数
-		virtual void OnPreCreate()override;
-		virtual void OnUpdate()override{}
-		virtual void OnPreDraw(){}
-		virtual void OnDraw()override;
-		//衝突判定チェック（ステージより呼ばれる）
-		void CollisionChk();
-		//衝突時のイベント
-		virtual void OnCollision(const shared_ptr<GameObject>& other) {}
+		virtual void PreCreate()override;
+		virtual void Update(){}
+		virtual void Update2(){}
+		virtual void Update3(){}
+		virtual void PreDraw(){}
+		virtual void Draw()override;
 
 	private:
 		// pImplイディオム
@@ -1118,8 +1004,8 @@ namespace basedx11{
 		vector< shared_ptr<Particle> >& GetParticleVec() const;
 		//操作
 		shared_ptr<Particle> InsertParticle(size_t Count, Particle::DrawOption Option = Particle::DrawOption::Billboard);
-		virtual void OnUpdate()override;
-		virtual void OnDraw()override;
+		virtual void Update()override;
+		virtual void Draw()override;
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -1139,7 +1025,7 @@ namespace basedx11{
 		explicit ParticleManager(const shared_ptr<Stage>& StagePtr);
 		virtual ~ParticleManager();
 		//初期化
-		virtual void OnCreate() override;
+		virtual void Create() override;
 
 		//アクセサ
 		bool GetZBufferUse() const;
@@ -1160,15 +1046,13 @@ namespace basedx11{
 		void AddParticle(const ParticleSprite& rParticleSprite, Particle::DrawOption Option,
 			const Vector3& EmitterPos, const shared_ptr<TextureResource>& TextureRes);
 
-		virtual void OnUpdate() override{}
-		virtual void OnDraw()override;
+		virtual void Update() override{}
+		virtual void Draw()override;
 	private:
 		//Implイディオム
 		struct Impl;
 		unique_ptr<Impl> pImpl;
 	};
-
-	
 
 	//--------------------------------------------------------------------------------------
 	//	class InputTextManager : public GameObject;
@@ -1180,7 +1064,7 @@ namespace basedx11{
 		explicit InputTextManager(const shared_ptr<Stage>& StagePtr);
 		virtual ~InputTextManager();
 		//初期化
-		virtual void OnCreate() override;
+		virtual void Create() override;
 		//アクセサ
 		shared_ptr<StringSprite> GetFocusInputString() const;
 		void SetFocusInputString(const shared_ptr<StringSprite>& Ptr);
@@ -1188,15 +1072,13 @@ namespace basedx11{
 		//操作
 		virtual void OnKeyDown(WPARAM wParam, LPARAM lParam);
 		virtual void OnChar(WPARAM wParam, LPARAM lParam);
-		virtual void OnUpdate() override{}
-		virtual void OnDraw()override{}
+		virtual void Update() override{}
+		virtual void Draw()override{}
 	private:
 		//Implイディオム
 		struct Impl;
 		unique_ptr<Impl> pImpl;
 	};
-
-	
 
 
 	//--------------------------------------------------------------------------------------
@@ -1230,7 +1112,7 @@ namespace basedx11{
 		vector< shared_ptr<Stage> >& GetChileStageVec();
 		template<typename T>
 		shared_ptr<Stage> AddChileStage(){
-			auto Ptr = ObjectFactory::Create<T>();
+			auto Ptr = Object::CreateObject<T>();
 			auto StagePtr = dynamic_pointer_cast<Stage>(Ptr);
 			if (!StagePtr){
 				throw BaseMBException(
@@ -1265,7 +1147,7 @@ namespace basedx11{
 		template<typename T,typename... Ts>
 		shared_ptr<T> AddGameObject(Ts&&... params){
 			try{
-				auto Ptr = ObjectFactory::Create<T>(GetThis<Stage>(),params...);
+				auto Ptr = Object::CreateObject<T>(GetThis<Stage>(),params...);
 				PushBackGameObject(Ptr);
 				return Ptr;
 			}
@@ -1273,21 +1155,6 @@ namespace basedx11{
 				throw;
 			}
 		}
-
-		template<typename T, typename... Ts>
-		shared_ptr<T> AddGameObjectWithParam(Ts&&... params){
-			try{
-				auto Ptr = ObjectFactory::CreateGameObjectWithParam<T>(GetThis<Stage>(), params...);
-				PushBackGameObject(Ptr);
-				return Ptr;
-			}
-			catch (...){
-				throw;
-			}
-		}
-
-
-
 		//すでに存在するGemeObjectの追加
 		shared_ptr<GameObject> AddGameObject(const shared_ptr<GameObject>& Obj);
 
@@ -1343,11 +1210,11 @@ namespace basedx11{
 		void SetSharedObjectGroup(const wstring& Key, const shared_ptr<GameObjectGroup>& NewPtr);
 
 		//デフォルトのレンダリングターゲット類を準備する
-		void CreateDefaultRenderTargets(float ShadowMapDimension);
+		void CreateDefaultRenderTargets();
 
 		//仮想関数
 		virtual void OnMessage(UINT message, WPARAM wParam, LPARAM lParam);
-		virtual void OnPreCreate()override;
+		virtual void PreCreate()override;
 
 		//ステージ内の更新（シーンからよばれる）
 		virtual void UpdateStage();
@@ -1391,10 +1258,10 @@ namespace basedx11{
 
 
 	//--------------------------------------------------------------------------------------
-	//	class SceneBase: public Object, public ShapeInterface;
+	//	class SceneBase: public Object;
 	//	用途: シーンベースクラス
 	//--------------------------------------------------------------------------------------
-	class SceneBase : public Object, public ShapeInterface
+	class SceneBase : public Object
 	{
 	public:
 		//構築と破棄
@@ -1410,7 +1277,7 @@ namespace basedx11{
 		//アクティブなステージを設定して初期化する
 		template<typename T, typename... Ts>
 		shared_ptr<T> ResetActiveStage(Ts&&... params){
-			auto Ptr = ObjectFactory::Create<T>(params...);
+			auto Ptr = Object::CreateObject<T>(params...);
 			auto StagePtr = dynamic_pointer_cast<Stage>(Ptr);
 			if (!StagePtr){
 				throw BaseMBException(
@@ -1423,11 +1290,11 @@ namespace basedx11{
 			return Ptr;
 		}
 		virtual void OnMessage(UINT message, WPARAM wParam, LPARAM lParam);
-		virtual void OnPreCreate()override;
+		virtual void PreCreate()override;
 		//シーンを変化させる
-		virtual void OnUpdate()override;
+		virtual void Update();
 		//シーンを描画
-		virtual void OnDraw()override;
+		virtual void Draw();
 	private:
 		// pImplイディオム
 		struct Impl;

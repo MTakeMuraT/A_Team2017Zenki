@@ -25,7 +25,7 @@ namespace basedx11{
 	StaticText::~StaticText(){}
 
 	//初期化
-	void StaticText::OnCreate(){
+	void StaticText::Create(){
 		//表示用テキストの作成
 		auto PtrString = AddComponent<StringSprite>();
 		PtrString->SetStartPosition(Point2D<float>(0, 0));
@@ -302,7 +302,7 @@ namespace basedx11{
 
 
 	//初期化
-	void InputText::OnCreate(){
+	void InputText::Create(){
 		//入力テキストの作成
 		auto PtrString = AddComponent<StringSprite>();
 		PtrString->SetStartPosition(Point2D<float>(240.0f, 320.0f));
@@ -835,7 +835,6 @@ namespace basedx11{
 			Ret = L"";
 		}
 	}
-
 
 }
 //end basedx11

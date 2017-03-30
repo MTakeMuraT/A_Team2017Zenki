@@ -349,80 +349,289 @@ namespace basedx11{
 
 
 	//--------------------------------------------------------------------------------------
-	//	class MeshResource : public MeshResource;
-	/*!
-	@breaf Dx11プリミティブメッシュクラス.<br />
-	プリミティブメッシュは、スタティック関数を使って生成する
-	*/
+	//	struct MeshResource::Impl;
+	//	用途: Implイディオム
+	//--------------------------------------------------------------------------------------
+	struct MeshResource::Impl{
+		ComPtr<ID3D11Buffer> m_VertexBuffer;	//頂点バッファ
+		ComPtr<ID3D11Buffer> m_IndexBuffer;	//インデックスバッファ
+		UINT m_NumVertices;				//頂点の数
+		UINT m_NumIndicis;				//インデックスの数
+
+	};
+
+	//--------------------------------------------------------------------------------------
+	//	class MeshResource : public BaseResource;
+	//	用途: プリミティブメッシュクラス
+	//--------------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------------------
+	//	MeshResource();
+	//	用途: コンストラクタ
+	//	戻り値: なし
+	//--------------------------------------------------------------------------------------
+	MeshResource::MeshResource():
+		BaseResource(),
+		pImpl(new Impl())
+	{}
+	MeshResource::~MeshResource(){}
+
+	void MeshResource::SetVertexBuffer(ComPtr<ID3D11Buffer>& VertexBuffer){
+		pImpl->m_VertexBuffer = VertexBuffer;
+	}
+	void MeshResource::SetIndexBuffer(ComPtr<ID3D11Buffer>& IndexBuffer){
+		pImpl->m_IndexBuffer = IndexBuffer;
+	}
+	void MeshResource::SetNumVertices(UINT NumVertices){
+		pImpl->m_NumVertices = NumVertices;
+	}
+	void MeshResource::SetNumIndicis(UINT NumIndicis){
+		pImpl->m_NumIndicis = NumIndicis;
+	}
+
+	//アクセッサ
+	ComPtr<ID3D11Buffer>& MeshResource::GetVertexBuffer() const{
+		return pImpl->m_VertexBuffer;
+	}
+	ComPtr<ID3D11Buffer>& MeshResource::GetIndexBuffer() const{
+		return pImpl->m_IndexBuffer;
+
+	}
+	UINT MeshResource::GetNumVertices() const{
+		return pImpl->m_NumVertices;
+	}
+	UINT MeshResource::GetNumIndicis() const{
+		return pImpl->m_NumIndicis;
+	}
+
+	struct VertexParams{
+		ComPtr<ID3D11Buffer> m_VertexBuffer;	//頂点バッファ
+		ComPtr<ID3D11Buffer> m_IndexBuffer;	//インデックスバッファ
+		UINT m_NumVertices;				//頂点の数
+		UINT m_NumIndicis;				//インデックスの数
+	};
+
+	//--------------------------------------------------------------------------------------
+	//	struct CommonMeshResource::Impl;
+	//	用途: Implイディオム
+	//--------------------------------------------------------------------------------------
+	struct CommonMeshResource::Impl{
+		vector<VertexPositionNormalTexture> m_BackupVertices;
+		//ミューテックス
+		std::mutex Mutex;
+		//--------------------------------------------------------------------------------------
+		//	void CreateBuffers(
+		//	vector<VertexPositionNormalTexture>& vertices, //頂点を作成するための配列
+		//	vector<uint16_t>& indices,	//インデックスを作成するための配列
+		//	bool AccessWrite		//書き込みOKかどうか
+		//	VertexParams& RetParam
+		//	);
+		//	用途: バッファを作成する
+		//	戻り値: なし
+		//--------------------------------------------------------------------------------------
+		void CreateBuffers(const vector<VertexPositionNormalTexture>& vertices,const vector<uint16_t>& indices, bool AccessWrite, VertexParams& RetParam);
+	};
+
+	void CommonMeshResource::Impl::CreateBuffers(const vector<VertexPositionNormalTexture>& vertices,const vector<uint16_t>& indices, bool AccessWrite,
+		VertexParams& RetParam){
+		//デバイスの取得
+		auto Dev = App::GetApp()->GetDeviceResources();
+		ID3D11Device* pDx11Device = Dev->GetD3DDevice();
+		//バッファの作成
+		if (AccessWrite){
+			Util::DemandCreate(RetParam.m_VertexBuffer, Mutex, [&](ID3D11Buffer** pResult)
+			{
+				//頂点バッファの作成
+				VertexUtil::CreateDynamicPrimitiveVertexBuffer(pDx11Device, vertices, pResult);
+			});
+		}
+		else{
+			Util::DemandCreate(RetParam.m_VertexBuffer, Mutex, [&](ID3D11Buffer** pResult)
+			{
+				//頂点バッファの作成
+				VertexUtil::CreatePrimitiveBuffer(pDx11Device, vertices, D3D11_BIND_VERTEX_BUFFER, pResult);
+			});
+		}
+		//頂点数の設定
+		RetParam.m_NumVertices = static_cast<UINT>(vertices.size());
+		Util::DemandCreate(RetParam.m_IndexBuffer, Mutex, [&](ID3D11Buffer** pResult)
+		{
+			//インデックスバッファの作成
+			VertexUtil::CreatePrimitiveBuffer(pDx11Device, indices, D3D11_BIND_INDEX_BUFFER, pResult);
+		});
+		//インデックス数の設定
+		RetParam.m_NumIndicis = static_cast<UINT>(indices.size());
+	}
+
+
+
+
+
+	//--------------------------------------------------------------------------------------
+	//	class CommonMeshResource : public MeshResource;
+	//	用途: プリミティブメッシュクラス
 	//--------------------------------------------------------------------------------------
 	//構築
-	MeshResource::MeshResource() :
-		BaseResource(),
-		m_IsSkining(false),
-		m_BoneCount(0),
-		m_SampleCount(0)
+	CommonMeshResource::CommonMeshResource():
+		MeshResource(),
+		pImpl(new Impl())
 	{}
 	//破棄
-	MeshResource::~MeshResource() {}
+	CommonMeshResource::~CommonMeshResource(){}
 
 	//リソース構築
+	shared_ptr<CommonMeshResource> CommonMeshResource::CreateCommonMeshResource(
+		const vector<VertexPositionNormalTexture>& Vertices, 
+		const vector<uint16_t>& Indices, 
+		bool AccessWrite){
+		try{
+			shared_ptr<CommonMeshResource> Ptr(new CommonMeshResource());
 
-	shared_ptr<MeshResource> MeshResource::CreateSquare(float Size, bool AccessWrite) {
-		try {
-			//頂点配列
-			vector<VertexPositionNormalTexture> vertices;
-			//インデックスを作成するための配列
-			vector<uint16_t> indices;
-			//Squareの作成(ヘルパー関数を利用)
-			VertexUtil::CreateSquare(Size, vertices, indices);
-			return MeshResource::CreateMeshResource<VertexPositionNormalTexture>(vertices, indices, AccessWrite);
+			for (auto Virtex : Vertices){
+				Ptr->pImpl->m_BackupVertices.push_back(Virtex);
+			}
+
+			VertexParams Params;
+
+			//配列をもとに頂点とインデックスを作成
+			Ptr->pImpl->CreateBuffers(Ptr->pImpl->m_BackupVertices, Indices, AccessWrite, Params);
+			//書き込み不可の場合はバックアップを削除
+			if (!AccessWrite){
+				Ptr->pImpl->m_BackupVertices.clear();
+			}
+			Ptr->SetVertexBuffer(Params.m_VertexBuffer);
+			Ptr->SetIndexBuffer(Params.m_IndexBuffer);
+			Ptr->SetNumVertices(Params.m_NumVertices);
+			Ptr->SetNumIndicis(Params.m_NumIndicis);
+
+			return Ptr;
 		}
-		catch (...) {
+		catch (...){
 			throw;
 		}
 	}
-	shared_ptr<MeshResource> MeshResource::CreateCube(float Size, bool AccessWrite) {
-		try {
-			//頂点配列
-			vector<VertexPositionNormalTexture> vertices;
+
+
+	shared_ptr<CommonMeshResource> CommonMeshResource::CreateSquare(float Size, bool AccessWrite){
+		try{
+			shared_ptr<CommonMeshResource> Ptr(new CommonMeshResource());
+
+			float HelfSize = Size / 2.0f;
+			Ptr->pImpl->m_BackupVertices.push_back(VertexPositionNormalTexture(XMFLOAT3(-HelfSize, HelfSize, 0), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0.0f, 0.0f)));
+			Ptr->pImpl->m_BackupVertices.push_back(VertexPositionNormalTexture(XMFLOAT3(HelfSize, HelfSize, 0), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(1.0f, 0.0f)));
+			Ptr->pImpl->m_BackupVertices.push_back(VertexPositionNormalTexture(XMFLOAT3(-HelfSize, -HelfSize, 0), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0.0f, 1.0f)));
+			Ptr->pImpl->m_BackupVertices.push_back(VertexPositionNormalTexture(XMFLOAT3(HelfSize, -HelfSize, 0), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(1.0f, 1.0f)));
+
+			//インデックスを作成するための配列
+			vector<uint16_t> indices{
+				(uint16_t)0,
+				(uint16_t)1,
+				(uint16_t)2,
+				(uint16_t)1,
+				(uint16_t)3,
+				(uint16_t)2,
+			};
+
+			VertexParams Params;
+
+			//配列をもとに頂点とインデックスを作成
+			Ptr->pImpl->CreateBuffers(Ptr->pImpl->m_BackupVertices, indices, AccessWrite, Params);
+			//書き込み不可の場合はバックアップを削除
+			if (!AccessWrite){
+				Ptr->pImpl->m_BackupVertices.clear();
+			}
+			Ptr->SetVertexBuffer(Params.m_VertexBuffer);
+			Ptr->SetIndexBuffer(Params.m_IndexBuffer);
+			Ptr->SetNumVertices(Params.m_NumVertices);
+			Ptr->SetNumIndicis(Params.m_NumIndicis);
+
+			return Ptr;
+
+		}
+		catch (...){
+			throw;
+		}
+	}
+	shared_ptr<CommonMeshResource> CommonMeshResource::CreateCube(float Size, bool AccessWrite){
+		try{
+			shared_ptr<CommonMeshResource> Ptr(new CommonMeshResource());
+
 			//インデックスを作成するための配列
 			vector<uint16_t> indices;
 			//Cubeの作成(ヘルパー関数を利用)
-			VertexUtil::CreateCube(Size, vertices, indices);
-			return MeshResource::CreateMeshResource<VertexPositionNormalTexture>(vertices, indices, AccessWrite);
+			VertexUtil::CreateCube(Size, Ptr->pImpl->m_BackupVertices, indices);
+			VertexParams Params;
+			//バッファを作成
+			Ptr->pImpl->CreateBuffers(Ptr->pImpl->m_BackupVertices, indices, AccessWrite, Params);
+			//書き込み不可の場合はバックアップを削除
+			if (!AccessWrite){
+				Ptr->pImpl->m_BackupVertices.clear();
+			}
+			Ptr->SetVertexBuffer(Params.m_VertexBuffer);
+			Ptr->SetIndexBuffer(Params.m_IndexBuffer);
+			Ptr->SetNumVertices(Params.m_NumVertices);
+			Ptr->SetNumIndicis(Params.m_NumIndicis);
+
+			return Ptr;
+
 		}
-		catch (...) {
+		catch (...){
 			throw;
 		}
 	}
-	shared_ptr<MeshResource> MeshResource::CreateSphere(float Diameter, size_t Tessellation, bool AccessWrite) {
-		try {
-			//頂点配列
-			vector<VertexPositionNormalTexture> vertices;
+	shared_ptr<CommonMeshResource> CommonMeshResource::CreateSphere(float Diameter, size_t Tessellation, bool AccessWrite){
+		try{
+			shared_ptr<CommonMeshResource> Ptr(new CommonMeshResource());
+
 			//インデックスを作成するための配列
 			vector<uint16_t> indices;
 			//Sphereの作成(ヘルパー関数を利用)
-			VertexUtil::CreateSphere(Diameter, Tessellation, vertices, indices);
-			return MeshResource::CreateMeshResource<VertexPositionNormalTexture>(vertices, indices, AccessWrite);
+			VertexUtil::CreateSphere(Diameter, Tessellation, Ptr->pImpl->m_BackupVertices, indices);
+			VertexParams Params;
+			//バッファを作成
+			Ptr->pImpl->CreateBuffers(Ptr->pImpl->m_BackupVertices, indices, AccessWrite, Params);
+			//書き込み不可の場合はバックアップを削除
+			if (!AccessWrite){
+				Ptr->pImpl->m_BackupVertices.clear();
+			}
+			Ptr->SetVertexBuffer(Params.m_VertexBuffer);
+			Ptr->SetIndexBuffer(Params.m_IndexBuffer);
+			Ptr->SetNumVertices(Params.m_NumVertices);
+			Ptr->SetNumIndicis(Params.m_NumIndicis);
+
+			return Ptr;
 		}
-		catch (...) {
+		catch (...){
 			throw;
 		}
 	}
 
-	shared_ptr<MeshResource> MeshResource::CreateCapsule(float Diameter, float Height, size_t Tessellation, bool AccessWrite) {
-		try {
-			//頂点配列
-			vector<VertexPositionNormalTexture> vertices;
+	shared_ptr<CommonMeshResource> CommonMeshResource::CreateCapsule(float Diameter, float Height, size_t Tessellation, bool AccessWrite){
+		try{
+			shared_ptr<CommonMeshResource> Ptr(new CommonMeshResource());
+
 			//インデックスを作成するための配列
 			vector<uint16_t> indices;
+
 			Vector3 PointA(0, -Height / 2.0f, 0);
 			Vector3 PointB(0, Height / 2.0f, 0);
 			//Capsuleの作成(ヘルパー関数を利用)
-			VertexUtil::CreateCapsule(Diameter, PointA, PointB, Tessellation, vertices, indices);
-			return MeshResource::CreateMeshResource<VertexPositionNormalTexture>(vertices, indices, AccessWrite);
+			VertexUtil::CreateCapsule(Diameter, PointA, PointB, Tessellation, Ptr->pImpl->m_BackupVertices, indices);
+
+			VertexParams Params;
+			//バッファを作成
+			Ptr->pImpl->CreateBuffers(Ptr->pImpl->m_BackupVertices, indices, AccessWrite, Params);
+			//書き込み不可の場合はバックアップを削除
+			if (!AccessWrite){
+				Ptr->pImpl->m_BackupVertices.clear();
+			}
+			Ptr->SetVertexBuffer(Params.m_VertexBuffer);
+			Ptr->SetIndexBuffer(Params.m_IndexBuffer);
+			Ptr->SetNumVertices(Params.m_NumVertices);
+			Ptr->SetNumIndicis(Params.m_NumIndicis);
+
+			return Ptr;
 		}
-		catch (...) {
+		catch (...){
 			throw;
 		}
 
@@ -431,465 +640,1042 @@ namespace basedx11{
 
 
 
-	shared_ptr<MeshResource> MeshResource::CreateCylinder(float Height, float Diameter, size_t Tessellation, bool AccessWrite) {
-		try {
-			//頂点配列
-			vector<VertexPositionNormalTexture> vertices;
+	shared_ptr<CommonMeshResource> CommonMeshResource::CreateCylinder(float Height, float Diameter, size_t Tessellation, bool AccessWrite){
+		try{
+			shared_ptr<CommonMeshResource> Ptr(new CommonMeshResource());
+
 			//インデックスを作成するための配列
 			vector<uint16_t> indices;
 			//Cylinderの作成(ヘルパー関数を利用)
-			VertexUtil::CreateCylinder(Height, Diameter, Tessellation, vertices, indices);
-			return MeshResource::CreateMeshResource<VertexPositionNormalTexture>(vertices, indices, AccessWrite);
+			VertexUtil::CreateCylinder(Height,Diameter,Tessellation, Ptr->pImpl->m_BackupVertices, indices);
+			VertexParams Params;
+			//バッファを作成
+			Ptr->pImpl->CreateBuffers(Ptr->pImpl->m_BackupVertices, indices, AccessWrite, Params);
+			//書き込み不可の場合はバックアップを削除
+			if (!AccessWrite){
+				Ptr->pImpl->m_BackupVertices.clear();
+			}
+			Ptr->SetVertexBuffer(Params.m_VertexBuffer);
+			Ptr->SetIndexBuffer(Params.m_IndexBuffer);
+			Ptr->SetNumVertices(Params.m_NumVertices);
+			Ptr->SetNumIndicis(Params.m_NumIndicis);
+
+			return Ptr;
 		}
-		catch (...) {
+		catch (...){
 			throw;
 		}
 	}
 
-	shared_ptr<MeshResource> MeshResource::CreateCone(float Diameter, float Height, size_t Tessellation, bool AccessWrite) {
-		try {
-			//頂点配列
-			vector<VertexPositionNormalTexture> vertices;
+	shared_ptr<CommonMeshResource> CommonMeshResource::CreateCone(float Diameter, float Height, size_t Tessellation, bool AccessWrite){
+		try{
+			shared_ptr<CommonMeshResource> Ptr(new CommonMeshResource());
+
 			//インデックスを作成するための配列
 			vector<uint16_t> indices;
 			//Coneの作成(ヘルパー関数を利用)
-			VertexUtil::CreateCone(Diameter, Height, Tessellation, vertices, indices);
-			return MeshResource::CreateMeshResource<VertexPositionNormalTexture>(vertices, indices, AccessWrite);
+			VertexUtil::CreateCone(Diameter, Height, Tessellation, Ptr->pImpl->m_BackupVertices, indices);
+			VertexParams Params;
+			//バッファを作成
+			Ptr->pImpl->CreateBuffers(Ptr->pImpl->m_BackupVertices, indices, AccessWrite, Params);
+			//書き込み不可の場合はバックアップを削除
+			if (!AccessWrite){
+				Ptr->pImpl->m_BackupVertices.clear();
+			}
+			Ptr->SetVertexBuffer(Params.m_VertexBuffer);
+			Ptr->SetIndexBuffer(Params.m_IndexBuffer);
+			Ptr->SetNumVertices(Params.m_NumVertices);
+			Ptr->SetNumIndicis(Params.m_NumIndicis);
+
+			return Ptr;
 		}
-		catch (...) {
+		catch (...){
 			throw;
 		}
 	}
 
-	shared_ptr<MeshResource> MeshResource::CreateTorus(float Diameter, float Thickness, size_t Tessellation, bool AccessWrite) {
-		try {
-			//頂点配列
-			vector<VertexPositionNormalTexture> vertices;
+	shared_ptr<CommonMeshResource> CommonMeshResource::CreateTorus(float Diameter, float Thickness, size_t Tessellation, bool AccessWrite){
+		try{
+			shared_ptr<CommonMeshResource> Ptr(new CommonMeshResource());
+
 			//インデックスを作成するための配列
 			vector<uint16_t> indices;
 			//Torusの作成(ヘルパー関数を利用)
-			VertexUtil::CreateTorus(Diameter, Thickness, Tessellation, vertices, indices);
-			return MeshResource::CreateMeshResource<VertexPositionNormalTexture>(vertices, indices, AccessWrite);
+			VertexUtil::CreateTorus(Diameter, Thickness, Tessellation, Ptr->pImpl->m_BackupVertices, indices);
+			VertexParams Params;
+			//バッファを作成
+			Ptr->pImpl->CreateBuffers(Ptr->pImpl->m_BackupVertices, indices, AccessWrite, Params);
+			//書き込み不可の場合はバックアップを削除
+			if (!AccessWrite){
+				Ptr->pImpl->m_BackupVertices.clear();
+			}
+			Ptr->SetVertexBuffer(Params.m_VertexBuffer);
+			Ptr->SetIndexBuffer(Params.m_IndexBuffer);
+			Ptr->SetNumVertices(Params.m_NumVertices);
+			Ptr->SetNumIndicis(Params.m_NumIndicis);
+
+			return Ptr;
 		}
-		catch (...) {
+		catch (...){
 			throw;
 		}
 
 	}
 
-	shared_ptr<MeshResource> MeshResource::CreateTetrahedron(float Size, bool AccessWrite) {
-		try {
-			//頂点配列
-			vector<VertexPositionNormalTexture> vertices;
+	shared_ptr<CommonMeshResource> CommonMeshResource::CreateTetrahedron(float Size, bool AccessWrite){
+		try{
+			shared_ptr<CommonMeshResource> Ptr(new CommonMeshResource());
+
 			//インデックスを作成するための配列
 			vector<uint16_t> indices;
 			//Tetrahedronの作成(ヘルパー関数を利用)
-			VertexUtil::CreateTetrahedron(Size, vertices, indices);
-			return MeshResource::CreateMeshResource<VertexPositionNormalTexture>(vertices, indices, AccessWrite);
+			VertexUtil::CreateTetrahedron(Size, Ptr->pImpl->m_BackupVertices, indices);
+			VertexParams Params;
+			//バッファを作成
+			Ptr->pImpl->CreateBuffers(Ptr->pImpl->m_BackupVertices, indices, AccessWrite, Params);
+			//書き込み不可の場合はバックアップを削除
+			if (!AccessWrite){
+				Ptr->pImpl->m_BackupVertices.clear();
+			}
+			Ptr->SetVertexBuffer(Params.m_VertexBuffer);
+			Ptr->SetIndexBuffer(Params.m_IndexBuffer);
+			Ptr->SetNumVertices(Params.m_NumVertices);
+			Ptr->SetNumIndicis(Params.m_NumIndicis);
+
+			return Ptr;
 		}
-		catch (...) {
+		catch (...){
 			throw;
 		}
 	}
 
 	//正8面体
-	shared_ptr<MeshResource> MeshResource::CreateOctahedron(float Size, bool AccessWrite) {
-		try {
-			//頂点配列
-			vector<VertexPositionNormalTexture> vertices;
+	shared_ptr<CommonMeshResource> CommonMeshResource::CreateOctahedron(float Size, bool AccessWrite){
+		try{
+			shared_ptr<CommonMeshResource> Ptr(new CommonMeshResource());
+
 			//インデックスを作成するための配列
 			vector<uint16_t> indices;
 			//Octahedronの作成(ヘルパー関数を利用)
-			VertexUtil::CreateOctahedron(Size, vertices, indices);
-			return MeshResource::CreateMeshResource<VertexPositionNormalTexture>(vertices, indices, AccessWrite);
+			VertexUtil::CreateOctahedron(Size, Ptr->pImpl->m_BackupVertices, indices);
+			VertexParams Params;
+			//バッファを作成
+			Ptr->pImpl->CreateBuffers(Ptr->pImpl->m_BackupVertices, indices, AccessWrite, Params);
+			//書き込み不可の場合はバックアップを削除
+			if (!AccessWrite){
+				Ptr->pImpl->m_BackupVertices.clear();
+			}
+			Ptr->SetVertexBuffer(Params.m_VertexBuffer);
+			Ptr->SetIndexBuffer(Params.m_IndexBuffer);
+			Ptr->SetNumVertices(Params.m_NumVertices);
+			Ptr->SetNumIndicis(Params.m_NumIndicis);
+
+			return Ptr;
 		}
-		catch (...) {
+		catch (...){
 			throw;
 		}
 	}
 
-	shared_ptr<MeshResource> MeshResource::CreateDodecahedron(float Size, bool AccessWrite) {
-		try {
-			//頂点配列
-			vector<VertexPositionNormalTexture> vertices;
+	shared_ptr<CommonMeshResource> CommonMeshResource::CreateDodecahedron(float Size, bool AccessWrite){
+		try{
+			shared_ptr<CommonMeshResource> Ptr(new CommonMeshResource());
+
 			//インデックスを作成するための配列
 			vector<uint16_t> indices;
 			//Dodecahedronの作成(ヘルパー関数を利用)
-			VertexUtil::CreateDodecahedron(Size, vertices, indices);
-			return MeshResource::CreateMeshResource<VertexPositionNormalTexture>(vertices, indices, AccessWrite);
+			VertexUtil::CreateDodecahedron(Size, Ptr->pImpl->m_BackupVertices, indices);
+			VertexParams Params;
+			//バッファを作成
+			Ptr->pImpl->CreateBuffers(Ptr->pImpl->m_BackupVertices, indices, AccessWrite, Params);
+			//書き込み不可の場合はバックアップを削除
+			if (!AccessWrite){
+				Ptr->pImpl->m_BackupVertices.clear();
+			}
+			Ptr->SetVertexBuffer(Params.m_VertexBuffer);
+			Ptr->SetIndexBuffer(Params.m_IndexBuffer);
+			Ptr->SetNumVertices(Params.m_NumVertices);
+			Ptr->SetNumIndicis(Params.m_NumIndicis);
+
+			return Ptr;
 		}
-		catch (...) {
+		catch (...){
 			throw;
 		}
 	}
 
-	shared_ptr<MeshResource> MeshResource::CreateIcosahedron(float Size, bool AccessWrite) {
-		try {
-			//頂点配列
-			vector<VertexPositionNormalTexture> vertices;
+
+	shared_ptr<CommonMeshResource> CommonMeshResource::CreateIcosahedron(float Size, bool AccessWrite){
+		try{
+			shared_ptr<CommonMeshResource> Ptr(new CommonMeshResource());
+
 			//インデックスを作成するための配列
 			vector<uint16_t> indices;
 			//Icosahedronの作成(ヘルパー関数を利用)
-			VertexUtil::CreateIcosahedron(Size, vertices, indices);
-			return MeshResource::CreateMeshResource<VertexPositionNormalTexture>(vertices, indices, AccessWrite);
+			VertexUtil::CreateIcosahedron(Size, Ptr->pImpl->m_BackupVertices, indices);
+			VertexParams Params;
+			//バッファを作成
+			Ptr->pImpl->CreateBuffers(Ptr->pImpl->m_BackupVertices, indices, AccessWrite, Params);
+			//書き込み不可の場合はバックアップを削除
+			if (!AccessWrite){
+				Ptr->pImpl->m_BackupVertices.clear();
+			}
+			Ptr->SetVertexBuffer(Params.m_VertexBuffer);
+			Ptr->SetIndexBuffer(Params.m_IndexBuffer);
+			Ptr->SetNumVertices(Params.m_NumVertices);
+			Ptr->SetNumIndicis(Params.m_NumIndicis);
+
+			return Ptr;
 		}
-		catch (...) {
+		catch (...){
 			throw;
 		}
 	}
 
-	void MeshResource::ReadBaseData(const wstring& BinDataDir,const wstring& BinDataFile,
-		vector<VertexPositionNormalTexture>& vertices, vector<uint16_t>& indices, vector<MaterialEx>& materials){
-		vertices.clear();
-		indices.clear();
-		materials.clear();
-		wstring DataFile = BinDataDir + BinDataFile;
-		BinaryReader Reader(DataFile);
-		//ヘッダの読み込み
-		auto pHeader = Reader.ReadArray<char>(16);
-		string str = pHeader;
-		if (str != "BDV1.0"){
-			throw BaseException(
-				L"データ形式が違います",
-				DataFile,
-				L"MeshResource::ReadBaseData()"
-				);
-		}
-		//頂点の読み込み
-		auto blockHeader = Reader.Read<BlockHeader>();
-		if (blockHeader.m_Type != BlockType::Vertex){
-			throw BaseException(
-				L"頂点のヘッダが違います",
-				DataFile,
-				L"MeshResource::ReadBaseData()"
-				);
-		}
-		auto VerTexSize = blockHeader.m_Size / sizeof(VertexPositionNormalTexturePOD);
-		auto pVertex = Reader.ReadArray<VertexPositionNormalTexturePOD>((size_t)VerTexSize);
-		for (UINT i = 0; i < VerTexSize; i++){
-			VertexPositionNormalTexture v;
-			v.position.x = pVertex[i].position[0];
-			v.position.y = pVertex[i].position[1];
-			v.position.z = pVertex[i].position[2];
-			v.normal.x = pVertex[i].normal[0];
-			v.normal.y = pVertex[i].normal[1];
-			v.normal.z = pVertex[i].normal[2];
-			v.textureCoordinate.x = pVertex[i].textureCoordinate[0];
-			v.textureCoordinate.y = pVertex[i].textureCoordinate[1];
-			vertices.push_back(v);
-		}
 
-		//インデックスの読み込み
-		blockHeader = Reader.Read<BlockHeader>();
-		if (blockHeader.m_Type != BlockType::Index){
-			throw BaseException(
-				L"インデックスのヘッダが違います",
-				DataFile,
-				L"MeshResource::ReadBaseData()"
-				);
-		}
 
-		auto IndexSize = blockHeader.m_Size / sizeof(uint16_t);
-		auto pIndex = Reader.ReadArray<uint16_t>((size_t)IndexSize);
-		for (UINT i = 0; i < IndexSize; i++){
-			indices.push_back(pIndex[i]);
-		}
-
-		//マテリアルの読み込み
-		//マテリアル数の読み込み
-		blockHeader = Reader.Read<BlockHeader>();
-		if (blockHeader.m_Type != BlockType::MaterialCount){
-			throw BaseException(
-				L"マテリアル数のヘッダが違います",
-				DataFile,
-				L"MeshResource::ReadBaseData()"
-				);
-		}
-		UINT MaterialCount = blockHeader.m_Size;
-		for (UINT i = 0; i < MaterialCount; i++){
-			//テクスチャファイル名が可変長なので注意。
-			blockHeader = Reader.Read<BlockHeader>();
-			if (blockHeader.m_Type != BlockType::Material){
-				throw BaseException(
-					L"マテリアルのヘッダが違います",
-					DataFile,
-					L"MeshResource::ReadBaseData()"
-					);
-			}
-			UINT TextureFileNameSize = blockHeader.m_Size - sizeof(MaterialExPOD);
-			auto rMaterial = Reader.Read<MaterialExPOD>();
-			MaterialEx ToM;
-			//!開始インデックス
-			ToM.m_StartIndex = rMaterial.m_StartIndex;
-			//!描画インデックスカウント
-			ToM.m_IndexCount = rMaterial.m_IndexCount;
-			//! デフィーズ（物体の色）
-			ToM.m_Diffuse.x = rMaterial.m_Diffuse[0];
-			ToM.m_Diffuse.y = rMaterial.m_Diffuse[1];
-			ToM.m_Diffuse.z = rMaterial.m_Diffuse[2];
-			ToM.m_Diffuse.w = rMaterial.m_Diffuse[3];
-			//! スペキュラー（反射光）
-			ToM.m_Specular.x = rMaterial.m_Specular[0];
-			ToM.m_Specular.y = rMaterial.m_Specular[1];
-			ToM.m_Specular.z = rMaterial.m_Specular[2];
-			ToM.m_Specular.w = rMaterial.m_Specular[3];
-			//! アンビエント（環境色）
-			ToM.m_Ambient.x = rMaterial.m_Ambient[0];
-			ToM.m_Ambient.y = rMaterial.m_Ambient[1];
-			ToM.m_Ambient.z = rMaterial.m_Ambient[2];
-			ToM.m_Ambient.w = rMaterial.m_Ambient[3];
-			//! エミッシブ（放射光）
-			ToM.m_Emissive.x = rMaterial.m_Emissive[0];
-			ToM.m_Emissive.y = rMaterial.m_Emissive[1];
-			ToM.m_Emissive.z = rMaterial.m_Emissive[2];
-			ToM.m_Emissive.w = rMaterial.m_Emissive[3];
-			auto pTexture = Reader.ReadArray<wchar_t>(TextureFileNameSize / sizeof(wchar_t));
-			wstring TextureFileStr = pTexture;
-			TextureFileStr = BinDataDir + TextureFileStr;
-			ToM.m_TextureResource = ObjectFactory::Create<TextureResource>(TextureFileStr);
-			materials.push_back(ToM);
-		}
-
-		//Endの読み込み
-		blockHeader = Reader.Read<BlockHeader>();
-		if (blockHeader.m_Type != BlockType::End){
-			throw BaseException(
-				L"Endヘッダが違います",
-				DataFile,
-				L"MeshResource::ReadBaseData()"
-				);
-		}
+	vector<VertexPositionNormalTexture>& CommonMeshResource::GetBackupVertices()const {
+		return pImpl->m_BackupVertices;
 	}
 
-	void MeshResource::ReadBaseBoneData(const wstring& BinDataDir, const wstring& BinDataFile,
-		vector<VertexPositionNormalTextureSkinning>& vertices, vector<uint16_t>& indices, vector<MaterialEx>& materials,
-		vector<Matrix4X4>& bonematrix, UINT& BoneCount, UINT& SampleCount){
-		vertices.clear();
-		indices.clear();
-		materials.clear();
-		bonematrix.clear();
+	void CommonMeshResource::UpdateVirtexBuffer(const vector<VertexPositionNormalTexture>& NewBuffer){
+		if (NewBuffer.size() != pImpl->m_BackupVertices.size()){
+			// Map失敗
+			throw BaseException(
+				L"変更する頂点の数がバックアップと違います",
+				L"if (NewBuffer.size() != pImpl->m_BackupVertices.size())",
+				L"CommonMeshResource::UpdateVirtexBuffer()"
+				);
+		}
+		//座標を変更する
+		auto Dev = App::GetApp()->GetDeviceResources();
+		ID3D11Device* pDx11Device = Dev->GetD3DDevice();
+		ID3D11DeviceContext* pID3D11DeviceContext = Dev->GetD3DDeviceContext();
+		//頂点バッファをリソースから取り出す
+		auto pVertexBuffer = GetVertexBuffer().Get();
 
-		wstring DataFile = BinDataDir + BinDataFile;
-		BinaryReader Reader(DataFile);
-		//ヘッダの読み込み
-		auto pHeader = Reader.ReadArray<char>(16);
-		string str = pHeader;
-		if (str != "BDV1.0"){
+		//D3D11_MAP_WRITE_DISCARDは重要。この処理により、GPUに邪魔されない
+		D3D11_MAP mapType = D3D11_MAP_WRITE_DISCARD;
+		D3D11_MAPPED_SUBRESOURCE mappedBuffer;
+		//頂点のマップ
+		if (FAILED(pID3D11DeviceContext->Map(pVertexBuffer, 0, mapType, 0, &mappedBuffer))){
+			// Map失敗
 			throw BaseException(
-				L"データ形式が違います",
-				DataFile,
-				L"MeshResource::ReadBaseBoneData()"
+				L"頂点のMapに失敗しました。",
+				L"if(FAILED(pID3D11DeviceContext->Map()))",
+				L"CommonMeshResource::UpdateVirtexBuffer()"
 				);
 		}
-		//頂点の読み込み
-		auto blockHeader = Reader.Read<BlockHeader>();
-		if (blockHeader.m_Type != BlockType::SkinedVertex){
-			throw BaseException(
-				L"頂点(スキン処理)のヘッダが違います",
-				DataFile,
-				L"MeshResource::ReadBaseBoneData()"
-				);
+		//頂点の変更
+		VertexPositionNormalTexture* vertices = (VertexPositionNormalTexture*)mappedBuffer.pData;
+		for (size_t i = 0; i < NewBuffer.size(); i++){
+			vertices[i] = NewBuffer[i];
 		}
-		auto VerTexSize = blockHeader.m_Size / sizeof(VertexPositionNormalTextureSkinningPOD);
-		auto pVertex = Reader.ReadArray<VertexPositionNormalTextureSkinningPOD>((size_t)VerTexSize);
-		for (UINT i = 0; i < VerTexSize; i++){
-			VertexPositionNormalTextureSkinning v;
-			v.position.x = pVertex[i].position[0];
-			v.position.y = pVertex[i].position[1];
-			v.position.z = pVertex[i].position[2];
-			v.normal.x = pVertex[i].normal[0];
-			v.normal.y = pVertex[i].normal[1];
-			v.normal.z = pVertex[i].normal[2];
-			v.textureCoordinate.x = pVertex[i].textureCoordinate[0];
-			v.textureCoordinate.y = pVertex[i].textureCoordinate[1];
-			for (int j = 0; j < 4; j++){
-				v.indices[j] = pVertex[i].indices[j];
-				v.weights[j] = pVertex[i].weights[j];
+		//アンマップ
+		pID3D11DeviceContext->Unmap(pVertexBuffer, 0);
+
+	}
+
+
+
+
+
+	//--------------------------------------------------------------------------------------
+	//	struct FbxMeshResource::Impl;
+	//	用途: Implイディオム
+	//--------------------------------------------------------------------------------------
+	struct FbxMeshResource::Impl{
+		unique_ptr<FbxMesh, FbxMeshDeleter> m_FbxMesh;
+		//FBXシーン
+		weak_ptr<FbxSceneResource> m_FbxSceneResource;
+
+		//FBX名（空白の場合あり）
+		string m_FbxName;
+		//マテリアル情報の数
+		DWORD m_MaterialCount;
+		//マテリアルの配列
+		vector<Material> m_MaterialVec;
+		//テクスチャの配列（テクスチャはこちらで削除）
+		vector< shared_ptr<TextureResource> > m_TextureVec;
+		//以下、スキンメッシュ用
+		//スキンメッシュの場合nullptr以外になる
+		unique_ptr<FbxSkin, FbxSkinDeleter> m_FbxSkin;
+		//スキンメッシュでも強制的にスタティックで読むかどうか
+		bool m_NeedStatic;
+		//１フレームの基準となる時間
+		FbxTime m_timePeriod;
+		//スキンアニメーションに使用するボーンの数
+		UINT m_NumBones;
+		//スキンアニメーションに使用するボーン
+		//ボーンの配列
+		vector< Bone > m_vecBones;
+		//ボーンを名前で照会するする際に使用するインデックステーブル
+		map< string, UINT > m_mapBoneList;
+		//アニメーションを名前で照会するする際に使用するインデックステーブル
+		map< string, AnimationData > m_AnimationMap;
+		//ミューテックス
+		std::mutex Mutex;
+		//--------------------------------------------------------------------------------------
+		//	void CreateBuffers(
+		//	vector<VertexPositionNormalTexture>& vertices, //頂点を作成するための配列
+		//	vector<uint16_t>& indices,	//インデックスを作成するための配列
+		//	bool AccessWrite		//書き込みOKかどうか
+		//	VertexParams& RetParam
+		//	);
+		//	用途: バッファを作成する
+		//	戻り値: なし
+		//--------------------------------------------------------------------------------------
+		template<typename T>
+		void CreateBuffers(vector<T>& vertices, vector<uint16_t>& indices, bool AccessWrite, VertexParams& RetParam){
+			//デバイスの取得
+			auto Dev = App::GetApp()->GetDeviceResources();
+			ID3D11Device* pDx11Device = Dev->GetD3DDevice();
+			//バッファの作成
+			if (AccessWrite){
+				Util::DemandCreate(RetParam.m_VertexBuffer, Mutex, [&](ID3D11Buffer** pResult)
+				{
+					//頂点バッファの作成
+					VertexUtil::CreateDynamicPrimitiveVertexBuffer(pDx11Device, vertices, pResult);
+				});
 			}
-			vertices.push_back(v);
+			else{
+				Util::DemandCreate(RetParam.m_VertexBuffer, Mutex, [&](ID3D11Buffer** pResult)
+				{
+					//頂点バッファの作成
+					VertexUtil::CreatePrimitiveBuffer(pDx11Device, vertices, D3D11_BIND_VERTEX_BUFFER, pResult);
+				});
+			}
+			//頂点数の設定
+			RetParam.m_NumVertices = static_cast<UINT>(vertices.size());
+			Util::DemandCreate(RetParam.m_IndexBuffer, Mutex, [&](ID3D11Buffer** pResult)
+			{
+				//インデックスバッファの作成
+				VertexUtil::CreatePrimitiveBuffer(pDx11Device, indices, D3D11_BIND_INDEX_BUFFER, pResult);
+			});
+			//インデックス数の設定
+			RetParam.m_NumIndicis = static_cast<UINT>(indices.size());
 		}
 
-		//インデックスの読み込み
-		blockHeader = Reader.Read<BlockHeader>();
-		if (blockHeader.m_Type != BlockType::Index){
-			throw BaseException(
-				L"インデックスのヘッダが違います",
-				DataFile,
-				L"MeshResource::ReadBaseBoneData()"
-				);
-		}
 
-		auto IndexSize = blockHeader.m_Size / sizeof(uint16_t);
-		auto pIndex = Reader.ReadArray<uint16_t>((size_t)IndexSize);
-		for (UINT i = 0; i < IndexSize; i++){
-			indices.push_back(pIndex[i]);
+		Impl(shared_ptr<FbxSceneResource> FbxSceneResourcePtr, FbxMesh* pFbxMesh, bool NeedStatic) :
+			m_FbxSceneResource(FbxSceneResourcePtr),
+			m_MaterialCount(0),
+			m_FbxSkin(nullptr),
+			m_timePeriod(0),
+			m_NumBones(0),
+			m_FbxMesh(pFbxMesh),
+			m_NeedStatic(NeedStatic)
+		{}
+		~Impl(){
 		}
+	};
 
-		//マテリアルの読み込み
-		//マテリアル数の読み込み
-		blockHeader = Reader.Read<BlockHeader>();
-		if (blockHeader.m_Type != BlockType::MaterialCount){
-			throw BaseException(
-				L"マテリアル数のヘッダが違います",
-				DataFile,
-				L"MeshResource::ReadBaseData()"
-				);
+	//--------------------------------------------------------------------------------------
+	//	class FbxMeshResource : public BaseResource;
+	//	用途: FBXメッシュリソースクラス
+	//--------------------------------------------------------------------------------------
+	//構築と破棄
+	FbxMeshResource::FbxMeshResource(
+		shared_ptr<FbxSceneResource> FbxSceneResourcePtr,
+		FbxMesh* pFbxMesh,
+		bool NeedStatic
+		) :
+		MeshResource(),
+		pImpl(new Impl(FbxSceneResourcePtr, pFbxMesh, NeedStatic))
+	{}
+	FbxMeshResource::~FbxMeshResource(){}
+
+	//初期化
+
+	//--------------------------------------------------------------------------------------
+	void FbxMeshResource::CreateInstanceFromStaticFbx(){
+		VertexParams Params;
+		//メッシュ単体の読み込み
+		DWORD dwNumPolygons = 0;	//ポリゴン数
+		//頂点がない	
+		if ((Params.m_NumVertices = pImpl->m_FbxMesh->GetControlPointsCount()) <= 0) {
+			//失敗した
+			throw BaseException(L"Fbxに頂点がありません",
+				L"m_FbxMesh->GetControlPointsCount() <= 0",
+				L"FbxMeshResource::Create()");
 		}
-		UINT MaterialCount = blockHeader.m_Size;
-		for (UINT i = 0; i < MaterialCount; i++){
-			//テクスチャファイル名が可変長なので注意。
-			blockHeader = Reader.Read<BlockHeader>();
-			if (blockHeader.m_Type != BlockType::Material){
-				throw BaseException(
-					L"マテリアルのヘッダが違います",
-					DataFile,
-					L"MeshResource::ReadBaseBoneData()"
+		//このFBXに名前があればそれを保持
+		if (pImpl->m_FbxMesh->GetName()){
+			pImpl->m_FbxName = pImpl->m_FbxMesh->GetName();
+		}
+		//ポリゴン数の取得
+		dwNumPolygons = pImpl->m_FbxMesh->GetPolygonCount();
+
+		//頂点を作成するための配列
+		vector<VertexPositionNormalTexture> vertices(Params.m_NumVertices);
+
+		FbxStringList sUVSetNames;
+		pImpl->m_FbxMesh->GetUVSetNames(sUVSetNames);
+		FbxString sUVSetName = sUVSetNames.GetStringAt(0);
+		bool bUnmapped = true;
+		//頂点座標・法線・テクスチャ座標の取得
+		for (DWORD i = 0; i < dwNumPolygons; i++) {
+			//ポリゴンのサイズを得る（通常３）
+			const DWORD dwPolygonSize = pImpl->m_FbxMesh->GetPolygonSize(i);
+			for (DWORD j = 0; j < dwPolygonSize; j++) {
+				const int	iIndex = pImpl->m_FbxMesh->GetPolygonVertex(i, j);
+				FbxVector4	vPos, vNormal;
+				FbxVector2	vUV;
+				//Fbxから頂点を得る
+				vPos = pImpl->m_FbxMesh->GetControlPointAt(iIndex);
+				//法線を得る
+				pImpl->m_FbxMesh->GetPolygonVertexNormal(i, j, vNormal);
+				//UV値を得る
+				pImpl->m_FbxMesh->GetPolygonVertexUV(i, j, sUVSetName, vUV, bUnmapped);
+				vertices[iIndex] =
+					VertexPositionNormalTexture(
+					//頂点の設定
+					//Z座標がFbxとは符号が逆になる（DirectXは左手座標系）
+					XMFLOAT3(static_cast< float >(vPos[0]), static_cast< float >(vPos[1]), -static_cast< float >(vPos[2])),
+					//法線の設定
+					//Z座標がFbxとは符号が逆になる（DirectXは左手座標系）
+					XMFLOAT3(static_cast< float >(vNormal[0]), static_cast< float >(vNormal[1]), -static_cast< float >(vNormal[2])),
+					//UV値の設定
+					//Vの値が、1.0から引いた値になる
+					XMFLOAT2(static_cast< float >(vUV[0]), 1.0f - static_cast< float >(vUV[1]))
 					);
 			}
-			UINT TextureFileNameSize = blockHeader.m_Size - sizeof(MaterialExPOD);
-			auto rMaterial = Reader.Read<MaterialExPOD>();
-			MaterialEx ToM;
-			//!開始インデックス
-			ToM.m_StartIndex = rMaterial.m_StartIndex;
-			//!描画インデックスカウント
-			ToM.m_IndexCount = rMaterial.m_IndexCount;
-			//! デフィーズ（物体の色）
-			ToM.m_Diffuse.x = rMaterial.m_Diffuse[0];
-			ToM.m_Diffuse.y = rMaterial.m_Diffuse[1];
-			ToM.m_Diffuse.z = rMaterial.m_Diffuse[2];
-			ToM.m_Diffuse.w = rMaterial.m_Diffuse[3];
-			//! スペキュラー（反射光）
-			ToM.m_Specular.x = rMaterial.m_Specular[0];
-			ToM.m_Specular.y = rMaterial.m_Specular[1];
-			ToM.m_Specular.z = rMaterial.m_Specular[2];
-			ToM.m_Specular.w = rMaterial.m_Specular[3];
-			//! アンビエント（環境色）
-			ToM.m_Ambient.x = rMaterial.m_Ambient[0];
-			ToM.m_Ambient.y = rMaterial.m_Ambient[1];
-			ToM.m_Ambient.z = rMaterial.m_Ambient[2];
-			ToM.m_Ambient.w = rMaterial.m_Ambient[3];
-			//! エミッシブ（放射光）
-			ToM.m_Emissive.x = rMaterial.m_Emissive[0];
-			ToM.m_Emissive.y = rMaterial.m_Emissive[1];
-			ToM.m_Emissive.z = rMaterial.m_Emissive[2];
-			ToM.m_Emissive.w = rMaterial.m_Emissive[3];
-			auto pTexture = Reader.ReadArray<wchar_t>(TextureFileNameSize / sizeof(wchar_t));
-			wstring TextureFileStr = pTexture;
-			TextureFileStr = BinDataDir + TextureFileStr;
-			ToM.m_TextureResource = ObjectFactory::Create<TextureResource>(TextureFileStr);
-			materials.push_back(ToM);
 		}
 
-		//ボーン数
-		blockHeader = Reader.Read<BlockHeader>();
-		if (blockHeader.m_Type != BlockType::BoneCount){
-			throw BaseException(
-				L"ボーン数のヘッダが違います",
-				DataFile,
-				L"MeshResource::ReadBaseBoneData()"
-				);
-		}
-		BoneCount = blockHeader.m_Size;
-		//ボーンアニメーション行列
-		blockHeader = Reader.Read<BlockHeader>();
-		if (blockHeader.m_Type != BlockType::AnimeMatrix){
-			throw BaseException(
-				L"アニメーション行列のヘッダが違います",
-				DataFile,
-				L"MeshResource::ReadBaseBoneData()"
-				);
-		}
-		auto MatrixSize = blockHeader.m_Size / sizeof(MatrixPOD);
-		auto pAnimeMatrix = Reader.ReadArray<MatrixPOD>((size_t)MatrixSize);
-		for (UINT i = 0; i < MatrixSize; i++){
-			//ボーン単位ではなく行列単位で読み込む
-			Matrix4X4 mat;
-			for (int u = 0; u < 4; u++){
-				for (int v = 0; v < 4; v++){
-					mat(u, v) = pAnimeMatrix->m_Mat[u][v];
+		//マテリアルの数を取得する(一つのメッシュに対し、複数のマテリアルが割り当てられていることがある)
+		pImpl->m_MaterialCount = pImpl->m_FbxMesh->GetNode()->GetMaterialCount();
+		//マテリアルの読み込み
+		CreateMaterial();
+
+
+		//インデックスを作成するための配列
+		vector<uint16_t> indices;
+		//マテリアルのポインタを取得する
+		const FbxLayerElementMaterial*	fbxMaterial = pImpl->m_FbxMesh->GetLayer(0)->GetMaterials();
+		DWORD dwIndexCount = 0;
+		for (DWORD i = 0; i < pImpl->m_MaterialCount; i++) {
+			//頂点インデックスを最適化する(同じマテリアルを使用するポリゴンをまとめて描画できるように並べ、
+			//描画時にマテリアルの切り替え回数を減らす)
+			for (DWORD j = 0; j < dwNumPolygons; j++) {
+				DWORD	dwMaterialId = fbxMaterial->GetIndexArray().GetAt(j);
+				if (dwMaterialId == i) {
+					int iPolygonSize = pImpl->m_FbxMesh->GetPolygonSize(j);
+					for (int k = 0; k < iPolygonSize; k++) {
+						indices.push_back(static_cast< uint16_t >(pImpl->m_FbxMesh->GetPolygonVertex(j, 2 - k)));
+						pImpl->m_MaterialVec[i].m_IndexCount++;
+					}
 				}
 			}
-			bonematrix.push_back(mat);
-			pAnimeMatrix++;
 		}
-		SampleCount = MatrixSize / BoneCount;
 
-		//End
-		blockHeader = Reader.Read<BlockHeader>();
-		if (blockHeader.m_Type != BlockType::End){
+		//マテリアル配列にスタート地点を設定
+		UINT StarIndex = 0;
+		for (DWORD i = 0; i < pImpl->m_MaterialVec.size(); i++) {
+			pImpl->m_MaterialVec[i].m_StartIndex = StarIndex;
+			StarIndex += pImpl->m_MaterialVec[i].m_IndexCount;
+		}
+
+		//配列をもとに頂点とインデックスを作成
+		pImpl->CreateBuffers(vertices, indices,false,Params);
+
+		SetVertexBuffer(Params.m_VertexBuffer);
+		SetIndexBuffer(Params.m_IndexBuffer);
+		SetNumVertices(Params.m_NumVertices);
+		SetNumIndicis(Params.m_NumIndicis);
+
+	}
+
+	//--------------------------------------------------------------------------------------
+	void FbxMeshResource::CreateInstanceFromSkinFbx(){
+		VertexParams Params;
+
+		//メッシュ単体の読み込み
+		DWORD dwNumPolygons = 0;	//ポリゴン数
+		//頂点がない	
+		if ((Params.m_NumVertices = pImpl->m_FbxMesh->GetControlPointsCount()) <= 0) {
+			//失敗した
+			throw BaseException(L"Fbxに頂点がありません",
+				L"m_pFbxMesh->GetControlPointsCount() <= 0",
+				L"FbxMeshResource::CreateInstanceFromSkinFbx()");
+		}
+		//このFBXに名前があればそれを保持
+		if (pImpl->m_FbxMesh->GetName()){
+			pImpl->m_FbxName = pImpl->m_FbxMesh->GetName();
+		}
+		//ポリゴン数の取得
+		dwNumPolygons = pImpl->m_FbxMesh->GetPolygonCount();
+
+		//頂点を作成するための配列
+		//ブレンドウェイトとブレンドインデックスがある
+		vector<VertexPositionNormalTextureSkinning> vertices(Params.m_NumVertices);
+
+		FbxStringList sUVSetNames;
+		pImpl->m_FbxMesh->GetUVSetNames(sUVSetNames);
+		FbxString sUVSetName = sUVSetNames.GetStringAt(0);
+		bool bUnmapped = true;
+		//頂点座標・法線・テクスチャ座標の取得
+		for (DWORD i = 0; i < dwNumPolygons; i++) {
+			//ポリゴンのサイズを得る（通常３）
+			const DWORD dwPolygonSize = pImpl->m_FbxMesh->GetPolygonSize(i);
+			for (DWORD j = 0; j < dwPolygonSize; j++) {
+				const int	iIndex = pImpl->m_FbxMesh->GetPolygonVertex(i, j);
+				FbxVector4	vPos, vNormal;
+				FbxVector2	vUV;
+				//Fbxから頂点を得る
+				vPos = pImpl->m_FbxMesh->GetControlPointAt(iIndex);
+				//法線を得る
+				pImpl->m_FbxMesh->GetPolygonVertexNormal(i, j, vNormal);
+				//UV値を得る
+				pImpl->m_FbxMesh->GetPolygonVertexUV(i, j, sUVSetName, vUV, bUnmapped);
+				uint32_t temp[4] = { 0, 0, 0, 0 };
+				float tempf[4] = { 0, 0, 0, 0 };
+				vertices[iIndex] =
+					VertexPositionNormalTextureSkinning(
+					//頂点の設定
+					//Z座標がFbxとは符号が逆になる（DirectXは左手座標系）
+					XMFLOAT3(static_cast< float >(vPos[0]), static_cast< float >(vPos[1]), -static_cast< float >(vPos[2])),
+					//法線の設定
+					//Z座標がFbxとは符号が逆になる（DirectXは左手座標系）
+					XMFLOAT3(static_cast< float >(vNormal[0]), static_cast< float >(vNormal[1]), -static_cast< float >(vNormal[2])),
+					//UV値の設定
+					//Vの値が、1.0から引いた値になる
+					XMFLOAT2(static_cast< float >(vUV[0]), 1.0f - static_cast< float >(vUV[1])),
+					//ブレンドインデックスはとりあえず0
+					temp,
+					//ブレンドウエイトはとりあえず0
+					tempf
+					);
+			}
+		}
+
+		//ブレンドウェイトとブレンドインデックスの読み込み
+		const int	iNumCluster = pImpl->m_FbxSkin->GetClusterCount();
+		// 変換した FbxSkin から クラスター(ボーン)の数を取得する
+
+		for (int i = 0; i < iNumCluster; i++) {
+			int		iNumBlendIndices = pImpl->m_FbxSkin->GetCluster(i)->GetControlPointIndicesCount();	// i 番目のクラスターに影響を受ける頂点の数を取得する
+			int*	piBlendIndices = pImpl->m_FbxSkin->GetCluster(i)->GetControlPointIndices();		// i 番目のクラスターに影響を受ける頂点の番号を配列で取得する
+			double*	pdBlendWeights = pImpl->m_FbxSkin->GetCluster(i)->GetControlPointWeights();		// i 番目のクラスターに影響を受ける頂点に対応した重みデータを配列で取得する
+
+			for (int j = 0; j < iNumBlendIndices; j++) {
+				int	idx = piBlendIndices[j];
+
+				//頂点に登録する４つのブレンドウェイトのうち、最少の値をもつ要素を検索する（DirectX9の固定シェーダでは４つのボーンからしかブレンドできない）
+				int	iMinIndex = 0;
+				for (int k = 0; k < 4 - 1; k++) {
+					for (int l = k + 1; l < 4; l++) {
+						if (vertices[idx].weights[k] < vertices[idx].weights[l]) {
+							iMinIndex = k;
+						}
+						else {
+							iMinIndex = l;
+							k = l;
+							break;
+						}
+					}
+				}
+				//すでに登録されている中で最小のブレンドウェイトよりも大きい値を持つデータを登録する
+				if (static_cast< float >(pdBlendWeights[j]) > vertices[idx].weights[iMinIndex]) {
+					vertices[idx].indices[iMinIndex] = static_cast< BYTE >(i);
+					vertices[idx].weights[iMinIndex] = static_cast< float >(pdBlendWeights[j]);
+				}
+			}
+		}
+		//ウエイトのチェック
+		//各頂点ごとにウェイトを足して1.0fにならないとスキンがうまくできない
+		for (size_t i = 0; i < vertices.size(); i++){
+			float f = vertices[i].weights[0] + vertices[i].weights[1] + vertices[i].weights[2] + vertices[i].weights[3];
+			if (f > 0 && f < 1.0f){
+				float k = 1.0f / f;
+				vertices[i].weights[0] *= k;
+				vertices[i].weights[1] *= k;
+				vertices[i].weights[2] *= k;
+				vertices[i].weights[3] *= k;
+			}
+		}
+
+		//基準タイマーの設定
+		FbxGlobalSettings&	globalTimeSettings = pImpl->m_FbxMesh->GetScene()->GetGlobalSettings();
+		FbxTime::EMode timeMode = globalTimeSettings.GetTimeMode();
+		pImpl->m_timePeriod.SetTime(0, 0, 0, 1, 0, timeMode);
+
+		//マテリアルの数を取得する(一つのメッシュに対し、複数のマテリアルが割り当てられていることがある)
+		pImpl->m_MaterialCount = pImpl->m_FbxMesh->GetNode()->GetMaterialCount();
+		//マテリアルの読み込み
+		CreateMaterial();
+
+		//インデックスバッファの作成
+		//インデックスを作成するための配列
+		vector<uint16_t> indices;
+		//マテリアルのポインタを取得する
+		const FbxLayerElementMaterial*	fbxMaterial = pImpl->m_FbxMesh->GetLayer(0)->GetMaterials();
+		DWORD dwIndexCount = 0;
+		for (DWORD i = 0; i < pImpl->m_MaterialCount; i++) {
+			//頂点インデックスを最適化する(同じマテリアルを使用するポリゴンをまとめて描画できるように並べ、
+			//描画時にマテリアルの切り替え回数を減らす)
+			for (DWORD j = 0; j < dwNumPolygons; j++) {
+				DWORD	dwMaterialId = fbxMaterial->GetIndexArray().GetAt(j);
+				if (dwMaterialId == i) {
+					int iPolygonSize = pImpl->m_FbxMesh->GetPolygonSize(j);
+					for (int k = 0; k < iPolygonSize; k++) {
+						indices.push_back(static_cast< uint16_t >(pImpl->m_FbxMesh->GetPolygonVertex(j, 2 - k)));
+						pImpl->m_MaterialVec[i].m_IndexCount++;
+					}
+				}
+			}
+		}
+
+		//マテリアル配列にスタート地点を設定
+		UINT StarIndex = 0;
+		for (DWORD i = 0; i < pImpl->m_MaterialVec.size(); i++) {
+			pImpl->m_MaterialVec[i].m_StartIndex = StarIndex;
+			StarIndex += pImpl->m_MaterialVec[i].m_IndexCount;
+		}
+
+
+		//バッファの作成
+		pImpl->CreateBuffers(vertices, indices, false, Params);
+
+
+		//ボーン数を得る
+		pImpl->m_NumBones = pImpl->m_FbxSkin->GetClusterCount();
+		for (UINT i = 0; i < pImpl->m_NumBones; i++) {
+			Bone	bone;
+
+			FbxAMatrix	mBindPose, mCurrentPose;
+			pImpl->m_FbxSkin->GetCluster(i)->GetTransformLinkMatrix(mBindPose);
+			mCurrentPose = pImpl->m_FbxSkin->GetCluster(i)->GetLink()->EvaluateGlobalTransform(pImpl->m_timePeriod * 0);
+
+			for (int r = 0; r < 4; r++) {
+				for (int c = 0; c < 4; c++) {
+					bone.m_BindPose(r, c) = static_cast< float >(mBindPose.Get(r, c));
+					bone.m_CurrentPose(r, c) = static_cast< float >(mCurrentPose.Get(r, c));
+				}
+			}
+
+			Matrix4X4	mMirror, mBindInverse;
+			mMirror.Identity();
+			mMirror(2, 2) = -1.0f;
+
+			bone.m_BindPose *= mMirror;
+			bone.m_CurrentPose *= mMirror;
+			Vector4 temp4;
+			mBindInverse = Matrix4X4EX::Inverse(&temp4, bone.m_BindPose);
+			bone.m_ConbinedPose = mBindInverse * bone.m_CurrentPose;
+
+			pImpl->m_vecBones.push_back(bone);
+			//マップの登録
+			pImpl->m_mapBoneList[pImpl->m_FbxSkin->GetCluster(i)->GetName()] = i;
+		}
+		SetVertexBuffer(Params.m_VertexBuffer);
+		SetIndexBuffer(Params.m_IndexBuffer);
+		SetNumVertices(Params.m_NumVertices);
+		SetNumIndicis(Params.m_NumIndicis);
+
+	}
+
+	//--------------------------------------------------------------------------------------
+	void FbxMeshResource::CreateMaterial(){
+		//マテリアルの設定
+		//テクスチャファイル名作成のためのワーク配列
+		wchar_t Buff[MAX_PATH];
+		setlocale(LC_CTYPE, "jpn");
+
+		if (pImpl->m_FbxSceneResource.expired()){
+			//失敗した
 			throw BaseException(
-				L"終了ヘッダが違います",
-				DataFile,
-				L"MeshResource::ReadBaseBoneData()"
+				L"FbxSceneResourceが無効です",
+				L"if (pImpl->m_FbxSceneResource.expired())",
+				L"FbxMeshResource::CreateMaterial()");
+
+		}
+		auto FbxSceneResourcePtr = pImpl->m_FbxSceneResource.lock();
+
+		for (DWORD i = 0; i < pImpl->m_MaterialCount; i++) {
+			//マテリアル取得
+			Material material;
+			::ZeroMemory(&material, sizeof(Material));
+
+			FbxSurfaceMaterial*			pMaterial = pImpl->m_FbxMesh->GetNode()->GetMaterial(i);
+			FbxSurfacePhong*			pPhong = (FbxSurfacePhong*)pMaterial;
+			FbxPropertyT<FbxDouble3>	color;
+			color = pPhong->Ambient;
+			//アンビエントは使用しない
+			material.m_Ambient = Color4(0.5f, 0.5f, 0.5f, 1.0f);
+			//			material.m_Ambient = Color4((float)color.Get()[ 0 ], (float)color.Get()[ 1 ], (float)color.Get()[ 2 ], 1.0f);
+			color = pPhong->Diffuse;
+			//デフィーズはテクスチャを使うのでフル
+			//			material.m_Diffuse = Color4(1.0f,1.0f,1.0f,1.0f);
+			material.m_Diffuse = Color4((float)color.Get()[0], (float)color.Get()[1], (float)color.Get()[2], 1.0f);
+			//			material.m_Specular = Color4(0.0f,0.0f,0.0f,0.4f);
+			material.m_Specular = Color4((float)color.Get()[0] * 0.5f, (float)color.Get()[1] * 0.5f, (float)color.Get()[2] * 0.5f, 0.4f);
+			color = pPhong->Emissive;
+			//エミッシブはDirectXTKデフォルト
+			//			material.m_Emissive = Color4(0.05333332f,0.09882354f,0.1819608f,1.0f);
+			material.m_Emissive = Color4((float)color.Get()[0], (float)color.Get()[1], (float)color.Get()[2], 1.0f);
+			//マテリアルに関連付けられているテクスチャを読み込む
+			const FbxProperty	fbxProperty = pMaterial->FindProperty(FbxSurfaceMaterial::sDiffuse);
+			//テクスチャからファイル情報を抜き出す
+			FbxFileTexture*	pFbxFileTexture = fbxProperty.GetSrcObject< FbxFileTexture >(i);
+			TextureResource* pTexture = 0;
+			if (pFbxFileTexture) {
+				//テクスチャファイル名からパスを排除しファイル名+拡張子として合成する
+				char szTextureFilename[256], szFileExt[8];
+				_splitpath_s(pFbxFileTexture->GetFileName(), nullptr, 0, nullptr, 0, szTextureFilename, 256, szFileExt, 8);
+				//ファイル名の合成
+				string sTextureFilename(szTextureFilename);
+				sTextureFilename += szFileExt;
+				//UNIコードに変換
+				size_t size = 0;
+				mbstowcs_s(&size, Buff, sTextureFilename.c_str(), MAX_PATH - 1);
+				wstring strWork = FbxSceneResourcePtr->GetDataDir() + Buff;
+				//pFbxFileTextureからラップモードを取得してテクスチャを作成
+				auto PtrTexture = make_shared<TextureResource>(strWork.c_str());
+				pImpl->m_TextureVec.push_back(PtrTexture);
+				material.m_Texture = PtrTexture;
+			}
+			else{
+				if (pImpl->m_FbxSkin){
+					throw BaseException(
+						L"スキンメッシュのテクスチャがありません。\nスキンメッシュはテクスチャ無しは対応してません。",
+						L"if ( !pFbxFileTexture )",
+						L"FbxMeshResource::CreateMaterial()"
+						);
+				}
+				//テクスチャがない場合は0を設定
+				material.m_Texture = nullptr;
+			}
+			//マテリアル配列に追加
+			pImpl->m_MaterialVec.push_back(material);
+		}
+	}
+
+	void FbxMeshResource::Create(){
+		try{
+			//スキンメッシュかどうかを判断
+			pImpl->m_FbxSkin.reset(FbxCast< FbxSkin >(pImpl->m_FbxMesh->GetDeformer(0, FbxDeformer::eSkin)));
+			//スキンメッシュの場合
+			if (pImpl->m_FbxSkin && !pImpl->m_NeedStatic){
+				CreateInstanceFromSkinFbx();
+			}
+			//スタティックメッシュもしくは強制的にスタティックで読む場合
+			else{
+				pImpl->m_FbxSkin = nullptr;
+				CreateInstanceFromStaticFbx();
+			}
+		}
+		catch (...){
+			throw;
+		}
+	}
+
+	//アクセサ
+	//スキニングするかどうか
+	bool FbxMeshResource::IsSkining() const{
+		return (pImpl->m_FbxSkin && !pImpl->m_NeedStatic);
+	}
+
+	const AnimationData& FbxMeshResource::GetAnimationData(const string& AnimeName) const{
+		auto it = pImpl->m_AnimationMap.find(AnimeName);
+		if (it != pImpl->m_AnimationMap.end()){
+			return it->second;
+		}
+		else{
+			throw BaseMBException(
+				"指定のアニメーションが見つかりません",
+				AnimeName,
+				"AnimationData& FbxMeshResource::GetAnimationData()");
+		}
+	}
+
+
+
+	const unique_ptr<FbxMesh, FbxMeshResource::FbxMeshDeleter>& FbxMeshResource::GetFbxMesh()const{
+		return pImpl->m_FbxMesh;
+	}
+	const unique_ptr<FbxSkin, FbxMeshResource::FbxSkinDeleter>& FbxMeshResource::GetFbxSkin() const{
+		return pImpl->m_FbxSkin;
+	}
+
+
+	UINT FbxMeshResource::GetNumBones() const{
+		return pImpl->m_NumBones;
+	}
+
+	const vector<Material>& FbxMeshResource::GetMaterialVec()const{
+		return pImpl->m_MaterialVec;
+	}
+
+	const vector<Bone>& FbxMeshResource::GetBonesVec() const{
+		return pImpl->m_vecBones;
+	}
+
+
+	//
+	bool FbxMeshResource::GenerateCurrentPose(vector<Bone>& tgtBones, AnimationData& rAnimationData, float CurrentTime){
+		//経過時間からフレームを求める
+		float fCurrentFrame = CurrentTime * rAnimationData.m_FramesParSecond;
+		//アニメーションが最後までいってるかどうかを確認
+		bool ret = false;
+		if (!rAnimationData.m_IsLoop && ((UINT)fCurrentFrame >= rAnimationData.m_FrameLength)){
+			//ループしないで、アニメが最後に到達したら
+			ret = true;
+		}
+		int iAnimationFrame = static_cast< int >(fCurrentFrame * 10000.0f);
+
+		if (rAnimationData.m_FrameLength > 0) {
+			if (rAnimationData.m_IsLoop){
+				//ループする
+				iAnimationFrame %= rAnimationData.m_FrameLength * 10000;
+				iAnimationFrame += rAnimationData.m_StartFrame * 10000;
+			}
+			else{
+				//ループしない
+				if (ret){
+					//最後のフレームにポーズを設定する
+					iAnimationFrame = (rAnimationData.m_StartFrame + rAnimationData.m_FrameLength) * 10000;
+				}
+				else{
+					iAnimationFrame += rAnimationData.m_StartFrame * 10000;
+				}
+			}
+		}
+		FbxAMatrix	mCurrentPose;
+		Matrix4X4	mMirror, mBindInverse;
+		mMirror.Identity();
+		mMirror(2, 2) = -1.0f;	//座標系の関係でボーンが反転しているので、それをDirectXに合わせるために使用する行列
+
+		//カレント行列と合成行列を再計算する
+		for (UINT i = 0; i < pImpl->m_NumBones; i++) {
+			mCurrentPose = pImpl->m_FbxSkin->GetCluster(i)->GetLink()->EvaluateGlobalTransform((pImpl->m_timePeriod * iAnimationFrame) / 10000);
+			for (int r = 0; r < 4; r++) {
+				for (int c = 0; c < 4; c++) {
+					tgtBones[i].m_CurrentPose(r, c) = static_cast< float >(mCurrentPose.Get(r, c));
+				}
+			}
+			tgtBones[i].m_CurrentPose *= mMirror;
+
+			Vector4 temp;
+			mBindInverse = Matrix4X4EX::Inverse(&temp, tgtBones[i].m_BindPose);
+
+			tgtBones[i].m_ConbinedPose = mBindInverse * tgtBones[i].m_CurrentPose;
+		}
+		rAnimationData.m_IsLoopEnd = ret;
+		return ret;
+	}
+
+	void FbxMeshResource::AddAnimation(const char* Name, UINT StartFrame, UINT FrameLength, bool Loop,
+		float FramesParSecond){
+		if (pImpl->m_FbxSkin && pImpl->m_NumBones > 0){
+			map< string, AnimationData >::iterator it
+				= pImpl->m_AnimationMap.find(Name);
+			if (it != pImpl->m_AnimationMap.end()) {
+				//指定の名前が見つかった
+				//そのデータに差し替え
+				it->second.m_StartFrame = StartFrame;
+				it->second.m_FrameLength = FrameLength;
+				it->second.m_FramesParSecond = FramesParSecond;
+				it->second.m_IsLoop = Loop;
+			}
+			else{
+				//見つからない
+				//アニメーション定義の追加
+				pImpl->m_AnimationMap[Name] = AnimationData(StartFrame, FrameLength,
+					Loop, FramesParSecond);
+			}
+		}
+	}
+
+	//--------------------------------------------------------------------------------------
+	//	struct FbxSceneResource::Impl;
+	//	用途: Implイディオム
+	//--------------------------------------------------------------------------------------
+	struct FbxSceneResource::Impl{
+		//データディレクトリ名
+		wstring m_DataDir;
+		//FBXファイル名
+		wstring m_FileName;
+		//FBXシーン名
+		string m_FbxSceneName;
+		//FBXシーン
+		shared_ptr<FbxScene> m_FbxScene;
+		//強制的にstaticで読むかどうか
+		bool m_NeedStatic;
+		//単一のFBXメッシュの配列
+		vector< shared_ptr<FbxMeshResource> > m_FbxMeshResourceVec;
+
+		Impl(const wstring& DataDir,
+			const wstring& FileName, const string& SceneName, bool  NeedStatic) :
+			m_DataDir(DataDir),
+			m_FileName(FileName),
+			m_FbxSceneName(SceneName),
+			m_NeedStatic(NeedStatic)
+		{}
+		~Impl(){}
+
+	};
+
+
+	//--------------------------------------------------------------------------------------
+	//	class FbxSceneResource : public BaseResource;
+	//	用途: FBXシーンリソースクラス
+	//	＊一つのFBXファイルは１つのFbxSceneResourceとして管理する
+	//--------------------------------------------------------------------------------------
+	//構築と破棄
+	FbxSceneResource::FbxSceneResource(const wstring& DataDir,
+		const wstring& FileName, const string& SceneName, bool NeedStatic) :
+		pImpl(new Impl(DataDir, FileName, SceneName, NeedStatic))
+	{
+		try{
+			if (FileName == L""){
+				//失敗した
+				throw BaseException(
+					L"Fbxファイル名が無効です",
+					L"if(FileName == \"\")",
+					L"FbxSceneResource::FbxSceneResource()");
+			}
+
+			if (pImpl->m_FbxSceneName == ""){
+				if (FileName == L""){
+					//失敗した
+					throw BaseException(
+						L"ファイル名が無効です",
+						L"if(FileName == \"\")",
+						L"FbxSceneResource::FbxSceneResource()");
+				}
+				wstring strWork;
+				strWork = pImpl->m_FileName;
+				//ファイル名をマルチバイトに変換しシーン名を作成
+				Util::WStoMB(strWork, pImpl->m_FbxSceneName);
+				pImpl->m_FbxSceneName += ".scene";
+			}
+		}
+		catch (...){
+			throw;
+		}
+	}
+	//static構築
+	shared_ptr<FbxSceneResource> FbxSceneResource::CreateFbxScene(const wstring& DataDir,
+		const wstring& FileName, const string& SceneName, bool NeedStatic){
+		shared_ptr<FbxSceneResource> ScenePtr(new FbxSceneResource(DataDir, FileName, SceneName, NeedStatic));
+		ScenePtr->Create();
+		return ScenePtr;
+	}
+	FbxSceneResource::~FbxSceneResource(){}
+
+	//再帰的にシーンを読み込む
+	void FbxSceneResource::CreateFbxMeshVector(FbxNode* pFbxNode){
+		//ノードが有効でなければリターン
+		if (!pFbxNode){
+			return;
+		}
+		//FBXシーンの取得
+		FbxScene* pScene = pFbxNode->GetScene();
+		//ノードの属性を取得
+		FbxNodeAttribute* pFbxNodeAttribute = pFbxNode->GetNodeAttribute();
+		//ノードの属性が有効であれば、属性のタイプを判定し、タイプがメッシュであればvectorに登録する
+		if (pFbxNodeAttribute){
+			if (pFbxNodeAttribute->GetAttributeType() == FbxNodeAttribute::eMesh) {
+				//三角分割
+				FbxGeometryConverter converter(pFbxNode->GetFbxManager());
+				converter.Triangulate(pScene, true);
+				//メッシュを取り出す
+				FbxMesh* pFbxMesh = pFbxNode->GetMesh();
+				//シーンのグローバル行列を取得
+				FbxAnimEvaluator* pFbxAnimEvaluator = pScene->GetAnimationEvaluator();
+				FbxMatrix mGlobal = pFbxAnimEvaluator->GetNodeGlobalTransform(pFbxNode);
+				//グローバル行列をすべての頂点に適用
+				int	iNumControlPoints = pFbxMesh->GetControlPointsCount();
+				FbxVector4*	v = pFbxMesh->GetControlPoints();
+				for (int i = 0; i < iNumControlPoints; i++){
+					v[i] = mGlobal.MultNormalize(v[i]);
+				}
+				//Fbxメッシュの配列に登録
+				auto FbxMeshPtr = make_shared<FbxMeshResource>(GetThis<FbxSceneResource>(), pFbxMesh,pImpl->m_NeedStatic);
+				FbxMeshPtr->Create();
+				pImpl->m_FbxMeshResourceVec.push_back(
+					FbxMeshPtr
+					);
+			}
+		}
+		//子ノードの数を取得する
+		int iNumChild = pFbxNode->GetChildCount();
+		for (int i = 0; i < iNumChild; i++) {
+			//子ノードすべてを再帰的にメッシュを登録する
+			CreateFbxMeshVector(pFbxNode->GetChild(i));
+		}
+	}
+	//初期化
+	void FbxSceneResource::Create(){
+		try{
+
+			//インポーターを作成する
+			FbxImporter* lImporter = FbxImporter::Create(App::GetApp()->GetFbxManager().get(), "");
+			//ファイル名をマルチバイトにする
+			wstring strWork;
+			strWork = pImpl->m_DataDir + pImpl->m_FileName;
+			//マルチバイトに変換
+			string sFileName;
+			Util::WStoMB(strWork, sFileName);
+			//インポーターの初期化
+			if (!lImporter->Initialize(sFileName.c_str(), -1, App::GetApp()->GetFbxManager().get()->GetIOSettings())) {
+				//失敗した
+				throw BaseMBException(
+					"インポータの初期化に失敗しました",
+					lImporter->GetStatus().GetErrorString(),
+					"FbxSceneResource::FbxSceneResource()");
+			}
+			//シーンの作成
+			pImpl->m_FbxScene = shared_ptr<FbxScene>(
+				FbxScene::Create(App::GetApp()->GetFbxManager().get(), pImpl->m_FbxSceneName.c_str()),	//生ポインタ
+				FbxSceneDeleter()	//カスタムデリータ
+				);
+			//インポータによるシーンへの読み込み
+			lImporter->Import(pImpl->m_FbxScene.get());
+			//インポータはもう必要ない
+			lImporter->Destroy();
+
+
+			//再帰的に読み込む
+			CreateFbxMeshVector(pImpl->m_FbxScene->GetRootNode());
+
+
+		}
+		catch (...){
+			throw;
+		}
+	}
+
+
+
+	//アクセサ
+	wstring FbxSceneResource::GetDataDir() const{
+		return pImpl->m_DataDir;
+	}
+	wstring FbxSceneResource::GetFileName() const{
+		return pImpl->m_FileName;
+	}
+	string FbxSceneResource::GetFbxSceneName() const{
+		return pImpl->m_FbxSceneName;
+	}
+	shared_ptr<FbxMeshResource> FbxSceneResource::GetFbxMeshResource(size_t Index) const{
+		if (Index >= pImpl->m_FbxMeshResourceVec.size()){
+			auto str = Util::UintToWStr(Index);
+			str += L" >= m_FbxMeshResourceVec.size()";
+			throw BaseException(
+				L"インデックスが範囲外です",
+				str,
+				L"FbxSceneResource::GetMeshResource()"
 				);
 		}
-
-
+		return pImpl->m_FbxMeshResourceVec[Index];
 	}
-
-
-
-	shared_ptr<MeshResource> MeshResource::CreateStaticModelMesh(const wstring& BinDataDir, const wstring& BinDataFile, bool AccessWrite){
-		try {
-			//頂点配列
-			vector<VertexPositionNormalTexture> vertices;
-			//インデックスを作成するための配列
-			vector<uint16_t> indices;
-			//マテリアルを設定する配列
-			vector<MaterialEx> Materials;
-			ReadBaseData(BinDataDir, BinDataFile,vertices, indices, Materials);
-			auto Ptr = MeshResource::CreateMeshResource<VertexPositionNormalTexture>(vertices, indices, AccessWrite);
-			Ptr->m_MaterialExVec.clear();
-			for (auto& v : Materials){
-				Ptr->m_MaterialExVec.push_back(v);
-			}
-			return Ptr;
-		}
-		catch (...) {
-			throw;
-		}
+	size_t FbxSceneResource::GetFbxMeshResourceSize() const{
+		return pImpl->m_FbxMeshResourceVec.size();
 	}
-
-
-	shared_ptr<MeshResource> MeshResource::CreateBoneModelMesh(const wstring& BinDataDir,
-		const wstring& BinDataFile, bool AccessWrite){
-		try {
-			//頂点配列
-			vector<VertexPositionNormalTextureSkinning> vertices;
-			//インデックスを作成するための配列
-			vector<uint16_t> indices;
-			//マテリアルを設定する配列
-			vector<MaterialEx> Materials;
-			//サンプリング行列
-			vector<Matrix4X4> SampleMatrices;
-			//ボーン数
-			UINT BoneCount;
-			//サンプル数
-			UINT SampleCount;
-			ReadBaseBoneData(BinDataDir, BinDataFile,vertices, indices, Materials,
-				SampleMatrices, BoneCount, SampleCount);
-			auto Ptr = MeshResource::CreateMeshResource<VertexPositionNormalTextureSkinning>(vertices, indices, AccessWrite);
-			Ptr->m_MaterialExVec.clear();
-			for (auto& v : Materials){
-				Ptr->m_MaterialExVec.push_back(v);
-			}
-			Ptr->m_SampleMatrixVec.clear();
-			for (auto& v : SampleMatrices){
-				Ptr->m_SampleMatrixVec.push_back(v);
-			}
-			Ptr->m_BoneCount = BoneCount;
-			Ptr->m_SampleCount = SampleCount;
-			Ptr->m_IsSkining = true;
-			return Ptr;
-		}
-		catch (...) {
-			throw;
-		}
-
+	vector< shared_ptr<FbxMeshResource> >& FbxSceneResource::GetFbxMeshResourceVec() const{
+		return pImpl->m_FbxMeshResourceVec;
 	}
-
-
-
 
 
 }

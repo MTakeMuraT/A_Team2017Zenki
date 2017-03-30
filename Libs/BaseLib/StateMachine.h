@@ -79,7 +79,6 @@ namespace basedx11{
 		//--------------------------------------------------------------------------------------
 		explicit StateMachine(const shared_ptr<T>& owner) :
 			m_Owner(owner)
-			//m_CurrentState(nullptr), m_PreviousState(nullptr)
 		{}
 		//--------------------------------------------------------------------------------------
 		//	virtual ~StateMachine();

@@ -15,43 +15,14 @@ namespace basedx11{
 	class MeshResource;
 	class FbxMeshResource;
 
-	//--------------------------------------------------------------------------------------
-	//	class DrawComponent : public Component;
-	//	用途: 描画コンポーネントの親クラス
-	//--------------------------------------------------------------------------------------
-	class DrawComponent : public Component{
-	protected:
-		DrawComponent(const shared_ptr<GameObject>& GameObjectPtr);
-		virtual ~DrawComponent();
-	public:
-		BlendState GetBlendState() const;
-		DepthStencilState GetDepthStencilState() const;
-		RasterizerState GetRasterizerState() const;
-		SamplerState GetSamplerState() const;
+	struct	Bone;
 
-		void SetBlendState(const BlendState state);
-		void SetDepthStencilState(const DepthStencilState state);
-		void SetRasterizerState(const RasterizerState state);
-		void SetSamplerState(const SamplerState state);
-
-		const Matrix4X4& GetMeshToTransformMatrix() const;
-		void SetMeshToTransformMatrix(const Matrix4X4& Mat);
-
-
-		//各オブジェクトごとにボーンを所持しておくポインタ
-		//シャドウマップから親クラスで参照できるように仮想関数にする
-		virtual const vector< Matrix4X4 >* GetVecLocalBonesPtr() const{ return nullptr; }
-	private:
-		// pImplイディオム
-		struct Impl;
-		unique_ptr<Impl> pImpl;
-	};
 
 	//--------------------------------------------------------------------------------------
-	//	class Shadowmap : public DrawComponent;
+	//	class Shadowmap : public Component;
 	//	用途: シャドウマップコンポーネント（前処理用）
 	//--------------------------------------------------------------------------------------
-	class Shadowmap : public DrawComponent{
+	class Shadowmap : public Component{
 	public:
 		explicit Shadowmap(const shared_ptr<GameObject>& GameObjectPtr);
 		virtual ~Shadowmap();
@@ -67,17 +38,175 @@ namespace basedx11{
 		static void SetLightFar(float f);
 		static void SetViewWidth(float f);
 		static void SetViewHeight(float f);
-		static void SetViewSize(float f);
+
+		shared_ptr<MeshResource> GetMeshResource(bool ExceptionActive = true) const;
+		void SetMeshResource(const wstring& ResKey);
+		void SetMeshResource(const shared_ptr<MeshResource>& MeshResourcePtr);
+
+		const Matrix4X4& GetMeshToTransform() const;
+		void SetMeshToTransform(const Matrix4X4& Mat);
+
+		//操作
+		virtual void Update()override{}
+		virtual void Draw();
+	private:
+		// pImplイディオム
+		struct Impl;
+		unique_ptr<Impl> pImpl;
+	};
+
+
+
+	//--------------------------------------------------------------------------------------
+	//	class DrawComponent : public Component;
+	//	用途: 描画コンポーネントの親クラス
+	//--------------------------------------------------------------------------------------
+	class DrawComponent : public Component{
+	protected:
+		DrawComponent(const shared_ptr<GameObject>& GameObjectPtr) :
+			Component(GameObjectPtr){}
+		virtual ~DrawComponent(){}
+	public:
+		//各オブジェクトごとにボーンを所持しておくポインタ
+		//シャドウマップから親クラスで参照できるように仮想関数にする
+		virtual const vector< Bone >* GetVecLocalBonesPtr() const{ return nullptr; }
+	};
+
+	//--------------------------------------------------------------------------------------
+	//	class SimpleDirectDraw : public DrawComponent;
+	//	用途: SimpleDirectDraw描画コンポーネント
+	//--------------------------------------------------------------------------------------
+	class SimpleDirectDraw : public DrawComponent{
+	public:
+		explicit SimpleDirectDraw(const shared_ptr<GameObject>& GameObjectPtr);
+		virtual ~SimpleDirectDraw();
+		//アクセサ
+		const Color4& GetDiffuse() const;
+		void SetDiffuse(const Color4& c);
+		D3D11_PRIMITIVE_TOPOLOGY GetPrimitiveTopology() const;
+		void SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY t);
+		//頂点配列を渡して頂点バッファを作成する
+		void CreateVertex(const vector<VertexPosition>& Verteces);
+		//操作
+		virtual void Update()override{}
+		virtual void Draw();
+	private:
+		// pinplイディオム
+		struct Impl;
+		unique_ptr<Impl> pImpl;
+	};
+
+
+
+	//--------------------------------------------------------------------------------------
+	//	class SimplePNTDraw : public DrawComponent;
+	//	用途: SimplePNTDraw描画コンポーネント
+	//--------------------------------------------------------------------------------------
+	class SimplePNTDraw : public DrawComponent{
+	public:
+		explicit SimplePNTDraw(const shared_ptr<GameObject>& GameObjectPtr);
+		virtual ~SimplePNTDraw();
+		//アクセサ
+		const Color4& GetDiffuse() const;
+		void SetDiffuse(const Color4& c);
+
+		bool GetOwnShadowActive() const;
+		bool IsOwnShadowActive() const;
+		void SetOwnShadowActive(bool b);
+
+		bool GetZBufferUse() const;
+		bool IsZBufferUse() const;
+		void SetZBufferUse(bool b);
+
+		bool IsAlphaBlendSrcOne()const;
+		bool GetAlphaBlendSrcOne()const;
+		void SetAlphaBlendSrcOne(bool b);
+
+		size_t GetShaderVirsion() const;
+		void SetShaderVirsion(size_t v);
+
+
+		void SetSamplerState(ID3D11SamplerState* pSamplerState);
 
 
 		shared_ptr<MeshResource> GetMeshResource(bool ExceptionActive = true) const;
 		void SetMeshResource(const wstring& ResKey);
 		void SetMeshResource(const shared_ptr<MeshResource>& MeshResourcePtr);
 
+		shared_ptr<TextureResource> GetTextureResource(bool ExceptionActive = true) const;
+		void SetTextureResource(const wstring& ResKey);
+		void SetTextureResource(const shared_ptr<TextureResource>& TextureResourcePtr);
 
 		//操作
-		virtual void OnUpdate()override{}
-		virtual void OnDraw()override;
+		virtual void Update()override{}
+		virtual void Draw();
+	private:
+		// pinplイディオム
+		struct Impl;
+		unique_ptr<Impl> pImpl;
+	};
+
+
+	//--------------------------------------------------------------------------------------
+	//	class BasicPNTDraw : public DrawComponent;
+	//	用途: BasicPNTDraw描画コンポーネント
+	//--------------------------------------------------------------------------------------
+	class BasicPNTDraw : public DrawComponent{
+		void DrawWithShadow();
+		void DrawNotShadow();
+	public:
+		//構築と破棄
+		explicit BasicPNTDraw(const shared_ptr<GameObject>& GameObjectPtr);
+		virtual ~BasicPNTDraw();
+		//アクセサ
+		const Color4& GetDiffuse() const;
+		void SetDiffuse(const Color4& c);
+		const Color4& GetEmissive() const;
+		void SetEmissive(const Color4& c);
+		const Color4& GetSpecularAndPower() const;
+		void SetSpecularAndPower(const Color4& c);
+
+		bool GetOwnShadowActive() const;
+		bool IsOwnShadowActive() const;
+		void SetOwnShadowActive(bool b);
+
+		bool GetCullNone() const;
+		bool IsCullNone() const;
+		void SetCullNone(bool b);
+
+		bool GetZBufferUse() const;
+		bool IsZBufferUse() const;
+		void SetZBufferUse(bool b);
+
+		bool IsAlphaBlendSrcOne()const;
+		bool GetAlphaBlendSrcOne()const;
+		void SetAlphaBlendSrcOne(bool b);
+
+
+
+		size_t GetShaderVirsion() const;
+		void SetShaderVirsion(size_t v);
+
+
+		void SetSamplerState(ID3D11SamplerState* pSamplerState);
+		ID3D11SamplerState* GetSamplerState() const;
+
+		shared_ptr<MeshResource> GetMeshResource(bool ExceptionActive = true) const;
+		void SetMeshResource(const wstring& ResKey);
+		void SetMeshResource(const shared_ptr<MeshResource>& MeshResourcePtr);
+
+		shared_ptr<TextureResource> GetTextureResource(bool ExceptionActive = true) const;
+		void SetTextureResource(const wstring& ResKey);
+		void SetTextureResource(const shared_ptr<TextureResource>& TextureResourcePtr);
+
+		void SetTextureOnlyNoLight(bool b);
+		bool GetTextureOnlyNoLight() const;
+		bool IsTextureOnlyNoLight() const;
+
+
+		//操作
+		virtual void Update()override{}
+		virtual void Draw();
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -85,297 +214,99 @@ namespace basedx11{
 	};
 
 
-	//座標系
-	enum class SpriteCoordinate {
-		m_CenterZeroPlusUpY,		//センター原点でY軸上向きプラス（デフォルト）
-		m_LeftBottomZeroPlusUpY,	//左下原点でY軸上向きプラス
-		m_LeftTopZeroPlusDownY,		//左上原点でY軸下向きプラス
-	};
 
 
 	//--------------------------------------------------------------------------------------
-	//	class SpriteBaseDraw : public DrawComponent;
-	//	用途: Sprite描画コンポーネントの親
+	//	class BasicFbxPNTDraw : public DrawComponent;
+	//	用途: BasicFbxPNTDraw描画コンポーネント
 	//--------------------------------------------------------------------------------------
-	class SpriteBaseDraw : public DrawComponent {
+	class BasicFbxPNTDraw : public DrawComponent{
+		void DrawWithShadow();
+		void DrawNotShadow();
 	protected:
-		explicit SpriteBaseDraw(const shared_ptr<GameObject>& GameObjectPtr);
-		virtual ~SpriteBaseDraw();
-		void CalcSpriteCoordinate(Matrix4X4& Retmat);
+		//ボーン行列をリソースから読み込む
+		//親クラスでは何もしない
+		virtual void SetBoneVec(){}
 	public:
-		void SetSpriteCoordinate(SpriteCoordinate cood);
-	private:
-		// pImplイディオム
-		struct Impl;
-		unique_ptr<Impl> pImpl;
-	};
-
-	//--------------------------------------------------------------------------------------
-	//	class PCSpriteDraw : public SpriteBaseDraw;
-	//	用途: PCSprite描画コンポーネント
-	//--------------------------------------------------------------------------------------
-	class PCSpriteDraw : public SpriteBaseDraw {
-		void CreateMeshResource();
-	public:
-		explicit PCSpriteDraw(const shared_ptr<GameObject>& GameObjectPtr,
-			const Vector2& Size,const Color4& Col);
-		explicit PCSpriteDraw(const shared_ptr<GameObject>& GameObjectPtr,
-			const Vector2& Size, const vector<Color4>& ColorVec);
-		virtual ~PCSpriteDraw();
-		shared_ptr<MeshResource> GetMeshResource() const;
-		Color4 GetEmissive() const;
-		void SetEmissive(const Color4& col);
-		//操作
-		virtual void OnCreate()override;
-		virtual void OnUpdate()override {}
-		virtual void OnDraw()override;
-	private:
-		// pImplイディオム
-		struct Impl;
-		unique_ptr<Impl> pImpl;
-	};
-
-	//--------------------------------------------------------------------------------------
-	//	class PTSpriteDraw : public SpriteBaseDraw;
-	//	用途: Dx11PTSprite描画コンポーネント
-	//--------------------------------------------------------------------------------------
-	class PTSpriteDraw : public SpriteBaseDraw {
-	public:
-		explicit PTSpriteDraw(const shared_ptr<GameObject>& GameObjectPtr,
-			const Vector2& Size);
-		virtual ~PTSpriteDraw();
-		shared_ptr<MeshResource> GetMeshResource() const;
-		void SetTextureResource(const shared_ptr<TextureResource>& TextureRes);
-		void SetTextureResource(const wstring& TextureKey);
-		shared_ptr<TextureResource> GetTextureResource() const;
-		Color4 GetEmissive() const;
-		void SetEmissive(const Color4& col);
-		Color4 GetDiffuse() const;
-		void SetDiffuse(const Color4& col);
-		//操作
-		virtual void OnCreate()override;
-		virtual void OnUpdate()override {}
-		virtual void OnDraw()override;
-	private:
-		// pImplイディオム
-		struct Impl;
-		unique_ptr<Impl> pImpl;
-	};
-
-	//--------------------------------------------------------------------------------------
-	//	class PCTSpriteDraw : public SpriteBaseDraw;
-	//	用途: Dx11PCTSprite描画コンポーネント
-	//--------------------------------------------------------------------------------------
-	class PCTSpriteDraw : public SpriteBaseDraw {
-		void CreateMeshResource();
-	public:
-		explicit PCTSpriteDraw(const shared_ptr<GameObject>& GameObjectPtr,
-			const Vector2& Size, const Color4& Col);
-		virtual ~PCTSpriteDraw();
-		explicit PCTSpriteDraw(const shared_ptr<GameObject>& GameObjectPtr,
-			const Vector2& Size, const vector<Color4>& ColorVec);
-		shared_ptr<MeshResource> GetMeshResource() const;
-		void SetTextureResource(const shared_ptr<TextureResource>& TextureRes);
-		void SetTextureResource(const wstring& TextureKey);
-		shared_ptr<TextureResource> GetTextureResource() const;
-		Color4 GetEmissive() const;
-		void SetEmissive(const Color4& col);
-		//操作
-		virtual void OnCreate()override;
-		virtual void OnUpdate()override {}
-		virtual void OnDraw()override;
-	private:
-		// pImplイディオム
-		struct Impl;
-		unique_ptr<Impl> pImpl;
-	};
-
-
-	//--------------------------------------------------------------------------------------
-	//	class PCTStaticDraw : public DrawComponent;
-	//	用途: PCTStatic描画コンポーネント
-	//--------------------------------------------------------------------------------------
-	class PCTStaticDraw : public DrawComponent {
-	public:
-		explicit PCTStaticDraw(const shared_ptr<GameObject>& GameObjectPtr);
-		virtual ~PCTStaticDraw();
-		shared_ptr<MeshResource> GetMeshResource() const;
-		void SetMeshResource(const shared_ptr<MeshResource>& MeshRes);
-		void SetMeshResource(const wstring& MeshKey);
-		void SetTextureResource(const shared_ptr<TextureResource>& TextureRes);
-		void SetTextureResource(const wstring& TextureKey);
-		shared_ptr<TextureResource> GetTextureResource() const;
-		Color4 GetEmissive() const;
-		void SetEmissive(const Color4& col);
-
-		//操作
-		virtual void OnCreate()override;
-		virtual void OnUpdate()override {}
-		virtual void OnDraw()override;
-	private:
-		// pImplイディオム
-		struct Impl;
-		unique_ptr<Impl> pImpl;
-	};
-
-	//--------------------------------------------------------------------------------------
-	//	class PNTStaticDraw : public DrawComponent;
-	//	用途: PNTStatic描画コンポーネント
-	//--------------------------------------------------------------------------------------
-	class PNTStaticDraw : public DrawComponent {
-		void DrawWithShadow();
-		void DrawNotShadow();
-	public:
-		explicit PNTStaticDraw(const shared_ptr<GameObject>& GameObjectPtr);
-		virtual ~PNTStaticDraw();
-		shared_ptr<MeshResource> GetMeshResource() const;
-		void SetMeshResource(const shared_ptr<MeshResource>& MeshRes);
-		void SetMeshResource(const wstring& MeshKey);
-		void SetTextureResource(const shared_ptr<TextureResource>& TextureRes);
-		void SetTextureResource(const wstring& TextureKey);
-		shared_ptr<TextureResource> GetTextureResource() const;
-		Color4 GetEmissive() const;
-		void SetEmissive(const Color4& col);
-		Color4 GetDiffuse() const;
-		void SetDiffuse(const Color4& col);
+		//構築と破棄
+		explicit BasicFbxPNTDraw(const shared_ptr<GameObject>& GameObjectPtr);
+		virtual ~BasicFbxPNTDraw();
+		//アクセサ
+		const Color4& GetDiffuse() const;
+		void SetDiffuse(const Color4& c);
+		const Color4& GetEmissive() const;
+		void SetEmissive(const Color4& c);
+		const Color4& GetSpecularAndPower() const;
+		void SetSpecularAndPower(const Color4& c);
 
 		bool GetOwnShadowActive() const;
 		bool IsOwnShadowActive() const;
 		void SetOwnShadowActive(bool b);
 
+		bool IsAlphaBlendSrcOne()const;
+		bool GetAlphaBlendSrcOne()const;
+		void SetAlphaBlendSrcOne(bool b);
+
+
+		void SetSamplerState(ID3D11SamplerState* pSamplerState);
+		ID3D11SamplerState* GetSamplerState() const;
+
+
+		shared_ptr<FbxMeshResource> GetFbxMeshResource(bool ExceptionActive = true) const;
+		void SetFbxMeshResource(const wstring& ResKey);
+		void SetFbxMeshResource(const shared_ptr<FbxMeshResource>& FbxMeshResourcePtr);
+
+		const Matrix4X4& GetMeshToTransform() const;
+		void SetMeshToTransform(const Matrix4X4& Mat);
+
+		void SetTextureOnlyNoLight(bool b);
+		bool GetTextureOnlyNoLight() const;
+		bool IsTextureOnlyNoLight() const;
+
 		//操作
-		virtual void OnCreate()override;
-		virtual void OnUpdate()override {}
-		virtual void OnDraw()override;
+		virtual void Update()override{}
+		virtual void Draw();
 	private:
 		// pImplイディオム
 		struct Impl;
 		unique_ptr<Impl> pImpl;
 	};
 
+
 	//--------------------------------------------------------------------------------------
-	//	class PNTStaticModelDraw : public DrawComponent;
-	//	用途: PNTStaticModelDraw描画コンポーネント
+	//	class BasicFbxPNTBoneDraw : public BasicFbxPNTDraw;
+	//	用途: BasicFbxPNTBoneDraw描画コンポーネント
 	//--------------------------------------------------------------------------------------
-	class PNTStaticModelDraw : public DrawComponent {
+	class BasicFbxPNTBoneDraw : public BasicFbxPNTDraw{
 		void DrawWithShadow();
 		void DrawNotShadow();
+	protected:
+		//ボーン行列をリソースから読み込む
+		virtual void SetBoneVec()override;
 	public:
-		explicit PNTStaticModelDraw(const shared_ptr<GameObject>& GameObjectPtr);
-		virtual ~PNTStaticModelDraw();
-		shared_ptr<MeshResource> GetMeshResource() const;
-		void SetMeshResource(const shared_ptr<MeshResource>& MeshRes);
-		void SetMeshResource(const wstring& MeshKey);
+		//構築と破棄
+		explicit BasicFbxPNTBoneDraw(const shared_ptr<GameObject>& GameObjectPtr);
+		virtual ~BasicFbxPNTBoneDraw();
+		//アクセサ
+		//各オブジェクトごとにボーンを所持しておくポインタ
+		const vector< Bone >& GetVecLocalBones() const;
+		virtual const vector< Bone >* GetVecLocalBonesPtr() const;
 
-		bool GetOwnShadowActive() const;
-		bool IsOwnShadowActive() const;
-		void SetOwnShadowActive(bool b);
+		//カレントアニメーション
+		const string& GetCurrentAnimation() const;
+		void SetCurrentAnimation(const string& AnemationName,float StartTime = 0.0f);
+		//現在のアニメーションが終了しているかどうか
+		bool IsTargetAnimeEnd() const;
+
+		//指定したIDのボーンの現在の行列を取得する
+		void GetBoneMatrix(UINT BoneId, Matrix4X4& Matrix) const;
+
+		//指定したIDのボーンの現在のローカル行列を取得する（親子関係を構築するなど用）
+		void GetLocalBoneMatrix(UINT BoneId, Matrix4X4& Matrix) const;
 
 		//操作
-		virtual void OnCreate()override;
-		virtual void OnUpdate()override {}
-		virtual void OnDraw()override;
-	private:
-		// pImplイディオム
-		struct Impl;
-		unique_ptr<Impl> pImpl;
-	};
-
-	//--------------------------------------------------------------------------------------
-	//	struct	AnimationData;
-	/*!
-	アニメーションデータ構造体.
-	*/
-	//--------------------------------------------------------------------------------------
-	struct	AnimationData
-	{
-		//!	スタートサンプル
-		UINT	m_StartSample;
-		//!	サンプルの長さ
-		UINT	m_SampleLength;
-		//!	ループするかどうか
-		bool	m_IsLoop;
-		//!	アニメが終了したかどうか
-		bool	m_IsAnimeEnd;
-		//!	1秒当たりのフレーム
-		float	m_SamplesParSecond;
-		//--------------------------------------------------------------------------------------
-		//	AnimationData();
-		/*!
-		@breaf コンストラクタ.
-		@param なし
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		AnimationData()
-		{
-			ZeroMemory(this, sizeof(AnimationData));
-		}
-		//--------------------------------------------------------------------------------------
-		//	AnimationData(
-		//		UINT StartSample,	//スタートフレーム
-		//		UINT SampleLength,	//フレームの長さ
-		//		bool bLoop,			//ループするかどうか
-		//		float SamplesParSecond = 30.0f	//1秒あたりのフレーム数
-		//	);
-		/*!
-		@breaf コンストラクタ.
-		@param UINT StartSample	スタートフレーム
-		@param UINT SampleLength	フレームの長さ
-		@param bool bLoop	ループするかどうか
-		@param float SamplesParSecond = 30.0f	1秒あたりのフレーム数
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		AnimationData(UINT StartSample, UINT SampleLength, bool bLoop,
-			float SamplesParSecond = 30.0f) :
-			m_StartSample{ StartSample },
-			m_SampleLength{ SampleLength },
-			m_IsLoop{ bLoop },
-			m_IsAnimeEnd{ false },
-			m_SamplesParSecond{ SamplesParSecond }
-		{}
-	};
-
-
-	//--------------------------------------------------------------------------------------
-	//	class PNTBoneModelDraw : public DrawComponent;
-	//	用途: PNTBoneModelDraw描画コンポーネント
-	//--------------------------------------------------------------------------------------
-	class PNTBoneModelDraw : public DrawComponent {
-		void DrawWithShadow();
-		void DrawNotShadow();
-	public:
-		explicit PNTBoneModelDraw(const shared_ptr<GameObject>& GameObjectPtr);
-		virtual ~PNTBoneModelDraw();
-		shared_ptr<MeshResource> GetMeshResource() const;
-		void SetMeshResource(const shared_ptr<MeshResource>& MeshRes);
-		void SetMeshResource(const wstring& MeshKey);
-
-		bool GetOwnShadowActive() const;
-		bool IsOwnShadowActive() const;
-		void SetOwnShadowActive(bool b);
-
-		//補間処理
-		void InterpolationMatrix(const Matrix4X4& m1, const Matrix4X4& m2, float t, Matrix4X4& out);
-
-		void AddAnimation(const wstring& Name,int StartSample, int SampleLength, bool Loop,
-			float SamplesParSecond = 30.0f);
-
-		void ChangeCurrentAnimation(const wstring& AnemationName, float StartTime = 0.0f);
-		const wstring& GetCurrentAnimation() const;
-
-		bool UpdateAnimation(float ElapsedTime);
-
-		virtual const vector< Matrix4X4 >* GetVecLocalBonesPtr() const;
-
-
-
-
-		//操作
-		virtual void OnCreate()override;
-		virtual void OnUpdate()override {}
-		virtual void OnDraw()override;
+		virtual void Update()override;
+		virtual void Draw()override;
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -384,29 +315,6 @@ namespace basedx11{
 
 
 
-
-	//--------------------------------------------------------------------------------------
-	//	class PNTCollisionDraw : public DrawComponent;
-	//	用途: PNTCollision描画コンポーネント
-	//--------------------------------------------------------------------------------------
-	class PNTCollisionDraw : public DrawComponent {
-	public:
-		explicit PNTCollisionDraw(const shared_ptr<GameObject>& GameObjectPtr);
-		virtual ~PNTCollisionDraw();
-		Color4 GetEmissive() const;
-		void SetEmissive(const Color4& col);
-		Color4 GetDiffuse() const;
-		void SetDiffuse(const Color4& col);
-
-		//操作
-		virtual void OnCreate()override;
-		virtual void OnUpdate()override {}
-		virtual void OnDraw()override;
-	private:
-		// pImplイディオム
-		struct Impl;
-		unique_ptr<Impl> pImpl;
-	};
 
 
 

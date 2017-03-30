@@ -44,7 +44,7 @@ namespace basedx11{
 		void AddText(const wstring& str);
 
 		//初期化
-		virtual void OnCreate() override;
+		virtual void Create() override;
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -136,7 +136,7 @@ namespace basedx11{
 		virtual const wstring& GetValue();
 		virtual void SetValue(const wstring& Str);
 		//初期化
-		virtual void OnCreate() override;
+		virtual void Create() override;
 	private:
 		// pImplイディオム
 		struct Impl;

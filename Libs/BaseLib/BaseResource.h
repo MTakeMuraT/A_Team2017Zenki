@@ -147,108 +147,33 @@ namespace basedx11{
 	};
 
 
-	struct BackupDataBase {
-		BackupDataBase() {}
-		virtual ~BackupDataBase() {}
-
-	};
-	template<typename T>
-	struct BackupData : public BackupDataBase {
-		vector<T> m_Vertices;
-	};
-
-	struct VertexPositionNormalTexturePOD{
-		float position[3];
-		float normal[3];
-		float textureCoordinate[2];
-	};
-
-	struct VertexPositionNormalTextureSkinningPOD{
-		float position[3];
-		float normal[3];
-		float textureCoordinate[2];
-		uint32_t indices[4];
-		float weights[4];
-	};
-
-
-	struct MaterialEx{
-		//!開始インデックス
-		UINT m_StartIndex;
-		//!描画インデックスカウント
-		UINT m_IndexCount;
-		//! デフィーズ（物体の色）
-		Color4 m_Diffuse;
-		//! スペキュラー（反射光）
-		Color4 m_Specular;
-		//! アンビエント（環境色）
-		Color4 m_Ambient;
-		//! エミッシブ（放射光）
-		Color4 m_Emissive;
-		//シェーダリソースビュー（テクスチャリソース）
-		shared_ptr<TextureResource> m_TextureResource;
-	};
-
-	struct MaterialExPOD{
-		//!開始インデックス
-		UINT m_StartIndex;
-		//!描画インデックスカウント
-		UINT m_IndexCount;
-		//! デフィーズ（物体の色）
-		float m_Diffuse[4];
-		//! スペキュラー（反射光）
-		float m_Specular[4];
-		//! アンビエント（環境色）
-		float m_Ambient[4];
-		//! エミッシブ（放射光）
-		float m_Emissive[4];
-	};
-
-	struct	MatrixPOD
-	{
-		float	m_Mat[4][4];
-	};
-
-
-
-	enum class BlockType{
-		Vertex,
-		Index,
-		Material,
-		MaterialCount,
-		SkinedVertex,
-		BoneCount,
-		AnimeMatrix,
-		End = 100
-	};
-
-	struct BlockHeader{
-		BlockType m_Type;
-		UINT m_Size;
-	};
-
-
 	//--------------------------------------------------------------------------------------
 	//	class MeshResource : public BaseResource;
 	/*!
-	@breaf Dx11プリミティブメッシュクラス.<br />
-	プリミティブメッシュは、スタティック関数を使って生成する
+	メッシュ親クラス
 	*/
 	//--------------------------------------------------------------------------------------
-	class MeshResource : public BaseResource {
-		friend class ObjectFactory;
-		ComPtr<ID3D11Buffer> m_VertexBuffer;	//頂点バッファ
-		ComPtr<ID3D11Buffer> m_IndexBuffer;	//インデックスバッファ
-		UINT m_NumVertices;				//頂点の数
-		UINT m_NumIndicis;				//インデックスの数
-		shared_ptr<BackupDataBase> m_BackUpData;
-		vector<MaterialEx> m_MaterialExVec;	//マテリアルの配列（モデルで使用）
-		//以下、ボーン用
-		bool m_IsSkining;
-		UINT m_BoneCount;	//ボーンの数
-		UINT m_SampleCount;	//サンプリング数
-		vector<Matrix4X4> m_SampleMatrixVec;	//サンプリングされたボーン行列
+	class MeshResource : public BaseResource{
 	protected:
+		//--------------------------------------------------------------------------------------
+		//	MeshResource();
+		/*!
+		@breaf プロテクトコンストラクタ<br />
+		派生クラスから構築する
+		@param なし
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
+		MeshResource();
+		//--------------------------------------------------------------------------------------
+		//	virtual ~MeshResource();
+		/*!
+		@breaf プロテクトデストラクタ
+		@param なし
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
+		virtual ~MeshResource();
 		//派生クラスからのみアクセスできるアクセサ
 		//--------------------------------------------------------------------------------------
 		//	void SetVertexBuffer(
@@ -260,9 +185,7 @@ namespace basedx11{
 		@return	なし
 		*/
 		//--------------------------------------------------------------------------------------
-		void SetVertexBuffer(ComPtr<ID3D11Buffer>& VertexBuffer) {
-			m_VertexBuffer = VertexBuffer;
-		}
+		void SetVertexBuffer(ComPtr<ID3D11Buffer>& VertexBuffer);
 		//--------------------------------------------------------------------------------------
 		//	void SetNumVertices(
 		//		UINT NumVertices	//頂点数
@@ -274,9 +197,7 @@ namespace basedx11{
 		@return	なし
 		*/
 		//--------------------------------------------------------------------------------------
-		void SetNumVertices(UINT NumVertices) {
-			m_NumVertices = NumVertices;
-		}
+		void SetNumVertices(UINT NumVertices);
 		//--------------------------------------------------------------------------------------
 		//	void SetIndexBuffer(
 		//		ComPtr<ID3D11Buffer>& IndexBuffer	//インデックスバッファ
@@ -287,9 +208,7 @@ namespace basedx11{
 		@return	なし
 		*/
 		//--------------------------------------------------------------------------------------
-		void SetIndexBuffer(ComPtr<ID3D11Buffer>& IndexBuffer) {
-			m_IndexBuffer = IndexBuffer;
-		}
+		void SetIndexBuffer(ComPtr<ID3D11Buffer>& IndexBuffer);
 		//--------------------------------------------------------------------------------------
 		//	void SetNumIndicis(
 		//		UINT NumIndicis	//インデックス数
@@ -301,52 +220,27 @@ namespace basedx11{
 		@return	なし
 		*/
 		//--------------------------------------------------------------------------------------
-		void SetNumIndicis(UINT NumIndicis) {
-			m_NumIndicis = NumIndicis;
-		}
-		//--------------------------------------------------------------------------------------
-		//	MeshResource();
-		/*!
-		@breaf プロテクトコンストラクタ<br />
-		構築はスタティック関数を利用する
-		@param なし
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		MeshResource();
+		void SetNumIndicis(UINT NumIndicis);
 	public:
-		//--------------------------------------------------------------------------------------
-		//	virtual ~MeshResource();
-		/*!
-		@breaf デストラクタ
-		@param なし
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		virtual ~MeshResource();
 		//アクセサ
 		//--------------------------------------------------------------------------------------
-		//	ComPtr<ID3D11Buffer> GetVertexBuffer() const;
+		//	ComPtr<ID3D11Buffer>& GetVertexBuffer() const;
 		/*!
 		@breaf 頂点バッファの取得
 		@param なし
 		@return	頂点バッファ
 		*/
 		//--------------------------------------------------------------------------------------
-		ComPtr<ID3D11Buffer> GetVertexBuffer() const {
-			return m_VertexBuffer;
-		}
+		ComPtr<ID3D11Buffer>& GetVertexBuffer() const;
 		//--------------------------------------------------------------------------------------
-		//	ComPtr<ID3D11Buffer> GetIndexBuffer() const;
+		//	ComPtr<ID3D11Buffer>& GetIndexBuffer() const;
 		/*!
 		@breaf インデックスバッファの取得
 		@param なし
 		@return	インデックスバッファ
 		*/
 		//--------------------------------------------------------------------------------------
-		ComPtr<ID3D11Buffer> GetIndexBuffer() const {
-			return m_IndexBuffer;
-		}
+		ComPtr<ID3D11Buffer>& GetIndexBuffer() const;
 		//--------------------------------------------------------------------------------------
 		//	UINT GetNumVertices() const;
 		/*!
@@ -355,9 +249,7 @@ namespace basedx11{
 		@return	頂点数
 		*/
 		//--------------------------------------------------------------------------------------
-		UINT GetNumVertices() const {
-			return m_NumVertices;
-		}
+		UINT GetNumVertices() const;
 		//--------------------------------------------------------------------------------------
 		//	UINT GetNumIndicis() const;
 		/*!
@@ -366,20 +258,7 @@ namespace basedx11{
 		@return	インデックス数
 		*/
 		//--------------------------------------------------------------------------------------
-		UINT GetNumIndicis() const {
-			return m_NumIndicis;
-		}
-		//--------------------------------------------------------------------------------------
-		//	const vvector<MaterialEx>& GetMaterialExVec()const;
-		/*!
-		@breaf マテリアル配列の取得
-		@param なし
-		@return	マテリアルの配列
-		*/
-		//--------------------------------------------------------------------------------------
-		const vector<MaterialEx>& GetMaterialExVec()const{
-			return m_MaterialExVec;
-		}
+		UINT GetNumIndicis() const;
 		//--------------------------------------------------------------------------------------
 		//	virtual bool IsSkining() const;
 		/*!
@@ -389,37 +268,60 @@ namespace basedx11{
 		@return	スキニングする場合はtrue
 		*/
 		//--------------------------------------------------------------------------------------
-		virtual bool IsSkining() const { return m_IsSkining; }
+		virtual bool IsSkining() const{ return false; }
+	private:
+		// pImplイディオム
+		struct Impl;
+		unique_ptr<Impl> pImpl;
+	};
+
+
+	//--------------------------------------------------------------------------------------
+	//	class CommonMeshResource : public MeshResource;
+	/*!
+	@breaf プリミティブメッシュクラス.<br />
+	プリミティブメッシュは、スタティック関数を使って生成する
+	*/
+	//--------------------------------------------------------------------------------------
+	class CommonMeshResource : public MeshResource{
 		//--------------------------------------------------------------------------------------
-		//	UINT GetBoneCount() const;
+		//	CommonMeshResource();
 		/*!
-		@breaf ボーン数を得る
+		@breaf プライベートコンストラクタ<br />
+		構築はスタティック関数を利用する
 		@param なし
-		@return	ボーン数
+		@return	なし
 		*/
 		//--------------------------------------------------------------------------------------
-		UINT GetBoneCount() const{
-			return m_BoneCount;
-		}
+		CommonMeshResource();
+	public:
 		//--------------------------------------------------------------------------------------
-		//	UINT GetSampleCount() const;
+		//	virtual ~CommonMeshResource();
 		/*!
-		@breaf サンプリング数を得る
+		@breaf デストラクタ
 		@param なし
-		@return	サンプリング数
+		@return	なし
 		*/
 		//--------------------------------------------------------------------------------------
-		UINT GetSampleCount() const{
-			return m_SampleCount;
-		}
-
-		const vector<Matrix4X4>& GetSampleMatrixVec() const{
-			return m_SampleMatrixVec;
-		}
-
+		virtual ~CommonMeshResource();
 		//リソース構築
 		//--------------------------------------------------------------------------------------
-		//	static shared_ptr<Dx11CommonMes> CreateSquare(
+		//	static shared_ptr<CommonMeshResource> CreateCommonMeshResource(
+		//		const vector<VertexPositionNormalTexture>& Vertices,	//頂点の配列
+		//		const vector<uint16_t>& Indices				//インデックスの配列
+		//		bool AccessWrite = false	//頂点を変更できるかどうか
+		//	);
+		/*!
+		@breaf 頂点とインデックスを設定したコモンメッシュの作成
+		@param	const vector<VertexPositionNormalTexture>& Vertices		頂点の配列
+		@param	const vector<uint16_t>& Indices	インデックスの配列
+		@param	bool AccessWrite = false	頂点を変更できるかどうか
+		@return	リソースのスマートポインタ
+		*/
+		//--------------------------------------------------------------------------------------
+		static shared_ptr<CommonMeshResource> CreateCommonMeshResource(const vector<VertexPositionNormalTexture>& Vertices, const vector<uint16_t>& Indices, bool AccessWrite = false);
+		//--------------------------------------------------------------------------------------
+		//	static shared_ptr<CommonMeshResource> CreateSquare(
 		//		float Size,		//1辺のサイズ
 		//		bool AccessWrite = false	//頂点を変更できるかどうか
 		//	);
@@ -430,9 +332,9 @@ namespace basedx11{
 		@return	リソースのスマートポインタ
 		*/
 		//--------------------------------------------------------------------------------------
-		static shared_ptr<MeshResource> CreateSquare(float Size, bool AccessWrite = false);
+		static shared_ptr<CommonMeshResource> CreateSquare(float Size, bool AccessWrite = false);
 		//--------------------------------------------------------------------------------------
-		//	static shared_ptr<MeshResource> CreateCube(
+		//	static shared_ptr<CommonMeshResource> CreateCube(
 		//		float Size,		//1辺のサイズ
 		//		bool AccessWrite = false	//頂点を変更できるかどうか
 		//	);
@@ -443,9 +345,9 @@ namespace basedx11{
 		@return	リソースのスマートポインタ
 		*/
 		//--------------------------------------------------------------------------------------
-		static shared_ptr<MeshResource> CreateCube(float Size, bool AccessWrite = false);
+		static shared_ptr<CommonMeshResource> CreateCube(float Size, bool AccessWrite = false);
 		//--------------------------------------------------------------------------------------
-		//	static shared_ptr<MeshResource> CreateSphere(
+		//	static shared_ptr<CommonMeshResource> CreateSphere(
 		//		float Diameter,		//直径
 		//		size_t Tessellation,	//分割数
 		//		bool AccessWrite = false	//頂点を変更できるかどうか
@@ -458,9 +360,9 @@ namespace basedx11{
 		@return	リソースのスマートポインタ
 		*/
 		//--------------------------------------------------------------------------------------
-		static shared_ptr<MeshResource> CreateSphere(float Diameter, size_t Tessellation, bool AccessWrite = false);
+		static shared_ptr<CommonMeshResource> CreateSphere(float Diameter, size_t Tessellation, bool AccessWrite = false);
 		//--------------------------------------------------------------------------------------
-		//	static shared_ptr<MeshResource> CreateCapsule(
+		//	static shared_ptr<CommonMeshResource> CreateCapsule(
 		//		float Diameter,		//直径
 		//		float Height,		//高さ
 		//		size_t Tessellation, //分割数
@@ -475,9 +377,9 @@ namespace basedx11{
 		@return	リソースのスマートポインタ
 		*/
 		//--------------------------------------------------------------------------------------
-		static shared_ptr<MeshResource> CreateCapsule(float Diameter, float Height, size_t Tessellation, bool AccessWrite = false);
+		static shared_ptr<CommonMeshResource> CreateCapsule(float Diameter, float Height, size_t Tessellation, bool AccessWrite = false);
 		//--------------------------------------------------------------------------------------
-		//	static shared_ptr<MeshResource> CreateCylinder(
+		//	static shared_ptr<CommonMeshResource> CreateCylinder(
 		//		float Height,	//高さ
 		//		float Diameter, //直径
 		//		size_t Tessellation,	//分割数
@@ -492,9 +394,9 @@ namespace basedx11{
 		@return	リソースのスマートポインタ
 		*/
 		//--------------------------------------------------------------------------------------
-		static shared_ptr<MeshResource> CreateCylinder(float Height, float Diameter, size_t Tessellation, bool AccessWrite = false);
+		static shared_ptr<CommonMeshResource> CreateCylinder(float Height, float Diameter, size_t Tessellation, bool AccessWrite = false);
 		//--------------------------------------------------------------------------------------
-		//	static shared_ptr<MeshResource> CreateCone(
+		//	static shared_ptr<CommonMeshResource> CreateCone(
 		//		float Diameter, //直径
 		//		float Height, //高さ
 		//		size_t Tessellation, //分割数
@@ -509,9 +411,9 @@ namespace basedx11{
 		@return	リソースのスマートポインタ
 		*/
 		//--------------------------------------------------------------------------------------
-		static shared_ptr<MeshResource> CreateCone(float Diameter, float Height, size_t Tessellation, bool AccessWrite = false);
+		static shared_ptr<CommonMeshResource> CreateCone(float Diameter, float Height, size_t Tessellation, bool AccessWrite = false);
 		//--------------------------------------------------------------------------------------
-		//	static shared_ptr<MeshResource> CreateTorus(
+		//	static shared_ptr<CommonMeshResource> CreateTorus(
 		//		float Diameter, //直径
 		//		float Thickness, //ドーナッツの太さ
 		//		size_t Tessellation, //分割数
@@ -526,9 +428,9 @@ namespace basedx11{
 		@return	リソースのスマートポインタ
 		*/
 		//--------------------------------------------------------------------------------------
-		static shared_ptr<MeshResource> CreateTorus(float Diameter, float Thickness, size_t Tessellation, bool AccessWrite = false);
+		static shared_ptr<CommonMeshResource> CreateTorus(float Diameter, float Thickness, size_t Tessellation, bool AccessWrite = false);
 		//--------------------------------------------------------------------------------------
-		//	static shared_ptr<MeshResource> CreateTetrahedron(
+		//	static shared_ptr<CommonMeshResource> CreateTetrahedron(
 		//		float Size,		//サイズ
 		//		bool AccessWrite = false	//頂点を変更できるかどうか
 		//	);
@@ -539,9 +441,9 @@ namespace basedx11{
 		@return	リソースのスマートポインタ
 		*/
 		//--------------------------------------------------------------------------------------
-		static shared_ptr<MeshResource> CreateTetrahedron(float Size, bool AccessWrite = false);
+		static shared_ptr<CommonMeshResource> CreateTetrahedron(float Size, bool AccessWrite = false);
 		//--------------------------------------------------------------------------------------
-		//	static shared_ptr<MeshResource> CreateOctahedron(
+		//	static shared_ptr<CommonMeshResource> CreateOctahedron(
 		//		float Size,		//サイズ
 		//		bool AccessWrite = false	//頂点を変更できるかどうか
 		//	);
@@ -552,9 +454,9 @@ namespace basedx11{
 		@return	リソースのスマートポインタ
 		*/
 		//--------------------------------------------------------------------------------------
-		static shared_ptr<MeshResource> CreateOctahedron(float Size, bool AccessWrite = false);
+		static shared_ptr<CommonMeshResource> CreateOctahedron(float Size, bool AccessWrite = false);
 		//--------------------------------------------------------------------------------------
-		//	static shared_ptr<MeshResource> CreateDodecahedron(
+		//	static shared_ptr<CommonMeshResource> CreateDodecahedron(
 		//		float Size,		//サイズ
 		//		bool AccessWrite = false	//頂点を変更できるかどうか
 		//	);
@@ -565,9 +467,9 @@ namespace basedx11{
 		@return	リソースのスマートポインタ
 		*/
 		//--------------------------------------------------------------------------------------
-		static shared_ptr<MeshResource> CreateDodecahedron(float Size, bool AccessWrite = false);
+		static shared_ptr<CommonMeshResource> CreateDodecahedron(float Size, bool AccessWrite = false);
 		//--------------------------------------------------------------------------------------
-		//	static shared_ptr<MeshResource> CreateIcosahedron(
+		//	static shared_ptr<CommonMeshResource> CreateIcosahedron(
 		//		float Size,		//サイズ
 		//		bool AccessWrite = false	//頂点を変更できるかどうか
 		//	);
@@ -578,240 +480,532 @@ namespace basedx11{
 		@return	リソースのスマートポインタ
 		*/
 		//--------------------------------------------------------------------------------------
-		static shared_ptr<MeshResource> CreateIcosahedron(float Size, bool AccessWrite = false);
+		static shared_ptr<CommonMeshResource> CreateIcosahedron(float Size, bool AccessWrite = false);
 
+		//アクセサ
 		//--------------------------------------------------------------------------------------
-		// static void ReadBaseData(
-		//		const wstring& BinDataDir, //基準ディレクトリ
-		//		const wstring& BinDataFile,	//データファイル名
-		//		vector<VertexPositionNormalTexture>& vertices,	//頂点の参照 
-		//		vector<uint16_t>& indices,	//インデックスの参照
-		//		vector<MaterialEx>& materials	//マテリアルの参照
-		//	);
+		//	vector<VertexPositionNormalTexture>& GetBackupVertices() const;
 		/*!
-		@breaf オリジナルメッシュデータの読み込み（スタティックメッシュ）
-		@param	const wstring& BinDataDir, 基準ディレクトリ
-		@param	const wstring& BinDataFile,	データファイル名
-		@param	vector<VertexPositionNormalTexture>& vertices,	頂点の参照
-		@param	vector<uint16_t>& indices,	インデックスの参照
-		@param	vector<MaterialEx>& materials	マテリアルの参照
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		static void ReadBaseData(const wstring& BinDataDir, const wstring& BinDataFile,
-			vector<VertexPositionNormalTexture>& vertices, vector<uint16_t>& indices, vector<MaterialEx>& materials);
-
-		static void ReadBaseBoneData(const wstring& BinDataDir, const wstring& BinDataFile,
-			vector<VertexPositionNormalTextureSkinning>& vertices, vector<uint16_t>& indices, vector<MaterialEx>& materials,
-			vector<Matrix4X4>& bonematrix, UINT& BoneCount, UINT& SampleCount);
-
-
-		//--------------------------------------------------------------------------------------
-		// static shared_ptr<MeshResource> CreateStaticModelMesh(
-		//		const wstring& BinDataDir,//基準ディレクトリ
-		//		const wstring& BinDataFile,//データファイル名
-		//		bool AccessWrite = false	//頂点を変更できるかどうか
-		//	);
-		/*!
-		@breaf オリジナルメッシュの作成（スタティックメッシュ）
-		@param	const wstring& BinDataDir, 基準ディレクトリ
-		@param	const wstring& BinDataFile,	データファイル名
-		@param	bool AccessWrite = false	頂点を変更できるかどうか
-		@return	リソースのスマートポインタ
-		*/
-		//--------------------------------------------------------------------------------------
-		static shared_ptr<MeshResource> CreateStaticModelMesh(const wstring& BinDataDir, 
-			const wstring& BinDataFile, bool AccessWrite = false);
-
-		static shared_ptr<MeshResource> CreateBoneModelMesh(const wstring& BinDataDir,
-			const wstring& BinDataFile, bool AccessWrite = false);
-
-
-
-		//--------------------------------------------------------------------------------------
-		//
-		//	template<typename T>
-		//	static  shared_ptr<MeshResource> CreateMeshResource(
-		//		const vector<T>& vertices,	//頂点の配列
-		//		bool AccessWrite			//上書き可能かどうか
-		//	);
-		/*!
-		@breaf メッシュリソースの作成
-		@param	const vector<T>& vertices,	頂点の配列
-		@param	bool AccessWrite			上書き可能かどうか
-		@return	リソースのスマートポインタ
-		*/
-		//--------------------------------------------------------------------------------------
-		template<typename T>
-		static  shared_ptr<MeshResource> CreateMeshResource(const vector<T>& vertices, bool AccessWrite) {
-			std::mutex Mutex;
-			//デバイスの取得
-			auto Dev = App::GetApp()->GetDeviceResources<Dx11DeviceResources>();
-			auto pDx11Device = Dev->GetD3DDevice();
-			auto Ptr = ObjectFactory::Create<MeshResource>();
-			//バッファの作成
-			if (AccessWrite) {
-				Util::DemandCreate(Ptr->m_VertexBuffer, Mutex, [&](ID3D11Buffer** pResult)
-				{
-					auto PtrBackup = shared_ptr< BackupData<T> >(new  BackupData<T>());
-					for (auto& v : vertices) {
-						PtrBackup->m_Vertices.push_back(v);
-					}
-					Ptr->m_BackUpData = PtrBackup;
-					//頂点バッファの作成
-					VertexUtil::CreateDynamicPrimitiveVertexBuffer(pDx11Device, vertices, pResult);
-				});
-			}
-			else {
-				Util::DemandCreate(Ptr->m_VertexBuffer, Mutex, [&](ID3D11Buffer** pResult)
-				{
-					//頂点バッファの作成
-					VertexUtil::CreatePrimitiveBuffer(pDx11Device, vertices, D3D11_BIND_VERTEX_BUFFER, pResult);
-				});
-			}
-			//頂点数の設定
-			Ptr->m_NumVertices = static_cast<UINT>(vertices.size());
-			return Ptr;
-		}
-		//--------------------------------------------------------------------------------------
-		//
-		//	template<typename T>
-		//	static  shared_ptr<MeshResource> CreateMeshResource(
-		//		const vector<T>& vertices,	//頂点の配列
-		//		const vector<uint16_t>& indices,	//インデックスの配列
-		//		bool AccessWrite			//上書き可能かどうか
-		//	);
-		/*!
-		@breaf メッシュリソースの作成
-		@param	const vector<T>& vertices,	頂点の配列
-		@param	const vector<uint16_t>& indices,	インデックスの配列
-		@param	bool AccessWrite			上書き可能かどうか
-		@return	リソースのスマートポインタ
-		*/
-		//--------------------------------------------------------------------------------------
-		template<typename T>
-		static  shared_ptr<MeshResource> CreateMeshResource(const vector<T>& vertices, const vector<uint16_t>& indices, bool AccessWrite) {
-			std::mutex Mutex;
-			//デバイスの取得
-			auto Dev = App::GetApp()->GetDeviceResources();
-			auto pDx11Device = Dev->GetD3DDevice();
-			auto pID3D11DeviceContext = Dev->GetD3DDeviceContext();
-			auto Ptr = ObjectFactory::Create<MeshResource>();
-			//バッファの作成
-			if (AccessWrite) {
-				Util::DemandCreate(Ptr->m_VertexBuffer, Mutex, [&](ID3D11Buffer** pResult)
-				{
-					auto PtrBackup = shared_ptr< BackupData<T> >(new  BackupData<T>());
-					for (auto& v : vertices) {
-						PtrBackup->m_Vertices.push_back(v);
-					}
-					Ptr->m_BackUpData = PtrBackup;
-					//頂点バッファの作成
-					VertexUtil::CreateDynamicPrimitiveVertexBuffer(pDx11Device, vertices, pResult);
-				});
-			}
-			else {
-				Util::DemandCreate(Ptr->m_VertexBuffer, Mutex, [&](ID3D11Buffer** pResult)
-				{
-					//頂点バッファの作成
-					VertexUtil::CreatePrimitiveBuffer(pDx11Device, vertices, D3D11_BIND_VERTEX_BUFFER, pResult);
-				});
-			}
-			//頂点数の設定
-			Ptr->m_NumVertices = static_cast<UINT>(vertices.size());
-			//インデックスの作成
-			Util::DemandCreate(Ptr->m_IndexBuffer, Mutex, [&](ID3D11Buffer** pResult)
-			{
-				//インデックスバッファの作成
-				VertexUtil::CreatePrimitiveBuffer(pDx11Device, indices, D3D11_BIND_INDEX_BUFFER, pResult);
-			});
-			//インデックス数の設定
-			Ptr->m_NumIndicis = static_cast<UINT>(indices.size());
-			return Ptr;
-		}
-		//--------------------------------------------------------------------------------------
-		// template<typename T>
-		//	vector<T>& GetBackupVerteces() const;
-		/*!
-		@breaf バックアップデータの取得<br />
-		AccessWriteがtrueで作成されたリソースは、頂点の配列によって頂点を変更できる。<br />
-		AccessWriteがtrueでない場合は、バックアップは空である。
+		@breaf バックアップ頂点配列の取得<br />
+		AccessWriteがtrueで作成されたリソースは、バックアップ頂点の配列を持つ<br />
+		クライアントはこの配列を利用して、必要な個所のみ書き換えることができる
 		@param	なし
-		@return	バックアップデータの配列。
+		@return	バックアップ頂点配列
 		*/
 		//--------------------------------------------------------------------------------------
-		template<typename T>
-		vector<T>& GetBackupVerteces() const {
-			auto Ptr = dynamic_pointer_cast< BackupData<T> >(m_BackUpData);
-			if (!Ptr) {
-				throw BaseMBException(
-					"バックアップをT型にキャストできません",
-					typeid(T).name(),
-					"MeshResource::GetBackupVerteces<T>()"
-					);
-			}
-			return Ptr->m_Vertices;
-		}
+		vector<VertexPositionNormalTexture>& GetBackupVertices() const;
 		//--------------------------------------------------------------------------------------
-		// template<typename T>
 		//	void UpdateVirtexBuffer(
-		//		const vector<T>& NewBuffer	//頂点の配列
+		//		const vector<VertexPositionNormalTexture>& NewBuffer	//頂点の配列
 		//	);
 		/*!
 		@breaf 頂点の変更.<br />
 		AccessWriteがtrueで作成されたリソースは、頂点の配列によって頂点を変更する。
-		@param	const vector<T>& NewBuffer	頂点の配列
+		@param	const vector<VertexPositionNormalTexture>& NewBuffer	頂点の配列
 		@return	なし
 		*/
 		//--------------------------------------------------------------------------------------
-		template<typename T>
-		void UpdateVirtexBuffer(const vector<T>& NewBuffer) {
-			auto Ptr = dynamic_pointer_cast< BackupData<T> >(m_BackUpData);
-			if (!Ptr) {
-				throw BaseMBException(
-					"バックアップをT型にキャストできません",
-					typeid(T).name(),
-					"MeshResource::UpdateVirtexBuffer<T>()"
-					);
-			}
+		void UpdateVirtexBuffer(const vector<VertexPositionNormalTexture>& NewBuffer);
+	private:
+		// pImplイディオム
+		struct Impl;
+		unique_ptr<Impl> pImpl;
+	};
 
-			if (NewBuffer.size() != Ptr->m_Vertices.size()) {
-				// Map失敗
-				throw BaseException(
-					L"変更する頂点の数がバックアップと違います",
-					L"if (NewBuffer.size() != Ptr->m_Vertices.size())",
-					L"MeshResource::UpdateVirtexBuffer<T>()"
-					);
-			}
-			//座標を変更する
-			auto Dev = App::GetApp()->GetDeviceResources();
-			auto pID3D11DeviceContext = Dev->GetD3DDeviceContext();
-			//頂点バッファをリソースから取り出す
-			auto pVertexBuffer = GetVertexBuffer().Get();
 
-			//D3D11_MAP_WRITE_DISCARDは重要。この処理により、GPUに邪魔されない
-			D3D11_MAP mapType = D3D11_MAP_WRITE_DISCARD;
-			D3D11_MAPPED_SUBRESOURCE mappedBuffer;
-			//頂点のマップ
-			if (FAILED(pID3D11DeviceContext->Map(pVertexBuffer, 0, mapType, 0, &mappedBuffer))) {
-				// Map失敗
-				throw BaseException(
-					L"頂点のMapに失敗しました。",
-					L"if(FAILED(pID3D11DeviceContext->Map()))",
-					L"MeshResource::UpdateVirtexBuffer<T>()"
-					);
-			}
-			//頂点の変更
-			T* vertices = (T*)mappedBuffer.pData;
-			for (size_t i = 0; i < NewBuffer.size(); i++) {
-				vertices[i] = NewBuffer[i];
-			}
-			//アンマップ
-			pID3D11DeviceContext->Unmap(pVertexBuffer, 0);
+	class FbxSceneResource;
 
+	//--------------------------------------------------------------------------------------
+	//	struct	AnimationData;
+	/*!
+	アニメーションデータ構造体.
+	*/
+	//--------------------------------------------------------------------------------------
+	struct	AnimationData
+	{
+		//!	スタートフレーム
+		UINT	m_StartFrame;
+		//!	フレームの長さ
+		UINT	m_FrameLength;
+		//!	ループするかどうか
+		bool	m_IsLoop;
+		//!	ループが終了したかどうか
+		bool	m_IsLoopEnd;
+		//!	1秒当たりのフレーム
+		float	m_FramesParSecond;
+		//--------------------------------------------------------------------------------------
+		//	AnimationData();
+		/*!
+		@breaf コンストラクタ.
+		@param なし
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
+		AnimationData()
+		{
+			ZeroMemory(this, sizeof(AnimationData));
 		}
-		virtual void OnPreCreate()override {}
-		virtual void OnCreate()override {}
+		//--------------------------------------------------------------------------------------
+		//	AnimationData(
+		//		UINT StartFrame,	//スタートフレーム
+		//		UINT FrameLength,	//フレームの長さ
+		//		bool bLoop,			//ループするかどうか
+		//		float FramesParSecond = 30.0f	//1秒あたりのフレーム数
+		//	);
+		/*!
+		@breaf コンストラクタ.
+		@param UINT StartFrame	スタートフレーム
+		@param UINT FrameLength	フレームの長さ
+		@param bool bLoop	ループするかどうか
+		@param float FramesParSecond = 30.0f	1秒あたりのフレーム数
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
+		AnimationData(UINT StartFrame, UINT FrameLength, bool bLoop,
+			float FramesParSecond = 30.0f): 
+			m_StartFrame{ StartFrame },
+			m_FrameLength{ FrameLength },
+			m_IsLoop{ bLoop },
+			m_IsLoopEnd{ false },
+			m_FramesParSecond{ FramesParSecond }
+		{}
+	};
+
+	//--------------------------------------------------------------------------------------
+	//	struct	Bone;
+	/*!
+	Bone構造体.
+	*/
+	//--------------------------------------------------------------------------------------
+	struct	Bone
+	{
+		//!基本ポーズへの行列
+		Matrix4X4	m_BindPose;
+		//!現在の行列
+		Matrix4X4	m_CurrentPose;
+		//!計算された現在の行列
+		Matrix4X4	m_ConbinedPose;
+		//--------------------------------------------------------------------------------------
+		//	Bone();
+		/*!
+		@breaf コンストラクタ.
+		@param なし
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
+		Bone()
+		{
+			::ZeroMemory(this, sizeof(Bone));
+		}
+	};
+
+	//--------------------------------------------------------------------------------------
+	//	struct Material;
+	/*!
+	マテリアル構造体.
+	*/
+	//--------------------------------------------------------------------------------------
+	struct Material{
+		//!開始インデックス
+		UINT m_StartIndex;
+		//!描画インデックスカウント
+		UINT m_IndexCount;
+		//! デフィーズ（物体の色）
+		Color4 m_Diffuse;
+		//! スペキュラー（反射光）
+		Color4 m_Specular;
+		//! アンビエント（環境色）
+		Color4 m_Ambient;
+		//! エミッシブ（放射光）
+		Color4 m_Emissive;
+		//! 参照用テクスチャ（削除しない）
+		shared_ptr<TextureResource> m_Texture;
+	};
+
+	//--------------------------------------------------------------------------------------
+	//	class FbxMeshResource : public MeshResource;
+	/*!
+	FBXメッシュリソースクラス.
+	*/
+	//--------------------------------------------------------------------------------------
+	class FbxMeshResource : public MeshResource{
+		//--------------------------------------------------------------------------------------
+		//	void CreateInstanceFromStaticFbx();
+		/*!
+		@breaf スタティックFBXからのインスタンスの構築.
+		@param なし
+		@return	なし（例外がthrowされる）
+		*/
+		//--------------------------------------------------------------------------------------
+		void CreateInstanceFromStaticFbx();
+		//--------------------------------------------------------------------------------------
+		//	void CreateInstanceFromSkinFbx();
+		/*!
+		@breaf スキンメッシュFBXからのインスタンスの構築.
+		@param なし
+		@return	なし（例外がthrowされる）
+		*/
+		//--------------------------------------------------------------------------------------
+		void CreateInstanceFromSkinFbx();
+		//--------------------------------------------------------------------------------------
+		//	void CreateMaterial();
+		/*!
+		@breaf FBXからマテリアルを読み込む.
+		@param なし
+		@return	なし（例外がthrowされる）
+		*/
+		//--------------------------------------------------------------------------------------
+		void CreateMaterial();
+	public:
+		//--------------------------------------------------------------------------------------
+		//	struct FbxMeshDeleter;
+		/*!
+		FBXメッシュのデリーター関数オブジェクト.
+		*/
+		//--------------------------------------------------------------------------------------
+		struct FbxMeshDeleter
+		{
+			//--------------------------------------------------------------------------------------
+			//	void operator()(
+			//		FbxMesh *p	//FBXメッシュのポインタ
+			//	);
+			/*!
+			@breaf FBXメッシュのdelete.<br />
+			削除はマネージャが行うので何もしない
+			@param FbxMesh *p	FBXメッシュのポインタ
+			@return	なし
+			*/
+			//--------------------------------------------------------------------------------------
+			void operator()(FbxMesh *p){
+				//削除はマネージャが行うので何もしない
+			}
+		};
+		//--------------------------------------------------------------------------------------
+		//	struct FbxSkinDeleter;
+		/*!
+		FBXスキンのデリーター関数オブジェクト.
+		*/
+		//--------------------------------------------------------------------------------------
+		struct FbxSkinDeleter
+		{
+			//--------------------------------------------------------------------------------------
+			//	void operator()(
+			//		FbxSkin *p	//FBXスキンのポインタ
+			//	);
+			/*!
+			@breaf FBXスキンのdelete.<br />
+			削除はマネージャが行うので何もしない
+			@param FbxSkin *p	FBXスキンのポインタ
+			@return	なし
+			*/
+			//--------------------------------------------------------------------------------------
+			void operator()(FbxSkin *p){
+				//削除はマネージャが行うので何もしない
+			}
+		};
+		//構築と破棄
+		//--------------------------------------------------------------------------------------
+		//	FbxMeshResource(
+		//		shared_ptr<FbxSceneResource> FbxSceneResourcePtr,	//FBXシーンリソース
+		//		FbxMesh* pFbxMesh,	//FBXメッシュリソース
+		//		bool NeedStatic = false	//スキンメッシュでもスタティックメッシュにするかどうか
+		//	);
+		/*!
+		@breaf コンストラクタ.<br/>
+		FBXメッシュからデータを読み出す
+		@param shared_ptr<FbxSceneResource> FbxSceneResourcePtr	FBXシーンリソース
+		@param FbxMesh* pFbxMesh	FBXメッシュリソース
+		@param bool NeedStatic = false	スキンメッシュでもスタティックメッシュにするかどうか
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
+		FbxMeshResource(shared_ptr<FbxSceneResource> FbxSceneResourcePtr, FbxMesh* pFbxMesh, bool NeedStatic = false);
+		//--------------------------------------------------------------------------------------
+		//	virtual ~FbxMeshResource();
+		/*!
+		@breaf デストラクタ.
+		@param　なし
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
+		virtual ~FbxMeshResource();
+		//初期化
+		//--------------------------------------------------------------------------------------
+		//	virtual void Create();
+		/*!
+		@breaf 初期化
+		@param　なし
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
+		virtual void Create();
+		//アクセサ
+		//--------------------------------------------------------------------------------------
+		//	virtual bool IsSkining() const;
+		/*!
+		@breaf スキニングするかどうか
+		@param　なし
+		@return	スキニングする場合はtrue
+		*/
+		//--------------------------------------------------------------------------------------
+		virtual bool IsSkining() const;
+		//--------------------------------------------------------------------------------------
+		//	const unique_ptr<FbxMesh, FbxMeshDeleter>& GetFbxMesh() const;
+		/*!
+		@breaf FBXメッシュの取得
+		@param　なし
+		@return	FBXメッシュのスマートポインタ
+		*/
+		//--------------------------------------------------------------------------------------
+		const unique_ptr<FbxMesh, FbxMeshDeleter>& GetFbxMesh() const;
+		//--------------------------------------------------------------------------------------
+		//	const unique_ptr<FbxSkin, FbxSkinDeleter>& GetFbxSkin() const;
+		/*!
+		@breaf FBXスキンの取得
+		@param　なし
+		@return	FBXスキンのスマートポインタ
+		*/
+		//--------------------------------------------------------------------------------------
+		const unique_ptr<FbxSkin, FbxSkinDeleter>& GetFbxSkin() const;
+		//--------------------------------------------------------------------------------------
+		//	UINT GetNumBones() const;
+		/*!
+		@breaf ボーン数の取得
+		@param　なし
+		@return	ボーン数
+		*/
+		//--------------------------------------------------------------------------------------
+		UINT GetNumBones() const;
+		//--------------------------------------------------------------------------------------
+		//	const vector<Material>& GetMaterialVec()const;
+		/*!
+		@breaf マテリアル配列の取得
+		@param　なし
+		@return	マテリアル配列
+		*/
+		//--------------------------------------------------------------------------------------
+		const vector<Material>& GetMaterialVec()const;
+		//--------------------------------------------------------------------------------------
+		//	const AnimationData& GetAnimationData(const string& AnimeName) const;
+		/*!
+		@breaf アニメーションデータを得る。無ければ例外
+		@param　なし
+		@return	アニメーションデータ
+		*/
+		//--------------------------------------------------------------------------------------
+		const AnimationData& GetAnimationData(const string& AnimeName) const;
+		//--------------------------------------------------------------------------------------
+		//	const vector< Bone >& GetBonesVec() const;
+		/*!
+		@breaf ボーンの配列を得る
+		@param　なし
+		@return	ボーンの配列
+		*/
+		//--------------------------------------------------------------------------------------
+		const vector< Bone >& GetBonesVec() const;
+		//操作
+		//--------------------------------------------------------------------------------------
+		//	bool GenerateCurrentPose(
+		//		vector< Bone >& tgtBones,			//変更すべきボーン配列
+		//		AnimationData& rAnimationData,		//指定のアニメーションデータ
+		//		float CurrentTime					//時間指定
+		//	);
+		/*!
+		@breaf 指定のアニメーションの設定されている時間における、カレントポーズと合成変換行列を再計算する
+		@param　vector< Bone >& tgtBones	変更すべきボーン配列
+		@param　AnimationData& rAnimationData	指定のアニメーションデータ
+		@param　float CurrentTime	時間指定
+		@return	ループなしで最後に到達したらtrue
+		*/
+		//--------------------------------------------------------------------------------------
+		bool GenerateCurrentPose(vector<Bone>& tgtBones, AnimationData& rAnimationData, float CurrentTime);
+		//--------------------------------------------------------------------------------------
+		//	void AddAnimation(
+		//		const char* Name,	//アニメーション名
+		//		UINT StartFrame,	//スタート位置
+		//		UINT FrameLength,	//長さ
+		//		bool Loop,			//ループするかどうか
+		//		float FramesParSecond = 30.0f //１秒あたりのフレーム数
+		//	);
+		/*!
+		@breaf アニメーションを設定する（すでにその定義があれば、差し替える）
+		@param　const char* Name	アニメーション名
+		@param　UINT StartFrame,	スタート位置
+		@param　UINT FrameLength	長さ
+		@param　bool Loop,			ループするかどうか
+		@param　float FramesParSecond = 30.0f １秒あたりのフレーム数
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
+		void AddAnimation(const char* Name, UINT StartFrame, UINT FrameLength, bool Loop,
+			float FramesParSecond = 30.0f);
+	private:
+		// pImplイディオム
+		struct Impl;
+		unique_ptr<Impl> pImpl;
+	};
+
+	//--------------------------------------------------------------------------------------
+	//	class FbxSceneResource : public BaseResource;
+	/*!
+	FBXシーンリソースクラス.<br />
+	一つのFBXファイルは１つのFbxSceneResourceとして管理する
+	*/
+	//--------------------------------------------------------------------------------------
+	class FbxSceneResource : public BaseResource{
+		//--------------------------------------------------------------------------------------
+		//	void CreateFbxMeshVector(
+		//		FbxNode* pFbxNode				//ターゲットとなるノード
+		//	);
+		/*!
+		@breaf FBXメッシュ配列を再帰的に読み込む
+		@param　FbxNode* pFbxNode	ターゲットとなるノード
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
+		void CreateFbxMeshVector(FbxNode* pFbxNode);
+	protected:
+		//--------------------------------------------------------------------------------------
+		//	FbxSceneResource(
+		//		const wstring& DataDir,	//データディレクトリ
+		//		const wstring& FileName,	//FBXファイル名
+		//		const string& SceneName,	//シーン名
+		//		bool NeedStatic				//static構築をするかどうか
+		//	);
+		/*!
+		@breaf プロテクトコンストラクタ.<br/>
+		FBXファイルからFBXシーンを構築する
+		@param const wstring& DataDir	データディレクトリ
+		@param const wstring& FileName	FBXファイル名
+		@param const string& SceneName	シーン名
+		@param bool NeedStatic	static構築をするかどうか
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
+		FbxSceneResource(const wstring& DataDir,
+			const wstring& FileName, const string& SceneName, bool NeedStatic);
+		//初期化
+		//--------------------------------------------------------------------------------------
+		//	virtual void Create();
+		/*!
+		@breaf 初期化
+		@param　なし
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
+		virtual void Create();
+	public:
+		//--------------------------------------------------------------------------------------
+		//	struct FbxSceneDeleter;
+		/*!
+		FBXシーンのデリーター関数オブジェクト.
+		*/
+		//--------------------------------------------------------------------------------------
+		struct FbxSceneDeleter
+		{
+			//--------------------------------------------------------------------------------------
+			//	void operator()(
+			//		FbxScene *p	//FBXシーンのポインタ
+			//	);
+			/*!
+			@breaf FBXシーンのdelete.<br />
+			削除はマネージャが行うので何もしない
+			@param FbxScene *p	FBXシーンのポインタ
+			@return	なし
+			*/
+			//--------------------------------------------------------------------------------------
+			void operator()(FbxScene *p){
+				//削除はマネージャが行うので何もしない
+			}
+		};
+		//--------------------------------------------------------------------------------------
+		//	virtual ~FbxSceneResource();
+		/*!
+		@breaf デストラクタ.
+		@param なし
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
+		virtual ~FbxSceneResource();
+		//--------------------------------------------------------------------------------------
+		//	static shared_ptr<FbxSceneResource> CreateFbxScene(
+		//		const wstring& DataDir,		//データディレクトリ
+		//		const wstring& FileName,	//ファイル名
+		//		const string& SceneName = "",	//シーン名
+		//		bool NeedStatic = false		//staticメッシュとして構築するかどうか
+		//	);
+		/*!
+		@breaf 構築用static関数.
+		@param const wstring& DataDir	データディレクトリ
+		@param const wstring& FileName		ファイル名
+		@param const string& SceneName = ""	シーン名
+		@param bool NeedStatic = false	staticメッシュとして構築するかどうか
+		@return　FBXシーンリソース
+		*/
+		//--------------------------------------------------------------------------------------
+		static shared_ptr<FbxSceneResource> CreateFbxScene(const wstring& DataDir,
+			const wstring& FileName, const string& SceneName = "", bool NeedStatic = false);
+		//アクセサ
+		//--------------------------------------------------------------------------------------
+		//	wstring GetDataDir() const;
+		/*!
+		@breaf データディレクトリを得る
+		@param　なし
+		@return	データディレクトリ
+		*/
+		//--------------------------------------------------------------------------------------
+		wstring GetDataDir() const;
+		//--------------------------------------------------------------------------------------
+		//	wstring GetFileName() const;
+		/*!
+		@breaf ファイル名を得る
+		@param　なし
+		@return	ファイル名
+		*/
+		//--------------------------------------------------------------------------------------
+		wstring GetFileName() const;
+		//--------------------------------------------------------------------------------------
+		//	wstring GetFileName() const;
+		/*!
+		@breaf FBXシーン名を得る
+		@param　なし
+		@return	FBXシーン名
+		*/
+		//--------------------------------------------------------------------------------------
+		string GetFbxSceneName() const;
+		//--------------------------------------------------------------------------------------
+		//	shared_ptr<FbxMeshResource> GetFbxMeshResource(
+		//		size_t Index	//FBX内のメッシュID
+		//	) const;
+		/*!
+		@breaf メッシュリソースを得る
+		@param　size_t Index	FBX内のメッシュID
+		@return	FBXメッシュリソースのスマートポインタ
+		*/
+		//--------------------------------------------------------------------------------------
+		shared_ptr<FbxMeshResource> GetFbxMeshResource(size_t Index) const;
+		//--------------------------------------------------------------------------------------
+		//	size_t GetFbxMeshResourceSize() const;
+		/*!
+		@breaf メッシュリソース数を得る
+		@param　なし
+		@return	FBXシーンに含まれるメッシュリソース数
+		*/
+		//--------------------------------------------------------------------------------------
+		size_t GetFbxMeshResourceSize() const;
+		//--------------------------------------------------------------------------------------
+		//	vector< shared_ptr<FbxMeshResource> >& GetFbxMeshResourceVec() const;
+		/*!
+		@breaf メッシュリソース配列を得る
+		@param　なし
+		@return	FBXシーンに含まれるメッシュリソース配列
+		*/
+		//--------------------------------------------------------------------------------------
+		vector< shared_ptr<FbxMeshResource> >& GetFbxMeshResourceVec() const;
+	private:
+		// pImplイディオム
+		struct Impl;
+		unique_ptr<Impl> pImpl;
 	};
 
 

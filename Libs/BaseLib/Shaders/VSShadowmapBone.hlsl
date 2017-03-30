@@ -4,7 +4,7 @@
 //--------------------------------------------------------------------------------------
 
 
-#include "INCShadowmap.hlsli"
+#include "ShadowmapParameters.hlsli"
 
 void Skin(inout VS_INPUT_WEIGHTS vin, uniform int boneCount)
 {

@@ -162,7 +162,7 @@ namespace basedx11{
 
 
 	//操作
-	void Gravity::OnUpdate(){
+	void Gravity::Update(){
 		if (IsGameObjectActive()){
 			auto PtrT = GetGameObject()->GetComponent<Transform>();
 			if (PtrT){
@@ -355,7 +355,7 @@ namespace basedx11{
 		pImpl->m_TargetPosition = Vector3(x,y,z);
 	}
 	//操作
-	void SeekSteering::OnUpdate(){
+	void SeekSteering::Update(){
 		//m_GameObjectがnullならUpdateしても意味がない
 		if (IsGameObjectActive()){
 			auto RigidPtr = GetGameObject()->GetComponent<Rigidbody>();
@@ -411,7 +411,7 @@ namespace basedx11{
 
 
 	//操作
-	void ArriveSteering::OnUpdate(){
+	void ArriveSteering::Update(){
 		//m_GameObjectがnullならUpdateしても意味がない
 		if (IsGameObjectActive()){
 			auto RigidPtr = GetGameObject()->GetComponent<Rigidbody>();
@@ -489,7 +489,7 @@ namespace basedx11{
 	}
 
 	//操作
-	void PursuitSteering::OnUpdate(){
+	void PursuitSteering::Update(){
 		//m_GameObjectがnullならUpdateしても意味がない
 		if (IsGameObjectActive()){
 			auto RigidPtr = GetGameObject()->GetComponent<Rigidbody>();
@@ -558,7 +558,7 @@ namespace basedx11{
 		pImpl->m_WanderJitter = f;
 	}
 
-	void WanderSteering::OnUpdate(){
+	void WanderSteering::Update(){
 		//m_GameObjectがnullならUpdateしても意味がない
 		if (IsGameObjectActive()){
 			auto RigidPtr = GetGameObject()->GetComponent<Rigidbody>();
@@ -625,7 +625,7 @@ namespace basedx11{
 
 
 	//操作
-	void WallAvoidanceSteering::OnUpdate(){
+	void WallAvoidanceSteering::Update(){
 		//m_GameObjectがnullならUpdateしても意味がない
 		if (IsGameObjectActive()){
 			auto RigidPtr = GetGameObject()->GetComponent<Rigidbody>();
@@ -699,7 +699,7 @@ namespace basedx11{
 	}
 
 
-	void ObstacleAvoidanceSteering::OnUpdate(){
+	void ObstacleAvoidanceSteering::Update(){
 		//m_GameObjectがnullならUpdateしても意味がない
 		if (IsGameObjectActive()){
 			auto RigidPtr = GetGameObject()->GetComponent<Rigidbody>();
@@ -775,7 +775,7 @@ namespace basedx11{
 	}
 
 	//操作
-	void FollowPathSteering::OnUpdate(){
+	void FollowPathSteering::Update(){
 		//m_GameObjectがnullならUpdateしても意味がない
 		if (IsGameObjectActive()){
 			auto RigidPtr = GetGameObject()->GetComponent<Rigidbody>();
@@ -835,7 +835,7 @@ namespace basedx11{
 		pImpl->m_Group = Group;
 	}
 	//操作
-	void AlignmentSteering::OnUpdate(){
+	void AlignmentSteering::Update(){
 		//m_GameObjectがnullならUpdateしても意味がない
 		if (IsGameObjectActive()){
 			auto RigidPtr = GetGameObject()->GetComponent<Rigidbody>();
@@ -890,7 +890,7 @@ namespace basedx11{
 	}
 
 	//操作
-	void CohesionSteering::OnUpdate(){
+	void CohesionSteering::Update(){
 		//m_GameObjectがnullならUpdateしても意味がない
 		if (IsGameObjectActive()){
 			auto RigidPtr = GetGameObject()->GetComponent<Rigidbody>();
@@ -944,7 +944,7 @@ namespace basedx11{
 		pImpl->m_Group = Group;
 	}
 
-	void SeparationSteering::OnUpdate(){
+	void SeparationSteering::Update(){
 		//m_GameObjectがnullならUpdateしても意味がない
 		if (IsGameObjectActive()){
 			auto RigidPtr = GetGameObject()->GetComponent<Rigidbody>();
@@ -1085,7 +1085,7 @@ namespace basedx11{
 	float Rigidbody::GetMaxForce() const{ return pImpl->m_MaxForce; }
 	void Rigidbody::SetMaxForce(float f){ pImpl->m_MaxForce = f; }
 
-	void Rigidbody::OnUpdate(){
+	void Rigidbody::Update(){
 		//m_GameObjectがnullならUpdateしても意味がない
 		if (IsGameObjectActive()){
 			auto PtrT = GetGameObject()->GetComponent<Transform>();
@@ -1434,7 +1434,7 @@ namespace basedx11{
 
 
 	//操作
-	void Collision::OnUpdate(){
+	void Collision::Update(){
 		//Collisionが有効かどうか
 		if (!IsUpdateActive()){
 			return;
@@ -1583,8 +1583,7 @@ namespace basedx11{
 				}
 			}
 		}
-		//ResetHitObjectはOnLastUpdate後の処理へ移動
-		//ResetHitObject();
+		ResetHitObject();
 		if (PtrSrcGravity){
 			if (PtrSrcGravity->GetOnObject()){
 				EscapeFromDestParent(PtrSrcGravity->GetOnObject());
@@ -1592,6 +1591,90 @@ namespace basedx11{
 			PtrSrcGravity->CheckBaseY();
 		}
 	}
+
+
+
+	void Collision::Draw(){
+
+		auto PtrGameObject = GetGameObject();
+		auto PtrStage = PtrGameObject->GetStage();
+		if (!PtrStage){
+			return;
+		}
+		auto PtrT = PtrGameObject->GetComponent<Transform>();
+		auto PtrMeshResource = pImpl->m_MeshResource.lock();
+		//ステージからカメラを取り出す
+		auto PtrCamera = PtrStage->GetTargetCamera();
+
+		if (PtrMeshResource && PtrCamera){
+
+			auto Dev = App::GetApp()->GetDeviceResources();
+			auto pID3D11DeviceContext = Dev->GetD3DDeviceContext();
+			//ステータスのポインタ
+			auto RenderStatePtr = PtrStage->GetRenderState();
+			//シャドウマップのレンダラーターゲット
+			auto ShadoumapPtr = PtrStage->GetShadowMapRenderTarget();
+
+			//カメラの取得
+			Matrix4X4 View, Proj;
+			View = PtrCamera->GetViewMatrix();
+			Proj = PtrCamera->GetProjMatrix();
+
+			//コンスタントバッファの設定
+			SimpleConstantBuffer sb;
+			sb.m_Model = Matrix4X4EX::Transpose(GetCollisionMatrix());
+			sb.m_View = Matrix4X4EX::Transpose(View);
+			sb.m_Projection = Matrix4X4EX::Transpose(Proj);
+			sb.m_Direction = Vector4(0, -1.0f, 0, 0);
+
+			sb.m_DiffuseColor = Color4(1.0f, 1.0f, 1.0f, 1.0f);
+			//コンスタントバッファの更新
+			pID3D11DeviceContext->UpdateSubresource(CBSimple::GetPtr()->GetBuffer(), 0, nullptr, &sb, 0, 0);
+
+			//ストライドとオフセット
+			UINT stride = sizeof(VertexPositionNormalTexture);
+			UINT offset = 0;
+			//頂点バッファの設定
+			pID3D11DeviceContext->IASetVertexBuffers(0, 1, PtrMeshResource->GetVertexBuffer().GetAddressOf(), &stride, &offset);
+			//インデックスバッファのセット
+			pID3D11DeviceContext->IASetIndexBuffer(PtrMeshResource->GetIndexBuffer().Get(), DXGI_FORMAT_R16_UINT, 0);
+			//描画方法（3角形）
+			pID3D11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+
+			ID3D11ShaderResourceView* pNull[1] = { 0 };
+			ID3D11SamplerState* pNullSR[1] = { 0 };
+
+			//サンプラーは使用しない
+			pID3D11DeviceContext->PSSetSamplers(0, 1, pNullSR);
+			pID3D11DeviceContext->PSSetSamplers(1, 1, pNullSR);
+			//テクスチャも使用しない
+			pID3D11DeviceContext->PSSetShaderResources(0, 1, pNull);
+			pID3D11DeviceContext->PSSetShaderResources(1, 1, pNull);
+			//テクスチャなしのピクセルシェーダの設定
+			pID3D11DeviceContext->PSSetShader(PSSimplePNT::GetPtr()->GetShader(), nullptr, 0);
+			//頂点シェーダの設定
+			pID3D11DeviceContext->VSSetShader(VSSimplePNT::GetPtr()->GetShader(), nullptr, 0);
+
+			//インプットレイアウトの設定
+			pID3D11DeviceContext->IASetInputLayout(VSSimplePNT::GetPtr()->GetInputLayout());
+
+			//コンスタントバッファの設定
+			ID3D11Buffer* pConstantBuffer = CBSimple::GetPtr()->GetBuffer();
+			pID3D11DeviceContext->VSSetConstantBuffers(0, 1, &pConstantBuffer);
+			pID3D11DeviceContext->PSSetConstantBuffers(0, 1, &pConstantBuffer);
+			//塗りつぶし
+			pID3D11DeviceContext->OMSetBlendState(RenderStatePtr->GetOpaque(), nullptr, 0xffffffff);
+			//レンダリングステート
+			pID3D11DeviceContext->RSSetState(RenderStatePtr->GetWireframe());
+			//描画
+			pID3D11DeviceContext->DrawIndexed(PtrMeshResource->GetNumIndicis(), 0, 0);
+			//後始末
+			Dev->InitializeStates(RenderStatePtr);
+		}
+
+	}
+
 
 
 	//--------------------------------------------------------------------------------------
@@ -1619,7 +1702,7 @@ namespace basedx11{
 	{}
 	CollisionSphere::~CollisionSphere(){}
 
-	void CollisionSphere::OnCreate(){
+	void CollisionSphere::Create(){
 		SetMeshResource(App::GetApp()->GetResource<MeshResource>(L"DEFAULT_SPHERE"));
 		SetDrawActive(false);
 	}
@@ -1717,13 +1800,8 @@ namespace basedx11{
 			SetHitTime(HitTime);
 			SetHitObject(DestObj);
 		}
-		//Capsuleが回転している場合などここまででヒット漏れする可能性がある
-		//その場合は現時点でのヒットとする
-		Vector3 RetVec;
-		if (HitTest::SPHERE_CAPSULE(SrcSphere, DestCapsule, RetVec)){
-			SetHitTime(0);
-			SetHitObject(DestObj);
-		}
+
+
 	}
 
 
@@ -1740,7 +1818,6 @@ namespace basedx11{
 		OBB DestObb = DestCollisionObbPtr->GetObb();
 		OBB DestBeforeObb = DestCollisionObbPtr->GetBeforeObb();
 		Vector3 DestVelocity = DestObb.m_Center - DestBeforeObb.m_Center;
-
 		Vector3 SpanVelocity = SrcVelocity - DestVelocity;
 		SpanVelocity /= ElapsedTime;
 		float HitTime = 0;
@@ -1751,13 +1828,6 @@ namespace basedx11{
 			//続いて残りも判定するが、最終的に、一番Before地点に近いオブジェクトが
 			//設定される
 			SetHitTime(HitTime);
-			SetHitObject(DestObj);
-		}
-		//OBBが回転している場合などここまででヒット漏れする可能性がある
-		//その場合は現時点でのヒットとする
-		Vector3 RetVec;
-		if (HitTest::SPHERE_OBB(SrcSphere, DestObb, RetVec)){
-			SetHitTime(0);
 			SetHitObject(DestObj);
 		}
 	}
@@ -1910,7 +1980,7 @@ namespace basedx11{
 	CollisionCapsule::~CollisionCapsule(){}
 
 	//初期化
-	void CollisionCapsule::OnCreate(){
+	void CollisionCapsule::Create(){
 		SetMeshResource(App::GetApp()->GetResource<MeshResource>(L"DEFAULT_CAPSULE"));
 		SetDrawActive(false);
 	}
@@ -1988,13 +2058,8 @@ namespace basedx11{
 			SetHitTime(HitTime);
 			SetHitObject(DestObj);
 		}
-		//Capsuleが回転している場合などここまででヒット漏れする可能性がある
-		//その場合は現時点でのヒットとする
-		Vector3 RetVec;
-		if (HitTest::SPHERE_CAPSULE(DestSphere, SrcCapsule, RetVec)){
-			SetHitTime(0);
-			SetHitObject(DestObj);
-		}
+
+
 	}
 	void CollisionCapsule::CollisionWithCapsule(const shared_ptr<GameObject>& DestObj){
 
@@ -2023,13 +2088,8 @@ namespace basedx11{
 			SetHitTime(HitTime);
 			SetHitObject(DestObj);
 		}
-		//Capsuleが回転している場合などここまででヒット漏れする可能性がある
-		//その場合は現時点でのヒットとする
-		Vector3 RetVec1, RetVec2;
-		if (HitTest::CAPSULE_CAPSULE(SrcCapsule, DestCapsule, RetVec1, RetVec2)){
-			SetHitTime(0);
-			SetHitObject(DestObj);
-		}
+
+
 	}
 	void CollisionCapsule::CollisionWithObb(const shared_ptr<GameObject>& DestObj){
 		auto DestCollisionObbPtr = DestObj->GetComponent<CollisionObb>();
@@ -2058,13 +2118,7 @@ namespace basedx11{
 			SetHitTime(HitTime);
 			SetHitObject(DestObj);
 		}
-		//回転している場合などここまででヒット漏れする可能性がある
-		//その場合は現時点でのヒットとする
-		Vector3 RetVec;
-		if (HitTest::CAPSULE_OBB(SrcCapsule, DestObb, RetVec)){
-			SetHitTime(0);
-			SetHitObject(DestObj);
-		}
+
 	}
 
 	void CollisionCapsule::GetNormalClosetPointWithHitObject(const shared_ptr<GameObject>& DestObj, Vector3& Normal, Vector3& ClosestPoint){
@@ -2251,7 +2305,7 @@ namespace basedx11{
 	CollisionObb::~CollisionObb(){}
 
 	//初期化
-	void CollisionObb::OnCreate(){
+	void CollisionObb::Create(){
 		SetMeshResource(App::GetApp()->GetResource<MeshResource>(L"DEFAULT_CUBE"));
 		SetDrawActive(false);
 	}
@@ -2318,13 +2372,6 @@ namespace basedx11{
 			SetHitTime(HitTime);
 			SetHitObject(DestObj);
 		}
-		//回転している場合などここまででヒット漏れする可能性がある
-		//その場合は現時点でのヒットとする
-		Vector3 RetVec;
-		if (HitTest::SPHERE_OBB(DestSphere, SrcObb, RetVec)){
-			SetHitTime(0);
-			SetHitObject(DestObj);
-		}
 	}
 
 	void CollisionObb::CollisionWithCapsule(const shared_ptr<GameObject>& DestObj){
@@ -2354,13 +2401,6 @@ namespace basedx11{
 			//続いて残りも判定するが、最終的に、一番Before地点に近いオブジェクトが
 			//設定される
 			SetHitTime(HitTime);
-			SetHitObject(DestObj);
-		}
-		//回転している場合などここまででヒット漏れする可能性がある
-		//その場合は現時点でのヒットとする
-		Vector3 RetVec;
-		if (HitTest::CAPSULE_OBB(DestCapsule, SrcObb, RetVec)){
-			SetHitTime(0);
 			SetHitObject(DestObj);
 		}
 	}
@@ -2408,12 +2448,6 @@ namespace basedx11{
 				SetHitTime(HitTime);
 				SetHitObject(DestObj);
 			}
-		}
-		//回転している場合などここまででヒット漏れする可能性がある
-		//その場合は現時点でのヒットとする
-		if (HitTest::OBB_OBB(SrcObb, DestObb)){
-			SetHitTime(0);
-			SetHitObject(DestObj);
 		}
 	}
 

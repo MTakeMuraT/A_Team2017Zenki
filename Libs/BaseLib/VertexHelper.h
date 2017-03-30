@@ -568,63 +568,6 @@ struct VertexPositionNormalTangentColorTextureSkinning : public VertexPositionNo
 	}
 };
 
-
-//--------------------------------------------------------------------------------------
-//const D3D11_INPUT_ELEMENT_DESC VertexPositionNormalTextureMatrixLayout[];
-//用途: 位置と法線とテクスチャと行列を持つ入力レイアウトの定義
-//--------------------------------------------------------------------------------------
-const D3D11_INPUT_ELEMENT_DESC VertexPositionNormalTextureMatrixLayout[] =
-{
-	{ "SV_Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	{ "MATRIX", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
-	{ "MATRIX", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
-	{ "MATRIX", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
-	{ "MATRIX", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
-};
-
-//--------------------------------------------------------------------------------------
-// struct VertexPositionNormalTextureMatrix;
-//用途: 位置と法線とテクスチャと行列を持つ頂点の定義
-//--------------------------------------------------------------------------------------
-struct  VertexPositionNormalTextureMatrix
-{
-	VertexPositionNormalTextureMatrix()
-	{ }
-
-	VertexPositionNormalTextureMatrix(XMFLOAT3 const& position, XMFLOAT3 const& normal, XMFLOAT2 const& textureCoordinate,
-		XMFLOAT4X4 const& matrix)
-		: position(position),
-		normal(normal),
-		textureCoordinate(textureCoordinate),
-		matrix(matrix)
-	{ }
-
-	VertexPositionNormalTextureMatrix(FXMVECTOR position, FXMVECTOR normal, FXMVECTOR textureCoordinate,
-		FXMMATRIX const& matrix)
-	{
-		XMStoreFloat3(&this->position, position);
-		XMStoreFloat3(&this->normal, normal);
-		XMStoreFloat2(&this->textureCoordinate, textureCoordinate);
-		XMStoreFloat4x4(&this->matrix, matrix);
-	}
-
-	XMFLOAT3 position;
-	XMFLOAT3 normal;
-	XMFLOAT2 textureCoordinate;
-	XMFLOAT4X4 matrix;
-
-	static const D3D11_INPUT_ELEMENT_DESC* GetVertexElement(){
-		return VertexPositionNormalTextureMatrixLayout;
-	}
-	static UINT GetNumElements(){
-		return  ARRAYSIZE(VertexPositionNormalTextureMatrixLayout);
-	}
-};
-
-
-
 /**************************************************************************
  class VertexUtil;
  用途: 頂点関連のユーティリティ関数群
@@ -853,19 +796,6 @@ static void CreatePrimitiveBuffer(
 			it->textureCoordinate.x = ( 1.f - it->textureCoordinate.x );
         }
     }
-/**************************************************************************
-static  void CreateSquare(
-	float size,	//1つの辺のサイズ
-	vector<VertexPositionNormalTexture>& vertices, //頂点を作成するための配列
-	vector<uint16_t>& indices	//インデックスを作成するための配列
-);
-	用途: 平面を作成する(static関数)
-	戻り値: なし
-	＊VertexPosNormalTexフォーマットの平面を作成する
-***************************************************************************/
-	static void CreateSquare(float size,
-		vector<VertexPositionNormalTexture>& vertices, vector<uint16_t>& indices);
-
 /**************************************************************************
  static  void CreateCube(
 	float size,	//1つの辺のサイズ

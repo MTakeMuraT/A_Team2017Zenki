@@ -60,9 +60,9 @@ namespace basedx11{
 		void StartJump(float x, float y, float z,float EscapeSpan = 0.001f);
 
 		//操作
-		virtual void OnUpdate()override;
-		virtual void Update2();
-		virtual void OnDraw()override{}
+		virtual void Update()override;
+		virtual void Update2()override;
+		virtual void Draw()override{}
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -102,8 +102,8 @@ namespace basedx11{
 		void SetTargetPosition(float x, float y, float z);
 
 		//操作
-		virtual void OnUpdate()override;
-		virtual void OnDraw()override{}
+		virtual void Update()override;
+		virtual void Draw()override{}
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -129,8 +129,8 @@ namespace basedx11{
 
 
 		//操作
-		virtual void OnUpdate()override;
-		virtual void OnDraw()override{}
+		virtual void Update()override;
+		virtual void Draw()override{}
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -162,8 +162,8 @@ namespace basedx11{
 
 
 		//操作
-		virtual void OnUpdate()override;
-		virtual void OnDraw()override{}
+		virtual void Update()override;
+		virtual void Draw()override{}
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -192,8 +192,8 @@ namespace basedx11{
 		void SetWanderJitter(float f);
 
 		//操作
-		virtual void OnUpdate()override;
-		virtual void OnDraw()override{}
+		virtual void Update()override;
+		virtual void Draw()override{}
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -221,8 +221,8 @@ namespace basedx11{
 		bool IsWallArribed() const;
 
 		//操作
-		virtual void OnUpdate()override;
-		virtual void OnDraw()override{}
+		virtual void Update()override;
+		virtual void Draw()override{}
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -251,8 +251,8 @@ namespace basedx11{
 
 
 		//操作
-		virtual void OnUpdate()override;
-		virtual void OnDraw()override{}
+		virtual void Update()override;
+		virtual void Draw()override{}
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -290,8 +290,8 @@ namespace basedx11{
 		bool IsFinished() const;
 
 		//操作
-		virtual void OnUpdate()override;
-		virtual void OnDraw()override{}
+		virtual void Update()override;
+		virtual void Draw()override{}
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -315,8 +315,8 @@ namespace basedx11{
 		void SetGameObjectGroup(const shared_ptr<GameObjectGroup>& Group);
 
 		//操作
-		virtual void OnUpdate()override;
-		virtual void OnDraw()override{}
+		virtual void Update()override;
+		virtual void Draw()override{}
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -337,8 +337,8 @@ namespace basedx11{
 		void SetGameObjectGroup(const shared_ptr<GameObjectGroup>& Group);
 
 		//操作
-		virtual void OnUpdate()override;
-		virtual void OnDraw()override{}
+		virtual void Update()override;
+		virtual void Draw()override{}
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -361,8 +361,8 @@ namespace basedx11{
 		void SetGameObjectGroup(const shared_ptr<GameObjectGroup>& Group);
 
 		//操作
-		virtual void OnUpdate()override;
-		virtual void OnDraw()override{}
+		virtual void Update()override;
+		virtual void Draw()override{}
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -421,8 +421,8 @@ namespace basedx11{
 		void SetMaxForce(float f);
 
 		//操作
-		virtual void OnUpdate()override;
-		virtual void OnDraw()override{}
+		virtual void Update()override;
+		virtual void Draw()override{}
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -437,6 +437,7 @@ namespace basedx11{
 	//--------------------------------------------------------------------------------------
 	class Collision : public Component {
 		friend class Gravity;
+		void ResetHitObject();
 		bool IsNewDest() const;
 		bool NeedAfterCollision() const;
 		bool NeedSendEvent() const;
@@ -457,6 +458,7 @@ namespace basedx11{
 		//構築と破棄
 		explicit Collision(const shared_ptr<GameObject>& GameObjectPtr);
 		virtual ~Collision();
+		shared_ptr<MeshResource> GetMeshResource() const;
 		void SetMeshResource(const shared_ptr<MeshResource>& Ptr);
 		//Rigidbodyがある場合のUpdate2
 		void Update2WithRigidbody2();
@@ -467,8 +469,6 @@ namespace basedx11{
 		void SetEscapeAlignPlus(float f);
 	public:
 		//アクセサ
-		shared_ptr<MeshResource> GetMeshResource() const;
-
 		bool GetFixed() const;
 		bool IsFixed() const;
 		void SetFixed(bool b);
@@ -500,7 +500,6 @@ namespace basedx11{
 		shared_ptr<GameObject> GetHitObject() const;
 		void SetHitObject(const shared_ptr<GameObject>& Ptr);
 
-		void ResetHitObject();
 		void ClearBothHitObject();
 
 		shared_ptr<GameObject> GetSubDispatchObject() const;
@@ -520,9 +519,9 @@ namespace basedx11{
 		virtual Matrix4X4 GetCollisionMatrix() const = 0;
 
 		//操作
-		virtual void OnUpdate()override;
-		virtual void Update2();
-		virtual void OnDraw()override{}
+		virtual void Update()override;
+		virtual void Update2()override;
+		virtual void Draw()override;
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -548,7 +547,7 @@ namespace basedx11{
 		explicit CollisionSphere(const shared_ptr<GameObject>& GameObjectPtr);
 		virtual ~CollisionSphere();
 		//初期化
-		virtual void OnCreate() override;
+		virtual void Create() override;
 
 		//アクセサ
 		float GetMakedDiameter() const;	//作成時の直径
@@ -587,7 +586,7 @@ namespace basedx11{
 		explicit CollisionCapsule(const shared_ptr<GameObject>& GameObjectPtr);
 		virtual ~CollisionCapsule();
 		//初期化
-		virtual void OnCreate() override;
+		virtual void Create() override;
 		//アクセサ
 		float GetMakedDiameter() const;	//作成時の直径
 		void SetMakedDiameter(float f);		//作成時の直径
@@ -627,7 +626,7 @@ namespace basedx11{
 		explicit CollisionObb(const shared_ptr<GameObject>& GameObjectPtr);
 		virtual ~CollisionObb();
 		//初期化
-		virtual void OnCreate() override;
+		virtual void Create() override;
 
 		//アクセサ
 		float GetMakedSize() const;	//作成時の1辺の長さ

@@ -526,8 +526,8 @@ namespace basedx11{
 		ComPtr<ID3D11Texture2D>		m_DepthStencil;		//深度ステンシルバッファ
 		ComPtr<ID3D11DepthStencilView>	m_DepthStencilView;	//深度ステンシルビュー
 		D3D11_VIEWPORT m_ViewPort;	//ビューポート
-		Impl(float ShadowMapDimension) :
-			m_ShadowMapDimension(ShadowMapDimension)
+		Impl():
+			m_ShadowMapDimension(2048.0f)
 		{}
 		~Impl(){}
 	};
@@ -539,8 +539,8 @@ namespace basedx11{
 	//	用途: シャドウマップのレンダリングターゲット
 	//--------------------------------------------------------------------------------------
 	//構築と破棄
-	ShadowMapRenderTarget::ShadowMapRenderTarget(float ShadowMapDimension) :
-		pImpl(new Impl(ShadowMapDimension))
+	ShadowMapRenderTarget::ShadowMapRenderTarget() :
+		pImpl(new Impl())
 	{
 		try{
 			//デバイスとコンテキストインターフェイスの取得
@@ -712,7 +712,7 @@ namespace basedx11{
 	//	＊デフォルトのレンダラー
 	//--------------------------------------------------------------------------------------
 	//構築
-	DefaultRenderTarget::DefaultRenderTarget(const shared_ptr<Stage>& stage) :
+	DefaultRenderTarget::DefaultRenderTarget(const shared_ptr<Stage>& stage):
 		pImpl(new Impl(stage))
 	{
 		try{

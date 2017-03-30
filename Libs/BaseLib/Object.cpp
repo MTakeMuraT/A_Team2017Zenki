@@ -266,7 +266,7 @@ namespace basedx11{
 	const Matrix4X4& Camera::GetProjMatrix() const{ return pImpl->m_ProjMatrix; }
 
 	//操作
-	void Camera::OnUpdate(){
+	void Camera::Update(){
 		if (!pImpl->m_CameraObject.expired()){
 			auto ShPtr = pImpl->m_CameraObject.lock();
 			auto TransPtr = ShPtr->GetComponent<Transform>();
@@ -337,7 +337,7 @@ namespace basedx11{
 	}
 
 
-	void LookAtCamera::OnUpdate(){
+	void LookAtCamera::Update(){
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		//前回のターンからの時間
 		float ElapsedTime = App::GetApp()->GetElapsedTime();
@@ -433,7 +433,7 @@ namespace basedx11{
 			}
 
 		}
-		Camera::OnUpdate();
+		Camera::Update();
 	}
 
 
@@ -587,7 +587,7 @@ namespace basedx11{
 	}
 	//Lightの追加
 	shared_ptr<Light> MultiLight::AddLight(){
-		auto Ptr = ObjectFactory::Create<Light>();
+		auto Ptr = Object::CreateObject<Light>();
 		pImpl->m_LightVec.push_back(Ptr);
 		return Ptr;
 	}
@@ -619,7 +619,7 @@ namespace basedx11{
 		size_t NouCount = pImpl->m_LightVec.size();
 		pImpl->m_LightVec.clear();
 		//最低一つはライトを置く
-		auto Ptr = ObjectFactory::Create<Light>(
+		auto Ptr = Object::CreateObject<Light>(
 			Vector3(0.5265408f, -0.5735765f, 0.6275069f),
 			Color4(1.0000000f, 0.9607844f, 0.8078432f, 1.0f),
 			Color4(1.0000000f, 0.9607844f, 0.8078432f, 1.0f)
@@ -627,7 +627,7 @@ namespace basedx11{
 		pImpl->m_LightVec.push_back(Ptr);
 		if (NouCount >= 2){
 
-			Ptr = ObjectFactory::Create<Light>(
+			Ptr = Object::CreateObject<Light>(
 				Vector3(-0.7198464f, 0.3420201f, -0.6040227f),
 				Color4(0.9647059f, 0.7607844f, 0.4078432f, 1.0f),
 				Color4(0.0000000f, 0.0000000f, 0.0000000f, 0.0f)
@@ -635,7 +635,7 @@ namespace basedx11{
 			pImpl->m_LightVec.push_back(Ptr);
 		}
 		if (NouCount >= 3){
-			Ptr = ObjectFactory::Create<Light>(
+			Ptr = Object::CreateObject<Light>(
 				Vector3(0.4545195f, -0.7660444f, 0.4545195f),
 				Color4(0.3231373f, 0.3607844f, 0.3937255f, 1.0f),
 				Color4(0.3231373f, 0.3607844f, 0.3937255f, 1.0f)
@@ -646,9 +646,9 @@ namespace basedx11{
 
 
 	//操作
-	void MultiLight::OnUpdate(){
+	void MultiLight::Update(){
 		for (auto Ptr : pImpl->m_LightVec){
-			Ptr->OnUpdate();
+			Ptr->Update();
 		}
 	}
 
@@ -746,12 +746,12 @@ namespace basedx11{
 
 
 	//操作
-	void View::OnUpdate(){
+	void View::Update(){
 		if (pImpl->m_Camera){
-			pImpl->m_Camera->OnUpdate();
+			pImpl->m_Camera->Update();
 		}
 		if (pImpl->m_MultiLight){
-			pImpl->m_MultiLight->OnUpdate();
+			pImpl->m_MultiLight->Update();
 		}
 	}
 

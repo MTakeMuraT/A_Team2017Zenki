@@ -22,7 +22,7 @@ namespace basedx11{
 		map<type_index, shared_ptr<Component> > m_CompMap;
 		shared_ptr<Rigidbody> m_Rigidbody;	//Rigidbodyは別にする
 		shared_ptr<Gravity> m_Gravity;	//Gravityは別にする
-		shared_ptr<TransformMatrix> m_TransformMatrix;	//TransformMatrixも別にする
+		shared_ptr<Transform> m_Transform;	//Transformも別にする
 		shared_ptr<Collision> m_Collision;	//Collisionも別にする
 
 		list<type_index> m_CompOrder;	//コンポーネント実行順番
@@ -61,12 +61,8 @@ namespace basedx11{
 		return pImpl->m_Gravity;
 	}
 
-	shared_ptr<TransformMatrix> GameObject::GetTransformMatrix()const {
-		return pImpl->m_TransformMatrix;
-
-	}
-	shared_ptr<Transform> GameObject::GetTransform()const {
-		return dynamic_pointer_cast<Transform>(pImpl->m_TransformMatrix);
+	shared_ptr<Transform> GameObject::GetTransform()const{
+		return pImpl->m_Transform;
 	}
 	shared_ptr<Collision> GameObject::GetCollision()const{
 		return pImpl->m_Collision;
@@ -111,14 +107,9 @@ namespace basedx11{
 		pImpl->m_Collision = Ptr;
 	}
 
-	void GameObject::SetTransformMatrix(const shared_ptr<TransformMatrix>& Ptr) {
+	void GameObject::SetTransform(const shared_ptr<Transform>& Ptr){
 		Ptr->AttachGameObject(GetThis<GameObject>());
-		pImpl->m_TransformMatrix = Ptr;
-	}
-
-	void GameObject::SetTransform(const shared_ptr<Transform>& Ptr) {
-		Ptr->AttachGameObject(GetThis<GameObject>());
-		pImpl->m_TransformMatrix = Ptr;
+		pImpl->m_Transform = Ptr;
 	}
 	void GameObject::AddMakedComponent(type_index TypeIndex, const shared_ptr<Component>& Ptr){
 		if (!SearchComponent(TypeIndex)){
@@ -214,122 +205,100 @@ namespace basedx11{
 	}
 	void GameObject::SetStage(const shared_ptr<Stage>& stage){ pImpl->m_Stage = stage; }
 
-	void GameObject::OnPreCreate(){
-		//TransformMatrix必須
-		AddComponent<TransformMatrix>();
+	void GameObject::PreCreate(){
+		//Transform必須
+		AddComponent<Transform>();
 	}
 
 	void GameObject::ComponentUpdate(){
-		//Transformかどうかを検証
-		auto Tptr = GetComponent<Transform>(false);
-		if (Tptr) {
-			auto RigidPtr = GetComponent<Rigidbody>(false);
-			auto GravityPtr = GetComponent<Gravity>(false);
-			if (RigidPtr) {
-				//Rigidbodyがあればフォースを初期化
-				RigidPtr->SetForce(0, 0, 0);
-			}
-			//マップを検証してUpdate
-			list<type_index>::iterator it = pImpl->m_CompOrder.begin();
-			while (it != pImpl->m_CompOrder.end()) {
-				map<type_index, shared_ptr<Component> >::const_iterator it2;
-				it2 = pImpl->m_CompMap.find(*it);
-				if (it2 != pImpl->m_CompMap.end()) {
-					//指定の型のコンポーネントが見つかった
-					if (it2->second->IsUpdateActive()) {
-						it2->second->OnUpdate();
-					}
+		//Transformがなければ例外
+		auto Tptr = GetComponent<Transform>();
+		auto RigidPtr = GetComponent<Rigidbody>(false);
+		auto GravityPtr = GetComponent<Gravity>(false);
+		if (RigidPtr){
+			//Rigidbodyがあればフォースを初期化
+			RigidPtr->SetForce(0, 0, 0);
+		}
+		//マップを検証してUpdate
+		list<type_index>::iterator it = pImpl->m_CompOrder.begin();
+		while (it != pImpl->m_CompOrder.end()){
+			map<type_index, shared_ptr<Component> >::const_iterator it2;
+			it2 = pImpl->m_CompMap.find(*it);
+			if (it2 != pImpl->m_CompMap.end()) {
+				//指定の型のコンポーネントが見つかった
+				if (it2->second->IsUpdateActive()){
+					it2->second->Update();
 				}
-				it++;
 			}
-			if (RigidPtr && RigidPtr->IsUpdateActive()) {
-				//RigidbodyがあればUpdate()
-				RigidPtr->OnUpdate();
-			}
-			if (GravityPtr && GravityPtr->IsUpdateActive()) {
-				//GravityPtrがあればUpdate()
-				GravityPtr->OnUpdate();
-			}
-			//TransformのUpdate
-			if (Tptr->IsUpdateActive()) {
-				Tptr->OnUpdate();
-			}
-			auto CollisionPtr = GetComponent<Collision>(false);
-			if (CollisionPtr && CollisionPtr->IsUpdateActive()) {
-				//CollisionがあればUpdate()
-				CollisionPtr->OnUpdate();
-			}
+			it++;
 		}
-		else {
-			auto TMptr = GetComponent<TransformMatrix>();
-			//マップを検証してUpdate
-			list<type_index>::iterator it = pImpl->m_CompOrder.begin();
-			while (it != pImpl->m_CompOrder.end()) {
-				map<type_index, shared_ptr<Component> >::const_iterator it2;
-				it2 = pImpl->m_CompMap.find(*it);
-				if (it2 != pImpl->m_CompMap.end()) {
-					//指定の型のコンポーネントが見つかった
-					if (it2->second->IsUpdateActive()) {
-						it2->second->OnUpdate();
-					}
-				}
-				it++;
-			}
-			//TransformMatrixのUpdate
-			if (TMptr->IsUpdateActive()) {
-				TMptr->OnUpdate();
-			}
+		if (RigidPtr && RigidPtr->IsUpdateActive()){
+			//RigidbodyがあればUpdate()
+			RigidPtr->Update();
 		}
-	}
-
-	void GameObject::CollisionChk() {
-		//Transformかどうかを検証
-		auto Tptr = GetComponent<Transform>(false);
-		if (Tptr) {
-			auto CollisionPtr = GetComponent<Collision>(false);
-			if (CollisionPtr && CollisionPtr->GetHitObject()) {
-				//何かとヒットしてた
-				OnCollision(CollisionPtr->GetHitObject());
-			}
+		if (GravityPtr && GravityPtr->IsUpdateActive()){
+			//GravityPtrがあればUpdate()
+			GravityPtr->Update();
 		}
-	}
-
-	void GameObject::ComponentUpdate2(){
-		//Transformかどうかを検証
-		auto Tptr = GetComponent<Transform>(false);
-		if (Tptr) {
-			auto GravityPtr = GetComponent<Gravity>(false);
-			if (GravityPtr && GravityPtr->IsUpdate2Active()) {
-				//GravityPtrがあればUpdate2()
-				GravityPtr->Update2();
-			}
-			auto CollisionPtr = GetComponent<Collision>(false);
-			if (CollisionPtr && CollisionPtr->IsUpdate2Active()) {
-				//CollisionがあればUpdate2()
-				CollisionPtr->Update2();
-			}
+		//TransformのUpdate
+		if (Tptr->IsUpdateActive()){
+			Tptr->Update();
 		}
-	}
-
-	void GameObject::CollisionReset(){
 		auto CollisionPtr = GetComponent<Collision>(false);
-		if (CollisionPtr) {
-			CollisionPtr->ResetHitObject();
+		if (CollisionPtr && CollisionPtr->IsUpdateActive()){
+			//CollisionがあればUpdate()
+			CollisionPtr->Update();
 		}
 	}
+	void GameObject::ComponentUpdate2(){
+		//Transformがなければ例外
+		auto Tptr = GetComponent<Transform>();
+		//マップを検証してUpdate
+		list<type_index>::iterator it = pImpl->m_CompOrder.begin();
+		while (it != pImpl->m_CompOrder.end()){
+			map<type_index, shared_ptr<Component> >::const_iterator it2;
+			it2 = pImpl->m_CompMap.find(*it);
+			if (it2 != pImpl->m_CompMap.end()) {
+				//指定の型のコンポーネントが見つかった
+				if (it2->second->IsUpdate2Active()){
+					it2->second->Update2();
+				}
+			}
+			it++;
+		}
+		auto RigidPtr = GetComponent<Rigidbody>(false);
+		if (RigidPtr && RigidPtr->IsUpdate2Active()){
+			//RigidbodyがあればUpdate2()
+			RigidPtr->Update2();
+		}
+		auto GravityPtr = GetComponent<Gravity>(false);
+		if (GravityPtr && GravityPtr->IsUpdate2Active()){
+			//GravityPtrがあればUpdate2()
+			GravityPtr->Update2();
+		}
 
+		//TransformのUpdate
+		if (Tptr->IsUpdate2Active()){
+			Tptr->Update2();
+		}
+		auto CollisionPtr = GetComponent<Collision>(false);
+		if (CollisionPtr && CollisionPtr->IsUpdate2Active()){
+			//CollisionがあればUpdate2()
+			CollisionPtr->Update2();
+		}
+	}
 
 	void GameObject::DrawShadowmap(){
 		auto shadowptr = GetDynamicComponent<Shadowmap>(false);
 		if (shadowptr){
-			shadowptr->OnDraw();
+			shadowptr->Draw();
 		}
 	}
 
 
 	void GameObject::ComponentDraw(){
-		//TransformMatrixがなければ例外
-		auto Tptr = GetComponent<TransformMatrix>();
+		//Transformがなければ例外
+		auto Tptr = GetComponent<Transform>();
 		//マップを検証してDraw
 		list<type_index>::iterator it = pImpl->m_CompOrder.begin();
 		while (it != pImpl->m_CompOrder.end()){
@@ -341,7 +310,7 @@ namespace basedx11{
 					//シャドウマップ以外なら実行
 					//そのコンポーネントの子コンポーネントの描画
 					if (it2->second->IsDrawActive()){
-						it2->second->OnDraw();
+						it2->second->Draw();
 					}
 				}
 			}
@@ -352,21 +321,21 @@ namespace basedx11{
 		//Rigidbodyの派生クラス対策
 		if (RigidPtr && RigidPtr->IsDrawActive()){
 			//RigidbodyがあればDraw()
-			RigidPtr->OnDraw();
+			RigidPtr->Draw();
 		}
-		//TransformMatrixのDraw
-		//TransformMatrixの派生クラス対策
+		//TransformのDraw
+		//Transformの派生クラス対策
 		if (Tptr->IsDrawActive()){
-			Tptr->OnDraw();
+			Tptr->Draw();
 		}
 		auto CollisionPtr = GetComponent<Collision>(false);
 		if (CollisionPtr && CollisionPtr->IsDrawActive()){
 			//CollisionがあればDraw()
-			CollisionPtr->OnDraw();
+			CollisionPtr->Draw();
 		}
 	}
 
-	void GameObject::OnDraw(){
+	void GameObject::Draw(){
 		//コンポーネント描画
 		//派生クラスで多重定義する場合は
 		//コンポーネント描画する場合は
@@ -625,12 +594,12 @@ namespace basedx11{
 			}
 		}
 		//新しいパーティクルを追加
-		shared_ptr<Particle> ParticlePtr = ObjectFactory::Create<Particle>(Count, Option);
+		shared_ptr<Particle> ParticlePtr = Object::CreateObject<Particle>(Count, Option);
 		pImpl->m_ParticleVec.push_back(ParticlePtr);
 		return ParticlePtr;
 	}
 
-	void MultiParticle::OnUpdate(){
+	void MultiParticle::Update(){
 		//前回のターンからの時間
 		float ElapsedTime = App::GetApp()->GetElapsedTime();
 		for (auto ParticlePtr : GetParticleVec()){
@@ -649,7 +618,7 @@ namespace basedx11{
 	}
 
 
-	void MultiParticle::OnDraw(){
+	void MultiParticle::Draw(){
 		if (pImpl->m_ParticleVec.size() > 0){
 			for (auto Ptr : pImpl->m_ParticleVec){
 				if (Ptr->IsActive()){
@@ -772,7 +741,7 @@ namespace basedx11{
 	ParticleManager::~ParticleManager(){}
 
 	//初期化
-	void ParticleManager::OnCreate(){
+	void ParticleManager::Create(){
 		try{
 			//バッファの作成
 			pImpl->CreateParticleBuffers();
@@ -922,7 +891,6 @@ namespace basedx11{
 	}
 
 	void ParticleManager::DrawSub(const shared_ptr<TextureResource>& TextureRes, UINT StartIndex, UINT DrawCount){
-
 		auto PtrStage = GetStage();
 		if (!PtrStage){
 			return;
@@ -950,7 +918,7 @@ namespace basedx11{
 
 			//コンスタントバッファの設定
 			SpriteConstantBuffer sb;
-			sb.World = ShaderMatrix;
+			sb.mTransformMatrix = ShaderMatrix;
 
 			//コンスタントバッファの更新
 			pID3D11DeviceContext->UpdateSubresource(CBSprite::GetPtr()->GetBuffer(), 0, nullptr, &sb, 0, 0);
@@ -980,11 +948,11 @@ namespace basedx11{
 			//テクスチャを設定
 			pID3D11DeviceContext->PSSetShaderResources(0, 1, TextureRes->GetShaderResourceView().GetAddressOf());
 			//テクスチャありのピクセルシェーダの設定
-			pID3D11DeviceContext->PSSetShader(PSPCTSprite::GetPtr()->GetShader(), nullptr, 0);
+			pID3D11DeviceContext->PSSetShader(PSSpritePCT::GetPtr()->GetShader(), nullptr, 0);
 			//頂点シェーダの設定
-			pID3D11DeviceContext->VSSetShader(VSPCTSprite::GetPtr()->GetShader(), nullptr, 0);
+			pID3D11DeviceContext->VSSetShader(VSSpritePCT::GetPtr()->GetShader(), nullptr, 0);
 			//インプットレイアウトの設定
-			pID3D11DeviceContext->IASetInputLayout(VSPCTSprite::GetPtr()->GetInputLayout());
+			pID3D11DeviceContext->IASetInputLayout(VSSpritePCT::GetPtr()->GetInputLayout());
 			if (IsZBufferUse()){
 				//デプスステンシル使用
 				pID3D11DeviceContext->OMSetDepthStencilState(RenderStatePtr->GetDepthDefault(), 0);
@@ -1036,7 +1004,7 @@ namespace basedx11{
 	}
 
 
-	void ParticleManager::OnDraw(){
+	void ParticleManager::Draw(){
 
 		if (pImpl->m_ParticleSpriteForDrawVec.size() <= 0){
 			return;
@@ -1133,7 +1101,7 @@ namespace basedx11{
 
 	}
 
-	
+
 	//--------------------------------------------------------------------------------------
 	//	struct InputTextManager::Impl;
 	//	用途: Implイディオム
@@ -1159,7 +1127,7 @@ namespace basedx11{
 	InputTextManager::~InputTextManager(){}
 
 	//初期化
-	void InputTextManager::OnCreate(){
+	void InputTextManager::Create(){
 		try{
 		}
 		catch (...){
@@ -1193,7 +1161,7 @@ namespace basedx11{
 			GetFocusInputString()->OnChar(wParam, lParam);
 		}
 	}
-	
+
 
 	//--------------------------------------------------------------------------------------
 	//	struct Stage::Impl;
@@ -1392,9 +1360,9 @@ namespace basedx11{
 			}
 			//親ステージの設定差し替え（自分自身）
 			Obj->SetStage(GetThis<Stage>());
-			//TranceformMatrix必須
+			//Tranceform必須
 			//なかったときの場合に対応
-			Obj->AddComponent<TransformMatrix>();
+			Obj->AddComponent<Transform>();
 			//オブジェクトの追加
 			PushBackGameObject(Obj);
 			return Obj;
@@ -1456,7 +1424,7 @@ namespace basedx11{
 					);
 			}
 			else{
-				auto Ptr = ObjectFactory::Create<GameObjectGroup>();
+				auto Ptr = Object::CreateObject<GameObjectGroup>();
 				pImpl->m_SharedGroupMap[Key] = Ptr;
 				return Ptr;
 			}
@@ -1511,15 +1479,14 @@ namespace basedx11{
 
 
 	//デフォルトのレンダリングターゲット類を準備する
-	void Stage::CreateDefaultRenderTargets(float ShadowMapDimension){
-
+	void Stage::CreateDefaultRenderTargets(){
 		auto Ptr = GetComponent<Transform>();
 		Ptr->SetScale(Vector3(1.0f, 1.0f, 1.0f));
 		Ptr->SetRotation(Vector3(0.0f, 0.0f, 0.0f));
 		Ptr->SetPosition(Vector3(0.0f, 0.0f, 0.0f));
 
 		//シャドウマップのレンダリングターゲットを作成
-		pImpl->m_ShadowMapRenderTarget = make_shared<ShadowMapRenderTarget>(ShadowMapDimension);
+		pImpl->m_ShadowMapRenderTarget = make_shared<ShadowMapRenderTarget>();
 		//デフォルトのレンダリングターゲットを作成
 		pImpl->m_DefaultRenderTarget = make_shared<DefaultRenderTarget>(GetThis<Stage>());
 		//レンダリングステートの作成
@@ -1527,32 +1494,33 @@ namespace basedx11{
 	}
 
 	void Stage::DrawBackColor(){
-		
 		auto Dev = App::GetApp()->GetDeviceResources();
 		auto pD3D11DeviceContext = Dev->GetD3DDeviceContext();
 
 		auto RenderStatePtr = GetRenderState();
 
 		//コンスタントバッファの準備
-		PDirectConstantBuffer sb;
-		sb.Diffuse = GetTargetBackColor();
+		SimpleDirectConstantBuffer sb;
+		sb.m_DiffuseColor = GetTargetBackColor();
 		//コンスタントバッファの更新
-		pD3D11DeviceContext->UpdateSubresource(CBPDirect::GetPtr()->GetBuffer(), 0, nullptr, &sb, 0, 0);
+		pD3D11DeviceContext->UpdateSubresource(CBSimpleDirect::GetPtr()->GetBuffer(), 0, nullptr, &sb, 0, 0);
 		//ストライドとオフセット
 		UINT stride = sizeof(VertexPosition);
 		UINT offset = 0;
 		pD3D11DeviceContext->IASetVertexBuffers(0, 1, pImpl->m_VertexBuffer.GetAddressOf(), &stride, &offset);
 		//描画方法（3角形）
 		pD3D11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-		//コンスタントバッファの設定
-		ID3D11Buffer* pConstantBuffer = CBPDirect::GetPtr()->GetBuffer();
-		pD3D11DeviceContext->VSSetConstantBuffers(0, 1, &pConstantBuffer);
+
+		ID3D11Buffer* pNullConstantBuffer = nullptr;
+		//コンスタントバッファの設定(ピクセルシェーダのみでよい)
+		ID3D11Buffer* pConstantBuffer = CBSimpleDirect::GetPtr()->GetBuffer();
+		pD3D11DeviceContext->VSSetConstantBuffers(0, 1, &pNullConstantBuffer);
 		pD3D11DeviceContext->PSSetConstantBuffers(0, 1, &pConstantBuffer);
 		//シェーダの設定
-		pD3D11DeviceContext->VSSetShader(VSPDirect::GetPtr()->GetShader(), nullptr, 0);
-		pD3D11DeviceContext->PSSetShader(PSPDirect::GetPtr()->GetShader(), nullptr, 0);
+		pD3D11DeviceContext->VSSetShader(VSSimpleDirect::GetPtr()->GetShader(), nullptr, 0);
+		pD3D11DeviceContext->PSSetShader(PSSimpleDirect::GetPtr()->GetShader(), nullptr, 0);
 		//インプットレイアウトの設定
-		pD3D11DeviceContext->IASetInputLayout(VSPDirect::GetPtr()->GetInputLayout());
+		pD3D11DeviceContext->IASetInputLayout(VSSimpleDirect::GetPtr()->GetInputLayout());
 
 		pD3D11DeviceContext->OMSetBlendState(RenderStatePtr->GetOpaque(), nullptr, 0xffffffff);
 		//デプスステンシルは使用しない
@@ -1564,8 +1532,6 @@ namespace basedx11{
 		pD3D11DeviceContext->Draw(pImpl->m_NumVertices, 0);
 		//後始末
 		Dev->InitializeStates(RenderStatePtr);
-
-		
 	}
 
 
@@ -1595,14 +1561,12 @@ namespace basedx11{
 		}
 	}
 
-	void Stage::OnPreCreate(){
-		GameObject::OnPreCreate();
-		//ステージはTransform必須
-		AddComponent<Transform>();
+	void Stage::PreCreate(){
+		GameObject::PreCreate();
 		//パーティクルマネージャの作成
-		pImpl->m_ParticleManager = ObjectFactory::Create<ParticleManager>(GetThis<Stage>());
+		pImpl->m_ParticleManager = Object::CreateObject<ParticleManager>(GetThis<Stage>());
 		//入力マネージャの作成
-		pImpl->m_InputTextManager = ObjectFactory::Create<InputTextManager>(GetThis<Stage>());
+		pImpl->m_InputTextManager = Object::CreateObject<InputTextManager>(GetThis<Stage>());
 
 
 		//頂点を作成するための配列
@@ -1625,24 +1589,24 @@ namespace basedx11{
 		//Transformコンポーネントの値をバックアップにコピー
 		for (auto ptr : GetGameObjectVec()){
 			if (ptr->IsUpdateActive()){
-				auto ptr2 = ptr->GetComponent<TransformMatrix>();
+				auto ptr2 = ptr->GetComponent<Transform>();
 				ptr2->SetToBefore();
 			}
 		}
 		if (IsUpdateActive()){
 			//自身のバックアップ
-			auto ptr2 = GetComponent<TransformMatrix>();
+			auto ptr2 = GetComponent<Transform>();
 			ptr2->SetToBefore();
 		}
 		//配置オブジェクトの更新1
 		for (auto ptr : GetGameObjectVec()){
 			if (ptr->IsUpdateActive()){
-				ptr->OnUpdate();
+				ptr->Update();
 			}
 		}
 		//自身の更新1
 		if (IsUpdateActive()){
-			OnUpdate();
+			Update();
 		}
 		//配置オブジェクトのコンポーネント更新1
 		for (auto ptr : GetGameObjectVec()){
@@ -1654,12 +1618,15 @@ namespace basedx11{
 		if (IsUpdateActive()){
 			ComponentUpdate();
 		}
-		//衝突判定チェック
-		//配置オブジェクトの衝突チェック
-		for (auto ptr : GetGameObjectVec()) {
-			if (ptr->IsUpdateActive()) {
-				ptr->CollisionChk();
+		//配置オブジェクトの更新2
+		for (auto ptr : GetGameObjectVec()){
+			if (ptr->IsUpdateActive()){
+				ptr->Update2();
 			}
+		}
+		//自身の更新2
+		if (IsUpdateActive()){
+			Update2();
 		}
 		//配置オブジェクトのコンポーネント更新2
 		for (auto ptr : GetGameObjectVec()){
@@ -1674,24 +1641,13 @@ namespace basedx11{
 		//配置オブジェクトのコンポーネント更新3
 		for (auto ptr : GetGameObjectVec()){
 			if (ptr->IsUpdateActive()){
-				ptr->OnLastUpdate();
+				ptr->Update3();
 			}
 		}
 		//自身の更新3
 		if (IsUpdateActive()){
-			OnLastUpdate();
+			Update3();
 		}
-
-		//コリジョンのリセット
-		for (auto ptr : GetGameObjectVec()){
-			ptr->CollisionReset();
-		}
-		//自身のコリジョンのリセット
-		if (IsUpdateActive()){
-			CollisionReset();
-		}
-		
-
 		//子供ステージの更新
 		for (auto PtrChileStage : GetChileStageVec()){
 			PtrChileStage->UpdateStage();
@@ -1702,15 +1658,11 @@ namespace basedx11{
 
 	//ステージ内の描画（シーンからよばれる）
 	void Stage::DrawStage(){
-		//レイヤーの取得と設定
-		set<int> DrawLayers;
 		//Spriteかそうでないかを分離
 		for (auto ptr : GetGameObjectVec()){
 			if (ptr->IsDrawActive()){
-				//描画レイヤーに登録
-				DrawLayers.insert(ptr->GetDrawLayer());
 				//Spriteかその派生クラスなら分離
-				if (ptr->GetDynamicComponent<SpriteBaseDraw>(false) || ptr->IsSpriteDraw()){
+				if (ptr->GetDynamicComponent<Sprite>(false) || ptr->IsSpriteDraw()){
 					pImpl->m_SpriteVec.push_back(ptr);
 				}
 				else{
@@ -1718,9 +1670,12 @@ namespace basedx11{
 				}
 			}
 		}
+		//レイヤーの取得と設定
+		set<int> DrawLayers;
 		//3Dの透明と非透明を分離
 		for (auto ptr : pImpl->m_Object3DVec){
 			if (ptr->IsDrawActive()){
+				DrawLayers.insert(ptr->GetDrawLayer());
 				if (ptr->IsAlphaActive()){
 					pImpl->m_Object3DAlphaVec.push_back(ptr);
 				}
@@ -1766,14 +1721,11 @@ namespace basedx11{
 			//以下は、オブジェクトを引数に取りboolを返すラムダ式
 			//--------------------------------------------------------
 			auto func = [&](shared_ptr<GameObject>& Left, shared_ptr<GameObject>& Right)->bool{
-				auto PtrLeftTrans = Left->GetComponent<TransformMatrix>();
-				auto PtrRightTrans = Right->GetComponent<TransformMatrix>();
+				auto PtrLeftTrans = Left->GetComponent<Transform>();
+				auto PtrRightTrans = Right->GetComponent<Transform>();
 
-				auto LeftPos = PtrLeftTrans->GetWorldMatrix().PosInMatrixSt();
-				auto RightPos = PtrRightTrans->GetWorldMatrix().PosInMatrixSt();
-
-				auto LeftLen = Vector3EX::Length(LeftPos - CameraEye);
-				auto RightLen = Vector3EX::Length(RightPos - CameraEye);
+				auto LeftLen = Vector3EX::Length(PtrLeftTrans->GetPosition() - CameraEye);
+				auto RightLen = Vector3EX::Length(PtrRightTrans->GetPosition() - CameraEye);
 
 				return (LeftLen > RightLen);
 			};
@@ -1783,33 +1735,29 @@ namespace basedx11{
 
 			//3Dノーマルオブジェクトの描画準備
 			for (auto ptr : pImpl->m_Object3DNormalVec){
-				ptr->OnPreDraw();
+				ptr->PreDraw();
 			}
 			//3D透明オブジェクトの描画準備
 			for (auto ptr : pImpl->m_Object3DAlphaVec){
-				ptr->OnPreDraw();
+				ptr->PreDraw();
 			}
 			//パーティクルの描画準備
 			if (GetParticleManager()){
-				GetParticleManager()->OnPreDraw();
+				GetParticleManager()->PreDraw();
 			}
 			//スプライトオブジェクトの描画準備
 			for (auto ptr : pImpl->m_SpriteVec){
-				ptr->OnPreDraw();
+				ptr->PreDraw();
 			}
 
 			//スプライトをZ座標距離でソート
 			//以下は、オブジェクトを引数に取りboolを返すラムダ式
 			//--------------------------------------------------------
 			auto funcSprite = [&](shared_ptr<GameObject>& Left, shared_ptr<GameObject>& Right)->bool{
-				auto PtrLeftTrans = Left->GetComponent<TransformMatrix>();
-				auto PtrRightTrans = Right->GetComponent<TransformMatrix>();
-
-				auto LeftPos = PtrLeftTrans->GetWorldMatrix().PosInMatrixSt();
-				auto RightPos = PtrRightTrans->GetWorldMatrix().PosInMatrixSt();
-
-				float LeftZ = LeftPos.z;
-				float RightZ = RightPos.z;
+				auto PtrLeftTrans = Left->GetComponent<Transform>();
+				auto PtrRightTrans = Right->GetComponent<Transform>();
+				float LeftZ = PtrLeftTrans->GetPosition().z;
+				float RightZ = PtrRightTrans->GetPosition().z;
 				return (LeftZ > RightZ);
 			};
 			std::sort(pImpl->m_SpriteVec.begin(), pImpl->m_SpriteVec.end(), funcSprite);
@@ -1819,29 +1767,26 @@ namespace basedx11{
 				//3Dノーマルオブジェクトの描画
 				for (auto ptr : pImpl->m_Object3DNormalVec){
 					if (ptr->GetDrawLayer() == Tgt){
-						ptr->OnDraw();
+						ptr->Draw();
 					}
 				}
 				//3D透明オブジェクトの描画
 				for (auto ptr : pImpl->m_Object3DAlphaVec){
 					if (ptr->GetDrawLayer() == Tgt){
-						ptr->OnDraw();
+						ptr->Draw();
 					}
 				}
 				//パーティクルの描画
-				auto PartPtr = GetParticleManager();
-				if (PartPtr && PartPtr->GetDrawLayer() == Tgt){
-					PartPtr->OnDraw();
-				}
-				//スプライトオブジェクトの描画
-				for (auto ptr : pImpl->m_SpriteVec){
-					if (ptr->GetDrawLayer() == Tgt){
-						ptr->OnDraw();
-					}
+				if (GetParticleManager()){
+					GetParticleManager()->Draw();
 				}
 			}
+			//スプライトオブジェクトの描画
+			for (auto ptr : pImpl->m_SpriteVec){
+				ptr->Draw();
+			}
 			//ステージのDraw();
-			OnDraw();
+			Draw();
 			//レンダリングターゲットの終了
 			GetDefaultRenderTarget()->EndRenderTarget();
 		}
@@ -2147,17 +2092,17 @@ namespace basedx11{
 	{
 		try{
 			//デフォルトのリソースの作成
-			App::GetApp()->RegisterResource(L"DEFAULT_SQUARE", MeshResource::CreateSquare(1.0f));
-			App::GetApp()->RegisterResource(L"DEFAULT_CUBE", MeshResource::CreateCube(1.0f));
-			App::GetApp()->RegisterResource(L"DEFAULT_SPHERE", MeshResource::CreateSphere(1.0f, 18));
-			App::GetApp()->RegisterResource(L"DEFAULT_CAPSULE", MeshResource::CreateCapsule(1.0f,1.0f,18));
-			App::GetApp()->RegisterResource(L"DEFAULT_CYLINDER", MeshResource::CreateCylinder(1.0f, 1.0f, 18));
-			App::GetApp()->RegisterResource(L"DEFAULT_CONE", MeshResource::CreateCone(1.0f, 1.0f, 18));
-			App::GetApp()->RegisterResource(L"DEFAULT_TORUS", MeshResource::CreateTorus(1.0f, 0.3f, 18));
-			App::GetApp()->RegisterResource(L"DEFAULT_TETRAHEDRON", MeshResource::CreateTetrahedron(1.0f));
-			App::GetApp()->RegisterResource(L"DEFAULT_OCTAHEDRON", MeshResource::CreateOctahedron(1.0f));
-			App::GetApp()->RegisterResource(L"DEFAULT_DODECAHEDRON", MeshResource::CreateDodecahedron(1.0f));
-			App::GetApp()->RegisterResource(L"DEFAULT_ICOSAHEDRON", MeshResource::CreateIcosahedron(1.0f));
+			App::GetApp()->RegisterResource(L"DEFAULT_SQUARE", CommonMeshResource::CreateSquare(1.0f));
+			App::GetApp()->RegisterResource(L"DEFAULT_CUBE", CommonMeshResource::CreateCube(1.0f));
+			App::GetApp()->RegisterResource(L"DEFAULT_SPHERE", CommonMeshResource::CreateSphere(1.0f, 18));
+			App::GetApp()->RegisterResource(L"DEFAULT_CAPSULE", CommonMeshResource::CreateCapsule(1.0f,1.0f,18));
+			App::GetApp()->RegisterResource(L"DEFAULT_CYLINDER", CommonMeshResource::CreateCylinder(1.0f, 1.0f, 18));
+			App::GetApp()->RegisterResource(L"DEFAULT_CONE", CommonMeshResource::CreateCone(1.0f, 1.0f, 18));
+			App::GetApp()->RegisterResource(L"DEFAULT_TORUS", CommonMeshResource::CreateTorus(1.0f, 0.3f, 18));
+			App::GetApp()->RegisterResource(L"DEFAULT_TETRAHEDRON", CommonMeshResource::CreateTetrahedron(1.0f));
+			App::GetApp()->RegisterResource(L"DEFAULT_OCTAHEDRON", CommonMeshResource::CreateOctahedron(1.0f));
+			App::GetApp()->RegisterResource(L"DEFAULT_DODECAHEDRON", CommonMeshResource::CreateDodecahedron(1.0f));
+			App::GetApp()->RegisterResource(L"DEFAULT_ICOSAHEDRON", CommonMeshResource::CreateIcosahedron(1.0f));
 		}
 		catch (...){
 			throw;
@@ -2191,11 +2136,11 @@ namespace basedx11{
 		}
 	}
 
-	void SceneBase::OnPreCreate(){
+	void SceneBase::PreCreate(){
 		//イベント送信オブジェクト作成
 		pImpl->m_EventDispatcher = make_shared<EventDispatcher>(GetThis<SceneBase>());
 	}
-	void SceneBase::OnUpdate(){
+	void SceneBase::Update(){
 		if (pImpl->m_ActiveStage){
 			//追加待ちになっているオブジェクトの追加
 			pImpl->m_ActiveStage->SetWaitToObjectVec();
@@ -2205,7 +2150,7 @@ namespace basedx11{
 			pImpl->m_ActiveStage->UpdateStage();
 		}
 	}
-	void SceneBase::OnDraw(){
+	void SceneBase::Draw(){
 		if (pImpl->m_ActiveStage){
 			pImpl->m_ActiveStage->DrawStage();
 		}

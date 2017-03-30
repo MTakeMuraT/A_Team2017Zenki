@@ -56,7 +56,6 @@ FBXSDK: オートデスク株式会社様(Autodesk, Inc.)
 #include <list>
 #include <map>
 #include <set>
-#include <stack>
 #include <functional>
 #include <algorithm>
 #include <iostream>
@@ -86,8 +85,8 @@ using namespace std;
 #include <DirectXColors.h>
 #include <DirectXCollision.h>
 #include <DirectXTex.h>
-//#define FBXSDK_NEW_API
-//#include <fbxsdk.h>
+#define FBXSDK_NEW_API
+#include <fbxsdk.h>
 
 // XInput includes
 #include <xinput.h>
@@ -103,7 +102,7 @@ using namespace std;
 //DirectXTx
 #pragma comment( lib, "DirectXTex.lib" )
 //FBX
-//#pragma comment(lib, "libfbxsdk-mt.lib")
+#pragma comment(lib, "libfbxsdk-mt.lib")
 // XInput
 #pragma comment( lib, "XInput.lib" )
 //オーディオ
@@ -136,8 +135,6 @@ using namespace Microsoft::WRL::Details;
 
 //ユーティリティ基本クラス（削除テンプレート、例外処理など）
 #include "BaseHelper.h"
-//インターフェイス
-#include "AppInterface.h"
 //２D用の基本クラス
 #include "Prim2D.h"
 //ベクトル計算の計算クラス
@@ -165,7 +162,7 @@ using namespace Microsoft::WRL::Details;
 #include "Shader.h"
 #include "ShaderBasic.h"
 #include "Components.h"
-#include "StringComponents.h"
+#include "SpriteComponents.h"
 #include "Rigidbody.h"
 #include "DrawComponents.h"
 #include "BaseResource.h"

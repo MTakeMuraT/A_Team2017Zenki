@@ -4,7 +4,6 @@
 
 
 namespace basedx11{
-
 	//---------------------------------------------------------------
 	/// ソートモード
 	struct SsPartsSortMode
@@ -845,7 +844,7 @@ namespace basedx11{
 			IXMLDOMNodePtr ScanNode, IXMLDOMNodePtr TgtNode, const shared_ptr<SSPart>& Parent,bool SpriteType);
 		virtual ~SSPart();
 		//初期化
-		virtual void OnCreate() override;
+		virtual void Create() override;
 		//アクセサ
 		int get_arrayIndex();
 		float GetPrio();
@@ -854,6 +853,9 @@ namespace basedx11{
 		//スプライトかどうか(Getterのみ)
 		bool GetSpriteType() const;
 		bool IsSpriteType() const;
+		//スプライトにおける、1メートル当たりのピクセル（デフォルト8）
+		float GetSpritePixelParMeter() const;
+		void SetSpritePixelParMeter(float f);
 
 		void SetTextureOnlyNoLight(bool b);
 		bool GetTextureOnlyNoLight() const;
@@ -867,7 +869,7 @@ namespace basedx11{
 		void CaluclateMatrix();
 		void SetPartInVector(vector<SSPart*>& PartVec);
 
-		virtual void OnDraw()override;
+		virtual void Draw();
 
 	private:
 		//頂点の変更
@@ -890,7 +892,7 @@ namespace basedx11{
 			const wstring& Xmlfilename, const wstring& StartAnimeName,bool SpriteType = false);
 		virtual ~SS5ssae();
 		//初期化
-		virtual void OnCreate() override;
+		virtual void Create() override;
 		//アクセッサ
 		//SS5ssaeからアニメーションオブジェクトへの行列
 		const Matrix4X4& GetToAnimeMatrix() const;
@@ -899,6 +901,10 @@ namespace basedx11{
 		//スプライトかどうか(Getterのみ)
 		bool GetSpriteType() const;
 		bool IsSpriteType() const;
+		//スプライトにおける、1メートル当たりのピクセル（デフォルト8）
+		float GetSpritePixelParMeter() const;
+		void SetSpritePixelParMeter(float f);
+
 
 		//現在選択されているアニメーションがループするかどうかを得る
 		bool IsLooped() const;
@@ -921,13 +927,14 @@ namespace basedx11{
 		//fps（再生スピード）を設定する
 		void SetFps(float f);
 
-		virtual void OnUpdate() override{}
-		virtual void OnDraw()override;
+		virtual void Update() override{}
+		virtual void Draw()override;
 	private:
 		//Implイディオム
 		struct Impl;
 		unique_ptr<Impl> pImpl;
 	};
+
 
 
 

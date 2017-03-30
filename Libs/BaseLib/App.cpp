@@ -238,6 +238,23 @@ namespace basedx11{
 			m_App.reset();
 		}
 	}
+
+	//FBXマネージャの取得
+	unique_ptr<FbxManager, App::FbxManagerDeleter>& App::GetFbxManager(){
+		try{
+			if (m_pFbxManager.get() == 0){
+				m_pFbxManager.reset(FbxManager::Create());
+				FbxIOSettings *ios = FbxIOSettings::Create(m_pFbxManager.get(), IOSROOT);
+				m_pFbxManager->SetIOSettings(ios);
+
+			}
+			return m_pFbxManager;
+		}
+		catch (...){
+			throw;
+		}
+	}
+
 	// オーディオマネージャの取得
 	unique_ptr<AudioManager>& App::GetAudioManager(){
 		try{
@@ -252,6 +269,8 @@ namespace basedx11{
 			throw;
 		}
 	}
+
+
 
 	void App::SetSceneBase(const shared_ptr<SceneBase>& ptr){
 		if (m_SceneBase.get()){
@@ -323,46 +342,69 @@ namespace basedx11{
 			return GetResource<TextureResource>(Key);
 		}
 		//
-		auto PtrTexture = ObjectFactory::Create<TextureResource>(TextureFileName, TexType);
+		auto PtrTexture = Object::CreateObject<TextureResource>(TextureFileName, TexType);
 		RegisterResource(Key, PtrTexture);
 		return PtrTexture;
 	}
 
-	//スタティックモデルの登録(同じキーのモデルがなければファイル名で作成し、登録)
-	//同じ名前のモデルがあればそのポインタを返す
-	shared_ptr<MeshResource> App::RegisterStaticModelMesh(const wstring& Key, const wstring& BinDataDir, const wstring& BinDataFile){
-		if (CheckResource<MeshResource>(Key)){
-			return GetResource<MeshResource>(Key);
-		}
-		//
-		auto MesshPtr = MeshResource::CreateStaticModelMesh(BinDataDir, BinDataFile);
-		RegisterResource(Key, MesshPtr);
-		return MesshPtr;
-
-	}
-
-	//ボーンモデルの登録(同じキーのモデルがなければファイル名で作成し、登録)
-	//同じ名前のモデルがあればそのポインタを返す
-	shared_ptr<MeshResource> App::RegisterBoneModelMesh(const wstring& Key, const wstring& BinDataDir, const wstring& BinDataFile){
-		if (CheckResource<MeshResource>(Key)){
-			return GetResource<MeshResource>(Key);
-		}
-		//
-		auto MesshPtr = MeshResource::CreateBoneModelMesh(BinDataDir, BinDataFile);
-		RegisterResource(Key, MesshPtr);
-		return MesshPtr;
-	}
-
-	//Wavの登録(同じキーのWavがなければファイル名で作成し、登録)
-	//同じ名前のWavがあればそのポインタを返す
+	//--------------------------------------------------------------------------------------
+	//	shared_ptr<AudioResource> RegisterWav(
+	//		const wstring& Key, // リソースキー
+	//		const wstring& WavFileName	//Wavファイル名
+	//	);
 	shared_ptr<AudioResource> App::RegisterWav(const wstring& Key, const wstring& WavFileName){
 		if (CheckResource<AudioResource>(Key)){
 			return GetResource<AudioResource>(Key);
 		}
 		//
-		auto PtrWav = ObjectFactory::Create<AudioResource>(WavFileName);
+		auto PtrWav = Object::CreateObject<AudioResource>(WavFileName);
 		RegisterResource(Key, PtrWav);
 		return PtrWav;
+	}
+
+
+
+	//--------------------------------------------------------------------------------------
+	//	shared_ptr<FbxSceneResource> RegisterFbxScene(
+	//		const wstring& Key,			//キー
+	//		const wstring& BaseDir.		//基準ディレクトリ
+	//		const wstring& FbxFileName	//FbxFile名
+	//	);
+	//--------------------------------------------------------------------------------------
+	shared_ptr<FbxSceneResource> App::RegisterFbxScene(const wstring& Key, const wstring& BaseDir, const wstring& FbxFileName){
+		try{
+			if (CheckResource<FbxSceneResource>(Key)){
+				return GetResource<FbxSceneResource>(Key);
+			}
+			auto PtrFbxScene = FbxSceneResource::CreateFbxScene(BaseDir, FbxFileName);
+			RegisterResource(Key, PtrFbxScene);
+			return PtrFbxScene;
+		}
+		catch (...){
+			throw;
+		}
+	}
+
+
+	//--------------------------------------------------------------------------------------
+	//	shared_ptr<FbxMeshResource> RegisterFbxMesh(
+	//		const wstring& Key,			//キー
+	//		const shared_ptr<FbxSceneResource>& FbxSceneRes		//このメッシュが含まれるシーンリソース
+	//		UINT MeshID					//メッシュのシーン内のID
+	//	);
+	//--------------------------------------------------------------------------------------
+	shared_ptr<FbxMeshResource> App::RegisterFbxMesh(const wstring& Key, const shared_ptr<FbxSceneResource>& FbxSceneRes, UINT MeshID){
+		try{
+			if (CheckResource<FbxMeshResource>(Key)){
+				return GetResource<FbxMeshResource>(Key);
+			}
+			auto PtrFbxMesh = FbxSceneRes->GetFbxMeshResource(MeshID);
+			RegisterResource(Key, PtrFbxMesh);
+			return PtrFbxMesh;
+		}
+		catch (...){
+			throw;
+		}
 	}
 	void App::OnMessage(UINT message, WPARAM wParam, LPARAM lParam){
 		m_SceneBase->OnMessage(message,wParam, lParam);
@@ -374,7 +416,7 @@ namespace basedx11{
 		// シーン オブジェクトを更新します。
 		m_Timer.Tick([&]()
 		{
-			m_SceneBase->OnUpdate();
+			m_SceneBase->Update();
 		});
 	}
 	bool App::Draw(){
@@ -383,7 +425,7 @@ namespace basedx11{
 		{
 			return false;
 		}
-		m_SceneBase->OnDraw();
+		m_SceneBase->Draw();
 		return true;
 	}
 	void App::Present(UINT SyncInterval, UINT Flags){

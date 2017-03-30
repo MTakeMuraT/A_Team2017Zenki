@@ -183,105 +183,16 @@ namespace basedx11{
 		*/
 		//--------------------------------------------------------------------------------------
 		void SetDrawActive(bool b);
-	private:
-		// pImplイディオム
-		struct Impl;
-		unique_ptr<Impl> pImpl;
-	};
-
-
-	//--------------------------------------------------------------------------------------
-	//	class TransformMatrix : public Component ;
-	/*!
-	行列のみ保持する変換クラス
-	*/
-	//--------------------------------------------------------------------------------------
-	class TransformMatrix : public Component {
-	protected:
-		bool IsInit() const;
-		void SetInitTrue();
-	public:
-		//構築と破棄
+		//操作
 		//--------------------------------------------------------------------------------------
-		//	explicit TransformMatrix(
-		//		const shared_ptr<GameObject>& GameObjectPtr	//このコンポーネントを所持するゲームオブジェクト
-		//	);
+		//	virtual void Update2();
 		/*!
-		@breaf コンストラクタ
-		@param const shared_ptr<GameObject>& GameObjectPtr	このコンポーネントを所持するゲームオブジェクト
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		explicit TransformMatrix(const shared_ptr<GameObject>& GameObjectPtr);
-		//--------------------------------------------------------------------------------------
-		//	virtual ~TransformMatrix();
-		/*!
-		@breaf デストラクタ
+		@breaf Update2処理
 		@param なし
 		@return	なし
 		*/
 		//--------------------------------------------------------------------------------------
-		virtual ~TransformMatrix();
-		//--------------------------------------------------------------------------------------
-		//	const Matrix4X4& GetWorldMatrix() const;
-		/*!
-		@breaf ワールド行列を得る
-		@param なし
-		@return	ワールド行列
-		*/
-		//--------------------------------------------------------------------------------------
-		const Matrix4X4& GetWorldMatrix() const;
-		//--------------------------------------------------------------------------------------
-		//	void SetWorldMatrix(
-		//		const Matrix4X4& WorldMatrix	//ワールド行列
-		//	);
-		/*!
-		@breaf ワールド行列を設定する.
-		＊仮想関数なので、派生クラス（Transform）では例外がでる。
-		@param const Matrix4X4& WorldMatrix	ワールド行列
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		virtual void SetWorldMatrix(const Matrix4X4& WorldMatrix);
-		//--------------------------------------------------------------------------------------
-		//	const Matrix4X4& GetBeforeWorldMatrix() const;
-		/*!
-		@breaf 1ターン前の行列を得る
-		@param なし
-		@return	1ターン前の行列
-		*/
-		//--------------------------------------------------------------------------------------
-		const Matrix4X4& GetBeforeWorldMatrix() const;
-		//--------------------------------------------------------------------------------------
-		//	virtual void SetToBefore();
-		/*!
-		@breaf 情報を一つ前に移す<br />
-		各情報はターンごとに1つ前のターン時の情報を持つ<br />
-		この関数はその処理を行う
-		@param なし
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		virtual void SetToBefore();
-		//--------------------------------------------------------------------------------------
-		//	virtual void OnUpdate()override;
-		/*!
-		@breaf 更新処理
-		@param なし
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		virtual void OnUpdate()override;
-		//--------------------------------------------------------------------------------------
-		//	virtual void OnDraw()override;
-		/*!
-		@breaf 描画処理。デフォルトは何も行わない
-		@param なし
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		virtual void OnDraw()override {}
-
+		virtual void Update2(){}
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -290,14 +201,13 @@ namespace basedx11{
 
 
 
-
 	//--------------------------------------------------------------------------------------
-	//	class Transform : public TransformMatrix ;
+	//	class Transform : public Component ;
 	/*!
 	変換クラス
 	*/
 	//--------------------------------------------------------------------------------------
-	class Transform : public TransformMatrix {
+	class Transform : public Component {
 		//--------------------------------------------------------------------------------------
 		//	void SetLocalQuaternion(
 		//		const Quaternion& quaternion, //回転クオータニオン
@@ -369,6 +279,36 @@ namespace basedx11{
 		virtual ~Transform();
 		//アクセサ
 		//--------------------------------------------------------------------------------------
+		//	bool IsPriorityMatrix()const;;
+		/*!
+		@breaf 行列優先にするかどうか
+		@param なし
+		@return	行列優先ならtrue
+		*/
+		//--------------------------------------------------------------------------------------
+		bool IsPriorityMatrix()const;
+		//--------------------------------------------------------------------------------------
+		//	bool GetPriorityMatrix()const;;
+		/*!
+		@breaf 行列優先にするかどうか
+		@param なし
+		@return	行列優先ならtrue
+		*/
+		//--------------------------------------------------------------------------------------
+		bool GetPriorityMatrix()const;
+		//--------------------------------------------------------------------------------------
+		//	void SetPriorityMatrix(
+		//	bool b	//行列優先ならtrue
+		//	);
+		/*!
+		@breaf 行列優先にするかどうかをセット.
+		＊行列優先にすると自動行列計算は行わない
+		@param bool b	行列優先ならtrue
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
+		void SetPriorityMatrix(bool b);
+		//--------------------------------------------------------------------------------------
 		//	bool IsPriorityPosition()const;
 		/*!
 		@breaf 行列計算を位置優先にするかどうか
@@ -397,6 +337,15 @@ namespace basedx11{
 		*/
 		//--------------------------------------------------------------------------------------
 		void SetPriorityPosition(bool b);
+		//--------------------------------------------------------------------------------------
+		//	const Matrix4X4& GetBeforeWorldMatrix() const;
+		/*!
+		@breaf 1ターン前の行列を得る
+		@param なし
+		@return	1ターン前の行列
+		*/
+		//--------------------------------------------------------------------------------------
+		const Matrix4X4& GetBeforeWorldMatrix() const;
 		//--------------------------------------------------------------------------------------
 		//	const Matrix4X4& GetBeforeLocalMatrix() const;
 		/*!
@@ -452,7 +401,16 @@ namespace basedx11{
 		//--------------------------------------------------------------------------------------
 		const Vector3& GetBeforeLocalPosition() const;
 		//--------------------------------------------------------------------------------------
-		//	virtual void SetWorldMatrix(
+		//	const Matrix4X4& GetWorldMatrix() const;
+		/*!
+		@breaf ワールド行列を得る
+		@param なし
+		@return	ワールド行列
+		*/
+		//--------------------------------------------------------------------------------------
+		const Matrix4X4& GetWorldMatrix() const;
+		//--------------------------------------------------------------------------------------
+		//	void SetWorldMatrix(
 		//		const Matrix4X4& WorldMatrix	//ワールド行列
 		//	);
 		/*!
@@ -462,7 +420,7 @@ namespace basedx11{
 		@return	なし
 		*/
 		//--------------------------------------------------------------------------------------
-		virtual void SetWorldMatrix(const Matrix4X4& WorldMatrix) override;
+		void SetWorldMatrix(const Matrix4X4& WorldMatrix);
 		//--------------------------------------------------------------------------------------
 		//	const Vector3& GetScale() const;
 		/*!
@@ -669,7 +627,7 @@ namespace basedx11{
 		//--------------------------------------------------------------------------------------
 		void CalcMatrix();
 		//--------------------------------------------------------------------------------------
-		//	virtual void SetToBefore();
+		//	void SetToBefore();
 		/*!
 		@breaf 情報を一つ前に移す<br />
 		各情報はターンごとに1つ前のターン時の情報を持つ<br />
@@ -678,7 +636,7 @@ namespace basedx11{
 		@return	なし
 		*/
 		//--------------------------------------------------------------------------------------
-		virtual void SetToBefore() override;
+		void SetToBefore();
 		//--------------------------------------------------------------------------------------
 		//	void LerpBeforeToNow(
 		//		float LerpTime	//補間時間
@@ -693,23 +651,23 @@ namespace basedx11{
 		//--------------------------------------------------------------------------------------
 		void LerpBeforeToNow(float LerpTime);
 		//--------------------------------------------------------------------------------------
-		//	virtual void OnUpdate()override;
+		//	virtual void Update()override;
 		/*!
 		@breaf 更新処理
 		@param なし
 		@return	なし
 		*/
 		//--------------------------------------------------------------------------------------
-		virtual void OnUpdate()override;
+		virtual void Update()override;
 		//--------------------------------------------------------------------------------------
-		//	virtual void OnDraw()override;
+		//	virtual void Draw()override;
 		/*!
 		@breaf 描画処理。デフォルトは何も行わない
 		@param なし
 		@return	なし
 		*/
 		//--------------------------------------------------------------------------------------
-		virtual void OnDraw()override {}
+		virtual void Draw()override{}
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -883,14 +841,14 @@ namespace basedx11{
 		//--------------------------------------------------------------------------------------
 		virtual void ReStart();
 		//--------------------------------------------------------------------------------------
-		//	virtual void OnDraw()override;
+		//	virtual void Draw()override;
 		/*!
 		@breaf 描画、空関数（Drawは基本的に行わない）
 		@param なし
 		@return　なし
 		*/
 		//--------------------------------------------------------------------------------------
-		virtual void OnDraw()override{}
+		virtual void Draw()override{}
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -947,14 +905,14 @@ namespace basedx11{
 		//--------------------------------------------------------------------------------------
 		virtual void Run()override;
 		//--------------------------------------------------------------------------------------
-		//	virtual void OnUpdate()override;
+		//	virtual void Update()override;
 		/*!
 		@breaf 更新処理
 		@param なし
 		@return　なし
 		*/
 		//--------------------------------------------------------------------------------------
-		virtual void OnUpdate()override;
+		virtual void Update()override;
 	};
 
 
@@ -1100,14 +1058,14 @@ namespace basedx11{
 		//--------------------------------------------------------------------------------------
 		virtual void Run()override;
 		//--------------------------------------------------------------------------------------
-		//	virtual void OnUpdate()override;
+		//	virtual void Update()override;
 		/*!
 		@breaf 更新処理
 		@param なし
 		@return　なし
 		*/
 		//--------------------------------------------------------------------------------------
-		virtual void OnUpdate()override;
+		virtual void Update()override;
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -1435,14 +1393,14 @@ namespace basedx11{
 		//--------------------------------------------------------------------------------------
 		virtual void Run()override;
 		//--------------------------------------------------------------------------------------
-		//	virtual void OnUpdate()override;
+		//	virtual void Update()override;
 		/*!
 		@breaf 更新処理
 		@param なし
 		@return　なし
 		*/
 		//--------------------------------------------------------------------------------------
-		virtual void OnUpdate()override;
+		virtual void Update()override;
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -1857,14 +1815,14 @@ namespace basedx11{
 		//--------------------------------------------------------------------------------------
 		virtual void Run()override;
 		//--------------------------------------------------------------------------------------
-		//	virtual void OnUpdate()override;
+		//	virtual void Update()override;
 		/*!
 		@breaf 更新処理
 		@param なし
 		@return　なし
 		*/
 		//--------------------------------------------------------------------------------------
-		virtual void OnUpdate()override;
+		virtual void Update()override;
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -2508,23 +2466,23 @@ namespace basedx11{
 		//--------------------------------------------------------------------------------------
 		virtual void ReStart();
 		//--------------------------------------------------------------------------------------
-		//	virtual void OnUpdate()override;
+		//	virtual void Update()override;
 		/*!
 		@breaf 更新処理
 		@param なし
 		@return　なし
 		*/
 		//--------------------------------------------------------------------------------------
-		virtual void OnUpdate()override;
+		virtual void Update()override;
 		//--------------------------------------------------------------------------------------
-		//	virtual void OnDraw()override;
+		//	virtual void Draw()override;
 		/*!
 		@breaf 描画処理。空関数
 		@param なし
 		@return　なし
 		*/
 		//--------------------------------------------------------------------------------------
-		virtual void OnDraw()override{}
+		virtual void Draw()override{}
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -2602,23 +2560,23 @@ namespace basedx11{
 		//--------------------------------------------------------------------------------------
 		shared_ptr<View> AddView();
 		//--------------------------------------------------------------------------------------
-		//	virtual void OnUpdate()override;
+		//	virtual void Update()override;
 		/*!
 		@breaf 更新処理。
 		@param なし
 		@return　なし
 		*/
 		//--------------------------------------------------------------------------------------
-		virtual void OnUpdate()override;
+		virtual void Update()override;
 		//--------------------------------------------------------------------------------------
-		//	virtual void OnDraw()override;
+		//	virtual void Draw()override;
 		/*!
 		@breaf 描画処理。空関数
 		@param なし
 		@return　なし
 		*/
 		//--------------------------------------------------------------------------------------
-		virtual void OnDraw()override{}
+		virtual void Draw()override{}
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -2701,23 +2659,23 @@ namespace basedx11{
 		//--------------------------------------------------------------------------------------
 		void Stop();
 		//--------------------------------------------------------------------------------------
-		//	virtual void OnUpdate()override;
+		//	virtual void Update()override;
 		/*!
 		@breaf 更新処理。空関数
 		@param なし
 		@return　なし
 		*/
 		//--------------------------------------------------------------------------------------
-		virtual void OnUpdate()override{}
+		virtual void Update()override{}
 		//--------------------------------------------------------------------------------------
-		//	virtual void OnDraw()override;
+		//	virtual void Draw()override;
 		/*!
 		@breaf 描画処理。空関数
 		@param なし
 		@return　なし
 		*/
 		//--------------------------------------------------------------------------------------
-		virtual void OnDraw()override{}
+		virtual void Draw()override{}
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -2801,23 +2759,23 @@ namespace basedx11{
 		//--------------------------------------------------------------------------------------
 		void Stop();
 		//--------------------------------------------------------------------------------------
-		//	virtual void OnUpdate()override;
+		//	virtual void Update()override;
 		/*!
 		@breaf 更新処理。空関数
 		@param なし
 		@return　なし
 		*/
 		//--------------------------------------------------------------------------------------
-		virtual void OnUpdate()override{}
+		virtual void Update()override{}
 		//--------------------------------------------------------------------------------------
-		//	virtual void OnDraw()override;
+		//	virtual void Draw()override;
 		/*!
 		@breaf 描画処理。空関数
 		@param なし
 		@return　なし
 		*/
 		//--------------------------------------------------------------------------------------
-		virtual void OnDraw()override{}
+		virtual void Draw()override{}
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -2942,23 +2900,23 @@ namespace basedx11{
 		//--------------------------------------------------------------------------------------
 		void Stop(const wstring& ResKey);
 		//--------------------------------------------------------------------------------------
-		//	virtual void OnUpdate()override;
+		//	virtual void Update()override;
 		/*!
 		@breaf 更新処理。空関数
 		@param なし
 		@return　なし
 		*/
 		//--------------------------------------------------------------------------------------
-		virtual void OnUpdate()override{}
+		virtual void Update()override{}
 		//--------------------------------------------------------------------------------------
-		//	virtual void OnDraw()override;
+		//	virtual void Draw()override;
 		/*!
 		@breaf 描画処理。空関数
 		@param なし
 		@return　なし
 		*/
 		//--------------------------------------------------------------------------------------
-		virtual void OnDraw()override{}
+		virtual void Draw()override{}
 	private:
 		// pImplイディオム
 		struct Impl;

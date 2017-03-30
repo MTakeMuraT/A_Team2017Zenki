@@ -97,69 +97,17 @@ namespace basedx11{
 
 
 	//--------------------------------------------------------------------------------------
-	//	struct TransformMatrix::Impl;
-	//	用途: コンポーネントImplクラス
-	//--------------------------------------------------------------------------------------
-	struct TransformMatrix::Impl {
-		bool m_Init{ false };	//初期化済みかどうか（1回目のUpdateで、Beforeに値を入れる）
-		Matrix4X4 m_BeforeWorldMatrix{ Matrix4X4() };			//アップデート直前のワールド行列
-		Matrix4X4 m_WorldMatrix{ Matrix4X4() };
-		Impl()
-		{}
-		~Impl() {}
-	};
-	//--------------------------------------------------------------------------------------
-	//	class TransformMatrix : public Component ;
-	// 行列のみ保持する変換クラス
-	//--------------------------------------------------------------------------------------
-	bool TransformMatrix::IsInit() const {
-		return pImpl->m_Init;
-	}
-	void TransformMatrix::SetInitTrue() {
-		pImpl->m_Init = true;
-	}
-
-
-	TransformMatrix::TransformMatrix(const shared_ptr<GameObject>& GameObjectPtr) :
-		Component(GameObjectPtr), pImpl(new Impl())
-	{}
-	TransformMatrix::~TransformMatrix() {}
-	const Matrix4X4& TransformMatrix::GetWorldMatrix() const {
-		return pImpl->m_WorldMatrix;
-	}
-	void TransformMatrix::SetWorldMatrix(const Matrix4X4& WorldMatrix) {
-		pImpl->m_WorldMatrix = WorldMatrix;
-	}
-	const Matrix4X4& TransformMatrix::GetBeforeWorldMatrix() const {
-		return pImpl->m_BeforeWorldMatrix;
-	}
-	void TransformMatrix::SetToBefore() {
-		pImpl->m_BeforeWorldMatrix = pImpl->m_WorldMatrix;
-
-	}
-
-	void TransformMatrix::OnUpdate() {
-		if (!pImpl->m_Init) {
-			SetToBefore();
-			pImpl->m_Init = true;
-		}
-	}
-
-
-
-
-
-
-
-	//--------------------------------------------------------------------------------------
 	//	struct Transform::Impl;
 	//	用途: コンポーネントImplクラス
 	//--------------------------------------------------------------------------------------
-	struct Transform::Impl {
+	struct Transform::Impl{
+		bool m_Init{ false };	//初期化済みかどうか（1回目のUpdateで、Beforeに値を入れる）
+		bool m_PriorityMatrix{ false };
 		bool m_PriorityPosition{ false };	//行列計算を位置優先にするかどうか
 		weak_ptr<GameObject> m_Parent;	//親ゲームオブジェクト
 
 		Matrix4X4 m_BeforeLocalMatrix{ Matrix4X4() };			//アップデート直前のローカル行列
+		Matrix4X4 m_BeforeWorldMatrix{ Matrix4X4() };			//アップデート直前のワールド行列
 		Vector3 m_BeforeScale{ 1.0f, 1.0f, 1.0f };			//スケーリングはローカルワールド共通	
 		Quaternion m_BeforeLocalQuaternion{ Quaternion() };		//一つ前のローカルクオータニオン
 		Quaternion m_BeforeWorldQuaternion{ Quaternion() };		//一つ前のワールドクオータニオン
@@ -167,14 +115,15 @@ namespace basedx11{
 		Vector3 m_BeforeWorldPosition{ 0, 0, 0 };	//一つ前のワールド位置
 
 		Matrix4X4 m_LocalMatrix{ Matrix4X4() };
+		Matrix4X4 m_WorldMatrix{ Matrix4X4() };
 		Vector3 m_Scale{ 1.0f, 1.0f, 1.0f };		//スケーリングはローカルワールド共通
 		Quaternion m_LocalQuaternion{ Quaternion() };
 		Quaternion m_Quaternion{ Quaternion() };
 		Vector3 m_LocalPosition{ 0, 0, 0 };
 		Vector3 m_Position{ 0, 0, 0 };
-		Impl()
+		Impl() 
 		{}
-		~Impl() {}
+		~Impl(){}
 	};
 
 
@@ -183,178 +132,210 @@ namespace basedx11{
 	//	用途: 変化
 	//--------------------------------------------------------------------------------------
 	Transform::Transform(const shared_ptr<GameObject>& GameObjectPtr) :
-		TransformMatrix(GameObjectPtr), pImpl(new Impl())
+		Component(GameObjectPtr), pImpl(new Impl())
 	{}
-	Transform::~Transform() {}
+	Transform::~Transform(){}
 
 	//アクセサ
-	bool Transform::IsPriorityPosition()const {
+	bool Transform::IsPriorityMatrix()const{ return pImpl->m_PriorityMatrix; }
+	bool Transform::GetPriorityMatrix()const{ return pImpl->m_PriorityMatrix; }
+	void Transform::SetPriorityMatrix(bool b){ pImpl->m_PriorityMatrix = b; }
+
+	bool Transform::IsPriorityPosition()const{
 		return pImpl->m_PriorityPosition;
 	}
-	bool Transform::GetPriorityPosition()const {
+	bool Transform::GetPriorityPosition()const{
 		return pImpl->m_PriorityPosition;
 	}
-	void Transform::SetPriorityPosition(bool b) {
+	void Transform::SetPriorityPosition(bool b){
 		pImpl->m_PriorityPosition = b;
 	}
 
 
 	//BeforeGetter
-	const Matrix4X4& Transform::GetBeforeLocalMatrix() const {
+	const Matrix4X4& Transform::GetBeforeWorldMatrix() const{
+		return pImpl->m_BeforeWorldMatrix;
+	}
+	const Matrix4X4& Transform::GetBeforeLocalMatrix() const{
 		return pImpl->m_BeforeLocalMatrix;
 	}
-	const Vector3& Transform::GetBeforeScale() const {
+	const Vector3& Transform::GetBeforeScale() const{
 		return pImpl->m_BeforeScale;
 	}
-	const Quaternion& Transform::GetBeforeWorldQuaternion() const {
+	const Quaternion& Transform::GetBeforeWorldQuaternion() const{
 		return pImpl->m_BeforeWorldQuaternion;
 	}
-	const Quaternion& Transform::GetBeforeLocalQuaternion() const {
+	const Quaternion& Transform::GetBeforeLocalQuaternion() const{
 		return pImpl->m_BeforeLocalQuaternion;
 	}
-	const Vector3& Transform::GetBeforeWorldPosition() const {
+	const Vector3& Transform::GetBeforeWorldPosition() const{
 		return pImpl->m_BeforeWorldPosition;
 	}
-	const Vector3& Transform::GetBeforeLocalPosition() const {
+	const Vector3& Transform::GetBeforeLocalPosition() const{
 		return pImpl->m_BeforeLocalPosition;
 	}
 
 
 	//Getter&Setter
-	void Transform::SetWorldMatrix(const Matrix4X4& WorldMatrix) {
-		throw BaseException(
-			L"Transformでは、行列は直接変更できません",
-			L"TransformMatrixコンポネントを使用してください",
-			L"Transform::SetWorldMatrix()"
-			);
+	const Matrix4X4& Transform::GetWorldMatrix()const {
+		return pImpl->m_WorldMatrix;
+	}
+	void Transform::SetWorldMatrix(const Matrix4X4& WorldMatrix){
+		if (!pImpl->m_PriorityMatrix){
+			throw BaseException(
+				L"PriorityMatrixではないので、行列は直接変更できません",
+				L"if (!pImpl->m_PriorityMatrix)",
+				L"Transform::Impl::SetMatrix()"
+				);
+		}
+		//m_PriorityMatrixの場合はm_WorldMatrixしか使わない
+		pImpl->m_WorldMatrix = WorldMatrix;
 	}
 
-	const Vector3& Transform::GetScale() const {
+	const Vector3& Transform::GetScale() const{
 		return pImpl->m_Scale;
 	}
 
-	void Transform::SetScale(const Vector3& Scale) {
+	void Transform::SetScale(const Vector3& Scale){
 		//Scaleはローカルワールド共通
 		pImpl->m_Scale = Scale;
-		//WorldSetterはすぐに計算する
-		CalcMatrix();
+		if (!pImpl->m_PriorityMatrix){
+			//WorldSetterはすぐに計算する
+			CalcMatrix();
+		}
 	}
-	void Transform::SetScale(float x, float y, float z) {
+	void Transform::SetScale(float x, float y, float z){
 		SetScale(Vector3(x, y, z));
 	}
 
-	const Quaternion& Transform::GetQuaternion() const {
+	const Quaternion& Transform::GetQuaternion() const{
 		return pImpl->m_Quaternion;
 	}
-	void Transform::SetQuaternion(const Quaternion& quaternion) {
-		//入力はワールド座標である
-		if (GetParent()) {
-			auto Ptr = GetParent()->GetComponent<TransformMatrix>();
-			Matrix4X4 Parmatrix = Ptr->GetWorldMatrix();
-			//スケーリングは1.0にする
-			Parmatrix.ScaleIdentity();
-			Vector4 v;
-			Parmatrix.Inverse(&v);
-			Quaternion ParQt = Parmatrix.QtInMatrix();
-			pImpl->m_LocalQuaternion = quaternion * ParQt;
+	void Transform::SetQuaternion(const Quaternion& quaternion){
+		if (!pImpl->m_PriorityMatrix){
+			//入力はワールド座標である
+			if (GetParent()){
+				auto Ptr = GetParent()->GetComponent<Transform>();
+				Matrix4X4 Parmatrix = Ptr->GetWorldMatrix();
+				//スケーリングは1.0にする
+				Parmatrix.ScaleIdentity();
+				Vector4 v;
+				Parmatrix.Inverse(&v);
+				Quaternion ParQt = Parmatrix.QtInMatrix();
+				pImpl->m_LocalQuaternion = quaternion * ParQt;
+			}
+			else{
+				pImpl->m_LocalQuaternion = quaternion;
+			}
+			//WorldSetterはすぐに計算する
+			CalcMatrix();
 		}
-		else {
-			pImpl->m_LocalQuaternion = quaternion;
+		else{
+			pImpl->m_Quaternion = quaternion;
 		}
-		//WorldSetterはすぐに計算する
-		CalcMatrix();
 	}
-	Vector3 Transform::GetRotation() const {
+	Vector3 Transform::GetRotation() const{
 		return pImpl->m_Quaternion.GetRotation();
 	}
 
-	void Transform::SetRotation(const Vector3& Rot) {
+	void Transform::SetRotation(const Vector3& Rot){
 		Quaternion Qt;
 		Qt.RotationRollPitchYawFromVector(Rot);
 		SetQuaternion(Qt);
 	}
-	void Transform::SetRotation(float x, float y, float z) {
+	void Transform::SetRotation(float x, float y, float z){
 		SetRotation(Vector3(x, y, z));
 	}
 
-	const Vector3& Transform::GetPosition() const {
+	const Vector3& Transform::GetPosition() const{
 		return pImpl->m_Position;
 	}
 
-	void Transform::SetPosition(const Vector3& Position) {
-		//入力はワールド座標である
-		if (auto ParPtr = GetParent()) {
-			Vector3 Temp = Position - pImpl->m_Position;
-			pImpl->m_LocalPosition += Temp;
+	void Transform::SetPosition(const Vector3& Position){
+		if (!pImpl->m_PriorityMatrix){
+			//入力はワールド座標である
+			if (auto ParPtr = GetParent()){
+				Vector3 Temp = Position - pImpl->m_Position;
+				pImpl->m_LocalPosition += Temp;
+			}
+			else{
+				pImpl->m_LocalPosition = Position;
+			}
+			//Setterはすぐに計算する
+			CalcMatrix();
 		}
-		else {
-			pImpl->m_LocalPosition = Position;
+		else{
+			pImpl->m_Position = Position;
 		}
-		//Setterはすぐに計算する
-		CalcMatrix();
 	}
-	void Transform::SetPosition(float x, float y, float z) {
+	void Transform::SetPosition(float x, float y, float z){
 		SetPosition(Vector3(x, y, z));
 	}
 
-	const Matrix4X4& Transform::GetLocalMatrix() const {
+	const Matrix4X4& Transform::GetLocalMatrix() const{
 		return pImpl->m_LocalMatrix;
 	}
 
-	const Quaternion& Transform::GetLocalQuaternion() const {
+	const Quaternion& Transform::GetLocalQuaternion() const{
 		return pImpl->m_LocalQuaternion;
 	}
-	void Transform::SetLocalQuaternion(const Quaternion& quaternion, bool CalcFlg) {
+	void Transform::SetLocalQuaternion(const Quaternion& quaternion, bool CalcFlg){
 		pImpl->m_LocalQuaternion = quaternion;
-		//Setterはすぐに計算する
-		if (CalcFlg) {
-			CalcMatrix();
+		if (!pImpl->m_PriorityMatrix){
+			//Setterはすぐに計算する
+			if (CalcFlg){
+				CalcMatrix();
+			}
 		}
+		//PriorityMatrix時は何もしない
 	}
-	Vector3 Transform::GetLocalRotation() const {
+	Vector3 Transform::GetLocalRotation() const{
 		return pImpl->m_LocalQuaternion.GetRotation();
 	}
 
-	void Transform::SetLocalRotation(const Vector3& Rot, bool CalcFlg) {
+	void Transform::SetLocalRotation(const Vector3& Rot, bool CalcFlg){
 		Quaternion Qt;
 		Qt.RotationRollPitchYawFromVector(Rot);
 		SetLocalQuaternion(Qt, CalcFlg);
 	}
-	void Transform::SetLocalRotation(float x, float y, float z, bool CalcFlg) {
+	void Transform::SetLocalRotation(float x, float y, float z, bool CalcFlg){
 		SetLocalRotation(Vector3(x, y, z), CalcFlg);
 	}
 
 
-	const Vector3& Transform::GetLocalPosition() const {
+	const Vector3& Transform::GetLocalPosition() const{
 		return pImpl->m_LocalPosition;
 	}
 
-	void Transform::SetLocalPosition(const Vector3& Position, bool CalcFlg) {
+	void Transform::SetLocalPosition(const Vector3& Position, bool CalcFlg){
 		pImpl->m_LocalPosition = Position;
-		//Setterはすぐに計算する
-		if (CalcFlg) {
-			CalcMatrix();
+		if (!pImpl->m_PriorityMatrix){
+			//Setterはすぐに計算する
+			if (CalcFlg){
+				CalcMatrix();
+			}
 		}
+		//PriorityMatrix時は何もしない
 	}
 
-	void Transform::SetLocalPosition(float x, float y, float z, bool CalcFlg) {
+	void Transform::SetLocalPosition(float x, float y, float z, bool CalcFlg){
 		SetLocalPosition(Vector3(x, y, z), CalcFlg);
 	}
 
 
-	shared_ptr<GameObject> Transform::GetParent() const {
-		if (!pImpl->m_Parent.expired()) {
+	shared_ptr<GameObject> Transform::GetParent() const{
+		if (!pImpl->m_Parent.expired()){
 			return pImpl->m_Parent.lock();
 		}
 		return nullptr;
 	}
-	void Transform::SetParent(const shared_ptr<GameObject>& Ptr) {
-		if (Ptr) {
-			if (!pImpl->m_Parent.expired()) {
+	void Transform::SetParent(const shared_ptr<GameObject>& Ptr){
+		if (Ptr){
+			if (!pImpl->m_Parent.expired()){
 				ClearParent();
 			}
 			pImpl->m_Parent = Ptr;
-			auto ParTransPtr = Ptr->GetComponent<TransformMatrix>();
+			auto ParTransPtr = Ptr->GetComponent<Transform>();
 			Matrix4X4 ParMatrix = ParTransPtr->GetWorldMatrix();
 			ParMatrix.ScaleIdentity();
 			Vector4 Vec;
@@ -365,11 +346,11 @@ namespace basedx11{
 			SetLocalPosition(Matrix.PosInMatrix(), false);
 			CalcMatrix();
 		}
-		else {
+		else{
 			ClearParent();
 		}
 	}
-	void Transform::ClearParent() {
+	void Transform::ClearParent(){
 		pImpl->m_Parent.reset();
 		//設定時は計算しない
 		SetLocalQuaternion(GetQuaternion(), false);
@@ -379,54 +360,56 @@ namespace basedx11{
 
 
 	//計算
-	void Transform::CalcMatrix() {
-		if (IsGameObjectActive()) {
-			if (pImpl->m_PriorityPosition) {
-				pImpl->m_LocalMatrix.STRTransformation(
-					pImpl->m_Scale,
-					pImpl->m_LocalPosition,
-					pImpl->m_LocalQuaternion
-					);
-			}
-			else {
-				pImpl->m_LocalMatrix.DefTransformation(
-					pImpl->m_Scale,
-					pImpl->m_LocalQuaternion,
-					pImpl->m_LocalPosition
-					);
-			}
-			//親がある場合は、各値は親の配下になる。
-			if (GetParent()) {
-				auto PtrTrans = GetParent()->GetComponent<TransformMatrix>();
-				Matrix4X4 Parmatrix = PtrTrans->GetWorldMatrix();
-				//スケーリングは1.0にする
-				Parmatrix.ScaleIdentity();
-				TransformMatrix::SetWorldMatrix(pImpl->m_LocalMatrix * Parmatrix);
-				pImpl->m_Quaternion = GetWorldMatrix().QtInMatrix();
-				pImpl->m_Position = GetWorldMatrix().PosInMatrix();
-			}
-			else {
-				//親がない
-				TransformMatrix::SetWorldMatrix(pImpl->m_LocalMatrix);
-				pImpl->m_Quaternion = pImpl->m_LocalQuaternion;
-				pImpl->m_Position = pImpl->m_LocalPosition;
+	void Transform::CalcMatrix(){
+		if (IsGameObjectActive()){
+			if (!pImpl->m_PriorityMatrix){
+				if (pImpl->m_PriorityPosition){
+					pImpl->m_LocalMatrix.STRTransformation(
+						pImpl->m_Scale,
+						pImpl->m_LocalPosition,
+						pImpl->m_LocalQuaternion
+						);
+				}
+				else{
+					pImpl->m_LocalMatrix.DefTransformation(
+						pImpl->m_Scale,
+						pImpl->m_LocalQuaternion,
+						pImpl->m_LocalPosition
+						);
+				}
+				//親がある場合は、各値は親の配下になる。
+				if (GetParent()){
+					auto PtrTrans = GetParent()->GetComponent<Transform>();
+					Matrix4X4 Parmatrix = PtrTrans->GetWorldMatrix();
+					//スケーリングは1.0にする
+					Parmatrix.ScaleIdentity();
+					pImpl->m_WorldMatrix = pImpl->m_LocalMatrix * Parmatrix;
+					pImpl->m_Quaternion = pImpl->m_WorldMatrix.QtInMatrix();
+					pImpl->m_Position = pImpl->m_WorldMatrix.PosInMatrix();
+				}
+				else{
+					//親がない
+					pImpl->m_WorldMatrix = pImpl->m_LocalMatrix;
+					pImpl->m_Quaternion = pImpl->m_LocalQuaternion;
+					pImpl->m_Position = pImpl->m_LocalPosition;
+				}
 			}
 		}
 	}
 
-	void Transform::SetToBefore() {
-		if (GetGameObject()) {
+	void Transform::SetToBefore(){
+		if (GetGameObject()){
 			auto PtrRidid = GetGameObject()->GetComponent<Rigidbody>(false);
-			if (PtrRidid && !IsInit()) {
+			if (PtrRidid && !pImpl->m_Init){
 				float Len = Vector3EX::Length(PtrRidid->GetVelocity());
 				float PosLen = Vector3EX::Length(pImpl->m_Position - pImpl->m_BeforeWorldPosition);
-				if (PtrRidid->IsVelocityZeroCommand() && Len > 0 && PosLen <= 0) {
+				if (PtrRidid->IsVelocityZeroCommand() && Len > 0 && PosLen <= 0){
 					PtrRidid->SetVelocity(0, 0, 0);
 				}
 			}
 		}
 		pImpl->m_BeforeLocalMatrix = pImpl->m_LocalMatrix;
-		TransformMatrix::SetToBefore();
+		pImpl->m_BeforeWorldMatrix = pImpl->m_WorldMatrix;
 		pImpl->m_BeforeScale = pImpl->m_Scale;
 		pImpl->m_BeforeLocalQuaternion = pImpl->m_LocalQuaternion;
 		pImpl->m_BeforeWorldQuaternion = pImpl->m_Quaternion;
@@ -434,11 +417,11 @@ namespace basedx11{
 		pImpl->m_BeforeWorldPosition = pImpl->m_Position;
 	}
 
-	void Transform::LerpBeforeToNow(float LerpTime) {
+	void Transform::LerpBeforeToNow(float LerpTime){
 		//前回のターンからの時間
 		float ElapsedTime = App::GetApp()->GetElapsedTime();
 		//LerpTimeは衝突タイムなので、少し前に置く
-		if (LerpTime >= 0.001f) {
+		if (LerpTime >= 0.001f){
 			LerpTime -= 0.001f;
 		}
 
@@ -457,14 +440,16 @@ namespace basedx11{
 		pImpl->m_LocalPosition = Lerp::CalculateLerp<Vector3>(
 			pImpl->m_BeforeLocalPosition, pImpl->m_LocalPosition, 0, ElapsedTime, LerpTime, Lerp::Linear
 			);
-		CalcMatrix();
+		if (!pImpl->m_PriorityMatrix){
+			CalcMatrix();
+		}
 	}
 	//操作
-	void Transform::OnUpdate() {
+	void Transform::Update(){
 		CalcMatrix();
-		if (!IsInit()) {
+		if (!pImpl->m_Init){
 			SetToBefore();
-			SetInitTrue();
+			pImpl->m_Init = true;
 		}
 	}
 
@@ -597,7 +582,7 @@ namespace basedx11{
 			}
 		}
 	}
-	void ActionInterval::OnUpdate(){
+	void ActionInterval::Update(){
 		if (IsGameObjectActive() && GetRun()){
 			if (!AdditionalNowTime()){
 				if (GetTotalTime() <= 0){
@@ -674,7 +659,7 @@ namespace basedx11{
 		}
 	}
 
-	void ScaleComponent::OnUpdate(){
+	void ScaleComponent::Update(){
 		if (IsGameObjectActive() && GetRun()){
 			auto TransPtr = GetGameObject()->GetComponent<Transform>();
 			if (AdditionalNowTime()){
@@ -876,7 +861,7 @@ namespace basedx11{
 			}
 		}
 	}
-	void RotateComponent::OnUpdate(){
+	void RotateComponent::Update(){
 		if (IsGameObjectActive() && GetRun()){
 			auto TransPtr = GetGameObject()->GetComponent<Transform>();
 			if (AdditionalNowTime()){
@@ -1207,7 +1192,7 @@ namespace basedx11{
 		}
 	}
 
-	void MoveComponent::OnUpdate(){
+	void MoveComponent::Update(){
 		if (IsGameObjectActive() && GetRun()){
 			auto TransPtr = GetGameObject()->GetComponent<Transform>();
 			if (AdditionalNowTime()){
@@ -1523,20 +1508,20 @@ namespace basedx11{
 
 	//操作
 	shared_ptr<ScaleTo> Action::AddScaleTo(float TotalTime, const Vector3& TargetScale, Lerp::rate Rate){
-		auto Ptr = ObjectFactory::Create<ScaleTo>(GetGameObject());
+		auto Ptr = Object::CreateObject<ScaleTo>(GetGameObject());
 		Ptr->SetParams(TotalTime, TargetScale, Rate);
 		pImpl->m_ScaleVec.push_back(Ptr);
 		return Ptr;
 	}
 	shared_ptr<ScaleBy> Action::AddScaleBy(float TotalTime, const Vector3& LocalScale, Lerp::rate Rate){
-		auto Ptr = ObjectFactory::Create<ScaleBy>(GetGameObject());
+		auto Ptr = Object::CreateObject<ScaleBy>(GetGameObject());
 		Ptr->SetParams(TotalTime, LocalScale, Rate);
 		pImpl->m_ScaleVec.push_back(Ptr);
 		return Ptr;
 	}
 
 	shared_ptr<ActionInterval> Action::AddScaleInterval(float TotalTime){
-		auto Ptr = ObjectFactory::Create<ActionInterval>(GetGameObject());
+		auto Ptr = Object::CreateObject<ActionInterval>(GetGameObject());
 		Ptr->SetTotalTime(TotalTime);
 		pImpl->m_ScaleVec.push_back(Ptr);
 		return Ptr;
@@ -1559,14 +1544,14 @@ namespace basedx11{
 
 
 	shared_ptr<RotateTo> Action::AddRotateTo(float TotalTime, const Vector3& TargetRotate){
-		auto Ptr = ObjectFactory::Create<RotateTo>(GetGameObject());
+		auto Ptr = Object::CreateObject<RotateTo>(GetGameObject());
 		Ptr->SetParams(TotalTime, TargetRotate);
 		pImpl->m_RotateVec.push_back(Ptr);
 		return Ptr;
 	}
 
 	shared_ptr<RotateTo> Action::AddRotateTo(float TotalTime, const Quaternion& TargetQuaternion){
-		auto Ptr = ObjectFactory::Create<RotateTo>(GetGameObject());
+		auto Ptr = Object::CreateObject<RotateTo>(GetGameObject());
 		Ptr->SetParams(TotalTime, TargetQuaternion);
 		pImpl->m_RotateVec.push_back(Ptr);
 		return Ptr;
@@ -1574,14 +1559,14 @@ namespace basedx11{
 
 
 	shared_ptr<RotateBy> Action::AddRotateBy(float TotalTime, const Vector3& LocalRotate){
-		auto Ptr = ObjectFactory::Create<RotateBy>(GetGameObject());
+		auto Ptr = Object::CreateObject<RotateBy>(GetGameObject());
 		Ptr->SetParams(TotalTime, LocalRotate);
 		pImpl->m_RotateVec.push_back(Ptr);
 		return Ptr;
 	}
 
 	shared_ptr<RotateBy> Action::AddRotateBy(float TotalTime, const Quaternion& LocalQuaternion){
-		auto Ptr = ObjectFactory::Create<RotateBy>(GetGameObject());
+		auto Ptr = Object::CreateObject<RotateBy>(GetGameObject());
 		Ptr->SetParams(TotalTime, LocalQuaternion);
 		pImpl->m_RotateVec.push_back(Ptr);
 		return Ptr;
@@ -1589,7 +1574,7 @@ namespace basedx11{
 
 
 	shared_ptr<ActionInterval> Action::AddRotateInterval(float TotalTime){
-		auto Ptr = ObjectFactory::Create<ActionInterval>(GetGameObject());
+		auto Ptr = Object::CreateObject<ActionInterval>(GetGameObject());
 		Ptr->SetTotalTime(TotalTime);
 		pImpl->m_RotateVec.push_back(Ptr);
 		return Ptr;
@@ -1611,14 +1596,14 @@ namespace basedx11{
 	}
 
 	shared_ptr<MoveTo> Action::AddMoveTo(float TotalTime, const Vector3& TargetPosition, Lerp::rate Rate){
-		auto Ptr = ObjectFactory::Create<MoveTo>(GetGameObject());
+		auto Ptr = Object::CreateObject<MoveTo>(GetGameObject());
 		Ptr->SetParams(TotalTime, TargetPosition, Rate);
 		pImpl->m_MoveVec.push_back(Ptr);
 		return Ptr;
 	}
 
 	shared_ptr<MoveTo> Action::AddMoveTo(float TotalTime, const Vector3& TargetPosition, Lerp::rate RateX, Lerp::rate RateY, Lerp::rate RateZ){
-		auto Ptr = ObjectFactory::Create<MoveTo>(GetGameObject());
+		auto Ptr = Object::CreateObject<MoveTo>(GetGameObject());
 		Ptr->SetParams(TotalTime, TargetPosition, RateX, RateY, RateZ);
 		pImpl->m_MoveVec.push_back(Ptr);
 		return Ptr;
@@ -1626,14 +1611,14 @@ namespace basedx11{
 
 
 	shared_ptr<MoveBy> Action::AddMoveBy(float TotalTime, const Vector3& LocalVector, Lerp::rate Rate){
-		auto Ptr = ObjectFactory::Create<MoveBy>(GetGameObject());
+		auto Ptr = Object::CreateObject<MoveBy>(GetGameObject());
 		Ptr->SetParams(TotalTime, LocalVector, Rate);
 		pImpl->m_MoveVec.push_back(Ptr);
 		return Ptr;
 	}
 
 	shared_ptr<MoveBy> Action::AddMoveBy(float TotalTime, const Vector3& LocalVector, Lerp::rate RateX, Lerp::rate RateY, Lerp::rate RateZ){
-		auto Ptr = ObjectFactory::Create<MoveBy>(GetGameObject());
+		auto Ptr = Object::CreateObject<MoveBy>(GetGameObject());
 		Ptr->SetParams(TotalTime, LocalVector, RateX, RateY, RateZ);
 		pImpl->m_MoveVec.push_back(Ptr);
 		return Ptr;
@@ -1641,7 +1626,7 @@ namespace basedx11{
 
 
 	shared_ptr<ActionInterval> Action::AddMoveInterval(float TotalTime){
-		auto Ptr = ObjectFactory::Create<ActionInterval>(GetGameObject());
+		auto Ptr = Object::CreateObject<ActionInterval>(GetGameObject());
 		Ptr->SetTotalTime(TotalTime);
 		pImpl->m_MoveVec.push_back(Ptr);
 		return Ptr;
@@ -1717,7 +1702,7 @@ namespace basedx11{
 		bool ret = false;
 		if (TgtVector.size() > 0 && TgtIndex < TgtVector.size()){
 			if (TgtVector[TgtIndex]->IsUpdateActive()){
-				TgtVector[TgtIndex]->OnUpdate();
+				TgtVector[TgtIndex]->Update();
 				if (TgtVector[TgtIndex]->IsArrived()){
 					//到着した
 					//インデックスを加算
@@ -1744,7 +1729,7 @@ namespace basedx11{
 		return ret;
 	}
 	//更新
-	void Action::OnUpdate(){
+	void Action::Update(){
 		pImpl->m_ScaleArrived = UpdateSub(pImpl->m_ScaleVec, pImpl->m_ScaleActiveIndex);
 		pImpl->m_RotateArrived = UpdateSub(pImpl->m_RotateVec, pImpl->m_RotateActiveIndex);
 		pImpl->m_MoveArrived = UpdateSub(pImpl->m_MoveVec, pImpl->m_MoveActiveIndex);
@@ -1814,9 +1799,9 @@ namespace basedx11{
 		return Ptr;
 	}
 
-	void MultiView::OnUpdate(){
+	void MultiView::Update(){
 		for (auto Ptr : pImpl->m_ViewVec){
-			Ptr->OnUpdate();
+			Ptr->Update();
 		}
 	}
 

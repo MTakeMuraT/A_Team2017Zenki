@@ -6,22 +6,123 @@ namespace basedx11{
 	struct Event;
 	class App;
 
+	//--------------------------------------------------------------------------------------
+	//	class ShapeInterface;
+	//	用途: UpdateとDrawのインターフェイス
+	//--------------------------------------------------------------------------------------
+	class ShapeInterface{
+	public:
+		//構築と破棄
+		//--------------------------------------------------------------------------------------
+		//	ShapeInterface();
+		/*!
+		@breaf コンストラクタ
+		@param なし
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
+		ShapeInterface(){}
+		//--------------------------------------------------------------------------------------
+		//	virtual ~ShapeInterface();
+		/*!
+		@breaf デストラクタ
+		@param なし
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
+		virtual ~ShapeInterface(){}
+		//操作
+		//--------------------------------------------------------------------------------------
+		//	virtual void Update() = 0;
+		/*!
+		@breaf Update処理
+		@param なし
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
+		virtual void Update() = 0;
+		//--------------------------------------------------------------------------------------
+		//	virtual void Update2();
+		/*!
+		@breaf Update2処理
+		@param なし
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
+		virtual void Update2() = 0;
+		//--------------------------------------------------------------------------------------
+		//	virtual void Update3();
+		/*!
+		@breaf Update3処理.
+		この関数のみデフォルト定義しておく
+		@param なし
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
+		virtual void Update3(){}
+		//--------------------------------------------------------------------------------------
+		//	virtual void Draw() = 0;
+		/*!
+		@breaf Draw処理
+		@param なし
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
+		virtual void Draw() = 0;
+	};
+
 
 
 	//--------------------------------------------------------------------------------------
-	//	class Object public ObjectInterface;
+	//	class Object;
 	//	用途: すべてのオブジェクトの基底クラス（抽象クラス）
 	//--------------------------------------------------------------------------------------
-	class Object : public ObjectInterface{
+	class Object : public std::enable_shared_from_this<Object>{
+		//クリエイト済みかどうか
+		//Create関数が呼び出し後にtrueになる
+		bool m_Created;
+		void SetCreated(bool b){
+			m_Created = b;
+		}
 	protected:
 		//構築と破棄
-		Object(){}
+		Object():m_Created(false){}
 		virtual ~Object(){}
 	public:
+		//thisポインタ取得
+		template<typename T>
+		std::shared_ptr<T> GetThis(){
+			auto Ptr = dynamic_pointer_cast<T>(shared_from_this());
+			if (Ptr){
+				return Ptr;
+			}
+			else{
+				throw BaseException(
+					L"thisをT型にキャストできません",
+					L"if( ! dynamic_pointer_cast<T>(shared_from_this()) )",
+					L"Object::GetThis()"
+					);
+			}
+		}
+		//オブジェクト作成（static関数）
+		template<typename T, typename... Ts>
+		static shared_ptr<T> CreateObject(Ts&&... params){
+			shared_ptr<T> Ptr = shared_ptr<T>(new T(params...));
+			//仮想関数呼び出し
+			Ptr->PreCreate();
+			Ptr->Create();
+			Ptr->SetCreated(true);
+			return Ptr;
+		}
+
 		//初期化を行う（仮想関数）
 		//＊thisポインタが必要なオブジェクトはこの関数を多重定義して、構築する
-		virtual void OnPreCreate() override {}
-		virtual void OnCreate() override {}
+		virtual void PreCreate(){}
+		virtual void Create(){}
+		//クリエイト済みかどうか
+		bool IsCreated(){
+			return m_Created;
+		}
 		// イベントのPOST（キューに入れる）
 		void PostEvent(float DispatchTime, const shared_ptr<Object>& Sender, const shared_ptr<Object>& Receiver,
 			const wstring& MsgStr, shared_ptr<void>& Info = shared_ptr<void>());
@@ -205,8 +306,9 @@ namespace basedx11{
 		const Matrix4X4& GetViewMatrix() const;
 		const Matrix4X4& GetProjMatrix() const;
 		//操作
-		virtual void OnUpdate()override;
-		virtual void OnDraw()override{}
+		virtual void Update()override;
+		virtual void Update2(){}
+		virtual void Draw()override{}
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -230,7 +332,7 @@ namespace basedx11{
 		void SetToTargetLerp(float f);
 
 		//操作
-		virtual void OnUpdate() override;
+		virtual void Update() override;
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -267,8 +369,9 @@ namespace basedx11{
 		void SetSpecularColor(const Color4& col);
 		void SetSpecularColor(float r, float g, float b, float a);
 
-		virtual void OnUpdate()override{}
-		virtual void OnDraw()override{}
+		virtual void Update()override{}
+		virtual void Update2()override{}
+		virtual void Draw()override{}
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -302,8 +405,9 @@ namespace basedx11{
 		void SetDefaultLighting();
 
 		//操作
-		virtual void OnUpdate()override;
-		virtual void OnDraw()override{}
+		virtual void Update()override;
+		virtual void Update2()override{}
+		virtual void Draw()override{}
 	private:
 		// pImplイディオム
 		struct Impl;
@@ -352,9 +456,9 @@ namespace basedx11{
 			vp.Width = ViewPortSize.Width();
 			vp.Height = ViewPortSize.Height();
 			//カメラを差し替える
-			auto CameraPtr = ObjectFactory::Create<CameraType>();
+			auto CameraPtr = Object::CreateObject<CameraType>();
 			//ライトを差し替える
-			auto MultiLightPtr = ObjectFactory::Create<LightType>();
+			auto MultiLightPtr = Object::CreateObject<LightType>();
 			for (size_t i = 0; i < LightCount; i++){
 				MultiLightPtr->AddLight();
 			}
@@ -364,8 +468,9 @@ namespace basedx11{
 				dynamic_pointer_cast<MultiLight>(MultiLightPtr));
 		}
 		//操作
-		virtual void OnUpdate()override;
-		virtual void OnDraw()override{}
+		virtual void Update()override;
+		virtual void Update2()override{}
+		virtual void Draw()override{}
 	private:
 		// pImplイディオム
 		struct Impl;

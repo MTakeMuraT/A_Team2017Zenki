@@ -431,6 +431,15 @@ namespace basedx11{
 		map<wstring, shared_ptr<BaseResource> > m_ResMap;		//キーとリソースを結び付けるマップ
 		StepTimer m_Timer;										//タイマー
 		InputDevice m_InputDevice;					//入力機器
+		//FBXマネージャーのデリーター
+		struct FbxManagerDeleter
+		{
+			void operator()(FbxManager *p){ 
+				p->Destroy(); 
+			}
+		};
+		//FBXマネージャ
+		unique_ptr<FbxManager, FbxManagerDeleter> m_pFbxManager;
 		//オーディオマネージャ
 		unique_ptr<AudioManager> m_AudioManager;
 		//構築と破棄
@@ -442,6 +451,8 @@ namespace basedx11{
 			bool FullScreen = false, UINT Width = 0, UINT Height = 0);
 		//! 強制破棄
 		static void DeleteApp();
+		//! FBXマネージャの取得
+		unique_ptr<FbxManager, FbxManagerDeleter>& GetFbxManager();
 		//! オーディオマネージャの取得
 		unique_ptr<AudioManager>& GetAudioManager();
 		//アクセサ
@@ -479,8 +490,8 @@ namespace basedx11{
 				}
 				m_SceneBase = Ptr;
 				//シーンの初期化実行
-				m_SceneBase->OnPreCreate();
-				m_SceneBase->OnCreate();
+				m_SceneBase->PreCreate();
+				m_SceneBase->Create();
 				return Ptr;
 			}
 			catch (...){
@@ -575,41 +586,6 @@ namespace basedx11{
 		shared_ptr<TextureResource> RegisterTexture(const wstring& Key, const wstring& TextureFileName, const wstring& TexType = L"WIC");
 
 		//--------------------------------------------------------------------------------------
-		//	shared_ptr<MeshResource> RegisterStaticModelMesh(
-		//		const wstring& Key, // リソースキー
-		//		const wstring& BinDataDir,	//基準ディレクトリ 
-		//		const wstring& BinDataFile	//スタティックモデルメッシュファイル
-		//	);
-		/*!
-		@breaf スタティックモデルの登録(同じキーのテクスチャがなければファイル名で作成し、登録)。
-		同じ名前のメッシュがあればそのポインタを返す
-		@param const wstring& Key リソースキー
-		@param const wstring& BinDataDir	基準ディレクトリ
-		@param const wstring& BinDataFile	スタティックモデルメッシュファイル
-		@return	リソースのスマートポインタ
-		*/
-		//--------------------------------------------------------------------------------------
-		shared_ptr<MeshResource> RegisterStaticModelMesh(const wstring& Key,const wstring& BinDataDir,const wstring& BinDataFile);
-
-		//--------------------------------------------------------------------------------------
-		//	shared_ptr<MeshResource> RegisterBoneModelMesh(
-		//		const wstring& Key, // リソースキー
-		//		const wstring& BinDataDir,	//基準ディレクトリ 
-		//		const wstring& BinDataFile	//スタティックモデルメッシュファイル
-		//	);
-		/*!
-		@breaf ボーンモデルの登録(同じキーのテクスチャがなければファイル名で作成し、登録)。
-		同じ名前のメッシュがあればそのポインタを返す
-		@param const wstring& Key リソースキー
-		@param const wstring& BinDataDir	基準ディレクトリ
-		@param const wstring& BinDataFile	スタティックモデルメッシュファイル
-		@return	リソースのスマートポインタ
-		*/
-		//--------------------------------------------------------------------------------------
-		shared_ptr<MeshResource> RegisterBoneModelMesh(const wstring& Key, const wstring& BinDataDir, const wstring& BinDataFile);
-
-
-		//--------------------------------------------------------------------------------------
 		//	shared_ptr<AudioResource> RegisterWav(
 		//		const wstring& Key, // リソースキー
 		//		const wstring& WavFileName	//Wavファイル名
@@ -621,8 +597,41 @@ namespace basedx11{
 		@param const wstring& WavFileName テクスチャファイル名
 		@return	リソースのスマートポインタ
 		*/
+		shared_ptr<AudioResource> RegisterWav(const wstring& Key,const wstring& WavFileName);
 		//--------------------------------------------------------------------------------------
-		shared_ptr<AudioResource> RegisterWav(const wstring& Key, const wstring& WavFileName);
+		//	shared_ptr<FbxSceneResource> RegisterFbxScene(
+		//		const wstring& Key,			//キー
+		//		const wstring& BaseDir.		//基準ディレクトリ
+		//		const wstring& FbxFileName	//FbxFile名
+		//	);
+		/*!
+		@breaf Fbxシーンの登録(同じキーのシーンがなければファイル名で作成し、登録)。
+		同じ名前のFbxシーンがあればそのポインタを返す
+		@param const wstring& Key リソースキー
+		@param const wstring& BaseDir.	基準ディレクトリ
+		@param const wstring& FbxFileName	FbxFile名
+		@return	リソースのスマートポインタ
+		*/
+		//--------------------------------------------------------------------------------------
+		shared_ptr<FbxSceneResource> RegisterFbxScene(const wstring& Key, const wstring& BaseDir, const wstring& FbxFileName);
+
+		//--------------------------------------------------------------------------------------
+		//	shared_ptr<FbxMeshResource> RegisterFbxMesh(
+		//		const wstring& Key,			//キー
+		//		const shared_ptr<FbxSceneResource>& FbxSceneRes		//このメッシュが含まれるシーンリソース
+		//		UINT MeshID					//メッシュのシーン内のID
+		//	);
+		/*!
+		@breaf Fbxメッシュの登録(同じキーのメッシュがなければ作成し、登録)。
+		同じ名前のFbxメッシュがあればそのポインタを返す
+		@param const wstring& Key リソースキー
+		@param const shared_ptr<FbxSceneResource>& FbxSceneRes	このメッシュが含まれるシーンリソース
+		@param UINT MeshID	メッシュのシーン内のID
+		@return	リソースのスマートポインタ
+		*/
+		//--------------------------------------------------------------------------------------
+		shared_ptr<FbxMeshResource> RegisterFbxMesh(const wstring& Key,const shared_ptr<FbxSceneResource>& FbxSceneRes,UINT MeshID);
+
 		//--------------------------------------------------------------------------------------
 		//	template <typename T>
 		//	bool CheckResource(
