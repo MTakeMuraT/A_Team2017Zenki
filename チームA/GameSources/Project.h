@@ -14,6 +14,7 @@
 #include "GameStage.h"
 #include "Character.h"
 #include "TitleScene.h"
+#include "StageSelectScene.h"
 //オブジェクト関係
 #include "Player.h"
 

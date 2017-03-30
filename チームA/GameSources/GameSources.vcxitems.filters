@@ -36,6 +36,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\BaseCrossDx11\LicenseScene.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)StageSelectScene.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)Character.cpp">
@@ -63,6 +66,9 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\BaseCrossDx11\LicenseScene.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)StageSelectScene.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
