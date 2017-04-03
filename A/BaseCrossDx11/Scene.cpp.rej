@@ -1,0 +1,10 @@
+diff a/RobMemory/BaseCrossDx11/Scene.cpp b/RobMemory/BaseCrossDx11/Scene.cpp	(rejected hunks)
+@@ -21,7 +21,7 @@
+ 			
+ 
+ 			//�ŏ��̃A�N�e�B�u�X�e�[�W�̐ݒ�
+-			ResetActiveStage<LicenseScene>();
++			ResetActiveStage<TutorialScene>();
+ 		}
+ 		catch (...) {
+ 			throw;

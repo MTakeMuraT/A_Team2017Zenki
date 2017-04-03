@@ -1,0 +1,254 @@
+/*!
+@file GameStage.cpp
+@brief ゲームステージ実体
+*/
+
+#include "stdafx.h"
+#include "Project.h"
+
+namespace basecross {
+
+	//--------------------------------------------------------------------------------------
+	//	ゲームステージクラス実体
+	//--------------------------------------------------------------------------------------
+
+
+
+
+
+	//ビューとライトの作成
+	void StageSelectScene::CreateViewLight() {
+		auto PtrView = CreateView<SingleView>();
+		//ビューのカメラの設定
+		auto PtrLookAtCamera = ObjectFactory::Create<LookAtCamera>();
+		PtrView->SetCamera(PtrLookAtCamera);
+		PtrLookAtCamera->SetEye(Vector3(0.0f, 5.0f, -5.0f));
+		PtrLookAtCamera->SetAt(Vector3(0.0f, 0.0f, 0.0f));
+		//シングルライトの作成
+		auto PtrSingleLight = CreateLight<SingleLight>();
+		//ライトの設定
+		PtrSingleLight->GetLight().SetPositionToDirectional(-0.25f, 1.0f, -0.25f);
+
+	}
+
+
+	//プレートの作成
+	void StageSelectScene::CreatePlate() {
+		////ステージへのゲームオブジェクトの追加
+		//auto Ptr = AddGameObject<GameObject>();
+		//auto PtrTrans = Ptr->GetComponent<Transform>();
+		//Quaternion Qt;
+		//Qt.RotationRollPitchYawFromVector(Vector3(XM_PIDIV2, 0, 0));
+		//Matrix4X4 WorldMat;
+		//WorldMat.DefTransformation(
+		//	Vector3(200.0f, 200.0f, 1.0f),
+		//	Qt,
+		//	Vector3(0.0f, 0.0f, 0.0f)
+		//);
+		//PtrTrans->SetScale(20.0f, 30.0f, 1.0f);
+		//PtrTrans->SetQuaternion(Qt);
+		//PtrTrans->SetPosition(6.0f, 0.0f, -5.0f);
+
+		////描画コンポーネントの追加
+		//auto DrawComp = Ptr->AddComponent<PNTStaticDraw>();
+		////描画コンポーネントに形状（メッシュ）を設定
+		//DrawComp->SetMeshResource(L"DEFAULT_SQUARE");
+		////自分に影が映りこむようにする
+		//DrawComp->SetOwnShadowActive(true);
+
+		////描画コンポーネントテクスチャの設定
+		//DrawComp->SetTextureResource(L"IceFloor_TX");
+	}
+	void StageSelectScene::CreateBackGround() {
+		AddGameObject<BackGround>(
+			Vector3(5.3f, 3.3f, 0.5f),
+			Vector3(0.25f, 0.0f, 0.0f),
+			Vector3(0.0f, 0.25f, -1.0f),
+			2
+			);
+	}
+	void StageSelectScene::CreateStageSelectionPlate() {
+		auto CreateGroup = CreateSharedObjectGroup(L"SelectionPlateGroup");
+		auto PtrSelctonPlate = AddGameObject<StageSelectionPlate>(
+			Vector3(1.2f, 0.7f, 0.1f),
+			Vector3(1.3f, 1.0f, -1.5f),
+			1
+			);
+		CreateGroup->IntoGroup(PtrSelctonPlate);
+		PtrSelctonPlate = AddGameObject<StageSelectionPlate>(
+			Vector3(1.2f, 0.7f, 0.1f),
+			Vector3(1.35f, 0.5f, -1.5f),
+			2
+			);
+		CreateGroup->IntoGroup(PtrSelctonPlate);
+		PtrSelctonPlate = AddGameObject<StageSelectionPlate>(
+			Vector3(1.2f, 0.7f, 0.1f),
+			Vector3(1.4f, 0.0f, -1.5f),
+			3
+			);
+		CreateGroup->IntoGroup(PtrSelctonPlate);
+		PtrSelctonPlate = AddGameObject<StageSelectionPlate>(
+			Vector3(1.2f, 0.7f, 0.1f),
+			Vector3(1.45f, -0.52f, -1.5f),
+			4
+			);
+		CreateGroup->IntoGroup(PtrSelctonPlate);
+		PtrSelctonPlate = AddGameObject<StageSelectionPlate>(
+			Vector3(1.2f, 0.7f, 0.1f),
+			Vector3(1.5f, -1.08f, -1.5f),
+			5
+			);
+		CreateGroup->IntoGroup(PtrSelctonPlate);
+
+		auto PtrWhiteOut = AddGameObject<WhiteOut>();
+		SetSharedGameObject(L"WhiteOut", PtrWhiteOut);
+
+		auto PtrWhiteIn = AddGameObject<WhiteIn>();
+		SetSharedGameObject(L"WhiteIn", PtrWhiteIn);
+
+		AddGameObject<Decision_SEBox>();
+		AddGameObject<Choice_SEBox>(2);
+		AddGameObject<SelectDebug>();
+		}
+
+
+	//シーン変更
+	void StageSelectScene::SceneChange1()
+	{
+		
+		auto ScenePtr = App::GetApp()->GetScene<Scene>();
+			PostEvent(1.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToProtoScene");
+		
+	}
+	void StageSelectScene::SceneChange2()
+	{
+		auto ScenePtr = App::GetApp()->GetScene<Scene>();
+			PostEvent(1.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToGameStage_2");
+	}
+	void StageSelectScene::SceneChange3()
+	{
+		auto ScenePtr = App::GetApp()->GetScene<Scene>();
+			PostEvent(1.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToGameStage_3");	
+	}
+	void StageSelectScene::SceneChange4()
+	{
+		auto ScenePtr = App::GetApp()->GetScene<Scene>();
+		PostEvent(1.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToGameStage_4");
+	}
+<<<<<<< HEAD
+	void StageSelectScene::SceneShange5()
+	{
+		auto ScenePtr = App::GetApp()->GetScene<Scene>();
+		PostEvent(1.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToGameStage_5");
+	}
+	
+=======
+	void StageSelectScene::DebugChange() {
+		auto ScenePtr = App::GetApp()->GetScene<Scene>();
+		PostEvent(1.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToGameStage_");
+	}
+
+>>>>>>> master
+	void StageSelectScene::OnCreate() {
+
+		A_Pushflg = false;
+		try {
+
+			//ビューとライトの作成
+			CreateViewLight();
+			//プレートの作成
+			CreatePlate();
+			//背景の作成
+			CreateBackGround();
+			//ステージ選択用の板
+			CreateStageSelectionPlate();
+
+			//オーディオの初期化
+			m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
+			m_AudioObjectPtr->AddAudioResource(L"Select");
+			m_AudioObjectPtr->Start(L"Select", XAUDIO2_LOOP_INFINITE, 0.5f);
+
+		}
+		catch (...) {
+			throw;
+		}
+	}
+	void StageSelectScene::OnUpdate() {
+		auto PtrWhiteOut = GetSharedGameObject<WhiteOut>(L"WhiteOut");
+		auto PtrWhiteIn = GetSharedGameObject<WhiteIn>(L"WhiteIn");
+		
+		
+
+		PtrWhiteOut->StartWhite();
+		if (PtrWhiteOut->GetWhiteFinish()) {
+			//コントローラの取得
+			auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+			if (CntlVec[0].bConnected) {
+				//Aボタンが押された瞬間ならステージ推移
+				if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A) {
+					//Aが押されたあとのスティック入力を防ぐフラグ
+					A_Pushflg = true;
+					PtrWhiteIn->StartWhiteIn();
+
+				}
+			}
+
+			if (select_type == 1) {
+				if (PtrWhiteIn->GetWhiteInFinish()) {
+					SceneChange1();
+				}
+			}
+			else if (select_type == 2) {
+				if (PtrWhiteIn->GetWhiteInFinish()) {
+					SceneChange2();
+				}
+			}
+			else if (select_type == 3) {
+				if (PtrWhiteIn->GetWhiteInFinish()) {
+					SceneChange3();
+				}
+			}
+			else if (select_type == 4) {
+				if (PtrWhiteIn->GetWhiteInFinish()) {
+					SceneChange4();
+				}
+			}
+			else if (select_type == 5) {
+				if (PtrWhiteIn->GetWhiteInFinish()) {
+					SceneShange5();
+				}
+			}
+			auto ScenePtr = App::GetApp()->GetScene<Scene>();
+			ScenePtr->SetSelectType(select_type);
+
+			if (A_Pushflg == false) {
+				if (CntlVec[0].fThumbLY >= 0.5f) {
+					if (!ChoiceFlg) {
+						select_type -= 1;
+						if (select_type < 1) {
+							select_type = 5;
+						}
+						ChoiceFlg = true;
+					}
+				}
+				else if (CntlVec[0].fThumbLY <= -0.5f) {
+					if (!ChoiceFlg) {
+						select_type += 1;
+						if (select_type > 5) {
+							select_type = 1;
+						}
+						ChoiceFlg = true;
+					}
+				}
+				else {
+					ChoiceFlg = false;
+				}
+			}
+		}
+	}
+	StageSelectScene::~StageSelectScene() {
+		m_AudioObjectPtr->Stop(L"Select");
+	}
+
+}
+//end basecross
