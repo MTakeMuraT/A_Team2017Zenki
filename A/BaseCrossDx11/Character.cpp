@@ -7,45 +7,7 @@
 #include "Project.h"
 
 namespace basecross{
-	//--------------------------------------------------------------------------------------
-	//	class TestLin : public GameObject;
-	//	用途: シーン表示テスト系統
-	//--------------------------------------------------------------------------------------
-	//構築と破棄
-	TestLin::TestLin(const shared_ptr<Stage>& StagePtr,
-		const Vector3& Scale,
-		const Vector3& Position,
-		const int& Type
-	) :
-		GameObject(StagePtr),
-		m_Scale(Scale),
-		m_Position(Position),
-		m_Type(Type)
-	{
-	}
-	TestLin::~TestLin() {}
 
-	//初期化
-	void TestLin::OnCreate() {
-		auto PtrTransform = GetComponent<Transform>();
-
-		PtrTransform->SetScale(m_Scale);
-		PtrTransform->SetRotation(0, 0, 0);
-		PtrTransform->SetPosition(m_Position);
-
-		auto PtrDraw = AddComponent<PCTSpriteDraw>();
-
-		if (m_Type == 1) {
-			PtrDraw->SetTextureResource(L"TEST_Taitoru_TX");
-		}
-		else if (m_Type == 2) {
-			PtrDraw->SetTextureResource(L"TEST_Serekuto_TX");
-		}
-		else if (m_Type == 3) {
-			PtrDraw->SetTextureResource(L"TEST_Game_TX");
-		}
-		SetAlphaActive(true);
-	}
 
 	//むっくん
 	//--------------------------------------------------------------------------------------
@@ -141,7 +103,7 @@ namespace basecross{
 
 
 
-
+	////////////////////デバック、テスト系/////////////////////////////////////////////////////////
 
 	//--------------------------------------------------------------------------------------
 	//	class Dedug : public GameObject;
@@ -169,7 +131,47 @@ namespace basecross{
 			}
 		}
 
-	
+
+	//--------------------------------------------------------------------------------------
+	//	class TestLin : public GameObject;
+	//	用途: シーン表示テスト系統
+	//--------------------------------------------------------------------------------------
+	//構築と破棄
+	TestLin::TestLin(const shared_ptr<Stage>& StagePtr,
+		const Vector3& Scale,
+		const Vector3& Position,
+		const int& Type
+	) :
+		GameObject(StagePtr),
+		m_Scale(Scale),
+		m_Position(Position),
+		m_Type(Type)
+	{
+	}
+	TestLin::~TestLin() {}
+
+	//初期化
+	void TestLin::OnCreate() {
+		auto PtrTransform = GetComponent<Transform>();
+
+		PtrTransform->SetScale(m_Scale);
+		PtrTransform->SetRotation(0, 0, 0);
+		PtrTransform->SetPosition(m_Position);
+
+		auto PtrDraw = AddComponent<PCTSpriteDraw>();
+
+		if (m_Type == 1) {
+			PtrDraw->SetTextureResource(L"TEST_Taitoru_TX");
+		}
+		else if (m_Type == 2) {
+			PtrDraw->SetTextureResource(L"TEST_Serekuto_TX");
+		}
+		else if (m_Type == 3) {
+			PtrDraw->SetTextureResource(L"TEST_Game_TX");
+		}
+		SetAlphaActive(true);
+	}
+
 }
 	
 	
