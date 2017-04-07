@@ -55,7 +55,7 @@ namespace basecross {
 	}
 
 	void StageSelectScene::OnUpdate() {
-		//コントローラ
+		//キーの入力
 		auto KeylVec = App::GetApp()->GetInputDevice().GetKeyState();
 		if (KeylVec.m_bPressedKeyTbl['A']) {
 			auto ScenePtr = App::GetApp()->GetScene<Scene>();
