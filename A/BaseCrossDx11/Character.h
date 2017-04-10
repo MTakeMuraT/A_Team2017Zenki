@@ -115,6 +115,32 @@ namespace basecross{
 		//操作
 	};
 
+	//--------------------------------------------------------------------------------------
+	//	class FixdBox : public GameObject;
+	//	用途: エネミーテスト用
+	//--------------------------------------------------------------------------------------
+	class FixdBox : public GameObject {
+		Vector3 m_Scale;
+		Vector3 m_Rotation;
+		Vector3 m_Position;
+		wstring m_TX_Name;
+		bool Inserted = false;
+		float Speed_F = 0.0f;
+		Vector3 Vec_Vec3 = Vector3(0, 0, 0);
+	public:
+		//構築と破棄
+		FixdBox(const shared_ptr<Stage>& StagePtr,
+			const Vector3& Scale,
+			const Vector3& Rotation,
+			const Vector3& Position,
+			const wstring& TXName);
+		virtual ~FixdBox() {};
+		virtual void OnCreate()override;
+		virtual void OnUpdate()override;
+		virtual void OnLastUpdate()override;
+		void InputStick();
+	};
+
 
 	//--------------------------------------------------------------------------------------
 	//	class Dedug : public GameObject;

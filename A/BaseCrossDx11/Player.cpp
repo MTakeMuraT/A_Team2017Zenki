@@ -68,11 +68,16 @@ namespace basecross {
 		VelocityPowerStr += Util::FloatToWStr(VelocityPower);
 		VelocityPowerStr += L"\n";
 
-		 
-		wstring str = FPS + VelocityPowerStr;
+		auto Pos = GetComponent<Transform>()->GetWorldMatrix().PosInMatrix();
+		wstring PositionStr(L"Position:\t");
+		PositionStr += L"X=" + Util::FloatToWStr(Pos.x, 6, Util::FloatModify::Fixed) + L",\t";
+		PositionStr += L"Y=" + Util::FloatToWStr(Pos.y, 6, Util::FloatModify::Fixed) + L",\t";
+		PositionStr += L"Z=" + Util::FloatToWStr(Pos.z, 6, Util::FloatModify::Fixed) + L"\n";
+
+		wstring str = FPS + VelocityPowerStr + PositionStr;
 		
 		auto PtrString = GetComponent<StringSprite>();
-		PtrString->SetText(str);
+		//PtrString->SetText(str);
 	}
 
 	
@@ -127,6 +132,7 @@ namespace basecross {
 				Partner_Pos_Vec3 = GetStage()->GetSharedGameObject<Player_Second>(L"GamePlayer_R", false)->GetComponent<Transform>()->GetPosition();
 				New_Vec = Move_Velo(My_Pos_Vec3, Partner_Pos_Vec3);
 				Rig->SetVelocity(Vector3(New_Vec * ElapsedTime_float * Speed_F * VelocityPower));
+				
 			}
 			else
 			{
@@ -231,10 +237,7 @@ namespace basecross {
 		auto PtrRedid = AddComponent<Rigidbody>();
 		//衝突判定をつける
 		auto PtrCol = AddComponent<CollisionSphere>();
-		//文字列をつける
-		auto PtrString = AddComponent<StringSprite>();
-		PtrString->SetText(L"");
-		PtrString->SetTextRect(Rect2D<float>(16.0f, 16.0f, 640.0f, 480.0f));
+		
 
 		//影をつける（シャドウマップを描画する）
 		auto ShadowPtr = AddComponent<Shadowmap>();
@@ -313,6 +316,7 @@ namespace basecross {
 				Partner_Pos_Vec3 = GetStage()->GetSharedGameObject<Player>(L"GamePlayer", false)->GetComponent<Transform>()->GetPosition();
 				New_Vec = Move_Velo(My_Pos_Vec3, Partner_Pos_Vec3);
 				Rig->SetVelocity(Vector3(New_Vec * ElapsedTime_float * Speed_F * VelocityPower));
+				
 			}
 			else {
 				VelocityPower = 1.0f;

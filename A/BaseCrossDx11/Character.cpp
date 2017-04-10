@@ -133,6 +133,126 @@ namespace basecross{
 
 
 	//--------------------------------------------------------------------------------------
+	//	class FixdBox : public GameObject;
+	//	用途: エネミーテスト用
+	//--------------------------------------------------------------------------------------
+	FixdBox::FixdBox(const shared_ptr<Stage>& StagePtr, const Vector3& Scale, const Vector3& Rotation, const Vector3& Position, const wstring& TXName) :
+		GameObject(StagePtr),
+		m_Scale(Scale),
+		m_Rotation(Rotation),
+		m_Position(Position),
+		m_TX_Name(TXName)
+	{
+	}
+	void FixdBox::OnCreate(){
+		auto Trans = GetComponent<Transform>();
+
+		Trans->SetScale(m_Scale);
+		Trans->SetRotation(m_Rotation);
+		Trans->SetPosition(m_Position);
+
+		//Rigidbody
+		auto Rigid = AddComponent<Rigidbody>();
+		//衝突判定
+		auto Col = AddComponent<CollisionObb>();
+		Col->SetFixed(true);
+		Col->SetDrawActive(true);
+		//描画設定
+		auto Draw = AddComponent<PNTStaticDraw>();
+		//メッシュ設定
+		Draw->SetMeshResource(L"DEFAULT_CUBE");
+		Draw->SetTextureResource(m_TX_Name);
+		
+		auto PtrString = AddComponent<StringSprite>();
+		PtrString->SetText(L"");
+		PtrString->SetTextRect(Rect2D<float>(16.0f, 16.0f, 640.0f, 480.0f));
+		
+	}
+	void FixdBox::OnUpdate() {
+		//プレイヤーL
+		auto PtrPlayer_L = GetStage()->GetSharedGameObject<Player>(L"GamePlayer", false);
+		auto PtrPlayer_L_Trans = PtrPlayer_L->GetComponent<Transform>();
+		Vector3 PtrPlayer_L_Pos = PtrPlayer_L_Trans->GetPosition();
+		Vector3 PtrPlayer_L_Scale = PtrPlayer_L_Trans->GetScale();
+		Vector3 PtrPlayer_L_ScaleHalf_Vec =  Vector3(PtrPlayer_L_Scale.x / 2 ,PtrPlayer_L_Scale.y/2 ,PtrPlayer_L_Scale.z/2);
+		//プレイヤーR
+		auto PtrPlayer_R = GetStage()->GetSharedGameObject<Player_Second>(L"GamePlayer_R", false);
+		auto PtrPlayer_R_Trans = PtrPlayer_R->GetComponent<Transform>();
+		Vector3 PtrPlayer_R_Pos = PtrPlayer_R_Trans->GetPosition();
+		Vector3 PtrPlayer_R_Scale = PtrPlayer_R_Trans->GetScale();
+		Vector3 PtrPlayer_R_ScaleHalf_Vec = Vector3(PtrPlayer_R_Scale.x / 2, PtrPlayer_R_Scale.y / 2, PtrPlayer_R_Scale.z / 2);
+		//自分
+		auto Trans = GetComponent<Transform>();
+		Vector3 Pos = Trans->GetPosition();
+		Vector3 MyScale = Trans->GetScale();
+		Vector3 ScaleHalf = Vector3(MyScale.x / 2, MyScale.y / 2, MyScale.z / 2);
+
+		//
+		Vector3 TestScale = Vector3(MyScale.x + 0.5f, MyScale.y, MyScale.z + 0.5f);
+		Vector3 TestPos_p = Vector3((Pos.x + (TestScale.x / 2)), Pos.y, (Pos.z + (TestScale.z / 2)));
+		Vector3 TestPos_m = Vector3((Pos.x - (TestScale.x / 2)), Pos.y, (Pos.z - (TestScale.z / 2)));
+		if (PtrPlayer_L_Pos.x  < TestPos_p.x  && PtrPlayer_L_Pos.x > TestPos_m.x&&
+			PtrPlayer_L_Pos.z < TestPos_p.z  && PtrPlayer_L_Pos.z > TestPos_m.z &&
+			PtrPlayer_R_Pos.x  < TestPos_p.x  && PtrPlayer_R_Pos.x > TestPos_m.x&&
+			PtrPlayer_R_Pos.z < TestPos_p.z  && PtrPlayer_R_Pos.z > TestPos_m.z) {
+			Inserted = true;
+		}
+		else {
+			Inserted = false;
+		}
+			
+		if (Inserted) {
+			auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+			if (CntlVec[0].wButtons &XINPUT_GAMEPAD_A) {
+				InputStick();
+			}
+		}
+		else {
+			auto Rig = GetComponent<Rigidbody>();
+			Rig->SetVelocity(0, 0, 0);
+		}
+		
+
+	}
+	void FixdBox::OnLastUpdate() {
+
+		wstring LogName(L"Enemy");
+		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
+		wstring FPS(L"FPS: ");
+		FPS += Util::UintToWStr(fps);
+		FPS += L"\n";
+
+		auto ScaleS = GetComponent<Transform>()->GetScale();
+		wstring ScaleStr(L"Position:\t");
+		ScaleStr += L"X=" + Util::FloatToWStr(ScaleS.x, 6, Util::FloatModify::Fixed) + L",\t";
+		ScaleStr += L"Y=" + Util::FloatToWStr(ScaleS.y, 6, Util::FloatModify::Fixed) + L",\t";
+		ScaleStr += L"Z=" + Util::FloatToWStr(ScaleS.z, 6, Util::FloatModify::Fixed) + L"\n";
+		
+		wstring InterposeStr(L"挟むフラグ:");
+		if (Inserted) {
+			InterposeStr += L"true";
+		}
+		else {
+			InterposeStr += L"false";
+		}
+		InterposeStr += L"\n";
+
+		wstring str = LogName + FPS + ScaleStr + InterposeStr;
+		auto PtrString = GetComponent<StringSprite>();
+		PtrString->SetText(str);
+	}
+
+	//スティック入力
+	void FixdBox::InputStick() {
+		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		auto Rig = GetComponent<Rigidbody>();
+		Speed_F = 100.0f;
+		Vec_Vec3 = Vector3(CntlVec[0].fThumbLX, 0, CntlVec[0].fThumbLY);
+		Rig->SetVelocity(Vec_Vec3 * Speed_F);
+
+	}
+
+	//--------------------------------------------------------------------------------------
 	//	class TestLin : public GameObject;
 	//	用途: シーン表示テスト系統
 	//--------------------------------------------------------------------------------------

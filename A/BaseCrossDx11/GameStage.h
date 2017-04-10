@@ -22,6 +22,9 @@ namespace basecross
 		void CreatePlate();
 		void CreatePlayerLin();
 
+		//テスト時に使用
+		void CreateTestLin();
+
 	public:
 		//構築と破棄
 		GameStage() :Stage() {}

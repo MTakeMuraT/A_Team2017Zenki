@@ -64,6 +64,21 @@ namespace basecross
 		SetSharedGameObject(L"GamePlayer_R", PtrPlayer_R);
 	}
 
+	//実装したものをテストする時に使用
+	void GameStage::CreateTestLin() {
+		AddGameObject<FixdBox>(
+			Vector3(1, 1, 1),
+			Vector3(0, 0, 0),
+			Vector3(0, 1, -5),
+			wstring(L"TRACE_TX")
+			);
+		/*AddGameObject<FixdBox>(
+			Vector3(1, 1, 1),
+			Vector3(0, 0, 0),
+			Vector3(0, 1, 5),
+			wstring(L"TRACE_TX")
+			);*/
+	}
 
 	void GameStage::OnCreate()
 	{
@@ -73,7 +88,7 @@ namespace basecross
 			CreatePlate();
 			CreatePlayerLin();
 			CreateGround();
-
+			CreateTestLin();
 			//背景の作成
 			CreateBackGround();
 

@@ -18,8 +18,7 @@ namespace basecross {
 		strTexture = DataDir + L"TestTexture\\number.png";
 		App::GetApp()->RegisterTexture(L"NUMBER_TX", strTexture);
 
-		strTexture = DataDir + L"TestTexture\\TEST.png";
-		App::GetApp()->RegisterTexture(L"TEST_TX", strTexture);
+		
 
 		//テスト用TX
 		strTexture = DataDir + L"TestTexture\\GameS.png";
@@ -29,12 +28,12 @@ namespace basecross {
 		strTexture = DataDir + L"TestTexture\\Taitoru.png";
 		App::GetApp()->RegisterTexture(L"TEST_Taitoru_TX", strTexture); 
 		//セレクト
-		strTexture = DataDir + L"TestTexture\\SELECT_TEST.png";
+		strTexture = DataDir + L"Stage_Select_Lin\\STAGE_SELECT_TEST.png";
 		App::GetApp()->RegisterTexture(L"SELECT_TEST_TX", strTexture); 
 		//タイトル
-		strTexture = DataDir + L"TestTexture\\Taitoru_TEST.png";
+		strTexture = DataDir + L"Title_Lin\\TITLE_TEST.png";
 		App::GetApp()->RegisterTexture(L"Taitoru_TEST_TX", strTexture);
-		strTexture = DataDir + L"TestTexture\\Prres_any_boten_TEST.png";
+		strTexture = DataDir + L"Title_Lin\\Perres_any_boten_TEST.png";
 		App::GetApp()->RegisterTexture(L"Prres_any_boten_TEST_TX", strTexture);
 
 		
