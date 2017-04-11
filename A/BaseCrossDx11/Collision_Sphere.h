@@ -11,7 +11,7 @@
 
 namespace basecross {
 
-	class Collision_Sphere
+	class Collision_Sphere : public GameObject
 	{
 	private :
 		//ˆê‰ñ‘O‚ÌŒÄ‚Ño‚µ‚Å“–‚½‚Á‚Ä‚é‚©‚Ç‚¤‚©
@@ -26,7 +26,7 @@ namespace basecross {
 		//bool m_ExitCollisionFlg = false;
 		
 	public :
-		Collision_Sphere() {};
+		Collision_Sphere(const shared_ptr<Stage>& StagePtr):GameObject(StagePtr) {};
 
 		//“–‚½‚Á‚Ä‚é‚©‚Ç‚¤‚©”»’è
 		void CollisionTest(Vector3 TargetPos, Vector3 PlayerPos1, Vector3 PlayerPos2, Vector3 TargetScale, Vector3 PlayerScale);

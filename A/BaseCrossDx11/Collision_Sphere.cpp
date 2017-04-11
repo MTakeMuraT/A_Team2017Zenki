@@ -9,7 +9,7 @@ namespace basecross {
 		float ColLength = TargetScale.x + PlayerScale.x;
 		Vector3 def = PlayerPos1 - TargetPos;
 		//‚P‘Ì–Ú“–‚½‚Á‚Ä‚È‚¯‚ê‚Îo‚é
-		if (ColLength*ColLength < (def.x*def.x) + (def.y*def.y))
+		if (ColLength*ColLength < (def.x*def.x) + (def.z*def.z))
 		{
 			return;
 		}
@@ -17,7 +17,7 @@ namespace basecross {
 		def = PlayerPos2 - TargetPos;
 
 		//‚Q‘Ì–Ú“–‚½‚Á‚Ä‚È‚¯‚ê‚Îo‚é
-		if (ColLength*ColLength < (def.x*def.x) + (def.y*def.y))
+		if (ColLength*ColLength < (def.x*def.x) + (def.z*def.z))
 		{
 			return;
 		}
@@ -25,13 +25,13 @@ namespace basecross {
 		//‚Ç‚Á‚¿‚à“–‚½‚Á‚Ä‚½‚ç”»’è
 
 		//‚Q‘Ì–Ú‚ÌŠp“x
-		int angle2 = atan2(def.z, def.x);
+		int angle2 = (int)atan2(def.z, def.x);
 		angle2 += 360;
 		angle2 %= 360;
 
 		//‚P‘Ì–Ú‚ÌŠp“x
 		def = PlayerPos1 - TargetPos;
-		int angle1 = atan2(def.z, def.x);
+		int angle1 = (int)atan2(def.z, def.x);
 		//ƒ}ƒCƒiƒX‚ğ”½“]
 		angle1 += 360;
 		angle1 %= 360;
