@@ -21,8 +21,8 @@
 #include "Player.h"
 #include "GameMedia.h"
 
-
-
+//アタリ判定
+#include "Collision_Sphere.h"
 
 //オブジェクトのデータ
 enum DataID {
