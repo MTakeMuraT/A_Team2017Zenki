@@ -239,7 +239,7 @@ namespace basecross{
 
 		wstring str = LogName + FPS + ScaleStr + InterposeStr;
 		auto PtrString = GetComponent<StringSprite>();
-		PtrString->SetText(str);
+		//PtrString->SetText(str);
 	}
 
 	//スティック入力
