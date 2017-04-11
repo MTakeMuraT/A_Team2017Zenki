@@ -15,6 +15,9 @@ namespace basecross{
 	private:
 		//階層化ステートマシーン
 		shared_ptr<StateMachine<Player>>  m_StatePlayerMachine;
+		shared_ptr<Collision_Sphere> m_Collision_Sphere;
+		//当たったオブジェクト取得
+		shared_ptr<GameObject> m_HitObject;
 		Vector3 m_StartPos;
 		//移動スピード
 		float Speed_F = 0.0f;
@@ -22,16 +25,20 @@ namespace basecross{
 		//自分の位置を取得
 		Vector3 m_PlayerPos_Vec3 = Vector3(0, 0, 0);
 		
-		
 		//自分の位置
 		Vector3 My_Pos_Vec3 = Vector3(0, 0, 0);
 		Vector3 New_Vec = Vector3(0, 0, 0);
 		//相手の位置
 		Vector3 Partner_Pos_Vec3 = Vector3(0, 0, 0);
 		
-
 		float VelocityPower = 1.0f;
 		float AddVec = 10.0f;
+		bool FixedPos_b = true;
+		Vector3 Now_Pos_Vec3;
+		
+		//テストフラグ
+		bool Debug_StickDown_b = false;
+
 	public:
 
 		//構築と破棄
@@ -44,6 +51,7 @@ namespace basecross{
 		//初期化
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
+		virtual void OnCollision(vector<shared_ptr<GameObject>>& OtherVec) override;
 		virtual void OnLastUpdate() override;
 
 		void InputStick();
@@ -51,19 +59,23 @@ namespace basecross{
 		//行動のスタート関数
 		//void EnterMoveBehavior();
 		void EnterToAttractBehavior();
+		void EnterPinchBehavior();
 		//行動の継続関数
 		void ExcuteMoveBehavior();
 		void ExcuteToAttractBehavior();
+		void ExcutePinchBehavior();
 		//行動の終了関数
 		void ExitMoveBehabior();
 		void ExitToAttractBehavior();
+		void ExitPinchBehavior();
 
 		//Aボタンが押されてるか？（引き合うステートで使用）
 		bool KeepPushed_A = true;
 
 		Vector3 Move_Velo(Vector3 MyPos, Vector3 PartnerPos);
+		void FixedPos();
 
-		
+
 	};
 	
 	//--------------------------------------------------------------------------------------
@@ -101,6 +113,23 @@ namespace basecross{
 		//ステートにから抜けるときに呼ばれる関数
 		virtual void Exit(const shared_ptr<Player>& Obj)override;
 	};
+		//--------------------------------------------------------------------------------------
+		//	class PinchState : public ObjState<Player>;
+		//	用途:　挟んでいるステート
+		//--------------------------------------------------------------------------------------
+		class PinchState : public ObjState<Player>
+		{
+			PinchState() {}
+		public:
+			//ステートのインスタンス取得
+			static shared_ptr<PinchState> Instance();
+			//ステートに入ったときに呼ばれる関数
+			virtual void Enter(const shared_ptr<Player>& Obj)override;
+			//ステート実行中に毎ターン呼ばれる関数
+			virtual void Execute(const shared_ptr<Player>& Obj)override;
+			//ステートにから抜けるときに呼ばれる関数
+			virtual void Exit(const shared_ptr<Player>& Obj)override;
+		};
 
 		////////////////////////////もう一体のプレイヤー/////////////////////////////////////////////////////////////////////////////
 
@@ -129,6 +158,8 @@ namespace basecross{
 
 			float VelocityPower = 1.0f;
 			float AddVec = 2.0f;
+			bool FixedPos_b = true;
+			Vector3 Now_Pos_Vec3;
 		public:
 
 			//構築と破棄
@@ -141,24 +172,27 @@ namespace basecross{
 			//初期化
 			virtual void OnCreate() override;
 			virtual void OnUpdate() override;
-
+			virtual void Player_Second::OnCollision(vector<shared_ptr<GameObject>>& OtherVec);
 			void InputStick();
 
 			//行動のスタート関数
 			//void EnterMoveBehavior();
 			void EnterToAttractBehavior();
+			void EnterPinchBehavior();
 			//行動の継続関数
 			void ExcuteMoveBehavior();
 			void ExcuteToAttractBehavior();
+			void ExcutePinchBehavior();
 			//行動の終了関数
 			void ExitMoveBehabior();
 			void ExitToAttractBehavior();
+			void ExitPinchBehavior();
 
 			//Aボタンが押されてるか？（引き合うステートで使用）
 			bool KeepPushed_A = true;
 
 			Vector3 Move_Velo(Vector3 MyPos, Vector3 PartnerPos);
-
+			void FixedPos();
 
 		};
 
@@ -197,6 +231,24 @@ namespace basecross{
 			//ステートにから抜けるときに呼ばれる関数
 			virtual void Exit(const shared_ptr<Player_Second>& Obj)override;
 		};
+		//--------------------------------------------------------------------------------------
+		//	class PinchState_Second  : public ObjState<Player>;
+		//	用途:　挟んでいるステート
+		//--------------------------------------------------------------------------------------
+		class PinchState_Second : public ObjState<Player_Second>
+		{
+			PinchState_Second() {}
+		public:
+			//ステートのインスタンス取得
+			static shared_ptr<PinchState_Second > Instance();
+			//ステートに入ったときに呼ばれる関数
+			virtual void Enter(const shared_ptr<Player_Second>& Obj)override;
+			//ステート実行中に毎ターン呼ばれる関数
+			virtual void Execute(const shared_ptr<Player_Second>& Obj)override;
+			//ステートにから抜けるときに呼ばれる関数
+			virtual void Exit(const shared_ptr<Player_Second>& Obj)override;
+		};
+		
 }
 //end basecross
 
