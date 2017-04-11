@@ -143,7 +143,7 @@ namespace basecross
 		//見る部分
 		Vector3 At = CameraP->GetAt();
 
-		
+
 		//２体の座標もらう
 		Vector3 Player1Pos = GetSharedGameObject<Player>(L"GamePlayer", false)->GetComponent<Transform>()->GetPosition();
 		Vector3 Player2Pos = GetSharedGameObject<Player_Second>(L"GamePlayer_R", false)->GetComponent<Transform>()->GetPosition();
@@ -151,21 +151,21 @@ namespace basecross
 		//見る点をプレイヤー間の中心
 		At = (Player1Pos + Player2Pos) / 2;
 		//座標をちょっと手前上
-		Pos = At + Vector3(0,5,-5);
+		Pos = At;
 		//距離を測る
 		Vector3 def = Player2Pos - Player1Pos;
 		def = def*def;
-		//6以上離れたら離れた分上に
-		if (def.x + def.z > 6 * 6)
+		//上昇分
+		float Yup = sqrt(def.x + def.z) - 6;
+		//上昇分にカメラの初期高さを追加
+		Yup += 10;
+		if (Yup < 10)
 		{
-			//上昇分
-			float Yup = sqrt(def.x + def.z)-6;
-			//上昇分にカメラの初期高さを追加
-			Yup += 5;
-			Pos.y = Yup;
-			//同じ値をZにも
-			Pos.z = -Yup;
+			Yup = 10;
 		}
+		Pos.y = Yup;
+		//同じ値をZにも
+		Pos.z = -Yup;
 
 		//カメラ更新
 		CameraP->SetEye(Pos);
