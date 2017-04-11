@@ -9,8 +9,9 @@ namespace basecross
 	//ビューとライトの作成
 	void GameStage::CreateViewLight()
 	{
+		
 		auto PtrView = CreateView<SingleView>();
-
+		/*
 		//ビューのカメラの設定
 		auto PtrLookAtCamera = ObjectFactory::Create<LookAtCamera>();
 		PtrView->SetCamera(PtrLookAtCamera);
@@ -23,6 +24,17 @@ namespace basecross
 
 		//ライトの設定
 		PtrSingleLight->GetLight().SetPositionToDirectional(-0.25f, 1.0f, -0.25f);
+		*/
+		//ビューのカメラの設定(カメラ固定)
+		auto PtrCamera = PtrView->GetCamera();
+		PtrCamera->SetEye(Vector3(0.0f, 5.0f, -5.0f));
+		PtrCamera->SetAt(Vector3(0.0f, 0.0f, 0.0f));
+
+		//シングルライトの作成
+		auto PtrSingleLight = CreateLight<SingleLight>();
+		//ライトの設定
+		PtrSingleLight->GetLight().SetPositionToDirectional(-0.25f, 1.0f, -0.25f);
+
 	}
 
 
@@ -116,8 +128,49 @@ namespace basecross
 
 			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToTitleScene");
 		}
+
+		//カメラ更新
+		UpdateCamera();
 	}
 
+	//カメラ更新
+	void GameStage::UpdateCamera()
+	{
+		auto View = GetView();
+		auto CameraP = View->GetTargetCamera();
+		//座標
+		Vector3 Pos = CameraP->GetEye();
+		//見る部分
+		Vector3 At = CameraP->GetAt();
+
+		
+		//２体の座標もらう
+		Vector3 Player1Pos = GetSharedGameObject<Player>(L"GamePlayer", false)->GetComponent<Transform>()->GetPosition();
+		Vector3 Player2Pos = GetSharedGameObject<Player_Second>(L"GamePlayer_R", false)->GetComponent<Transform>()->GetPosition();
+
+		//見る点をプレイヤー間の中心
+		At = (Player1Pos + Player2Pos) / 2;
+		//座標をちょっと手前上
+		Pos = At + Vector3(0,5,-5);
+		//距離を測る
+		Vector3 def = Player2Pos - Player1Pos;
+		def = def*def;
+		//6以上離れたら離れた分上に
+		if (def.x + def.z > 6 * 6)
+		{
+			//上昇分
+			float Yup = sqrt(def.x + def.z)-6;
+			//上昇分にカメラの初期高さを追加
+			Yup += 5;
+			Pos.y = Yup;
+			//同じ値をZにも
+			Pos.z = -Yup;
+		}
+
+		//カメラ更新
+		CameraP->SetEye(Pos);
+		CameraP->SetAt(At);
+	}
 
 	//////////////////////////////////////////////////////////////////
 	// class Ground_GameStage : public GameObject

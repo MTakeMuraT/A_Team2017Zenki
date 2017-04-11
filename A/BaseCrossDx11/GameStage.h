@@ -25,6 +25,8 @@ namespace basecross
 		//テスト時に使用
 		void CreateTestLin();
 
+		//カメラ更新
+		void UpdateCamera();
 	public:
 		//構築と破棄
 		GameStage() :Stage() {}

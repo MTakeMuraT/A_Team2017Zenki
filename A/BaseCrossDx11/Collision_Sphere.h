@@ -23,7 +23,7 @@ namespace basecross {
 		//上から当たった瞬間フラグ、当たってる最中フラグ、離れた瞬間フラグ
 		bool m_OnCollisionFlg = false;
 		bool m_StayCollisionFlg = false;
-		bool m_ExitCollisionFlg = false;
+		//bool m_ExitCollisionFlg = false;
 		
 	public :
 		Collision_Sphere() {};
@@ -34,6 +34,6 @@ namespace basecross {
 		//フラグとれる
 		bool GetOnCollisionFlg() { return m_OnCollisionFlg; };
 		bool GetStayCollisionFlg() { return m_StayCollisionFlg; };
-		bool GetExitCollisionFlg() { return m_ExitCollisionFlg; };
+		//bool GetExitCollisionFlg() { return m_ExitCollisionFlg; };
 	};
 }

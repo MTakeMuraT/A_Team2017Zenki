@@ -40,7 +40,7 @@ namespace basecross {
 		m_beforeCollisionFlg = m_nowCollisionFlg;
 
 		//—£‚ê‚½uŠÔ‚ğƒŠƒZƒbƒg
-		m_ExitCollisionFlg = false;
+		//m_ExitCollisionFlg = false;
 
 		//ƒvƒŒƒCƒ„[‚ª‘ÎŠp(}‚R‚O“xˆÈ“à)‚É‚¢‚é‚©
 		int angledef = abs(angle2 - angle1);
@@ -53,11 +53,16 @@ namespace basecross {
 			m_nowCollisionFlg = false;
 		}
 
-		//—£‚ê‚½uŠÔ
-		if (!m_nowCollisionFlg && m_beforeCollisionFlg)
+		//“–‚½‚Á‚Ä‚éŠÔ
+		if (m_nowCollisionFlg && m_beforeCollisionFlg)
 		{
-			m_ExitCollisionFlg = true;
+			m_StayCollisionFlg = true;
 		}
+		////—£‚ê‚½uŠÔ
+		//if (!m_nowCollisionFlg && m_beforeCollisionFlg)
+		//{
+		//	m_ExitCollisionFlg = true;
+		//}
 	}
 
 }
