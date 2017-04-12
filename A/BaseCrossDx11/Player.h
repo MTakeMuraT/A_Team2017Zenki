@@ -36,9 +36,14 @@ namespace basecross{
 		bool FixedPos_b = true;
 		Vector3 Now_Pos_Vec3;
 		
+		float StanTime_F = 0.0f;
+		float TotalEnemyStanTime = 0.0f;
+		bool m_StanEnemy_b = false;
+		bool m_sandwich = false;
+		bool m_sandwichMove = false;
 		//テストフラグ
 		bool Debug_StickDown_b = false;
-
+		
 	public:
 
 		//構築と破棄
@@ -57,7 +62,7 @@ namespace basecross{
 		void InputStick();
 
 		//行動のスタート関数
-		//void EnterMoveBehavior();
+		void EnterMoveBehavior();
 		void EnterToAttractBehavior();
 		void EnterPinchBehavior();
 		void EnterSandwichBehavior();
@@ -78,6 +83,20 @@ namespace basecross{
 		Vector3 Move_Velo(Vector3 MyPos, Vector3 PartnerPos);
 		void FixedPos();
 
+		//アクセサ
+		bool GetStanEnemy() {
+			return m_StanEnemy_b;
+		}
+		void SetStanEnemy(bool Hitflg) {
+			m_StanEnemy_b = Hitflg;
+		}
+
+		bool Getsandwich() {
+			return m_sandwich;
+		}
+		bool GetsandwichMove() {
+			return m_sandwichMove;
+		}
 
 	};
 	

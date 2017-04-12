@@ -57,8 +57,32 @@ namespace basecross {
 	}
 	void Player::OnUpdate() {
 		m_StatePlayerMachine->Update();
-		
-		
+
+		//コントローラ取得
+		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		if (CntlVec[0].wButtons& XINPUT_GAMEPAD_A && GetStanEnemy() == false) {
+			StanTime_F += 0.1f;
+		}
+		else {
+			StanTime_F = 0.0f;
+		}
+
+		if (m_Collision_Sphere->GetStayCollisionFlg() && GetStanEnemy() == false) {
+			auto PtrEnemy01 = GetStage()->GetSharedGameObject<Enemy01>(L"Enemy01", false);
+			PtrEnemy01->Damage(StanTime_F);
+			TotalEnemyStanTime = StanTime_F * 3;
+			SetStanEnemy(true);
+		}
+
+		else if (TotalEnemyStanTime <= 0.0f  || !(CntlVec[0].wButtons& XINPUT_GAMEPAD_A)) {
+			auto PtrEnemy01 = GetStage()->GetSharedGameObject<Enemy01>(L"Enemy01", false);
+			SetStanEnemy(false);
+			TotalEnemyStanTime = 0.0f;
+			PtrEnemy01->Release();
+		}
+		else {
+			TotalEnemyStanTime += -App::GetApp()->GetElapsedTime();
+		}
 	}
 	void Player::OnLastUpdate() {
 		//文字列表示
@@ -70,6 +94,14 @@ namespace basecross {
 		wstring VelocityPowerStr(L"VelocityPower:");
 		VelocityPowerStr += Util::FloatToWStr(VelocityPower);
 		VelocityPowerStr += L"\n";
+
+		wstring STAN(L"\nStanTime");
+		STAN += Util::FloatToWStr(StanTime_F);
+		STAN += L"\n";
+		
+		wstring Total(L"\nトータルスタンタイム:");
+		Total += Util::FloatToWStr(TotalEnemyStanTime);
+		Total += L"\n";
 
 		auto Pos = GetComponent<Transform>()->GetWorldMatrix().PosInMatrix();
 		wstring PositionStr(L"Position:\t");
@@ -84,7 +116,7 @@ namespace basecross {
 		else {
 			m_FixedPos_b += L"false\n";
 		}
-		
+
 		wstring m_Debug_StickDown_b(L"挟んでいる時の移動Flg:");
 		if (Debug_StickDown_b) {
 			m_Debug_StickDown_b += L"true";
@@ -114,12 +146,12 @@ namespace basecross {
 			State += L"該当なし";
 			State += L"\n";
 		}
-		
+
 
 		wstring ObjStr(L"\nPosition:\t");
 		if (m_HitObject != NULL) {
 			auto Obj = m_HitObject->GetComponent<Transform>()->GetPosition();
-			
+
 			ObjStr += L"X=" + Util::FloatToWStr(Obj.x, 6, Util::FloatModify::Fixed) + L",\t";
 			ObjStr += L"Y=" + Util::FloatToWStr(Obj.y, 6, Util::FloatModify::Fixed) + L",\t";
 			ObjStr += L"Z=" + Util::FloatToWStr(Obj.z, 6, Util::FloatModify::Fixed) + L"\n";
@@ -135,31 +167,35 @@ namespace basecross {
 
 		Col += L"\n";
 
-		wstring  str = FPS + State + m_FixedPos_b + m_Debug_StickDown_b + Col;
+		wstring  str = /*FPS + State + m_FixedPos_b + m_Debug_StickDown_b + Col +*/ STAN + Total;
 		auto PtrString = GetComponent<StringSprite>();
 		PtrString->SetText(str);
 	}
 
 	void Player::OnCollision(vector<shared_ptr<GameObject>>& OtherVec) {
+		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		for (auto A : OtherVec) {
-			auto Fixd_Box = dynamic_pointer_cast<FixdBox>(A);
-			if (Fixd_Box) {
-				m_HitObject = dynamic_pointer_cast<GameObject>(A);
+			if (CntlVec[0].wButtons& XINPUT_GAMEPAD_A) {
+				auto Fixd_Box = dynamic_pointer_cast<FixdBox>(A);
+				if (Fixd_Box) {
+					m_HitObject = dynamic_pointer_cast<GameObject>(A);
 					//処理
 					GetStateMachine()->ChangeState(PinchState::Instance());
+					
 					//エネミーのフラグを変える
+				}
+				//Abe 20170412 14:56
+				auto Enemy_01 = dynamic_pointer_cast<Enemy01>(A);
+				if (Enemy_01) {
+					//Enemy_01->Damage(StanTime_F);
+					m_HitObject = dynamic_pointer_cast<GameObject>(A);
+					//処理
+					GetStateMachine()->ChangeState(PinchState::Instance());
+					
+					//エネミーのフラグを変える
+				}
+				//Abe 20170412 14:56
 			}
-			//Abe 20170412 14:56
-			auto Enemy_01 = dynamic_pointer_cast<Enemy01>(A);
-			if (Enemy_01) {
-				Enemy_01->Damage(1);
-				m_HitObject = dynamic_pointer_cast<GameObject>(A);
-				//処理
-				GetStateMachine()->ChangeState(PinchState::Instance());
-				//エネミーのフラグを変える
-			}
-			//Abe 20170412 14:56
-
 		}
 	}
 	
@@ -184,6 +220,10 @@ namespace basecross {
 	
 	
 	////////////////////////ステートスタート関数///////////////////////////////////
+	//移動
+	void Player::EnterMoveBehavior() {
+		m_sandwich = false;
+	}
 	//挟む
 	void Player::EnterToAttractBehavior() {
 		//Aボタンが押されてるか？
@@ -243,7 +283,6 @@ namespace basecross {
 
 	//挟んでいるとき
 	void Player::ExecutePinchBehavior() {
-		//コントローラ取得
 		//自分
 		auto Player_L_Trans = GetComponent<Transform>();
 		Vector3 Player_L_Pos_Vec3 = Player_L_Trans->GetPosition();
@@ -270,8 +309,9 @@ namespace basecross {
 			GetStateMachine()->ChangeState(MoveState::Instance());
 		}
 		//コントローラのLスティックの入力があれば挟んで移動ステートに移動
-		if (CntlVec[0].fThumbLX || CntlVec[0].fThumbLY) {
+		if (m_Collision_Sphere->GetStayCollisionFlg() && CntlVec[0].fThumbLX || CntlVec[0].fThumbLY) {
 			Debug_StickDown_b = true;
+			m_sandwich = true;
 			GetStateMachine()->ChangeState(SandwichState::Instance());
 		}
 		else {
@@ -343,6 +383,7 @@ namespace basecross {
 	}
 	//ステートに入ったときに呼ばれる関数
 	void MoveState::Enter(const shared_ptr<Player>& Obj) {
+		Obj->EnterMoveBehavior();
 	}
 	//ステート実行中に毎ターン呼ばれる関数
 	void MoveState::Execute(const shared_ptr<Player>& Obj) {
@@ -496,7 +537,7 @@ namespace basecross {
 			Speed_F = 100.0f;
 			Vec_Vec3 = Vector3(CntlVec[0].fThumbRX, 0, CntlVec[0].fThumbRY);
 		}
-		else {
+		else if(m_StatePlayer_SecondMachine->GetCurrentState() == SandwichState_Second::Instance()){
 			Speed_F = 3.0f;
 			Vec_Vec3 = Vector3(CntlVec[0].fThumbLX, 0, CntlVec[0].fThumbLY);
 		}
@@ -541,7 +582,9 @@ namespace basecross {
 	}
 	//挟むステート
 	void Player_Second::ExecuteToAttractBehavior() {
-		if (KeepPushed_A == true) {
+		auto PlayerL = GetStage()->GetSharedGameObject<Player>(L"GamePlayer", false);
+		if (KeepPushed_A == true) 
+		{
 			auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 			auto Trans = GetComponent<Transform>();
 			auto Rig = GetComponent<Rigidbody>();
@@ -561,6 +604,9 @@ namespace basecross {
 			}
 			VelocityPower += AddVec;
 		}
+		if (PlayerL->Getsandwich()) {
+			GetStateSecondMachine()->ChangeState(PinchState_Second::Instance());
+		}
 	}
 
 	//挟んでいるとき
@@ -571,9 +617,10 @@ namespace basecross {
 		if (CntlVec[0].wButtons &XINPUT_GAMEPAD_A) {
 			FixedPos();
 		}
-		if (CntlVec[0].wPressedButtons &XINPUT_GAMEPAD_B) {
+		else {
 			GetStateSecondMachine()->ChangeState(MoveState_Second::Instance());
 		}
+		
 		//コントローラのLスティックの入力があれば挟んで移動ステートに移動
 		if (CntlVec[0].fThumbLX || CntlVec[0].fThumbLY) {
 			GetStateSecondMachine()->ChangeState(SandwichState_Second::Instance());
@@ -584,10 +631,11 @@ namespace basecross {
 
 	//挟んで移動
 	void Player_Second::ExecuteSandwichBehavior() {
+		auto PtrPlayerL = GetStage()->GetSharedGameObject<Player>(L"GamePlayer", false);
 		//コントローラ取得
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		//自分移動
-		if (CntlVec[0].wButtons& XINPUT_GAMEPAD_A) {
+		if (CntlVec[0].wButtons& XINPUT_GAMEPAD_A && PtrPlayerL->GetStanEnemy()) {
 			InputStick();
 		}
 		else {
@@ -704,14 +752,14 @@ namespace basecross {
 	}
 	//ステート実行中に毎ターン呼ばれる関数
 	void PinchState_Second::Exit(const shared_ptr<Player_Second>& Obj) {
-		Obj->ExitPinchBehavior();
+	//Obj->ExitPinchBehavior();
 	}
 
 
 	//挟んでいどうしてるステート
 	//--------------------------------------------------------------------------------------
 	//	class SandwichState_Second : public ObjState<Player_Second>;
-	//	用途:挟んでいるステート
+	//	用途:挟んで移動ステート
 	//--------------------------------------------------------------------------------------
 	//ステートのインスタンス取得
 	shared_ptr<SandwichState_Second> SandwichState_Second::Instance() {
