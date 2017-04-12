@@ -107,7 +107,8 @@ namespace basecross
 
 			//Abe20170412
 			//エネミー作ってみた
-			AddGameObject<Enemy01>(Vector3(0, 1, 5), Vector3(1, 1, 1));
+			auto Enemy_01Ptr = AddGameObject<Enemy01>(Vector3(0, 1, 5), Vector3(1, 1, 1));
+			SetSharedGameObject(L"Enemy01", Enemy_01Ptr);
 			//Abe20170412
 
 		}
@@ -167,9 +168,9 @@ namespace basecross
 		{
 			Yup = 10;
 		}
-		Pos.y = Yup;
+		Pos.y += Yup;
 		//同じ値をZにも
-		Pos.z = -Yup;
+		Pos.z += -Yup;
 
 		//カメラ更新
 		CameraP->SetEye(Pos);
@@ -208,7 +209,7 @@ namespace basecross
 		PtrTrans->SetScale(m_Scale);
 		PtrTrans->SetQuaternion(Qt);
 		PtrTrans->SetPosition(m_Positon);
-
+		//PtrDraw->SetDrawActive(false);
 	}
 
 }
