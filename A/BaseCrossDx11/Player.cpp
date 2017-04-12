@@ -145,10 +145,9 @@ namespace basecross {
 			auto Fixd_Box = dynamic_pointer_cast<FixdBox>(A);
 			if (Fixd_Box) {
 				m_HitObject = dynamic_pointer_cast<GameObject>(A);
-				//処理
-				GetStateMachine()->ChangeState(PinchState::Instance());
-				//エネミーのフラグを変える
-				//
+					//処理
+					GetStateMachine()->ChangeState(PinchState::Instance());
+					//エネミーのフラグを変える
 			}
 		}
 	}
@@ -159,7 +158,12 @@ namespace basecross {
 	void Player::InputStick() {
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto Rig = GetComponent<Rigidbody>();
-		Speed_F = 100.0f;
+		if (m_StatePlayerMachine->GetCurrentState() == MoveState::Instance()) {
+			Speed_F = 100.0f;
+		}
+		else {
+			Speed_F = 3.0f;
+		}
 		Vec_Vec3 = Vector3(CntlVec[0].fThumbLX, 0, CntlVec[0].fThumbLY);
 		Rig->SetVelocity(Vec_Vec3 * Speed_F);
 
@@ -186,11 +190,12 @@ namespace basecross {
 	}
 	//挟んで移動の時
 	void Player::EnterSandwichBehavior() {
+		//処理なし
 	};
 
 	////////////////////////ステート継続関数///////////////////////////////////////
 	//ステートマシーンで使う関数
-	void Player::ExcuteMoveBehavior() {
+	void Player::ExecuteMoveBehavior() {
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		InputStick();
 		if (CntlVec[0].wButtons &XINPUT_GAMEPAD_A) {
@@ -200,7 +205,7 @@ namespace basecross {
 	}
 
 	//引き寄せ合うステート
-	void Player::ExcuteToAttractBehavior() {
+	void Player::ExecuteToAttractBehavior() {
 		if (KeepPushed_A == true) {
 			auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 			auto Trans = GetComponent<Transform>();
@@ -226,7 +231,7 @@ namespace basecross {
 	}
 
 	//挟んでいるとき
-	void Player::ExcutePinchBehavior() {
+	void Player::ExecutePinchBehavior() {
 		//コントローラ取得
 		//自分
 		auto Player_L_Trans = GetComponent<Transform>();
@@ -256,12 +261,25 @@ namespace basecross {
 		//コントローラのLスティックの入力があれば挟んで移動ステートに移動
 		if (CntlVec[0].fThumbLX || CntlVec[0].fThumbLY) {
 			Debug_StickDown_b = true;
+			GetStateMachine()->ChangeState(SandwichState::Instance());
 		}
 		else {
 			Debug_StickDown_b = false;
 		}
 	}
 
+	//挟んで移動
+	void Player::ExecuteSandwichBehavior() {
+		//コントローラ取得
+		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		//自分移動
+		if (CntlVec[0].wButtons& XINPUT_GAMEPAD_A) {
+			InputStick();
+		}
+		else {
+			GetStateMachine()->ChangeState(MoveState::Instance());
+		}
+	}
 
 	/////////////////////////ステート終了関数/////////////////////////////////////////
 	void Player::ExitMoveBehabior() {
@@ -269,8 +287,7 @@ namespace basecross {
 		Rig->SetVelocity(0,0,0);
 	}
 	void Player::ExitToAttractBehavior() {
-		
-
+		//処理なし
 	}
 	//挟んでいるとき
 	void Player::ExitPinchBehavior() {
@@ -278,7 +295,11 @@ namespace basecross {
 		m_Collision_Sphere->ResetFlg();
 		
 	}
-	//関数群
+	//挟んで移動とき
+	void Player::ExitSandwichBehavior() {
+	}
+
+	/////////////////////////////関数群////////////////////////////////
 	Vector3 Player::Move_Velo(Vector3 MyPos, Vector3 PartnerPos) {
 		Vector3 Default_Pos_Vec3 = PartnerPos - MyPos;
 		float Angle = atan2(Default_Pos_Vec3.z, Default_Pos_Vec3.x);
@@ -314,7 +335,7 @@ namespace basecross {
 	}
 	//ステート実行中に毎ターン呼ばれる関数
 	void MoveState::Execute(const shared_ptr<Player>& Obj) {
-		Obj->ExcuteMoveBehavior();
+		Obj->ExecuteMoveBehavior();
 	}
 	//ステート実行中に毎ターン呼ばれる関数
 	void MoveState::Exit(const shared_ptr<Player>& Obj) {
@@ -340,7 +361,7 @@ namespace basecross {
 	}
 	//ステート実行中に毎ターン呼ばれる関数
 	void ToAttractState::Execute(const shared_ptr<Player>& Obj) {
-		Obj->ExcuteToAttractBehavior();
+		Obj->ExecuteToAttractBehavior();
 	}
 	//ステート実行中に毎ターン呼ばれる関数
 	void ToAttractState::Exit(const shared_ptr<Player>& Obj) {
@@ -365,7 +386,7 @@ namespace basecross {
 	}
 	//ステート実行中に毎ターン呼ばれる関数
 	void PinchState::Execute(const shared_ptr<Player>& Obj) {
-		Obj->ExcutePinchBehavior();
+		Obj->ExecutePinchBehavior();
 	}
 	//ステート実行中に毎ターン呼ばれる関数
 	void PinchState::Exit(const shared_ptr<Player>& Obj) {
@@ -387,15 +408,15 @@ namespace basecross {
 	}
 	//ステートに入ったときに呼ばれる関数
 	void SandwichState::Enter(const shared_ptr<Player>& Obj) {
-		Obj->EnterPinchBehavior();
+		Obj->EnterSandwichBehavior();
 	}
 	//ステート実行中に毎ターン呼ばれる関数
 	void SandwichState::Execute(const shared_ptr<Player>& Obj) {
-		Obj->ExcutePinchBehavior();
+		Obj->ExecuteSandwichBehavior();
 	}
 	//ステート実行中に毎ターン呼ばれる関数
 	void SandwichState::Exit(const shared_ptr<Player>& Obj) {
-		Obj->ExitPinchBehavior();
+		Obj->ExitSandwichBehavior();
 	}
 
 	////////////////////////////もう一体のプレイヤー////////////////////////////////////////////////////////////////////
@@ -460,8 +481,15 @@ namespace basecross {
 	void Player_Second::InputStick() {
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto Rig = GetComponent<Rigidbody>();
-		Speed_F = 100.0f;
-		Vec_Vec3 = Vector3(CntlVec[0].fThumbRX, 0, CntlVec[0].fThumbRY);
+		if (m_StatePlayer_SecondMachine->GetCurrentState() == MoveState_Second::Instance()) {
+			Speed_F = 100.0f;
+			Vec_Vec3 = Vector3(CntlVec[0].fThumbRX, 0, CntlVec[0].fThumbRY);
+		}
+		else {
+			Speed_F = 3.0f;
+			Vec_Vec3 = Vector3(CntlVec[0].fThumbLX, 0, CntlVec[0].fThumbLY);
+		}
+		
 		Rig->SetVelocity(Vec_Vec3 * Speed_F);
 
 	}
@@ -485,9 +513,13 @@ namespace basecross {
 			FixedPos_b = true;
 		}
 	}
+	//挟んで移動の時
+	void Player_Second::EnterSandwichBehavior() {
+		//処理なし
+	};
 	////////////////////////ステート継続関数///////////////////////////////////////
 	//ステートマシーンで使う関数
-	void Player_Second::ExcuteMoveBehavior() {
+	void Player_Second::ExecuteMoveBehavior() {
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		InputStick();
 		if (CntlVec[0].wButtons &XINPUT_GAMEPAD_A) {
@@ -497,7 +529,7 @@ namespace basecross {
 		}
 	}
 	//挟むステート
-	void Player_Second::ExcuteToAttractBehavior() {
+	void Player_Second::ExecuteToAttractBehavior() {
 		if (KeepPushed_A == true) {
 			auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 			auto Trans = GetComponent<Transform>();
@@ -521,7 +553,7 @@ namespace basecross {
 	}
 
 	//挟んでいるとき
-	void Player_Second::ExcutePinchBehavior() {
+	void Player_Second::ExecutePinchBehavior() {
 		//コントローラ取得
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		//Aが押されていたらその場所の位置を固定させる
@@ -533,10 +565,22 @@ namespace basecross {
 		}
 		//コントローラのLスティックの入力があれば挟んで移動ステートに移動
 		if (CntlVec[0].fThumbLX || CntlVec[0].fThumbLY) {
-			//Debug_StickDown_b = true;
+			GetStateSecondMachine()->ChangeState(SandwichState_Second::Instance());
 		}
 		else {
-			//Debug_StickDown_b = false;
+		}
+	}
+
+	//挟んで移動
+	void Player_Second::ExecuteSandwichBehavior() {
+		//コントローラ取得
+		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		//自分移動
+		if (CntlVec[0].wButtons& XINPUT_GAMEPAD_A) {
+			InputStick();
+		}
+		else {
+			GetStateSecondMachine()->ChangeState(MoveState_Second::Instance());
 		}
 	}
 
@@ -560,7 +604,10 @@ namespace basecross {
 	//挟んでいるとき
 	void Player_Second::ExitPinchBehavior() {
 		FixedPos_b = false;
+	}
 
+	//挟んで移動とき
+	void Player_Second::ExitSandwichBehavior() {
 	}
 	//位置固定
 	void Player_Second::FixedPos() {
@@ -591,7 +638,7 @@ namespace basecross {
 	}
 	//ステート実行中に毎ターン呼ばれる関数
 	void MoveState_Second::Execute(const shared_ptr<Player_Second>& Obj) {
-		Obj->ExcuteMoveBehavior();
+		Obj->ExecuteMoveBehavior();
 	}
 	//ステート実行中に毎ターン呼ばれる関数
 	void MoveState_Second::Exit(const shared_ptr<Player_Second>& Obj) {
@@ -617,7 +664,7 @@ namespace basecross {
 	}
 	//ステート実行中に毎ターン呼ばれる関数
 	void ToAttractState_Second::Execute(const shared_ptr<Player_Second>& Obj) {
-		Obj->ExcuteToAttractBehavior();
+		Obj->ExecuteToAttractBehavior();
 	}
 	//ステート実行中に毎ターン呼ばれる関数
 	void ToAttractState_Second::Exit(const shared_ptr<Player_Second>& Obj) {
@@ -642,11 +689,38 @@ namespace basecross {
 	}
 	//ステート実行中に毎ターン呼ばれる関数
 	void PinchState_Second::Execute(const shared_ptr<Player_Second>& Obj) {
-		Obj->ExcutePinchBehavior();
+		Obj->ExecutePinchBehavior();
 	}
 	//ステート実行中に毎ターン呼ばれる関数
 	void PinchState_Second::Exit(const shared_ptr<Player_Second>& Obj) {
 		Obj->ExitPinchBehavior();
+	}
+
+
+	//挟んでいどうしてるステート
+	//--------------------------------------------------------------------------------------
+	//	class SandwichState_Second : public ObjState<Player_Second>;
+	//	用途:挟んでいるステート
+	//--------------------------------------------------------------------------------------
+	//ステートのインスタンス取得
+	shared_ptr<SandwichState_Second> SandwichState_Second::Instance() {
+		static shared_ptr<SandwichState_Second> instance;
+		if (!instance) {
+			instance = shared_ptr<SandwichState_Second>(new SandwichState_Second);
+		}
+		return instance;
+	}
+	//ステートに入ったときに呼ばれる関数
+	void SandwichState_Second::Enter(const shared_ptr<Player_Second>& Obj) {
+		Obj->EnterSandwichBehavior();
+	}
+	//ステート実行中に毎ターン呼ばれる関数
+	void SandwichState_Second::Execute(const shared_ptr<Player_Second>& Obj) {
+		Obj->ExecuteSandwichBehavior();
+	}
+	//ステート実行中に毎ターン呼ばれる関数
+	void SandwichState_Second::Exit(const shared_ptr<Player_Second>& Obj) {
+		Obj->ExitSandwichBehavior();
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
