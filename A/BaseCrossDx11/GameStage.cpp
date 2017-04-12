@@ -105,6 +105,10 @@ namespace basecross
 			CreateBackGround();
 
 
+			//Abe20170412
+			//エネミー作ってみた
+			AddGameObject<Enemy01>(Vector3(0, 1, 5), Vector3(1, 1, 1));
+			//Abe20170412
 
 		}
 		catch (...) {

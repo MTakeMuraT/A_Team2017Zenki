@@ -160,5 +160,37 @@ namespace basecross{
 
 		//操作
 	};
+
+	//--------------------------------------------------------------------------------------
+	//	class Enemy01 : public GameObject;
+	//	用途: エネミー1　
+	//--------------------------------------------------------------------------------------
+	//Abe20170412
+	class Enemy01 : public GameObject 
+	{
+	private :
+		//気絶フラグ
+		bool m_StanFlg = false;
+		//気絶してる時間
+		float m_StanTime = 0;
+		//座標
+		Vector3 m_InitPos;
+		//大きさ
+		Vector3 m_Scale;
+	public :
+		Enemy01(const shared_ptr<Stage>& StagePtr,Vector3 Pos,Vector3 Scale);
+
+		void OnCreate() override;
+		void OnUpdate() override;
+
+		//ダメージ状態時
+		void DamageState();
+		//ダメージ受けたとき
+		void Damage(float Time) { if (!m_StanFlg) { m_StanFlg = true; m_StanTime = Time * 3; } }
+		//プレイヤーから時間持ってくる版 Player_RGetATimeは仮
+		//void Damage(){m_StanFlg = true; GetStage()->GetSharedGameObject<Player>(L"Player_R")->GetATime();}
+	};
+	//Abe20170412
+
 }
 //end basecross

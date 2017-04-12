@@ -292,6 +292,73 @@ namespace basecross{
 		SetAlphaActive(true);
 	}
 
+
+	//--------------------------------------------------------------------------------------
+	//	class Enemy01 : public GameObject;
+	//	用途: エネミー1　
+	//--------------------------------------------------------------------------------------
+	//Abe20170412
+	Enemy01::Enemy01(const shared_ptr<Stage>& StagePtr, Vector3 Pos, Vector3 Scale):
+		GameObject(StagePtr),
+		m_InitPos(Pos),
+		m_Scale(Scale)
+	{}
+
+	void Enemy01::OnCreate()
+	{
+		auto Trans = GetComponent<Transform>();
+
+		Trans->SetScale(m_Scale);
+		Trans->SetRotation(0,0,0);
+		Trans->SetPosition(m_InitPos);
+
+		//Rigidbody
+		auto Rigid = AddComponent<Rigidbody>();
+		//衝突判定
+		auto Col = AddComponent<CollisionObb>();
+		Col->SetFixed(true);
+		Col->SetDrawActive(true);
+		//描画設定
+		auto Draw = AddComponent<PNTStaticDraw>();
+		//メッシュ設定
+		Draw->SetMeshResource(L"DEFAULT_CUBE");
+		Draw->SetTextureResource(L"SKY_TX");
+
+		auto PtrString = AddComponent<StringSprite>();
+		PtrString->SetText(L"");
+		PtrString->SetTextRect(Rect2D<float>(16.0f, 16.0f, 640.0f, 480.0f));
+
+	}
+
+	void Enemy01::OnUpdate()
+	{
+		if (m_StanFlg)
+		{
+			DamageState();
+		}
+	}
+
+	void Enemy01::DamageState()
+	{
+		GetComponent<StringSprite>()->SetText(Util::FloatToWStr(m_StanTime));
+		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		auto Rig = GetComponent<Rigidbody>();
+		Vector3 Vec_Vec3 = Vector3(CntlVec[0].fThumbLX, 0, CntlVec[0].fThumbLY);
+		Rig->SetVelocity(Vec_Vec3 * 3);
+
+		//時間いったら解除
+		if (m_StanTime < 0)
+		{
+			m_StanTime = 0;
+			m_StanFlg = false;
+		}
+		else
+		{
+			m_StanTime += -App::GetApp()->GetElapsedTime();
+		}
+	}
+	//Abe20170412
+
 }
 	
 	
