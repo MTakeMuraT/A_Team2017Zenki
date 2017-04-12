@@ -338,19 +338,29 @@ namespace basecross{
 		}
 	}
 
+	void Enemy01::Release()
+	{
+		m_SandFlg = false;
+	}
+
 	void Enemy01::DamageState()
 	{
-		GetComponent<StringSprite>()->SetText(Util::FloatToWStr(m_StanTime));
-		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
-		auto Rig = GetComponent<Rigidbody>();
-		Vector3 Vec_Vec3 = Vector3(CntlVec[0].fThumbLX, 0, CntlVec[0].fThumbLY);
-		Rig->SetVelocity(Vec_Vec3 * 3);
+		//‹²‚Ü‚ê‚Ä‚½‚çˆÚ“®
+		if (m_SandFlg)
+		{
+			GetComponent<StringSprite>()->SetText(Util::FloatToWStr(m_StanTime));
+			auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+			auto Rig = GetComponent<Rigidbody>();
+			Vector3 Vec_Vec3 = Vector3(CntlVec[0].fThumbLX, 0, CntlVec[0].fThumbLY);
+			Rig->SetVelocity(Vec_Vec3 * 3);
+		}
 
 		//ŠÔ‚¢‚Á‚½‚ç‰ğœ
 		if (m_StanTime < 0)
 		{
 			m_StanTime = 0;
 			m_StanFlg = false;
+			GetComponent<Rigidbody>()->SetVelocity(Vector3(0, 0, 0));
 		}
 		else
 		{

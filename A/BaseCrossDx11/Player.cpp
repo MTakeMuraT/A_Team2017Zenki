@@ -149,6 +149,17 @@ namespace basecross {
 					GetStateMachine()->ChangeState(PinchState::Instance());
 					//エネミーのフラグを変える
 			}
+			//Abe 20170412 14:56
+			auto Enemy_01 = dynamic_pointer_cast<Enemy01>(A);
+			if (Enemy_01) {
+				Enemy_01->Damage(1);
+				m_HitObject = dynamic_pointer_cast<GameObject>(A);
+				//処理
+				GetStateMachine()->ChangeState(PinchState::Instance());
+				//エネミーのフラグを変える
+			}
+			//Abe 20170412 14:56
+
 		}
 	}
 	
@@ -255,7 +266,7 @@ namespace basecross {
 		if (CntlVec[0].wButtons &XINPUT_GAMEPAD_A) {
 			FixedPos();
 		}
-		if (CntlVec[0].wButtons &XINPUT_GAMEPAD_B) {
+		else {
 			GetStateMachine()->ChangeState(MoveState::Instance());
 		}
 		//コントローラのLスティックの入力があれば挟んで移動ステートに移動

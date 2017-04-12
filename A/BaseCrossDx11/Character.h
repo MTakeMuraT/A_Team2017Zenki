@@ -171,6 +171,8 @@ namespace basecross{
 	private :
 		//気絶フラグ
 		bool m_StanFlg = false;
+		//挟まれてるフラグ
+		bool m_SandFlg = false;
 		//気絶してる時間
 		float m_StanTime = 0;
 		//座標
@@ -185,8 +187,10 @@ namespace basecross{
 
 		//ダメージ状態時
 		void DamageState();
+		//プレイヤーが離れたとき
+		void Release();
 		//ダメージ受けたとき
-		void Damage(float Time) { if (!m_StanFlg) { m_StanFlg = true; m_StanTime = Time * 3; } }
+		void Damage(float Time) { if (!m_SandFlg) { m_StanFlg = true; m_SandFlg = true; m_StanTime = Time * 3; } }
 		//プレイヤーから時間持ってくる版 Player_RGetATimeは仮
 		//void Damage(){m_StanFlg = true; GetStage()->GetSharedGameObject<Player>(L"Player_R")->GetATime();}
 	};
