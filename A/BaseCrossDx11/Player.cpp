@@ -125,7 +125,17 @@ namespace basecross {
 			ObjStr += L"Z=" + Util::FloatToWStr(Obj.z, 6, Util::FloatModify::Fixed) + L"\n";
 		}
 
-		wstring  str = FPS + State + m_FixedPos_b + m_Debug_StickDown_b;
+		wstring Col(L"\nコリジョンHIT\n");
+		if (m_Collision_Sphere->GetStayCollisionFlg()) {
+			Col += L"true";
+		}
+		else {
+			Col += L"flase";
+		}
+
+		Col += L"\n";
+
+		wstring  str = FPS + State + m_FixedPos_b + m_Debug_StickDown_b + Col;
 		auto PtrString = GetComponent<StringSprite>();
 		PtrString->SetText(str);
 	}
@@ -137,6 +147,8 @@ namespace basecross {
 				m_HitObject = dynamic_pointer_cast<GameObject>(A);
 				//処理
 				GetStateMachine()->ChangeState(PinchState::Instance());
+				//エネミーのフラグを変える
+				//
 			}
 		}
 	}
@@ -172,6 +184,9 @@ namespace basecross {
 			FixedPos_b = true;
 		}
 	}
+	//挟んで移動の時
+	void Player::EnterSandwichBehavior() {
+	};
 
 	////////////////////////ステート継続関数///////////////////////////////////////
 	//ステートマシーンで使う関数
@@ -260,6 +275,7 @@ namespace basecross {
 	//挟んでいるとき
 	void Player::ExitPinchBehavior() {
 		FixedPos_b = false;
+		m_Collision_Sphere->ResetFlg();
 		
 	}
 	//関数群
@@ -353,6 +369,32 @@ namespace basecross {
 	}
 	//ステート実行中に毎ターン呼ばれる関数
 	void PinchState::Exit(const shared_ptr<Player>& Obj) {
+		Obj->ExitPinchBehavior();
+	}
+
+	//挟んでいどうしてるステート
+	//--------------------------------------------------------------------------------------
+	//	class SandwichState : public ObjState<Player>;
+	//	用途:挟んでいるステート
+	//--------------------------------------------------------------------------------------
+	//ステートのインスタンス取得
+	shared_ptr<SandwichState> SandwichState::Instance() {
+		static shared_ptr<SandwichState> instance;
+		if (!instance) {
+			instance = shared_ptr<SandwichState>(new SandwichState);
+		}
+		return instance;
+	}
+	//ステートに入ったときに呼ばれる関数
+	void SandwichState::Enter(const shared_ptr<Player>& Obj) {
+		Obj->EnterPinchBehavior();
+	}
+	//ステート実行中に毎ターン呼ばれる関数
+	void SandwichState::Execute(const shared_ptr<Player>& Obj) {
+		Obj->ExcutePinchBehavior();
+	}
+	//ステート実行中に毎ターン呼ばれる関数
+	void SandwichState::Exit(const shared_ptr<Player>& Obj) {
 		Obj->ExitPinchBehavior();
 	}
 

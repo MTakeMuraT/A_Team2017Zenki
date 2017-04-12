@@ -60,14 +60,17 @@ namespace basecross{
 		//void EnterMoveBehavior();
 		void EnterToAttractBehavior();
 		void EnterPinchBehavior();
+		void EnterSandwichBehavior();
 		//行動の継続関数
 		void ExcuteMoveBehavior();
 		void ExcuteToAttractBehavior();
 		void ExcutePinchBehavior();
+		void ExcuteSandwichBehavior();
 		//行動の終了関数
 		void ExitMoveBehabior();
 		void ExitToAttractBehavior();
 		void ExitPinchBehavior();
+		void ExitSandwichBehavior();
 
 		//Aボタンが押されてるか？（引き合うステートで使用）
 		bool KeepPushed_A = true;
@@ -123,6 +126,23 @@ namespace basecross{
 		public:
 			//ステートのインスタンス取得
 			static shared_ptr<PinchState> Instance();
+			//ステートに入ったときに呼ばれる関数
+			virtual void Enter(const shared_ptr<Player>& Obj)override;
+			//ステート実行中に毎ターン呼ばれる関数
+			virtual void Execute(const shared_ptr<Player>& Obj)override;
+			//ステートにから抜けるときに呼ばれる関数
+			virtual void Exit(const shared_ptr<Player>& Obj)override;
+		};
+		//--------------------------------------------------------------------------------------
+		//	class SandwichState : public ObjState<Player>;
+		//	用途:　挟んで移動ステート
+		//--------------------------------------------------------------------------------------
+		class SandwichState : public ObjState<Player>
+		{
+			SandwichState() {}
+		public:
+			//ステートのインスタンス取得
+			static shared_ptr<SandwichState> Instance();
 			//ステートに入ったときに呼ばれる関数
 			virtual void Enter(const shared_ptr<Player>& Obj)override;
 			//ステート実行中に毎ターン呼ばれる関数
