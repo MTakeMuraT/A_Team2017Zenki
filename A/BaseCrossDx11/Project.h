@@ -11,7 +11,8 @@
 //行動クラス用.h
 #include "Behavior.h"
 
-
+//アタリ判定
+#include "Collision_Sphere.h"
 #include "ProjectShader.h"
 #include "Scene.h"
 #include "TitleScene.h"
@@ -21,8 +22,7 @@
 #include "Player.h"
 #include "GameMedia.h"
 
-//アタリ判定
-#include "Collision_Sphere.h"
+
 
 //オブジェクトのデータ
 enum DataID {
