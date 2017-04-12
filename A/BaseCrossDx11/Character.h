@@ -179,6 +179,10 @@ namespace basecross{
 		Vector3 m_InitPos;
 		//‘å‚«‚³
 		Vector3 m_Scale;
+		//”ò‚Î‚·—Í
+		float m_VeloPower = 10;
+		//—Í
+		Vector3 m_Vel;
 	public :
 		Enemy01(const shared_ptr<Stage>& StagePtr,Vector3 Pos,Vector3 Scale);
 

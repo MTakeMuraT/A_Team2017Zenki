@@ -335,12 +335,32 @@ namespace basecross{
 		if (m_StanFlg)
 		{
 			DamageState();
+			//”ò‚Î‚³‚ê‚Ä‚½‚ç
+			if (!m_SandFlg)
+			{
+				GetComponent<Rigidbody>()->SetVelocity(m_Vel);
+			}
 		}
+		
 	}
 
 	void Enemy01::Release()
 	{
 		m_SandFlg = false;
+		//”ò‚Î‚·•ûŒü‚ðŽæ‚é		
+		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		Vector2 InuptXY = Vector2(CntlVec[0].fThumbLX, CntlVec[0].fThumbLY);
+		float angle = atan2(InuptXY.y , InuptXY.x);
+		/*
+		int angleint = angle += 360;
+		angleint %= 360;
+		*/
+		m_Vel = Vector3(cos(angle), 0, sin(angle));
+
+		m_Vel *= m_VeloPower;
+
+
+
 	}
 
 	void Enemy01::DamageState()
