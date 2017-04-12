@@ -25,13 +25,13 @@ namespace basecross {
 		//‚Ç‚Á‚¿‚à“–‚½‚Á‚Ä‚½‚ç”»’è
 
 		//‚Q‘Ì–Ú‚ÌŠp“x
-		int angle2 = (int)atan2(def.z, def.x);
+	    int angle2 = int(atan2(def.z, def.x) * 180/3.149265f);
 		angle2 += 360;
 		angle2 %= 360;
 
 		//‚P‘Ì–Ú‚ÌŠp“x
 		def = PlayerPos1 - TargetPos;
-		int angle1 = (int)atan2(def.z, def.x);
+		int angle1 = int(atan2(def.z, def.x) * 180 / 3.149265f);
 		//ƒ}ƒCƒiƒX‚ð”½“]
 		angle1 += 360;
 		angle1 %= 360;

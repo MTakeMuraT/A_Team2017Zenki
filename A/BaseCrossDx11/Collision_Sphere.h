@@ -35,5 +35,6 @@ namespace basecross {
 		bool GetOnCollisionFlg() { return m_OnCollisionFlg; };
 		bool GetStayCollisionFlg() { return m_StayCollisionFlg; };
 		//bool GetExitCollisionFlg() { return m_ExitCollisionFlg; };
+		void ResetFlg() { m_OnCollisionFlg = false; m_StayCollisionFlg = false; }
 	};
 }
