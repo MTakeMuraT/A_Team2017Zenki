@@ -316,7 +316,8 @@ namespace basecross{
 		auto Rigid = AddComponent<Rigidbody>();
 		//Õ“Ë”»’è
 		auto Col = AddComponent<CollisionObb>();
-		Col->SetFixed(true);
+		//unity‚Å‚¢‚¤‚ÆisTrigger
+		//Col->SetFixed(true);
 		Col->SetDrawActive(true);
 		//•`‰æİ’è
 		auto Draw = AddComponent<PNTStaticDraw>();
@@ -395,6 +396,37 @@ namespace basecross{
 
 	}
 	//Abe20170412
+	//Abe20170413
+	void Enemy01::OnCollision(vector<shared_ptr<GameObject>>& OtherVec)
+	{
+		if (m_StanFlg)
+		{
+			for (auto obj : OtherVec)
+			{
+				auto Enemy01Ptr = dynamic_pointer_cast<Enemy01>(obj);
+				if (Enemy01Ptr)
+				{
+					Enemy01Ptr->Damage(m_StanTime/2);
+					Enemy01Ptr->Release(m_Vel);
+				}
+			}
+		}
+	}
+
+	void Enemy01::Release(Vector3 vel)
+	{
+		if (m_SandFlg)
+		{
+			GetComponent<Rigidbody>()->SetVelocity(Vector3(0, 0, 0));
+			m_SandFlg = false;
+			//”ò‚Î‚·•ûŒü‚ğæ‚é		
+			m_Vel = vel;
+
+			m_Vel *= m_VeloPower;
+		}
+
+	}
+	//Abe20170413
 
 }
 	

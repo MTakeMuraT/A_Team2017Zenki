@@ -193,10 +193,16 @@ namespace basecross{
 		void DamageState();
 		//プレイヤーが離れたとき
 		void Release();
+		//当てられた時のほう
+		void Release(Vector3 vel);
 		//ダメージ受けたとき
 		void Damage(float Time) { if (!m_SandFlg) { m_StanFlg = true; m_SandFlg = true; m_StanTime = Time * 2; } }
 		//プレイヤーから時間持ってくる版 Player_RGetATimeは仮
 		//void Damage(){m_StanFlg = true; GetStage()->GetSharedGameObject<Player>(L"Player_R")->GetATime();}
+
+		virtual void OnCollision(vector<shared_ptr<GameObject>>& OtherVec) override;
+
+		bool GetStanFlg() { return m_StanFlg; }
 	};
 	//Abe20170412
 
