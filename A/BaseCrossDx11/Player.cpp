@@ -70,7 +70,7 @@ namespace basecross {
 		if (m_Collision_Sphere->GetStayCollisionFlg() && GetStanEnemy() == false) {
 			auto PtrEnemy01 = GetStage()->GetSharedGameObject<Enemy01>(L"Enemy01", false);
 			PtrEnemy01->Damage(StanTime_F);
-			TotalEnemyStanTime = StanTime_F * 3;
+			TotalEnemyStanTime = StanTime_F * 2;
 			SetStanEnemy(true);
 		}
 
