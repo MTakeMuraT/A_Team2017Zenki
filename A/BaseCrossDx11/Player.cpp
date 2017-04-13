@@ -68,13 +68,15 @@ namespace basecross {
 		}
 
 		if (m_Collision_Sphere->GetStayCollisionFlg() && GetStanEnemy() == false) {
-			auto PtrEnemy01 = GetStage()->GetSharedGameObject<Enemy01>(L"Enemy01", false);
-			PtrEnemy01->Damage(StanTime_F);
+			if (dynamic_pointer_cast<Enemy01>(m_HitObject)) {
+				dynamic_pointer_cast<Enemy01>(m_HitObject)->Damage(StanTime_F);
 			TotalEnemyStanTime = StanTime_F * 2;
 			SetStanEnemy(true);
+			}
+			
 		}
 
-		else if (TotalEnemyStanTime <= 0.0f  || !(CntlVec[0].wButtons& XINPUT_GAMEPAD_A)) {
+		else if (TotalEnemyStanTime <= 0.0f  || !(CntlVec[0].wButtons& XINPUT_GAMEPAD_A) || !(dynamic_pointer_cast<Enemy01>(m_HitObject)->GetStanFlg()) ) {
 			auto PtrEnemy01 = GetStage()->GetSharedGameObject<Enemy01>(L"Enemy01", false);
 			SetStanEnemy(false);
 			TotalEnemyStanTime = 0.0f;
@@ -178,7 +180,7 @@ namespace basecross {
 			if (CntlVec[0].wButtons& XINPUT_GAMEPAD_A) {
 				auto Fixd_Box = dynamic_pointer_cast<FixdBox>(A);
 				if (Fixd_Box) {
-					m_HitObject = dynamic_pointer_cast<GameObject>(A);
+					m_HitObject = A;
 					//ˆ—
 					GetStateMachine()->ChangeState(PinchState::Instance());
 					
@@ -188,7 +190,7 @@ namespace basecross {
 				auto Enemy_01 = dynamic_pointer_cast<Enemy01>(A);
 				if (Enemy_01) {
 					//Enemy_01->Damage(StanTime_F);
-					m_HitObject = dynamic_pointer_cast<GameObject>(A);
+					m_HitObject = A;
 					//ˆ—
 					GetStateMachine()->ChangeState(PinchState::Instance());
 					
