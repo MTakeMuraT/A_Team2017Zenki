@@ -107,6 +107,7 @@ namespace basecross
 
 			//Abe20170412
 			//エネミー作ってみた
+
 			auto Enemy_01Ptr = AddGameObject<Enemy01>(Vector3(0, 1, 5), Vector3(1, 1, 1));
 			SetSharedGameObject(L"Enemy01", Enemy_01Ptr);
 			auto Enemy_02Ptr = AddGameObject<Enemy01>(Vector3(0, 1, -5), Vector3(1, 1, 1));

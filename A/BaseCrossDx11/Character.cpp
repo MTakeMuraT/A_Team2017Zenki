@@ -316,7 +316,7 @@ namespace basecross{
 		auto Rigid = AddComponent<Rigidbody>();
 		//衝突判定
 		auto Col = AddComponent<CollisionObb>();
-		//unityでいうとisTrigger
+		//unityでいうとisTrigger・・・、が動かない
 		//Col->SetFixed(true);
 		Col->SetDrawActive(true);
 		//描画設定
@@ -342,7 +342,7 @@ namespace basecross{
 				GetComponent<Rigidbody>()->SetVelocity(m_Vel);
 				m_StanTime += -App::GetApp()->GetElapsedTime();
 				//減衰
-				m_Vel *= 0.98f;
+				m_Vel *= 0.9f;
 				if (!m_StanFlg)
 				{
 					GetComponent<Rigidbody>()->SetVelocity(Vector3(0,0,0));
@@ -351,6 +351,18 @@ namespace basecross{
 			}
 		}
 		
+	}
+
+	void Enemy01::Damage(float Time)
+	{
+		 if (!m_SandFlg) 
+		 {
+			 m_StanFlg = true;
+			 m_SandFlg = true; 
+			 m_StanTime = Time * 2; 
+			 //変な判定消す、これにより挟んだ後引っかからずに移動できる
+			 GetComponent<CollisionObb>()->SetFixed(true);
+		 } 
 	}
 
 	void Enemy01::Release()
@@ -364,6 +376,9 @@ namespace basecross{
 			m_Vel = Vector3(CntlVec[0].fThumbLX, 0, CntlVec[0].fThumbLY);
 
 			m_Vel *= m_VeloPower;
+			//変な判定戻す、アタリ判定が復活？する
+			GetComponent<CollisionObb>()->SetFixed(false);
+
 		}
 
 
@@ -397,6 +412,7 @@ namespace basecross{
 	}
 	//Abe20170412
 	//Abe20170413
+	
 	void Enemy01::OnCollision(vector<shared_ptr<GameObject>>& OtherVec)
 	{
 		if (m_StanFlg)
