@@ -335,10 +335,18 @@ namespace basecross{
 		if (m_StanFlg)
 		{
 			DamageState();
-			//”ò‚Î‚³‚ê‚Ä‚½‚ç
+			//”ò‚Î‚³‚ê‚Ä‚½‚ç !m_StanFlg‚ÍDamageState‚Å•ÏX‚ª‚ ‚Á‚½ê‡‚Ì‘Îô
 			if (!m_SandFlg)
 			{
 				GetComponent<Rigidbody>()->SetVelocity(m_Vel);
+				m_StanTime += -App::GetApp()->GetElapsedTime();
+				//Œ¸Š
+				m_Vel *= 0.98f;
+				if (!m_StanFlg)
+				{
+					GetComponent<Rigidbody>()->SetVelocity(Vector3(0,0,0));
+					m_Vel = Vector3(0, 0, 0);
+				}
 			}
 		}
 		
@@ -346,19 +354,16 @@ namespace basecross{
 
 	void Enemy01::Release()
 	{
-		m_SandFlg = false;
-		//”ò‚Î‚·•ûŒü‚ğæ‚é		
-		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
-		Vector2 InuptXY = Vector2(CntlVec[0].fThumbLX, CntlVec[0].fThumbLY);
-		float angle = atan2(InuptXY.y , InuptXY.x);
-		/*
-		int angleint = angle += 360;
-		angleint %= 360;
-		*/
-		m_Vel = Vector3(cos(angle), 0, sin(angle));
+		if (m_SandFlg)
+		{
+			GetComponent<Rigidbody>()->SetVelocity(Vector3(0, 0, 0));
+			m_SandFlg = false;
+			//”ò‚Î‚·•ûŒü‚ğæ‚é		
+			auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+			m_Vel = Vector3(CntlVec[0].fThumbLX, 0, CntlVec[0].fThumbLY);
 
-		m_Vel *= m_VeloPower;
-
+			m_Vel *= m_VeloPower;
+		}
 
 
 	}
@@ -368,7 +373,6 @@ namespace basecross{
 		//‹²‚Ü‚ê‚Ä‚½‚çˆÚ“®
 		if (m_SandFlg)
 		{
-			GetComponent<StringSprite>()->SetText(Util::FloatToWStr(m_StanTime));
 			auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 			auto Rig = GetComponent<Rigidbody>();
 			Vector3 Vec_Vec3 = Vector3(CntlVec[0].fThumbLX, 0, CntlVec[0].fThumbLY);
@@ -385,7 +389,10 @@ namespace basecross{
 		else
 		{
 			m_StanTime += -App::GetApp()->GetElapsedTime();
+
 		}
+		GetComponent<StringSprite>()->SetText(Util::FloatToWStr(m_StanTime));
+
 	}
 	//Abe20170412
 
