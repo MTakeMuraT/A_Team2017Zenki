@@ -41,8 +41,18 @@ namespace basecross{
 		bool m_StanEnemy_b = false;
 		bool m_sandwich = false;
 		bool m_sandwichMove = false;
+
+		
 		//テストフラグ
 		bool Debug_StickDown_b = false;
+		bool Debug_flg = true;
+		float Debug_Rot_F = 0.0f;
+		Vector3 Dubug_Vec3;
+		Vector3 DeBug2_Vec3;
+		Vector3 DeBug3_Vec3;
+		float DebugDirection = 0.0f;
+		//
+		void Rot();
 		
 	public:
 
@@ -58,8 +68,17 @@ namespace basecross{
 		virtual void OnUpdate() override;
 		virtual void OnCollision(vector<shared_ptr<GameObject>>& OtherVec) override;
 		virtual void OnLastUpdate() override;
-
+		//スティック移動
 		void InputStick();
+		//回転
+		void InputRotation();
+		Vector3 def;
+		Vector3 CentrPos;
+		float angle;
+		int angle_int;
+		float RotSpeedSecond = 60.0f;
+		Vector3 MovePosVec3;
+
 
 		//行動のスタート関数
 		void EnterMoveBehavior();
@@ -236,6 +255,17 @@ namespace basecross{
 			Vector3 Move_Velo(Vector3 MyPos, Vector3 PartnerPos);
 			void FixedPos();
 
+			//回転
+			void InputRotation();
+			Vector3 def;
+			Vector3 CentrPos;
+			float angle;
+			int angle_int;
+			float RotSpeedSecond = 60.0f;
+			Vector3 MovePosVec3;
+			//
+			void Rot();
+
 		};
 
 		//--------------------------------------------------------------------------------------
@@ -308,6 +338,38 @@ namespace basecross{
 			virtual void Exit(const shared_ptr<Player_Second>& Obj)override;
 		};
 		
+		//センターの規定ボックス
+		//--------------------------------------------------------------------------------------
+		///	プレイヤーセンター
+		//--------------------------------------------------------------------------------------
+		class PlayerCenter : public GameObject {
+		public:
+			
+			PlayerCenter(const shared_ptr<Stage>& StagePtr);
+			virtual ~PlayerCenter() {}
+			virtual void OnCreate() override;
+			virtual void OnUpdate() override;
+		};
+
+
+		//--------------------------------------------------------------------------------------
+		//	class Skybox : public GameObject;
+		//	用途: ボスエリアの背景
+		//--------------------------------------------------------------------------------------
+		class Skybox : public GameObject {
+			Vector3 m_Scale;
+			Vector3 m_Position;
+		public:
+			//構築と破棄
+			Skybox(const shared_ptr<Stage>& StagePtr,
+				const Vector3& Scale,
+				const Vector3& Position
+			);
+			virtual ~Skybox();
+			//初期化
+			virtual void OnCreate() override;
+			//操作
+		};
 }
 //end basecross
 

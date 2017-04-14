@@ -32,6 +32,7 @@ namespace basecross {
 		auto PtrRedid = AddComponent<Rigidbody>();
 		//衝突判定をつける
 		auto PtrCol = AddComponent<CollisionSphere>();
+		
 		//文字列をつける
 		auto PtrString = AddComponent<StringSprite>();
 		PtrString->SetText(L"");
@@ -56,7 +57,12 @@ namespace basecross {
 		m_StatePlayerMachine->ChangeState(MoveState::Instance());
 	}
 	void Player::OnUpdate() {
+		InputRotation();
+
 		m_StatePlayerMachine->Update();
+		//InputRotation();
+		//Rot();
+
 
 		//コントローラ取得
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
@@ -73,6 +79,7 @@ namespace basecross {
 			TotalEnemyStanTime = StanTime_F * 2;
 			SetStanEnemy(true);
 			}
+
 			
 		}
 
@@ -105,11 +112,38 @@ namespace basecross {
 		Total += Util::FloatToWStr(TotalEnemyStanTime);
 		Total += L"\n";
 
+		wstring RotetoSpeedStr(L"回転スピード:");
+		RotetoSpeedStr += Util::FloatToWStr(RotSpeedSecond);
+		RotetoSpeedStr += L"\n";
+
+		wstring angle_RotetionStr(L"回転:"); 
+		angle_RotetionStr += Util::FloatToWStr(Debug_Rot_F);
+		angle_RotetionStr += L"\n";
+
+		wstring DebugDirectionStr(L"距離:"); 
+		DebugDirectionStr += Util::FloatToWStr(DebugDirection);
+		DebugDirectionStr += L"\n";
+
+		wstring Debug2Str(L"相手の位置:\t");
+		Debug2Str += L"X=" + Util::FloatToWStr(DeBug2_Vec3.x, 6, Util::FloatModify::Fixed) + L",\t";
+		Debug2Str += L"Y=" + Util::FloatToWStr(DeBug2_Vec3.y, 6, Util::FloatModify::Fixed) + L",\t";
+		Debug2Str += L"Z=" + Util::FloatToWStr(DeBug2_Vec3.z, 6, Util::FloatModify::Fixed) + L"\n";
+
+		wstring DebugStr(L"真ん中の位置:\t");
+		DebugStr += L"X=" + Util::FloatToWStr(Dubug_Vec3.x, 6, Util::FloatModify::Fixed) + L",\t";
+		DebugStr += L"Y=" + Util::FloatToWStr(Dubug_Vec3.y, 6, Util::FloatModify::Fixed) + L",\t";
+		DebugStr += L"Z=" + Util::FloatToWStr(Dubug_Vec3.z, 6, Util::FloatModify::Fixed) + L"\n";
+
 		auto Pos = GetComponent<Transform>()->GetWorldMatrix().PosInMatrix();
-		wstring PositionStr(L"Position:\t");
+		wstring PositionStr(L"自分の位置:\t");
 		PositionStr += L"X=" + Util::FloatToWStr(Pos.x, 6, Util::FloatModify::Fixed) + L",\t";
 		PositionStr += L"Y=" + Util::FloatToWStr(Pos.y, 6, Util::FloatModify::Fixed) + L",\t";
 		PositionStr += L"Z=" + Util::FloatToWStr(Pos.z, 6, Util::FloatModify::Fixed) + L"\n";
+
+		wstring DeBug3_Vec3str(L"MovePos;\n");
+		DeBug3_Vec3str += L"X=" + Util::FloatToWStr(DeBug3_Vec3.x, 6, Util::FloatModify::Fixed) + L",\t";
+		DeBug3_Vec3str += L"Y=" + Util::FloatToWStr(DeBug3_Vec3.y, 6, Util::FloatModify::Fixed) + L",\t";
+		DeBug3_Vec3str += L"Z=" + Util::FloatToWStr(DeBug3_Vec3.z, 6, Util::FloatModify::Fixed) + L"\n";
 
 		wstring m_FixedPos_b(L"位置固定フラグ:\t");
 		if (FixedPos_b) {
@@ -169,13 +203,14 @@ namespace basecross {
 
 		Col += L"\n";
 
-		wstring  str = /*FPS + State + m_FixedPos_b + m_Debug_StickDown_b + Col +*/ STAN + Total;
+		wstring  str = /*FPS + State + m_FixedPos_b + m_Debug_StickDown_b + Col +*/ STAN + Total + RotetoSpeedStr + angle_RotetionStr + DebugStr + Debug2Str + PositionStr + DebugDirectionStr + DeBug3_Vec3str;
 		auto PtrString = GetComponent<StringSprite>();
 		PtrString->SetText(str);
 	}
 
 	void Player::OnCollision(vector<shared_ptr<GameObject>>& OtherVec) {
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		
 		for (auto A : OtherVec) {
 			if (CntlVec[0].wButtons& XINPUT_GAMEPAD_A) {
 				auto Fixd_Box = dynamic_pointer_cast<FixdBox>(A);
@@ -218,7 +253,48 @@ namespace basecross {
 
 	}
 
-
+	void Player::InputRotation() {
+		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		auto PtrPlayerR = GetStage()->GetSharedGameObject<Player_Second>(L"GamePlayer_R", false);
+		CentrPos = PtrPlayerR->GetComponent<Transform>()->GetPosition();
+		DeBug2_Vec3 = CentrPos;
+		CentrPos = (GetComponent<Transform>()->GetPosition() + CentrPos) / 2;
+		//まず中心からみた角度を求める
+		def = GetComponent<Transform>()->GetPosition() - CentrPos;
+		Dubug_Vec3 = def;
+		angle = atan2(def.z, def.x) * 180 / XM_PI;
+		if (Debug_flg) {
+			Debug_Rot_F = angle;
+			Debug_flg = false;
+		}	
+		angle += 360;
+		angle_int = (int)angle % 360;
+		
+		
+		//
+		if (CntlVec[0].wButtons& XINPUT_GAMEPAD_RIGHT_SHOULDER)
+		{
+			angle_int += -RotSpeedSecond *  App::GetApp()->GetElapsedTime();
+			Debug_flg = true;
+		}
+		//
+		else if (CntlVec[0].wButtons& XINPUT_GAMEPAD_LEFT_SHOULDER)
+		{
+			angle_int += RotSpeedSecond *  App::GetApp()->GetElapsedTime();
+			Debug_flg = true;
+		}
+		angle_int %= 360;
+		DebugDirection = angle_int;
+		//そこから移動量を求める
+		//ラジアン変換
+		angle = angle_int *  XM_PI / 180;
+		//距離算出
+		float direction = sqrt((def.x * def.x) + (def.z * def.z));
+		
+		MovePosVec3 = CentrPos + Vector3(cos(angle) * direction,0, sin(angle) * direction);
+		DeBug3_Vec3 = MovePosVec3;
+		GetComponent<Transform>()->SetPosition(MovePosVec3);
+	}
 	
 	
 	////////////////////////ステートスタート関数///////////////////////////////////
@@ -319,6 +395,10 @@ namespace basecross {
 		else {
 			Debug_StickDown_b = false;
 		}
+		if (CntlVec[0].wButtons& XINPUT_GAMEPAD_LEFT_SHOULDER || CntlVec[0].wButtons& XINPUT_GAMEPAD_RIGHT_SHOULDER) {
+			InputRotation();
+		//	Rot();
+		}
 	}
 
 	//挟んで移動
@@ -369,6 +449,22 @@ namespace basecross {
 		FixedPos_b = false;
 		
 	}
+	//回転
+	void Player::Rot() {
+		auto PlayerCenterPtr = GetStage()->GetSharedGameObject<PlayerCenter>(L"PlayerCenter");
+		auto PlayerCenterPos = PlayerCenterPtr->GetComponent<Transform>()->GetPosition();
+		auto PlayerCenterRot = PlayerCenterPtr->GetComponent<Transform>()->GetRotation();
+		float RotY = PlayerCenterRot.y;
+		RotY -= XM_PIDIV2;
+		auto Pos = Vector3(sin(RotY), 0, cos(RotY));
+		Pos += PlayerCenterPos;
+		//初期位置などの設定
+		auto Ptr = GetComponent<Transform>();
+		Ptr->SetScale(1.0f, 1.0f, 1.0f);	//直径25センチの球体
+		Ptr->SetRotation(0.0f, 0.0f, 0.0f);
+		Ptr->SetPosition(Pos);
+	}
+
 
 	//移動ステート
 	//--------------------------------------------------------------------------------------
@@ -519,6 +615,8 @@ namespace basecross {
 	}
 	void Player_Second::OnUpdate() {
 		m_StatePlayer_SecondMachine->Update();
+		InputRotation();
+		// Rot();
 	}
 	void Player_Second::OnCollision(vector<shared_ptr<GameObject>>& OtherVec) {
 		for (auto A : OtherVec) {
@@ -548,7 +646,37 @@ namespace basecross {
 
 	}
 
+	void Player_Second::InputRotation() {
+		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		auto PtrPlayer = GetStage()->GetSharedGameObject<Player>(L"GamePlayer", false);
+		CentrPos = PtrPlayer->GetComponent<Transform>()->GetPosition();
+		CentrPos = (GetComponent<Transform>()->GetPosition() + CentrPos) / 2;
+		//まず中心からみた角度を求める
+		def = GetComponent<Transform>()->GetPosition()-CentrPos;
+		angle = atan2(def.z, def.x) * 180 / XM_PI;
+		angle += 360;
+		angle_int = (int)angle % 360;
 
+		//
+		if (CntlVec[0].wButtons& XINPUT_GAMEPAD_RIGHT_SHOULDER)
+		{
+			angle_int += -RotSpeedSecond *  App::GetApp()->GetElapsedTime();
+		}
+		//
+		else if (CntlVec[0].wButtons& XINPUT_GAMEPAD_LEFT_SHOULDER)
+		{
+			angle_int += RotSpeedSecond *  App::GetApp()->GetElapsedTime();
+		}
+		angle_int %= 360;
+		//そこから移動量を求める
+		//ラジアン変換
+		angle = angle_int *  XM_PI / 180;
+		
+		//距離算出
+		float direction = sqrt((def.x * def.x) + (def.z * def.z));
+		MovePosVec3 = CentrPos+Vector3(cos(angle) * direction,0, sin(angle) * direction);
+		GetComponent<Transform>()->SetPosition(MovePosVec3);
+	}
 
 
 	////////////////////////ステートスタート関数///////////////////////////////////
@@ -629,6 +757,10 @@ namespace basecross {
 		}
 		else {
 		}
+		if (CntlVec[0].wButtons& XINPUT_GAMEPAD_LEFT_SHOULDER || CntlVec[0].wButtons& XINPUT_GAMEPAD_RIGHT_SHOULDER) {
+			InputRotation();
+			// Rot();
+		}
 	}
 
 	//挟んで移動
@@ -680,7 +812,21 @@ namespace basecross {
 		FixedPos_b = false;
 
 	}
-
+	//回転
+	void Player_Second::Rot() {
+		auto PlayerCenterPtr = GetStage()->GetSharedGameObject<PlayerCenter>(L"PlayerCenter");
+		auto PlayerCenterPos = PlayerCenterPtr->GetComponent<Transform>()->GetPosition();
+		auto PlayerCenterRot = PlayerCenterPtr->GetComponent<Transform>()->GetRotation();
+		float RotY = PlayerCenterRot.y;
+		RotY += XM_PIDIV2;
+		auto Pos = Vector3(sin(RotY), 0, cos(RotY));
+		Pos += PlayerCenterPos;
+		//初期位置などの設定
+		auto Ptr = GetComponent<Transform>();
+		Ptr->SetScale(1.0f, 1.0f, 1.0f);	//直径25センチの球体
+		Ptr->SetRotation(0.0f, 0.0f, 0.0f);
+		Ptr->SetPosition(Pos);
+	}
 	////移動ステート
 	////--------------------------------------------------------------------------------------
 	////	class MoveState_Second : public ObjState<Player_Second>;
@@ -786,10 +932,98 @@ namespace basecross {
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
 
-	
+	//--------------------------------------------------------------------------------------
+	///	プレイヤーセンター
+	//--------------------------------------------------------------------------------------
+	PlayerCenter::PlayerCenter(const shared_ptr<Stage>& StagePtr) :
+		GameObject(StagePtr)
+	{}
+
+	void PlayerCenter::OnCreate() {
+		//初期位置などの設定
+		auto Ptr = GetComponent<Transform>();
+		Ptr->SetScale(0.25f, 0.25f, 0.25f);	//直径25センチの球体
+		Ptr->SetRotation(0.0f, 0.0f, 0.0f);
+		Ptr->SetPosition(0.0f, 0.5f, 5.0f);
+		/*
+		//影をつける（シャドウマップを描画する）
+		auto ShadowPtr = AddComponent<Shadowmap>();
+		//影の形（メッシュ）を設定
+		ShadowPtr->SetMeshResource(L"DEFAULT_SPHERE");
+		//描画コンポーネントの設定
+		auto PtrDraw = AddComponent<BcPNTStaticDraw>();
+		//描画するメッシュを設定
+		PtrDraw->SetMeshResource(L"DEFAULT_SPHERE");
+		//描画するテクスチャを設定
+		PtrDraw->SetTextureResource(L"TRACE_TX");
+		//透明処理
+		SetAlphaActive(true);
+		*/
+
+
+	}
+
+	void PlayerCenter::OnUpdate() {
+		auto Ptr = GetComponent<Transform>();
+		auto Qt = Ptr->GetQuaternion();
+		float ElapsedTime = App::GetApp()->GetElapsedTime();
+
+
+		//コントローラの取得
+		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		if (CntlVec[0].bConnected) {
+			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) {
+				Quaternion SpanQt(Vector3(0, 1, 0), -ElapsedTime * 2.0f);
+				Qt *= SpanQt;
+				Ptr->SetQuaternion(Qt);
+			}
+			else if (CntlVec[0].wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
+				Quaternion SpanQt(Vector3(0, 1, 0), ElapsedTime * 2.0f);
+				Qt *= SpanQt;
+				Ptr->SetQuaternion(Qt);
+			}
+		}
 
 
 
+	}
+
+
+	//--------------------------------------------------------------------------------------
+	//	class Skybox : public GameObject;
+	//	用途: スカイボックス
+	//--------------------------------------------------------------------------------------
+	//構築と破棄
+	Skybox::Skybox(const shared_ptr<Stage>& StagePtr,
+		const Vector3& Scale,
+		const Vector3& Position
+	) :
+		GameObject(StagePtr),
+		m_Scale(Scale),
+		m_Position(Position)
+	{
+	}
+	Skybox::~Skybox() {}
+
+	//初期化
+	void Skybox::OnCreate() {
+		auto PtrTransform = GetComponent<Transform>();
+
+		PtrTransform->SetScale(m_Scale);
+		PtrTransform->SetRotation(0, 0, 0);
+		PtrTransform->SetPosition(m_Position);
+
+
+		//影をつける
+		auto ShadowPtr = AddComponent<Shadowmap>();
+		ShadowPtr->SetMeshResource(L"DEFAULT_CUBE");
+
+		auto PtrDraw = AddComponent<PNTStaticDraw>();
+		PtrDraw->SetMeshResource(L"DEFAULT_CUBE");
+		PtrDraw->SetTextureResource(L"Background_TX");
+		SetAlphaActive(true);
+
+	}
 
 }
 //end basecross
