@@ -180,7 +180,7 @@ namespace basecross{
 		//大きさ
 		Vector3 m_Scale;
 		//飛ばす力
-		float m_VeloPower = 30;
+		float m_VeloPower = 100;
 		//力
 		Vector3 m_Vel;
 	public :
@@ -196,7 +196,7 @@ namespace basecross{
 		//当てられた時のほう
 		void Release(Vector3 vel);
 		//ダメージ受けたとき
-		void Damage(float Time) { if (!m_SandFlg) { m_StanFlg = true; m_SandFlg = true; m_StanTime = Time * 2; } }
+		void Damage(float Time);
 		//プレイヤーから時間持ってくる版 Player_RGetATimeは仮
 		//void Damage(){m_StanFlg = true; GetStage()->GetSharedGameObject<Player>(L"Player_R")->GetATime();}
 
