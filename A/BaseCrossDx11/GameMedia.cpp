@@ -4,8 +4,19 @@
 namespace basecross {
 	//リソースの作成
 	void GameMedia::OnCreate() {
+		//テクスチャの読み込みのテクニック　ファイル名とテクスチャを配列で持ち呼び出す
+		//struct {
+		//	wstring filename;
+		//	wstring key;
+		//}textureString[] = {
+		//	{ L"TestTexture\\trace.png" , L"SKY_TX" },
+		//};
+
+		//App::GetApp()->RegisterTexture(textureString[0].key, DataDir + textureString[0].filename);
+
 		wstring DataDir;
 		App::GetApp()->GetDataDirectory(DataDir);
+
 		wstring strTexture = DataDir + L"TestTexture\\trace.png";
 		App::GetApp()->RegisterTexture(L"TRACE_TX", strTexture);
 
@@ -20,6 +31,10 @@ namespace basecross {
 
 		
 
+		//ゲームステージ画面
+		strTexture = DataDir + L"GameStage\\Background.png";
+		App::GetApp()->RegisterTexture(L"Background_TX", strTexture);
+
 		//テスト用TX
 		strTexture = DataDir + L"TestTexture\\GameS.png";
 		App::GetApp()->RegisterTexture(L"TEST_Game_TX", strTexture);
@@ -33,7 +48,7 @@ namespace basecross {
 		//タイトル
 		strTexture = DataDir + L"Title_Lin\\TITLE_TEST.png";
 		App::GetApp()->RegisterTexture(L"Taitoru_TEST_TX", strTexture);
-		strTexture = DataDir + L"Title_Lin\\Perres_any_boten_TEST.png";
+		strTexture = DataDir + L"Title_Lin\\Press_any_button.png";
 		App::GetApp()->RegisterTexture(L"Prres_any_boten_TEST_TX", strTexture);
 
 		
