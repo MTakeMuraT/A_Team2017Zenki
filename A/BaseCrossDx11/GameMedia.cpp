@@ -34,6 +34,11 @@ namespace basecross {
 		//ゲームステージ画面
 		strTexture = DataDir + L"GameStage\\Background.png";
 		App::GetApp()->RegisterTexture(L"Background_TX", strTexture);
+		//プレイヤー関係
+		strTexture = DataDir + L"Player\\HP_Flame.png";
+		App::GetApp()->RegisterTexture(L"HP_Flame_TX", strTexture);
+		strTexture = DataDir + L"Player\\HP.png";
+		App::GetApp()->RegisterTexture(L"HP_TX", strTexture);
 
 		//テスト用TX
 		strTexture = DataDir + L"TestTexture\\GameS.png";
