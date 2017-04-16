@@ -205,7 +205,7 @@ namespace basecross {
 
 		wstring  str = /*FPS + State + m_FixedPos_b + m_Debug_StickDown_b + Col +*/ STAN + Total + RotetoSpeedStr + angle_RotetionStr + DebugStr + Debug2Str + PositionStr + DebugDirectionStr + DeBug3_Vec3str;
 		auto PtrString = GetComponent<StringSprite>();
-		PtrString->SetText(str);
+		//PtrString->SetText(str);
 	}
 
 	void Player::OnCollision(vector<shared_ptr<GameObject>>& OtherVec) {
@@ -990,11 +990,11 @@ namespace basecross {
 
 
 	//--------------------------------------------------------------------------------------
-	//	class Skybox : public GameObject;
-	//	用途: スカイボックス
+	//	class SkySphere : public GameObject;
+	//	用途: スカイスフィア
 	//--------------------------------------------------------------------------------------
 	//構築と破棄
-	Skybox::Skybox(const shared_ptr<Stage>& StagePtr,
+	SkySphere::SkySphere(const shared_ptr<Stage>& StagePtr,
 		const Vector3& Scale,
 		const Vector3& Position
 	) :
@@ -1003,10 +1003,10 @@ namespace basecross {
 		m_Position(Position)
 	{
 	}
-	Skybox::~Skybox() {}
+	SkySphere::~SkySphere() {}
 
 	//初期化
-	void Skybox::OnCreate() {
+	void SkySphere::OnCreate() {
 		auto PtrTransform = GetComponent<Transform>();
 
 		PtrTransform->SetScale(m_Scale);
@@ -1016,15 +1016,190 @@ namespace basecross {
 
 		//影をつける
 		auto ShadowPtr = AddComponent<Shadowmap>();
-		ShadowPtr->SetMeshResource(L"DEFAULT_CUBE");
+		ShadowPtr->SetMeshResource(L"DEFAULT_SPHERE");
 
 		auto PtrDraw = AddComponent<PNTStaticDraw>();
-		PtrDraw->SetMeshResource(L"DEFAULT_CUBE");
+		PtrDraw->SetMeshResource(L"DEFAULT_SPHERE");
 		PtrDraw->SetTextureResource(L"Background_TX");
 		SetAlphaActive(true);
 
 	}
 
+	
+	//--------------------------------------------------------------------------------------
+	///	NumberSpriteスプライト
+	//--------------------------------------------------------------------------------------
+	NumberSprite::NumberSprite(const shared_ptr<Stage>& StagePtr, UINT NumberOfDigits,
+		const float& RightNum, const float& leftNum,const Vector2& StartScale, const Vector3& StartPos) :
+		GameObject(StagePtr),
+		m_RightNum(RightNum),
+		m_leftNum(leftNum),
+		m_NumberOfDigits(NumberOfDigits),
+		m_StartScale(StartScale),
+		m_StartPos(StartPos),
+		m_Score(0.0f)
+	{}
+
+	void NumberSprite::OnCreate() {
+		float XPiecesize = 1.0f / (float)m_NumberOfDigits;
+		float HelfSize = 0.5f;
+
+		if (1.0 < m_RightNum && m_RightNum < 100) {
+			m_RightNum = m_RightNum /10;
+		}
+		if (1.0 < m_leftNum && m_leftNum < 100) {
+			m_leftNum = m_leftNum / 10;
+		}
+		if (0.0 > m_RightNum || 0.0 > m_leftNum || m_RightNum > 100 || m_leftNum > 100) {
+			throw BaseException(
+				L"1.0が超えた又は0.0を下回ったか100を超えました",
+				L"エラー場所:NumberSprite",
+				L"m_RightNum 又はm_leftNum"
+			);
+		}
+
+		//インデックス配列
+		vector<uint16_t> indices;
+		for (UINT i = 0; i < m_NumberOfDigits; i++) {
+			float Vertex0 = -HelfSize + XPiecesize * (float)i;
+			float Vertex1 = Vertex0 + XPiecesize;
+			//0
+			m_BackupVertices.push_back(
+				VertexPositionTexture(Vector3(Vertex0, HelfSize, 0), Vector2(m_RightNum,m_leftNum))
+			);
+			m_RightNum = 0.1f;
+			m_leftNum = 0.0f;
+			//1
+			m_BackupVertices.push_back(
+				VertexPositionTexture(Vector3(Vertex1, HelfSize, 0), Vector2(m_RightNum, m_leftNum))
+			);
+
+			m_RightNum = 0.0f;
+			m_leftNum = 1.0f;
+			//2
+			m_BackupVertices.push_back(
+				VertexPositionTexture(Vector3(Vertex0, -HelfSize, 0), Vector2(m_RightNum, m_leftNum))
+			);
+
+			m_RightNum = 0.1f;
+			m_leftNum = 1.0f;
+			//3
+			m_BackupVertices.push_back(
+				VertexPositionTexture(Vector3(Vertex1, -HelfSize, 0), Vector2(m_RightNum, m_leftNum))
+			);
+			indices.push_back(i * 4 + 0);
+			indices.push_back(i * 4 + 1);
+			indices.push_back(i * 4 + 2);
+			indices.push_back(i * 4 + 1);
+			indices.push_back(i * 4 + 3);
+			indices.push_back(i * 4 + 2);
+		}
+
+		SetAlphaActive(true);
+		auto PtrTransform = GetComponent<Transform>();
+		PtrTransform->SetScale(m_StartScale.x, m_StartScale.y, 1.0f);
+		PtrTransform->SetRotation(0, 0, 0);
+		PtrTransform->SetPosition(m_StartPos.x, m_StartPos.y, 0.0f);
+		//頂点とインデックスを指定してスプライト作成
+		auto PtrDraw = AddComponent<PTSpriteDraw>(m_BackupVertices, indices);
+		PtrDraw->SetTextureResource(L"NUMBER_TX");
+	}
+	void NumberSprite::OnUpdate() {
+		vector<VertexPositionTexture> NewVertices;
+		UINT Num;
+		int VerNum = 0;
+		for (UINT i = m_NumberOfDigits; i > 0; i--) {
+			UINT Base = (UINT)pow(10, i);
+			Num = ((UINT)m_Score) % Base;
+			Num = Num / (Base / 10);
+			Vector2 UV0 = m_BackupVertices[VerNum].textureCoordinate;
+			UV0.x = (float)Num / 10.0f;
+			auto v = VertexPositionTexture(
+				m_BackupVertices[VerNum].position,
+				UV0
+			);
+			NewVertices.push_back(v);
+
+			Vector2 UV1 = m_BackupVertices[VerNum + 1].textureCoordinate;
+			UV1.x = UV0.x + 0.1f;
+			v = VertexPositionTexture(
+				m_BackupVertices[VerNum + 1].position,
+				UV1
+			);
+			NewVertices.push_back(v);
+
+			Vector2 UV2 = m_BackupVertices[VerNum + 2].textureCoordinate;
+			UV2.x = UV0.x;
+
+			v = VertexPositionTexture(
+				m_BackupVertices[VerNum + 2].position,
+				UV2
+			);
+			NewVertices.push_back(v);
+
+			Vector2 UV3 = m_BackupVertices[VerNum + 3].textureCoordinate;
+			UV3.x = UV0.x + 0.1f;
+
+			v = VertexPositionTexture(
+				m_BackupVertices[VerNum + 3].position,
+				UV3
+			);
+			NewVertices.push_back(v);
+
+			VerNum += 4;
+		}
+		auto PtrDraw = GetComponent<PTSpriteDraw>();
+		PtrDraw->UpdateVertices(NewVertices);
+	}
+
+
+	//--------------------------------------------------------------------------------------
+	///	HP
+	//--------------------------------------------------------------------------------------
+	HP::HP(const shared_ptr<Stage>& StagePtr, const Vector2& StartScale, const Vector2& StartPos) :
+		GameObject(StagePtr),
+		m_StartScale(StartScale),
+		m_StartPos(StartPos)
+	{}
+
+	HP::~HP() {}
+	void HP::OnCreate() {
+
+		auto PtdDraw = AddComponent<PCTSpriteDraw>();
+		PtdDraw->SetTextureResource(L"HP_TX");
+
+		auto PtrTrans = AddComponent<Transform>();
+		PtrTrans->SetScale(m_StartScale.x, m_StartScale.y, 0);
+		PtrTrans->SetRotation(0, 0, 0);
+		PtrTrans->SetPosition(m_StartPos.x, m_StartPos.y, 0);
+		SetAlphaActive(true);
+
+		SetDrawLayer(1);
+	}
+
+	//--------------------------------------------------------------------------------------
+	///	HP背景スプライト
+	//--------------------------------------------------------------------------------------
+	HPBackGround::HPBackGround(const shared_ptr<Stage>& StagePtr, const Vector2& StartScale, const Vector2& StartPos) :
+		GameObject(StagePtr),
+		m_StartScale(StartScale),
+		m_StartPos(StartPos)
+	{}
+
+	HPBackGround::~HPBackGround() {}
+	void HPBackGround::OnCreate() {
+
+		auto PtdDraw = AddComponent<PCTSpriteDraw>();
+		PtdDraw->SetTextureResource(L"HP_Flame_TX");
+
+		auto PtrTrans = AddComponent<Transform>();
+		PtrTrans->SetScale(m_StartScale.x, m_StartScale.y, 0);
+		PtrTrans->SetRotation(0, 0, 0);
+		PtrTrans->SetPosition(m_StartPos.x, m_StartPos.y, 0);
+		SetAlphaActive(true);
+
+		SetDrawLayer(1);
+	}
 }
 //end basecross
 
