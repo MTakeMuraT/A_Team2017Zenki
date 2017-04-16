@@ -10,7 +10,7 @@ LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 
 //定数
 const wchar_t* pClassName = L"BaseCrossDx11Class";
-const wchar_t* pWndTitle = L"Rob Memory";
+const wchar_t* pWndTitle = L"A";
 
 
 //--------------------------------------------------------------------------------------
@@ -129,7 +129,7 @@ int MainLoop(HINSTANCE hInstance, HWND hWnd, bool isFullScreen, int iClientWidth
 	//例外処理開始
 	try {
 		//マウスを消す処理
-		::ShowCursor(false);
+		::ShowCursor(true);
 		//COMの初期化
 		//サウンドで使用する
 		if (FAILED(CoInitializeEx(nullptr, COINIT_MULTITHREADED))) {
