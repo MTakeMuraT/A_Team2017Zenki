@@ -74,9 +74,21 @@ namespace basecross
 			Vector3(5, 1, 0)
 			);
 		SetSharedGameObject(L"GamePlayer_R", PtrPlayer_R);
+
+		//HP関係
+		AddGameObject<HP>(
+			Vector2(512, 512),
+			Vector2(-440, 300));
+		AddGameObject<HPBackGround>(
+			Vector2(512, 512),
+			Vector2(-440, 300));
 	}
 
-	//実装したものをテストする時に使用
+	void GameStage::CreateUILin() {
+
+	}
+
+	//実装したいものをテストする時に使用
 	void GameStage::CreateTestLin() {
 		AddGameObject<FixdBox>(
 			Vector3(1, 1, 1),
@@ -84,12 +96,22 @@ namespace basecross
 			Vector3(0, 1, -5),
 			wstring(L"TRACE_TX")
 			);
+		AddGameObject<SkySphere>(
+			Vector3(300,300,300),
+			Vector3(0,0,0));
+		AddGameObject<Ground_GameStage>(
+			Vector3(300, 300, 300),
+			Vector3(0, -50, 0),
+			wstring(L"Background_TX")
+			);
 		/*AddGameObject<FixdBox>(
 			Vector3(1, 1, 1),
 			Vector3(0, 0, 0),
 			Vector3(0, 1, 5),
 			wstring(L"TRACE_TX")
 			);*/
+
+		
 	}
 
 	void GameStage::OnCreate()
@@ -100,10 +122,11 @@ namespace basecross
 			CreatePlate();
 			CreatePlayerLin();
 			CreateGround();
-			CreateTestLin();
+			CreateUILin();
+
 			//背景の作成
 			CreateBackGround();
-
+			CreateTestLin();
 
 			//Abe20170412
 			//エネミー作ってみた
@@ -197,7 +220,12 @@ namespace basecross
 	void Ground_GameStage::OnCreate() {
 		auto PtrDraw = AddComponent<PNTStaticDraw>();
 		PtrDraw->SetMeshResource(L"DEFAULT_SQUARE");
-		PtrDraw->SetTextureResource(m_TX_Name);
+		if (m_TX_Name == L"Background_TX") {
+			PtrDraw->SetTextureResource(m_TX_Name);
+		}
+		else if(m_TX_Name == L"TEST_Game_TX"){
+			PtrDraw->SetTextureResource(m_TX_Name);
+		}
 
 
 		auto PtrTrans = AddComponent<Transform>();

@@ -21,6 +21,7 @@ namespace basecross
 		void CreateGround();
 		void CreatePlate();
 		void CreatePlayerLin();
+		void CreateUILin();
 
 		//テスト時に使用
 		void CreateTestLin();
