@@ -47,8 +47,10 @@ namespace basecross{
 	PressSprite::~PressSprite() {}
 	void PressSprite::OnCreate() {
 
+
 		auto PtdDraw = AddComponent<PCTSpriteDraw>();
 		PtdDraw->SetTextureResource(L"Prres_any_boten_TEST_TX");
+		PtdDraw->SetDiffuse(Color4(1, 1, 1, 1));
 
 		auto PtrTrans = AddComponent<Transform>();
 		PtrTrans->SetScale(m_StartScale.x, m_StartScale.y, 0);
@@ -56,6 +58,72 @@ namespace basecross{
 		PtrTrans->SetPosition(m_StartPos.x, m_StartPos.y, 0);
 		SetAlphaActive(true);
 		SetDrawLayer(1);
+
+		//ï∂éöóÒÇÇ¬ÇØÇÈ
+		auto PtrString = AddComponent<StringSprite>();
+		PtrString->SetText(L"");
+		PtrString->SetTextRect(Rect2D<float>(16.0f, 16.0f, 640.0f, 480.0f));
+	}
+	void PressSprite::OnUpdate() {
+		auto PtdDraw = AddComponent<PCTSpriteDraw>();
+		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+
+		//m_alpha += 0.05f;
+
+
+		/*if (m_alpha > 2) {
+		lighton = false;
+		}
+		else if (m_alpha < 0) {
+		lighton = true;
+		}*/
+
+		if (CntlVec[0].wPressedButtons &XINPUT_GAMEPAD_A) {
+			Max = 0.5f;
+		}
+
+		if (m_alpha > Max) {
+			lighton = false;
+		}
+		else if (m_alpha < 0) {
+			lighton = true;
+		}
+
+
+
+
+
+
+		if (lighton == true) {
+			m_alpha += 0.05;
+		}
+		else if (lighton == false) {
+			m_alpha += -0.05;
+		}
+
+
+
+		PtdDraw->SetDiffuse(Color4(1, 1, 1, m_alpha));
+	}
+	void PressSprite::OnLastUpdate() {
+		//ï∂éöóÒï\é¶
+		wstring alphaStr(L"Alpha: ");
+		alphaStr += Util::FloatToWStr(m_alpha);
+		alphaStr += L"\n";
+
+		wstring flg(L"lighton ;\t");
+		if (lighton == true) {
+			flg += L"true";
+		}
+		else {
+			flg += L"false";
+		}
+		flg += L"\n";
+
+		wstring str = alphaStr + flg;
+
+		auto PtrString = GetComponent<StringSprite>();
+		PtrString->SetText(str);
 	}
 
 	//Ç‰Å[Ç∑ÇØÇ≠ÇÒ

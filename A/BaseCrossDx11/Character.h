@@ -57,9 +57,13 @@ namespace basecross{
 	class PressSprite : public GameObject {
 		Vector2 m_StartScale;
 		Vector2 m_StartPos;
-		
+
+		bool lighton = true;
+
 
 	public:
+		float m_alpha = 0.05;
+		float Max = 2.0f;
 
 		//--------------------------------------------------------------------------------------
 		PressSprite(const shared_ptr<Stage>& StagePtr,
@@ -71,7 +75,9 @@ namespace basecross{
 		virtual void OnCreate() override;
 		//--------------------------------------------------------------------------------------
 
-		virtual void OnUpdate()override {}
+		virtual void OnUpdate()override;
+		virtual void OnLastUpdate() override;
+
 	};
 
 
