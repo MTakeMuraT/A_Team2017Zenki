@@ -1025,7 +1025,7 @@ namespace basecross {
 
 	}
 
-	
+	/*
 	//--------------------------------------------------------------------------------------
 	///	NumberSpriteスプライト
 	//--------------------------------------------------------------------------------------
@@ -1151,7 +1151,7 @@ namespace basecross {
 		auto PtrDraw = GetComponent<PTSpriteDraw>();
 		PtrDraw->UpdateVertices(NewVertices);
 	}
-
+	
 
 	//--------------------------------------------------------------------------------------
 	///	HP
@@ -1200,6 +1200,7 @@ namespace basecross {
 
 		SetDrawLayer(1);
 	}
+	*/
 }
 //end basecross
 

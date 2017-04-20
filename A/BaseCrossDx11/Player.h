@@ -371,6 +371,7 @@ namespace basecross {
 		//操作
 	};
 
+	/*
 	//--------------------------------------------------------------------------------------
 	///	NumberSprite スプライト
 	//--------------------------------------------------------------------------------------
@@ -401,7 +402,7 @@ namespace basecross {
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 	};
-
+	
 
 
 	//HP関係
@@ -441,6 +442,7 @@ namespace basecross {
 		
 			virtual void OnUpdate()override {}
 		};
+		*/
 }
 //end basecross
 

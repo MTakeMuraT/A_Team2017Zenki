@@ -26,6 +26,11 @@ namespace basecross
 		//テスト時に使用
 		void CreateTestLin();
 
+		//タイマー作成
+		void CreateTimer();
+		//ライフ作成
+		void CreateLife();
+
 		//カメラ更新
 		void UpdateCamera();
 	public:

@@ -6,14 +6,14 @@
 #include "stdafx.h"
 #include "Project.h"
 
-namespace basecross{
+namespace basecross {
 
 
 	//むっくん
 	//--------------------------------------------------------------------------------------
 	///	タイトルのスプライト
 	//--------------------------------------------------------------------------------------
-	TitleSprite::TitleSprite(const shared_ptr<Stage>& StagePtr,const Vector2& StartScale, const Vector2& StartPos) :
+	TitleSprite::TitleSprite(const shared_ptr<Stage>& StagePtr, const Vector2& StartScale, const Vector2& StartPos) :
 		GameObject(StagePtr),
 		m_StartScale(StartScale),
 		m_StartPos(StartPos)
@@ -26,9 +26,9 @@ namespace basecross{
 		PtdDraw->SetTextureResource(L"Taitoru_TEST_TX");
 
 		auto PtrTrans = AddComponent<Transform>();
-		PtrTrans->SetScale(m_StartScale.x,m_StartScale.y,0);
+		PtrTrans->SetScale(m_StartScale.x, m_StartScale.y, 0);
 		PtrTrans->SetRotation(0, 0, 0);
-		PtrTrans->SetPosition(m_StartPos.x,m_StartPos.y,0);
+		PtrTrans->SetPosition(m_StartPos.x, m_StartPos.y, 0);
 
 
 		SetDrawLayer(1);
@@ -179,7 +179,7 @@ namespace basecross{
 	//--------------------------------------------------------------------------------------
 	//構築と破棄
 	Dedug::Dedug(const shared_ptr<Stage>& StagePtr
-	) :
+		) :
 		GameObject(StagePtr)
 	{
 	}
@@ -189,15 +189,15 @@ namespace basecross{
 	void Dedug::OnCreate() {
 	}
 	void Dedug::OnUpdate() {
-	
+
 		auto KeylVec = App::GetApp()->GetInputDevice().GetKeyState();
 
 		if (KeylVec.m_bPressedKeyTbl['A']) {
 			auto ScenePtr = App::GetApp()->GetScene<Scene>();
-			
-				PostEvent(1.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToTitleScene");
-			}
+
+			PostEvent(1.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToTitleScene");
 		}
+	}
 
 
 	//--------------------------------------------------------------------------------------
@@ -212,7 +212,7 @@ namespace basecross{
 		m_TX_Name(TXName)
 	{
 	}
-	void FixdBox::OnCreate(){
+	void FixdBox::OnCreate() {
 		auto Trans = GetComponent<Transform>();
 
 		Trans->SetScale(m_Scale);
@@ -230,11 +230,11 @@ namespace basecross{
 		//メッシュ設定
 		Draw->SetMeshResource(L"DEFAULT_CUBE");
 		Draw->SetTextureResource(m_TX_Name);
-		
+
 		auto PtrString = AddComponent<StringSprite>();
 		PtrString->SetText(L"");
 		PtrString->SetTextRect(Rect2D<float>(16.0f, 16.0f, 640.0f, 480.0f));
-		
+
 	}
 	void FixdBox::OnUpdate() {
 		//プレイヤーL
@@ -242,7 +242,7 @@ namespace basecross{
 		auto PtrPlayer_L_Trans = PtrPlayer_L->GetComponent<Transform>();
 		Vector3 PtrPlayer_L_Pos = PtrPlayer_L_Trans->GetPosition();
 		Vector3 PtrPlayer_L_Scale = PtrPlayer_L_Trans->GetScale();
-		Vector3 PtrPlayer_L_ScaleHalf_Vec =  Vector3(PtrPlayer_L_Scale.x / 2 ,PtrPlayer_L_Scale.y/2 ,PtrPlayer_L_Scale.z/2);
+		Vector3 PtrPlayer_L_ScaleHalf_Vec = Vector3(PtrPlayer_L_Scale.x / 2, PtrPlayer_L_Scale.y / 2, PtrPlayer_L_Scale.z / 2);
 		//プレイヤーR
 		auto PtrPlayer_R = GetStage()->GetSharedGameObject<Player_Second>(L"GamePlayer_R", false);
 		auto PtrPlayer_R_Trans = PtrPlayer_R->GetComponent<Transform>();
@@ -268,7 +268,7 @@ namespace basecross{
 		else {
 			Inserted = false;
 		}
-			
+
 		if (Inserted) {
 			auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 			if (CntlVec[0].wButtons &XINPUT_GAMEPAD_A) {
@@ -279,7 +279,7 @@ namespace basecross{
 			auto Rig = GetComponent<Rigidbody>();
 			Rig->SetVelocity(0, 0, 0);
 		}
-		
+
 
 	}
 	void FixdBox::OnLastUpdate() {
@@ -295,7 +295,7 @@ namespace basecross{
 		ScaleStr += L"X=" + Util::FloatToWStr(ScaleS.x, 6, Util::FloatModify::Fixed) + L",\t";
 		ScaleStr += L"Y=" + Util::FloatToWStr(ScaleS.y, 6, Util::FloatModify::Fixed) + L",\t";
 		ScaleStr += L"Z=" + Util::FloatToWStr(ScaleS.z, 6, Util::FloatModify::Fixed) + L"\n";
-		
+
 		wstring InterposeStr(L"挟むフラグ:");
 		if (Inserted) {
 			InterposeStr += L"true";
@@ -329,7 +329,7 @@ namespace basecross{
 		const Vector3& Scale,
 		const Vector3& Position,
 		const int& Type
-	) :
+		) :
 		GameObject(StagePtr),
 		m_Scale(Scale),
 		m_Position(Position),
@@ -366,7 +366,7 @@ namespace basecross{
 	//	用途: エネミー1　
 	//--------------------------------------------------------------------------------------
 	//Abe20170412
-	Enemy01::Enemy01(const shared_ptr<Stage>& StagePtr, Vector3 Pos, Vector3 Scale):
+	Enemy01::Enemy01(const shared_ptr<Stage>& StagePtr, Vector3 Pos, Vector3 Scale) :
 		GameObject(StagePtr),
 		m_InitPos(Pos),
 		m_Scale(Scale)
@@ -377,7 +377,7 @@ namespace basecross{
 		auto Trans = GetComponent<Transform>();
 
 		Trans->SetScale(m_Scale);
-		Trans->SetRotation(0,0,0);
+		Trans->SetRotation(0, 0, 0);
 		Trans->SetPosition(m_InitPos);
 
 		//Rigidbody
@@ -413,24 +413,24 @@ namespace basecross{
 				m_Vel *= 0.9f;
 				if (!m_StanFlg)
 				{
-					GetComponent<Rigidbody>()->SetVelocity(Vector3(0,0,0));
+					GetComponent<Rigidbody>()->SetVelocity(Vector3(0, 0, 0));
 					m_Vel = Vector3(0, 0, 0);
 				}
 			}
 		}
-		
+
 	}
 
 	void Enemy01::Damage(float Time)
 	{
-		 if (!m_SandFlg) 
-		 {
-			 m_StanFlg = true;
-			 m_SandFlg = true; 
-			 m_StanTime = Time * 2; 
-			 //変な判定消す、これにより挟んだ後引っかからずに移動できる
-			 GetComponent<CollisionObb>()->SetFixed(true);
-		 } 
+		if (!m_SandFlg)
+		{
+			m_StanFlg = true;
+			m_SandFlg = true;
+			m_StanTime = Time * 2;
+			//変な判定消す、これにより挟んだ後引っかからずに移動できる
+			GetComponent<CollisionObb>()->SetFixed(true);
+		}
 	}
 
 	void Enemy01::Release()
@@ -480,7 +480,7 @@ namespace basecross{
 	}
 	//Abe20170412
 	//Abe20170413
-	
+
 	void Enemy01::OnCollision(vector<shared_ptr<GameObject>>& OtherVec)
 	{
 		if (m_StanFlg)
@@ -490,7 +490,7 @@ namespace basecross{
 				auto Enemy01Ptr = dynamic_pointer_cast<Enemy01>(obj);
 				if (Enemy01Ptr)
 				{
-					Enemy01Ptr->Damage(m_StanTime/2);
+					Enemy01Ptr->Damage(m_StanTime / 2);
 					Enemy01Ptr->Release(m_Vel);
 				}
 			}
@@ -511,6 +511,368 @@ namespace basecross{
 
 	}
 	//Abe20170413
+
+
+	//Abe20170418
+	//--------------------------------------------------------------------------------------
+	//	class NumberSprite : public GameObject;
+	//	用途: 数字のスプライト
+	//--------------------------------------------------------------------------------------
+	NumberSprite::NumberSprite(const shared_ptr<Stage>& StagePtr, int num, Vector2 pos, Vector2 scale, int layer) :
+		GameObject(StagePtr),
+		m_num(num),
+		m_pos(pos),
+		m_scale(scale),
+		m_layer(layer)
+	{}
+
+	void NumberSprite::OnCreate()
+	{
+
+		//桁数える-------------------------------------
+		int count = m_num;
+		do
+		{
+			count /= 10;
+			m_digit++;
+		} while (count > 0);
+		//桁数える-------------------------------------
+
+		//数字の画像作成-------------------------
+		for (int i = 0; i < 10; i++)
+		{
+			//頂点配列
+			vector<VertexPositionNormalTexture> vertices;
+			//インデックスを作成するための配列
+			vector<uint16_t> indices;
+			//Squareの作成(ヘルパー関数を利用)
+			MeshUtill::CreateSquare(1.0f, vertices, indices);
+			//UV値の変更
+			float from = i / 10.0f;
+			float to = from + (1.0f / 10.0f);
+			//左上頂点
+			vertices[0].textureCoordinate = Vector2(from, 0);
+			//右上頂点
+			vertices[1].textureCoordinate = Vector2(to, 0);
+			//左下頂点
+			vertices[2].textureCoordinate = Vector2(from, 1.0f);
+			//右下頂点
+			vertices[3].textureCoordinate = Vector2(to, 1.0f);
+			//頂点の型を変えた新しい頂点を作成
+			vector<VertexPositionColorTexture> new_vertices;
+			for (auto& v : vertices) {
+				VertexPositionColorTexture nv;
+				nv.position = v.position;
+				nv.color = Color4(1.0f, 1.0f, 1.0f, 1.0f);
+				nv.textureCoordinate = v.textureCoordinate;
+				new_vertices.push_back(nv);
+			}
+			//メッシュ作成
+			m_Mesh.push_back(MeshResource::CreateMeshResource<VertexPositionColorTexture>(new_vertices, indices, true));
+		}
+		//数字の画像作成-------------------------
+
+		//数字スプライト作成---------------------
+		//処理用に数字取っておく
+		int masternum = m_num;
+
+		//計算結果入れておく用の箱
+		vector<int> OutNums;
+
+		//桁分ループ、数字作成
+		for (int j = 0; j < m_digit; j++)
+		{
+			//生成した桁数加算
+			m_Constdigit++;
+
+			//上位の桁から数字入れてく
+			int num = masternum / pow(10, (m_digit - 1) - j);
+			OutNums.push_back(num);
+			//計算用の桁の最上位の桁を排除
+			masternum = masternum % (int)(pow(10, (m_digit - 1) - j));
+		}
+
+		//一個右との差
+		float distance = m_scale.x / IntervalNums;
+
+		wstring txt;
+		//桁分逆からループ！(0から上位の桁入れてるので)
+		//動けばいいよね、バグ起きそうとか言わない
+		for (int j = 0; j < m_digit; j++) {
+
+
+			//生成オブジェ
+			auto NumP = GetStage()->AddGameObject<GameObject>();
+
+			//座標設定
+			auto TranP = NumP->AddComponent<Transform>();
+			TranP->SetPosition(m_pos.x - (distance*count), m_pos.y, 0);
+			TranP->SetScale(m_scale.x, m_scale.y, 1);
+			TranP->SetRotation(0, 0, 0);
+
+			//大きさ設定
+			auto DrawP = NumP->AddComponent<PCTSpriteDraw>();
+			DrawP->SetTextureResource(L"NUMBER_TX");
+			DrawP->SetMeshResource(m_Mesh[OutNums[(m_digit - 1) - j]]);
+			NumP->SetAlphaActive(true);
+
+			//レイヤー設定
+			NumP->SetDrawLayer(m_layer);
+			//メンバ変数の管理するやつに追加
+			m_Numbers.push_back(NumP);
+
+			//カウントアップ
+			count++;
+
+		}
+		//数字スプライト作成---------------------
+	}
+
+	/*
+	void NumberSprite::SetPositionVec2(Vector2 pos)
+	{
+	m_pos = pos;
+	//左にずらす一番右が0
+	float distance = m_scale.x / 1.8f;
+	int j = 0;
+	for (auto v : m_Numbers)
+	{
+	v->GetComponent<Transform>()->SetPosition(m_pos.x - (distance*j), m_pos.y - (distance*j), 0);
+	j++;
+	}
+	}
+
+	void NumberSprite::SetScaleVec2(Vector2 scale)
+	{
+	m_scale = scale;
+	for (auto v : m_Numbers)
+	{
+	v->GetComponent<Transform>()->SetScale(scale.x, scale.y, 0);
+	}
+
+	//左にずらす一番右が0
+	float distance = m_scale.x / 1.8f;
+	int j = 0;
+	for (auto v : m_Numbers)
+	{
+	v->GetComponent<Transform>()->SetPosition(m_pos.x - (distance*j), m_pos.y - (distance*j), 0);
+	j++;
+	}
+	}
+	*/
+
+	void NumberSprite::SetNum(int num)
+	{
+		//マイナス弾く
+		if (m_num >= 0)
+		{
+			m_num = num;
+			//入力された桁持ってくる
+			int digit = 0;
+			int innum = num;
+			do
+			{
+				innum /= 10;
+				digit++;
+			} while (innum > 0);
+
+			//処理用に数字取っておく
+			int masternum = m_num;
+			//計算結果入れておく用の箱
+			vector<int> OutNums;
+
+			//桁分ループ、数字作成
+			for (int j = 0; j < digit; j++)
+			{
+				//上位の桁から数字入れてく
+				int num = masternum / pow(10, (digit - 1) - j);
+				OutNums.push_back(num);
+				//計算用の桁の最上位の桁を排除
+				masternum = masternum % (int)(pow(10, (digit - 1) - j));
+			}
+
+
+			//入力されたほうが大きかったら
+			if (digit > m_digit)
+			{
+				//追加する分だけループ
+				for (int j = 0; j < (digit - m_Constdigit); j++)
+				{
+					//左側に桁追加だけ、数字は後で入れる
+					m_Constdigit++;
+
+					auto NumP = GetStage()->AddGameObject<GameObject>();
+
+					float distance = m_scale.x / 1.8f;
+
+					auto TranP = NumP->AddComponent<Transform>();
+					TranP->SetPosition(m_pos.x - (distance*(m_digit + j)), m_pos.y, 0);
+					TranP->SetScale(m_scale.x, m_scale.y, 1);
+					TranP->SetRotation(0, 0, 0);
+
+					auto DrawP = NumP->AddComponent<PCTSpriteDraw>();
+					DrawP->SetTextureResource(L"NUMBER_TX");
+					DrawP->SetMeshResource(m_Mesh[0]);
+					NumP->SetAlphaActive(true);
+
+					NumP->SetDrawLayer(m_layer);
+					m_Numbers.push_back(NumP);
+				}
+
+				for (int i = 0; i < m_Constdigit; i++)
+				{
+					m_Numbers[i]->SetDrawActive(true);
+				}
+
+			}
+			//入力されたほうが小さい
+			else if (digit < m_digit)
+			{
+				//添え字ように-1ずらす
+				for (int i = m_digit - 1; i > digit - 1; i--)
+				{
+					m_Numbers[i]->SetDrawActive(false);
+				}
+			}
+
+			//桁更新
+			m_digit = digit;
+
+			//数字入れ替え
+			masternum = m_num;
+			for (int i = 0; i < m_digit; i++)
+			{
+				m_Numbers[i]->GetComponent<PCTSpriteDraw>()->SetMeshResource(m_Mesh[OutNums[(m_digit - 1) - i]]);
+			}
+
+		}
+	}
+
+	void NumberSprite::SetNumDraw(bool flg)
+	{
+		for (auto v : m_Numbers)
+		{
+			v->SetDrawActive(flg);
+		}
+
+	}
+
+	//--------------------------------------------------------------------------------------
+	//	class Timer : public GameObject;
+	//	用途: タイマー
+	//--------------------------------------------------------------------------------------
+
+	Timer::Timer(const shared_ptr<Stage>& StagePtr, int Time, Vector2 pos, Vector2 scale, int layer) :
+		GameObject(StagePtr),
+		m_InitTime(Time),
+		m_InitPos(pos),
+		m_InitScale(scale),
+		m_LayerNum(layer)
+	{}
+
+	void Timer::OnCreate()
+	{
+		//数字作成
+		m_Numbers = GetStage()->AddGameObject<NumberSprite>(m_InitTime, m_InitPos, m_InitScale, m_LayerNum);
+		//初期時間入れる
+		m_Time = m_InitTime;
+	}
+
+	void Timer::OnUpdate()
+	{
+		//止めるフラグあったら動かさない
+		if (!m_TimeStopFlg)
+		{
+			//時間減らす
+			m_Time += -App::GetApp()->GetElapsedTime();
+			//０秒以下なら
+			if (m_Time <= 0)
+			{
+				m_FinishFlg = true;
+				m_Time = 0;
+			}
+
+			m_Numbers->SetNum((int)m_Time);
+		}
+	}
+
+	void Timer::SetTimer(bool flg)
+	{
+		m_TimeStopFlg = flg;
+	}
+
+	//--------------------------------------------------------------------------------------
+	//	class Player_Life : public GameObject;
+	//	用途:プレイヤーのHP
+	//--------------------------------------------------------------------------------------
+	Player_Life::Player_Life(const shared_ptr<Stage>& StagePtr, int LifeNum, Vector2 pos, Vector2 scale, int layer) :
+		GameObject(StagePtr),
+		m_Life(LifeNum),
+		m_LifeMax(LifeNum),
+		m_InitPos(pos),
+		m_InitScale(scale),
+		m_layer(layer)
+	{}
+
+	void Player_Life::OnCreate()
+	{
+		for (int i = 0; i < m_Life; i++)
+		{
+			//HP中身作成
+			auto HP = GetStage()->AddGameObject<GameObject>();
+
+			//座標設定
+			auto TranP = HP->AddComponent<Transform>();
+			TranP->SetPosition(m_InitPos.x + (m_IntervalLife * i * m_InitScale.x), m_InitPos.y, 0);
+			TranP->SetScale(m_InitScale.x, m_InitScale.y, 1);
+			TranP->SetRotation(0, 0, 0);
+
+			//大きさ設定
+			auto DrawP = HP->AddComponent<PCTSpriteDraw>();
+			DrawP->SetTextureResource(L"HP_TX");
+			HP->SetAlphaActive(true);
+
+			//レイヤー設定
+			HP->SetDrawLayer(m_layer);
+			//メンバ変数の管理するやつに追加
+			m_LifeSprite.push_back(HP);
+
+			//フレーム作成
+			auto HP_Flame = GetStage()->AddGameObject<GameObject>();
+			//座標設定
+			auto TranP2 = HP_Flame->AddComponent<Transform>();
+			TranP2->SetPosition(m_InitPos.x + (m_IntervalLife * i * m_InitScale.x), m_InitPos.y, 0);
+			TranP2->SetScale(m_InitScale.x, m_InitScale.y, 1);
+			TranP2->SetRotation(0, 0, 0);
+
+			//大きさ設定
+			auto DrawP2 = HP_Flame->AddComponent<PCTSpriteDraw>();
+			DrawP2->SetTextureResource(L"HP_FLAME_TX");
+			HP_Flame->SetAlphaActive(true);
+
+			//レイヤー設定
+			HP_Flame->SetDrawLayer(m_layer);
+
+		}
+	}
+
+	void Player_Life::LifeDown(int num)
+	{
+
+		m_Life += -num;
+		if (m_Life <= 0)
+		{
+			m_Life = 0;
+		}
+
+		//HP消す
+		for (int i = m_LifeMax - 1; i > m_Life - 1; i--)
+		{
+			//直接やるけどまあライフ増やさないしおkでしょ
+			m_LifeSprite[i]->SetDrawActive(false);
+		}
+	}
+	//Abe20170418
 
 }
 	

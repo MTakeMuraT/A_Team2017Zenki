@@ -75,13 +75,13 @@ namespace basecross
 			);
 		SetSharedGameObject(L"GamePlayer_R", PtrPlayer_R);
 
-		//HP関係
-		AddGameObject<HP>(
-			Vector2(512, 512),
-			Vector2(-440, 300));
-		AddGameObject<HPBackGround>(
-			Vector2(512, 512),
-			Vector2(-440, 300));
+		////HP関係
+		//AddGameObject<HP>(
+		//	Vector2(512, 512),
+		//	Vector2(-440, 300));
+		//AddGameObject<HPBackGround>(
+		//	Vector2(512, 512),
+		//	Vector2(-440, 300));
 	}
 
 	void GameStage::CreateUILin() {
@@ -113,6 +113,20 @@ namespace basecross
 
 		
 	}
+	//タイマー作成------------------------------------------
+	void GameStage::CreateTimer()
+	{
+		auto Ti = AddGameObject<Timer>(60, Vector2(50, 300), Vector2(100, 100), 5);
+		SetSharedGameObject(L"Timer", Ti);
+	}
+	//タイマー作成------------------------------------------
+	//ライフ作成--------------------------------------------
+	void GameStage::CreateLife()
+	{
+		auto life = AddGameObject<Player_Life>(10, Vector2(-580, 300), Vector2(100, 100), 4);
+		SetSharedGameObject(L"Life", life);
+	}
+	//ライフ作成--------------------------------------------
 
 	void GameStage::OnCreate()
 	{
@@ -124,6 +138,10 @@ namespace basecross
 			CreateGround();
 			CreateUILin();
 
+			//制限時間
+			CreateTimer();
+			//ライフ
+			CreateLife();
 			//背景の作成
 			CreateBackGround();
 			CreateTestLin();
@@ -159,6 +177,12 @@ namespace basecross
 			auto ScenePtr = App::GetApp()->GetScene<Scene>();
 
 			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToTitleScene");
+		}
+		if (KeylVec.m_bPressedKeyTbl['D'])
+		{
+			//ライフ減らす
+			GetSharedGameObject<Player_Life>(L"Life")->LifeDown(1);
+
 		}
 
 		//カメラ更新

@@ -26,7 +26,8 @@ namespace basecross {
 		strTexture = DataDir + L"TestTexture\\spark.png";
 		App::GetApp()->RegisterTexture(L"SPARK_TX", strTexture);
 
-		strTexture = DataDir + L"TestTexture\\number.png";
+		//数字のスプライト
+		strTexture = DataDir + L"number.png";
 		App::GetApp()->RegisterTexture(L"NUMBER_TX", strTexture);
 
 		
@@ -35,9 +36,11 @@ namespace basecross {
 		strTexture = DataDir + L"GameStage\\Background.png";
 		App::GetApp()->RegisterTexture(L"Background_TX", strTexture);
 		//プレイヤー関係
-		strTexture = DataDir + L"Player\\HP_Flame.png";
-		App::GetApp()->RegisterTexture(L"HP_Flame_TX", strTexture);
-		strTexture = DataDir + L"Player\\HP.png";
+		//HPのフレーム
+		strTexture = DataDir + L"HP_Flame.png";
+		App::GetApp()->RegisterTexture(L"HP_FLAME_TX", strTexture);
+		//HPの中身
+		strTexture = DataDir + L"HP.png";
 		App::GetApp()->RegisterTexture(L"HP_TX", strTexture);
 
 		//テスト用TX

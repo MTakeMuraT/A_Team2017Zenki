@@ -212,5 +212,124 @@ namespace basecross{
 	};
 	//Abe20170412
 
+	//Abe20170418
+	//--------------------------------------------------------------------------------------
+	//	class NumberSprite : public GameObject;
+	//	用途: 数字のスプライト
+	//　生成したら桁増えるごとに左にずれてく
+	//--------------------------------------------------------------------------------------
+	class NumberSprite : public GameObject
+	{
+	private:
+		//なんかしらんメッシュのリスト
+		vector<shared_ptr<MeshResource>> m_Mesh;
+		int m_num = 0;
+		//桁数
+		int m_digit = 0;
+		//生成されてる数字
+		int m_Constdigit = 0;
+		//表示レイヤー
+		int m_layer = 0;
+		//大きさ
+		Vector2 m_scale;
+		//位置
+		Vector2 m_pos;
+		//数字分のvector配列
+		vector<shared_ptr<GameObject>> m_Numbers;
+
+		//調整用
+		//文字と文字の間隔
+		float IntervalNums = 1.8f;
+	public:
+		NumberSprite(const shared_ptr<Stage>& StagePtr, int num, Vector2 pos, Vector2 scale, int layer);
+
+		void OnCreate()override;
+
+		/*以前試作してたものだけど使わなそうなので消しときます
+		//位置調整
+		void SetPositionVec2(Vector2 pos);
+		//大きさ調整
+		void SetScaleVec2(Vector2 scale);
+		*/
+
+		//数字設定
+		void SetNum(int num);
+
+		void SetNumDraw(bool flg);
+	};
+
+	//--------------------------------------------------------------------------------------
+	//	class Timer : public GameObject;
+	//	用途:タイマー
+	//　位置設定、大きさはスプライトなのでVec2で使う
+	//--------------------------------------------------------------------------------------
+
+	class Timer : public GameObject
+	{
+	private:
+		//初期位置
+		Vector2 m_InitPos;
+		//大きさ
+		Vector2 m_InitScale;
+		//レイヤー
+		int m_LayerNum;
+		//制限時間
+		int m_InitTime;
+		//現在時間
+		float m_Time;
+		//時間止めるフラグ
+		bool m_TimeStopFlg = false;
+		//終わったか
+		bool m_FinishFlg = false;
+		//数字
+		shared_ptr<NumberSprite> m_Numbers;
+	public:
+		//初期時間、座標、大きさ、レイヤー
+		Timer(const shared_ptr<Stage>& StagePtr, int Time, Vector2 pos, Vector2 scale, int layer);
+
+		void OnCreate()override;
+		void OnUpdate()override;
+
+		void SetTimer(bool flg);
+
+		bool GetTimerFlg() { return m_FinishFlg; }
+	};
+
+	//--------------------------------------------------------------------------------------
+	//	class Player_Life : public GameObject;
+	//	用途:プレイヤーのHP
+	//--------------------------------------------------------------------------------------
+	class Player_Life :public GameObject
+	{
+	private:
+		//現在地
+		int m_Life = 10;
+		//最大値
+		int m_LifeMax = 10;
+		//座標
+		Vector2 m_InitPos;
+		//大きさ
+		Vector2 m_InitScale;
+		//レイヤー
+		int m_layer;
+		//ライフスプライト
+		vector<shared_ptr<GameObject>> m_LifeSprite;
+		//フレーム・・・は増やすってなったら追加するか
+
+		//調整用
+		//間隔
+		float m_IntervalLife = 0.45f;
+	public:
+		Player_Life(const shared_ptr<Stage>& StagePtr, int LifeNum, Vector2 pos, Vector2 scale, int layer);
+
+		void OnCreate() override;
+
+		//入力した値分ライフから引く
+		void LifeDown(int num);
+
+		int GetLife() { return m_Life; }
+	};
+	//Abe20170418
+
 }
 //end basecross
