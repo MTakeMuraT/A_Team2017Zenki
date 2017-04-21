@@ -667,7 +667,7 @@ namespace basecross {
 		float m_MaxForce;				//最高フォース
 		Impl() :
 			m_Velocity(0, 0, 0),
-			m_MaxSpeed(10.0f),
+			m_MaxSpeed(100.0f),
 			m_MinVelocity(0.01f, 0.01f, 0.01f),
 			m_AngularVelocity(0, 0, 0),
 			m_Mass(1.0f),
