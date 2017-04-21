@@ -10,6 +10,60 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Behavior.h" />
+    <ClInclude Include="Character.h" />
+    <ClInclude Include="Collision_Sphere.h" />
+    <ClInclude Include="Common\Action.h" />
+    <ClInclude Include="Common\Collision.h" />
+    <ClInclude Include="Common\Common.h" />
+    <ClInclude Include="Common\Components.h" />
+    <ClInclude Include="Common\DrawComponents.h" />
+    <ClInclude Include="Common\GameObject.h" />
+    <ClInclude Include="Common\Gravity.h" />
+    <ClInclude Include="Common\Rigidbody.h" />
+    <ClInclude Include="Common\SharedResources.h" />
+    <ClInclude Include="Common\SpriteStudio5.h" />
+    <ClInclude Include="Common\StringComponents.h" />
+    <ClInclude Include="GameMedia.h" />
+    <ClInclude Include="GameStage.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="Project.h" />
+    <ClInclude Include="ProjectShader.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="Scene.h" />
+    <ClInclude Include="StageSelectScene.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="TitleScene.h" />
+    <ClInclude Include="Transform.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Character.cpp" />
+    <ClCompile Include="Collision_Sphere.cpp" />
+    <ClCompile Include="Common\Action.cpp" />
+    <ClCompile Include="Common\Collision.cpp" />
+    <ClCompile Include="Common\Components.cpp" />
+    <ClCompile Include="Common\DrawComponents.cpp" />
+    <ClCompile Include="Common\GameObject.cpp" />
+    <ClCompile Include="Common\Gravity.cpp" />
+    <ClCompile Include="Common\Rigidbody.cpp" />
+    <ClCompile Include="Common\SharedResources.cpp" />
+    <ClCompile Include="Common\SpriteStudio5.cpp" />
+    <ClCompile Include="Common\StringComponents.cpp" />
+    <ClCompile Include="GameMedia.cpp" />
+    <ClCompile Include="GameStage.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="ProjectShader.cpp" />
+    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="StageSelectScene.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="TitleScene.cpp" />
+    <ClCompile Include="WinMain.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6926A431-0C26-4D69-9640-271F3DC6C2A5}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -103,65 +157,6 @@
       <ObjectFileOutput>$(SolutionDir)media\Shaders\%(Filename).cso</ObjectFileOutput>
     </FxCompile>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="Behavior.h" />
-    <ClInclude Include="Character.h" />
-    <ClInclude Include="Collision_Sphere.h" />
-    <ClInclude Include="Common\Action.h" />
-    <ClInclude Include="Common\Collision.h" />
-    <ClInclude Include="Common\Common.h" />
-    <ClInclude Include="Common\Components.h" />
-    <ClInclude Include="Common\DrawComponents.h" />
-    <ClInclude Include="Common\GameObject.h" />
-    <ClInclude Include="Common\Gravity.h" />
-    <ClInclude Include="Common\Rigidbody.h" />
-    <ClInclude Include="Common\SharedResources.h" />
-    <ClInclude Include="Common\StringComponents.h" />
-    <ClInclude Include="GameMedia.h" />
-    <ClInclude Include="GameStage.h" />
-    <ClInclude Include="Player.h" />
-    <ClInclude Include="Project.h" />
-    <ClInclude Include="ProjectShader.h" />
-    <ClInclude Include="ProtoTypeStage.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="Scene.h" />
-    <ClInclude Include="StageSelectScene.h" />
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="targetver.h" />
-    <ClInclude Include="TitleScene.h" />
-    <ClInclude Include="Transform.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="BaseCrossDx11.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="icon1.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Character.cpp" />
-    <ClCompile Include="Collision_Sphere.cpp" />
-    <ClCompile Include="Common\Action.cpp" />
-    <ClCompile Include="Common\Collision.cpp" />
-    <ClCompile Include="Common\Components.cpp" />
-    <ClCompile Include="Common\DrawComponents.cpp" />
-    <ClCompile Include="Common\GameObject.cpp" />
-    <ClCompile Include="Common\Gravity.cpp" />
-    <ClCompile Include="Common\Rigidbody.cpp" />
-    <ClCompile Include="Common\SharedResources.cpp" />
-    <ClCompile Include="Common\StringComponents.cpp" />
-    <ClCompile Include="GameMedia.cpp" />
-    <ClCompile Include="GameStage.cpp" />
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="ProjectShader.cpp" />
-    <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="StageSelectScene.cpp" />
-    <ClCompile Include="stdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="TitleScene.cpp" />
-    <ClCompile Include="WinMain.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

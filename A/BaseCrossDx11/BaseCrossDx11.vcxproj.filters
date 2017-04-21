@@ -1,148 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Character.cpp">
-      <Filter>SourceCode\cpp</Filter>
-    </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>SourceCode\cpp</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene.cpp">
-      <Filter>SourceCode\cpp</Filter>
-    </ClCompile>
-    <ClCompile Include="TitleScene.cpp">
-      <Filter>SourceCode\cpp</Filter>
-    </ClCompile>
-    <ClCompile Include="WinMain.cpp">
-      <Filter>SourceCode\cpp</Filter>
-    </ClCompile>
-    <ClCompile Include="GameMedia.cpp">
-      <Filter>SourceCode\cpp</Filter>
-    </ClCompile>
-    <ClCompile Include="Common\GameObject.cpp">
-      <Filter>SourceCode\cpp</Filter>
-    </ClCompile>
-    <ClCompile Include="GameStage.cpp">
-      <Filter>SourceCode\cpp</Filter>
-    </ClCompile>
-    <ClCompile Include="StageSelectScene.cpp">
-      <Filter>SourceCode\cpp</Filter>
-    </ClCompile>
-    <ClCompile Include="Common\Action.cpp">
-      <Filter>その他</Filter>
-    </ClCompile>
-    <ClCompile Include="Common\Collision.cpp">
-      <Filter>その他</Filter>
-    </ClCompile>
-    <ClCompile Include="Common\Components.cpp">
-      <Filter>その他</Filter>
-    </ClCompile>
-    <ClCompile Include="Common\DrawComponents.cpp">
-      <Filter>その他</Filter>
-    </ClCompile>
-    <ClCompile Include="Common\Gravity.cpp">
-      <Filter>その他</Filter>
-    </ClCompile>
-    <ClCompile Include="ProjectShader.cpp">
-      <Filter>その他</Filter>
-    </ClCompile>
-    <ClCompile Include="Common\Rigidbody.cpp">
-      <Filter>その他</Filter>
-    </ClCompile>
-    <ClCompile Include="Common\SharedResources.cpp">
-      <Filter>その他</Filter>
-    </ClCompile>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>その他</Filter>
-    </ClCompile>
-    <ClCompile Include="Common\StringComponents.cpp">
-      <Filter>その他</Filter>
-    </ClCompile>
-    <ClCompile Include="Collision_Sphere.cpp">
-      <Filter>SourceCode\cpp</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Player.h">
-      <Filter>SourceCode\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene.h">
-      <Filter>SourceCode\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="TitleScene.h">
-      <Filter>SourceCode\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Character.h">
-      <Filter>SourceCode\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Behavior.h">
-      <Filter>SourceCode\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="GameMedia.h">
-      <Filter>SourceCode\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\GameObject.h">
-      <Filter>SourceCode\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="GameStage.h">
-      <Filter>SourceCode\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="ProtoTypeStage.h">
-      <Filter>SourceCode\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Project.h">
-      <Filter>SourceCode\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="StageSelectScene.h">
-      <Filter>SourceCode\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\Action.h">
-      <Filter>その他</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\Collision.h">
-      <Filter>その他</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\Common.h">
-      <Filter>その他</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\Components.h">
-      <Filter>その他</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\DrawComponents.h">
-      <Filter>その他</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\Gravity.h">
-      <Filter>その他</Filter>
-    </ClInclude>
-    <ClInclude Include="ProjectShader.h">
-      <Filter>その他</Filter>
-    </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>その他</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\Rigidbody.h">
-      <Filter>その他</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\SharedResources.h">
-      <Filter>その他</Filter>
-    </ClInclude>
-    <ClInclude Include="stdafx.h">
-      <Filter>その他</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\StringComponents.h">
-      <Filter>その他</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>その他</Filter>
-    </ClInclude>
-    <ClInclude Include="Transform.h">
-      <Filter>その他</Filter>
-    </ClInclude>
-    <ClInclude Include="Collision_Sphere.h">
-      <Filter>SourceCode\Header</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
     <Filter Include="SourceCode">
       <UniqueIdentifier>{ab37009f-6ac7-4e98-b9ef-bd56e5c2976d}</UniqueIdentifier>
     </Filter>
@@ -152,18 +10,159 @@
     <Filter Include="SourceCode\Header">
       <UniqueIdentifier>{7ee96d54-a4a6-4603-9100-687b3afd64ec}</UniqueIdentifier>
     </Filter>
-    <Filter Include="その他">
+    <Filter Include="Common">
       <UniqueIdentifier>{0a484df1-9bbf-4108-ab6a-a9a2fae94121}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common\Header">
+      <UniqueIdentifier>{5a267544-106f-4758-8c0e-4aa73f55c70e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common\cpp">
+      <UniqueIdentifier>{06bec4fe-eacd-4f6f-8c89-7504a75b189e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="BaseCrossDx11.rc">
-      <Filter>その他</Filter>
-    </ResourceCompile>
+    <ClInclude Include="Common\StringComponents.h">
+      <Filter>Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\SpriteStudio5.h">
+      <Filter>Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\SharedResources.h">
+      <Filter>Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Rigidbody.h">
+      <Filter>Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Gravity.h">
+      <Filter>Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\GameObject.h">
+      <Filter>Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\DrawComponents.h">
+      <Filter>Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Components.h">
+      <Filter>Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Common.h">
+      <Filter>Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Collision.h">
+      <Filter>Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Action.h">
+      <Filter>Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Behavior.h">
+      <Filter>SourceCode\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Character.h">
+      <Filter>SourceCode\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Collision_Sphere.h">
+      <Filter>SourceCode\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMedia.h">
+      <Filter>SourceCode\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GameStage.h">
+      <Filter>SourceCode\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>SourceCode\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Project.h">
+      <Filter>SourceCode\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="ProjectShader.h">
+      <Filter>SourceCode\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>SourceCode\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>SourceCode\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="StageSelectScene.h">
+      <Filter>SourceCode\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>SourceCode\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>SourceCode\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="TitleScene.h">
+      <Filter>SourceCode\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>SourceCode\Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="icon1.ico">
-      <Filter>その他</Filter>
-    </Image>
+    <ClCompile Include="Common\StringComponents.cpp">
+      <Filter>Common\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\SpriteStudio5.cpp">
+      <Filter>Common\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\SharedResources.cpp">
+      <Filter>Common\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Rigidbody.cpp">
+      <Filter>Common\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Gravity.cpp">
+      <Filter>Common\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\GameObject.cpp">
+      <Filter>Common\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\DrawComponents.cpp">
+      <Filter>Common\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Components.cpp">
+      <Filter>Common\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Collision.cpp">
+      <Filter>Common\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Action.cpp">
+      <Filter>Common\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="Character.cpp">
+      <Filter>SourceCode\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="Collision_Sphere.cpp">
+      <Filter>SourceCode\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="GameMedia.cpp">
+      <Filter>SourceCode\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="GameStage.cpp">
+      <Filter>SourceCode\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>SourceCode\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="ProjectShader.cpp">
+      <Filter>SourceCode\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>SourceCode\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="StageSelectScene.cpp">
+      <Filter>SourceCode\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>SourceCode\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="TitleScene.cpp">
+      <Filter>SourceCode\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="WinMain.cpp">
+      <Filter>SourceCode\cpp</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
