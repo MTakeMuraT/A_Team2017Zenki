@@ -1,3 +1,4 @@
+
 /*!
 @file Player.h
 @brief プレイヤーなど
@@ -31,7 +32,7 @@ namespace basecross {
 		//相手の位置
 		Vector3 Partner_Pos_Vec3 = Vector3(0, 0, 0);
 
-		float VelocityPower = 1.0f;
+		float VelocityPower = 5.0f;
 		float AddVec = 10.0f;
 		bool FixedPos_b = true;
 		Vector3 Now_Pos_Vec3;
@@ -42,6 +43,11 @@ namespace basecross {
 		bool m_sandwich = false;
 		bool m_sandwichMove = false;
 
+		//向きを得る
+		Vector3 Direction_Vec3 = Vector3(0, 0, 0);
+		//LeaveStateで使用
+		Vector3 SavePos_Vec3 = Vector3(0, 0, 0);
+
 
 		//テストフラグ
 		bool Debug_StickDown_b = false;
@@ -51,8 +57,11 @@ namespace basecross {
 		Vector3 DeBug2_Vec3;
 		Vector3 DeBug3_Vec3;
 		float DebugDirection = 0.0f;
+		bool Debug_R_flg = false;
+		float DubugSpeed_F = 100.0f;
 		//
 		void Rot();
+
 
 	public:
 
@@ -79,23 +88,30 @@ namespace basecross {
 		float RotSpeedSecond = 60.0f;
 		Vector3 MovePosVec3;
 
+		//攻撃前ステートで使用
+		//限界値
+		Vector3 Limit = Vector3(0, 0, 0);
+		Vector3 m_Direction = Vector3(0, 0, 0);
 
 		//行動のスタート関数
-		void EnterMoveBehavior();
-		void EnterToAttractBehavior();
-		void EnterPinchBehavior();
-		void EnterSandwichBehavior();
-		//行動の継続関数
+		void EnterMoveBehavior();//移動ステート
+		void EnterBeforeAttractBehavior();//攻撃前
+		void EnterToAttractBehavior();//引き付けるステート
+		void EnterLeaveBehavior();//離れるステート
+								  //行動の継続関数
 		void ExecuteMoveBehavior();
+		void ExecuteBeforeAttractBehavior();//攻撃前
 		void ExecuteToAttractBehavior();
-		void ExecutePinchBehavior();
-		void ExecuteSandwichBehavior();
-		//行動の終了関数
+		void ExecuteLeaveBehavior();//離れる
+									//行動の終了関数
 		void ExitMoveBehabior();
+		void ExitBeforeAttractBehavior();//攻撃前
 		void ExitToAttractBehavior();
-		void ExitPinchBehavior();
-		void ExitSandwichBehavior();
+		void ExitLeaveBehavior();//離れる
 
+
+								 //向きだけを取る
+		Vector3 Direction(Vector3 MyPos, Vector3 PartnerPos);
 		//Aボタンが押されてるか？（引き合うステートで使用）
 		bool KeepPushed_A = true;
 
@@ -116,6 +132,8 @@ namespace basecross {
 		bool GetsandwichMove() {
 			return m_sandwichMove;
 		}
+
+
 
 	};
 
@@ -154,41 +172,41 @@ namespace basecross {
 		//ステートにから抜けるときに呼ばれる関数
 		virtual void Exit(const shared_ptr<Player>& Obj)override;
 	};
-	//--------------------------------------------------------------------------------------
-	//	class PinchState : public ObjState<Player>;
-	//	用途:　挟んでいるステート
-	//--------------------------------------------------------------------------------------
-	class PinchState : public ObjState<Player>
-	{
-		PinchState() {}
-	public:
-		//ステートのインスタンス取得
-		static shared_ptr<PinchState> Instance();
-		//ステートに入ったときに呼ばれる関数
-		virtual void Enter(const shared_ptr<Player>& Obj)override;
-		//ステート実行中に毎ターン呼ばれる関数
-		virtual void Execute(const shared_ptr<Player>& Obj)override;
-		//ステートにから抜けるときに呼ばれる関数
-		virtual void Exit(const shared_ptr<Player>& Obj)override;
-	};
-	//--------------------------------------------------------------------------------------
-	//	class SandwichState : public ObjState<Player>;
-	//	用途:　挟んで移動ステート
-	//--------------------------------------------------------------------------------------
-	class SandwichState : public ObjState<Player>
-	{
-		SandwichState() {}
-	public:
-		//ステートのインスタンス取得
-		static shared_ptr<SandwichState> Instance();
-		//ステートに入ったときに呼ばれる関数
-		virtual void Enter(const shared_ptr<Player>& Obj)override;
-		//ステート実行中に毎ターン呼ばれる関数
-		virtual void Execute(const shared_ptr<Player>& Obj)override;
-		//ステートにから抜けるときに呼ばれる関数
-		virtual void Exit(const shared_ptr<Player>& Obj)override;
-	};
 
+	//--------------------------------------------------------------------------------------
+	//	class LeaveState : public ObjState<Player>;
+	//	用途:　離れるステート
+	//--------------------------------------------------------------------------------------
+	class LeaveState : public ObjState<Player>
+	{
+		LeaveState() {}
+	public:
+		//ステートのインスタンス取得
+		static shared_ptr<LeaveState> Instance();
+		//ステートに入ったときに呼ばれる関数
+		virtual void Enter(const shared_ptr<Player>& Obj)override;
+		//ステート実行中に毎ターン呼ばれる関数
+		virtual void Execute(const shared_ptr<Player>& Obj)override;
+		//ステートにから抜けるときに呼ばれる関数
+		virtual void Exit(const shared_ptr<Player>& Obj)override;
+	};
+	//--------------------------------------------------------------------------------------
+	//	class BeforeAttractState : public ObjState<Player>;
+	//	用途:　攻撃準備ステート
+	//--------------------------------------------------------------------------------------
+	class BeforeAttractState : public ObjState<Player>
+	{
+		BeforeAttractState() {}
+	public:
+		//ステートのインスタンス取得
+		static shared_ptr<BeforeAttractState> Instance();
+		//ステートに入ったときに呼ばれる関数
+		virtual void Enter(const shared_ptr<Player>& Obj)override;
+		//ステート実行中に毎ターン呼ばれる関数
+		virtual void Execute(const shared_ptr<Player>& Obj)override;
+		//ステートにから抜けるときに呼ばれる関数
+		virtual void Exit(const shared_ptr<Player>& Obj)override;
+	};
 	////////////////////////////もう一体のプレイヤー/////////////////////////////////////////////////////////////////////////////
 
 	//--------------------------------------------------------------------------------------
@@ -214,10 +232,17 @@ namespace basecross {
 		Vector3 Partner_Pos_Vec3 = Vector3(0, 0, 0);
 
 
+
+
 		float VelocityPower = 1.0f;
 		float AddVec = 2.0f;
 		bool FixedPos_b = true;
 		Vector3 Now_Pos_Vec3;
+
+		//
+		Vector3 SavePos_Vec3 = Vector3(0, 0, 0);
+		//向きを得る
+		Vector3 Direction_Vec3 = Vector3(0, 0, 0);
 	public:
 
 		//構築と破棄
@@ -235,25 +260,27 @@ namespace basecross {
 
 		//行動のスタート関数
 		//void EnterMoveBehavior();
+		void EnterBeforeAttractBehavior();//攻撃前　攻撃準備中
 		void EnterToAttractBehavior();
-		void EnterPinchBehavior();
-		void EnterSandwichBehavior();
-		//行動の継続関数
+		void EnterLeaveBehavior();//離れるステート
+								  //行動の継続関数
 		void ExecuteMoveBehavior();
+		void ExecuteBeforeAttractBehavior();//攻撃前　攻撃準備中
 		void ExecuteToAttractBehavior();
-		void ExecutePinchBehavior();
-		void ExecuteSandwichBehavior();
-		//行動の終了関数
+		void ExecuteLeaveBehavior();//離れる
+									//行動の終了関数
 		void ExitMoveBehabior();
+		void ExitBeforeAttractBehavior();//攻撃前　攻撃準備
 		void ExitToAttractBehavior();
-		void ExitPinchBehavior();
-		void ExitSandwichBehavior();
+		void ExitLeaveBehavior();//離れる
 
-		//Aボタンが押されてるか？（引き合うステートで使用）
+								 //Aボタンが押されてるか？（引き合うステートで使用）
 		bool KeepPushed_A = true;
 
 		Vector3 Move_Velo(Vector3 MyPos, Vector3 PartnerPos);
 		void FixedPos();
+		//向きだけを取る
+		Vector3 Direction(Vector3 MyPos, Vector3 PartnerPos);
 
 		//回転
 		void InputRotation();
@@ -304,15 +331,15 @@ namespace basecross {
 		virtual void Exit(const shared_ptr<Player_Second>& Obj)override;
 	};
 	//--------------------------------------------------------------------------------------
-	//	class PinchState_Second  : public ObjState<Player>;
-	//	用途:　挟んでいるステート
+	//	class LeaveState_Second : public ObjState<Player>;
+	//	用途:　離れるステート
 	//--------------------------------------------------------------------------------------
-	class PinchState_Second : public ObjState<Player_Second>
+	class LeaveState_Second : public ObjState<Player_Second>
 	{
-		PinchState_Second() {}
+		LeaveState_Second() {}
 	public:
 		//ステートのインスタンス取得
-		static shared_ptr<PinchState_Second > Instance();
+		static shared_ptr<LeaveState_Second> Instance();
 		//ステートに入ったときに呼ばれる関数
 		virtual void Enter(const shared_ptr<Player_Second>& Obj)override;
 		//ステート実行中に毎ターン呼ばれる関数
@@ -321,15 +348,15 @@ namespace basecross {
 		virtual void Exit(const shared_ptr<Player_Second>& Obj)override;
 	};
 	//--------------------------------------------------------------------------------------
-	//	class SandwichState_Second : public ObjState<Player_Second>;
-	//	用途:　挟んで移動ステート
+	//	class BeforeAttractState_Second : public ObjState<Player_Second>;
+	//	用途:　攻撃準備ステート
 	//--------------------------------------------------------------------------------------
-	class SandwichState_Second : public ObjState<Player_Second>
+	class BeforeAttractState_Second : public ObjState<Player_Second>
 	{
-		SandwichState_Second() {}
+		BeforeAttractState_Second() {}
 	public:
 		//ステートのインスタンス取得
-		static shared_ptr<SandwichState_Second> Instance();
+		static shared_ptr<BeforeAttractState_Second> Instance();
 		//ステートに入ったときに呼ばれる関数
 		virtual void Enter(const shared_ptr<Player_Second>& Obj)override;
 		//ステート実行中に毎ターン呼ばれる関数
@@ -337,6 +364,7 @@ namespace basecross {
 		//ステートにから抜けるときに呼ばれる関数
 		virtual void Exit(const shared_ptr<Player_Second>& Obj)override;
 	};
+
 
 	//センターの規定ボックス
 	//--------------------------------------------------------------------------------------
@@ -371,78 +399,6 @@ namespace basecross {
 		//操作
 	};
 
-	/*
-	//--------------------------------------------------------------------------------------
-	///	NumberSprite スプライト
-	//--------------------------------------------------------------------------------------
-	class NumberSprite : public GameObject {
-		Vector2 m_StartScale;
-		Vector3 m_StartPos;
-		float m_RightNum;
-		float m_leftNum;
-		float m_Score;
-		//桁数
-		UINT m_NumberOfDigits;
-		//バックアップ頂点データ
-		vector<VertexPositionTexture> m_BackupVertices;
-
-		//
-		float VertexNum = 0.0f;
-	public:
-		
-		NumberSprite(const shared_ptr<Stage>& StagePtr, UINT NumberOfDigits,
-			const float& RightNum,const float& leftNum,const Vector2& StartScale, const Vector3& StartPos);
-		
-		virtual ~NumberSprite() {}
-		
-		void SetScore(float f) {
-			m_Score = f;
-		}
-		
-		virtual void OnCreate() override;
-		virtual void OnUpdate() override;
-	};
-	
-
-
-	//HP関係
-	//--------------------------------------------------------------------------------------
-	///	HP スプライト
-	//--------------------------------------------------------------------------------------
-	class HP : public GameObject {
-		Vector2 m_StartScale;
-		Vector2 m_StartPos;
-
-	public:
-
-		HP(const shared_ptr<Stage>& StagePtr,
-			const Vector2& StartScale, const Vector2& StartPos);
-
-		virtual ~HP();
-
-		virtual void OnCreate() override;
-
-		virtual void OnUpdate()override {}
-	};
-	//--------------------------------------------------------------------------------------
-	///	HPBackGround スプライト
-	//--------------------------------------------------------------------------------------
-	class HPBackGround : public GameObject {
-			Vector2 m_StartScale;
-			Vector2 m_StartPos;
-
-		public:
-		
-			HPBackGround(const shared_ptr<Stage>& StagePtr,
-				const Vector2& StartScale, const Vector2& StartPos);
-			
-			virtual ~HPBackGround();
-			
-			virtual void OnCreate() override;
-		
-			virtual void OnUpdate()override {}
-		};
-		*/
 }
 //end basecross
 
