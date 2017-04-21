@@ -58,6 +58,8 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"Taitoru_TEST_TX", strTexture);
 		strTexture = DataDir + L"Title_Lin\\Press_any_button.png";
 		App::GetApp()->RegisterTexture(L"Prres_any_boten_TEST_TX", strTexture);
+		strTexture = DataDir + L"kuro.png";
+		App::GetApp()->RegisterTexture(L"KURO_TX", strTexture);
 
 		
 		

@@ -169,6 +169,58 @@ namespace basecross {
 		}*/
 	}
 
+	DimSprite::DimSprite(const shared_ptr<Stage>& StagePtr, bool Trace,
+		const Vector2& StartScale, const Vector2& StartPos) :
+		GameObject(StagePtr),
+		m_Trace(Trace),
+		m_StartScale(StartScale),
+		m_StartPos(StartPos),
+		m_TotalTime(0)
+	{
+	}
+
+	DimSprite::~DimSprite()
+	{
+	}
+	void DimSprite::OnCreate()
+	{
+		auto PtrTrans = AddComponent<Transform>();
+		PtrTrans->SetScale(m_StartScale.x, m_StartScale.y, 0);
+		PtrTrans->SetRotation(0, 0, 0);
+		PtrTrans->SetPosition(m_StartPos.x, m_StartPos.y, 0);
+		SetAlphaActive(true);
+		SetDrawLayer(1);
+		auto PtrDraw = AddComponent<PCTSpriteDraw>();
+		PtrDraw->SetTextureResource(L"KURO_TX");
+		PtrDraw->SetDiffuse(Color4(1, 1, 1, 0));
+
+	}
+
+	void DimSprite::OnUpdate()
+	{
+		auto PtdDraw = AddComponent<PCTSpriteDraw>();
+		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+
+		if (CntlVec[0].wPressedButtons &XINPUT_GAMEPAD_A)
+		{
+			dimon = true;
+		}
+
+		if (dimon == true)
+		{
+			dim += 0.05;
+		}
+
+		if (dimon == false)
+		{
+			dim += 0;
+		}
+
+
+		PtdDraw->SetDiffuse(Color4(1, 1, 1, dim));
+
+	}
+
 
 
 	////////////////////デバック、テスト系/////////////////////////////////////////////////////////

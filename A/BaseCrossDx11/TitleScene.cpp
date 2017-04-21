@@ -46,7 +46,11 @@ namespace basecross {
 			CreateViewLight();
 			//îwåiÇÃçÏê¨
 			CreateBackGround();	
+			AddGameObject<DimSprite>(true,
+				Vector2(1280, 720),
+				Vector2(0, 0));
 		}
+		
 		catch (...) {
 			throw;
 		}

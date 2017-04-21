@@ -99,6 +99,22 @@ namespace basecross{
 		virtual void OnCreate() override;
 
 	};
+	class DimSprite : public GameObject {
+		bool m_Trace;
+		Vector2 m_StartScale;
+		Vector2 m_StartPos;
+		float m_TotalTime;
+		//バックアップ頂点データ
+		vector<VertexPositionColor> m_BackupVertices;
+	public:
+		float dim = 0;
+		bool dimon;
+		DimSprite(const shared_ptr<Stage>& StagePtr, bool Trace,
+			const Vector2& StartScale, const Vector2& StartPos);
+		virtual ~DimSprite();
+		virtual void OnCreate() override;
+		virtual void OnUpdate()override;
+	};
 
 	//--------------------------------------------------------------------------------------
 	//	class TestLin : public GameObject;
