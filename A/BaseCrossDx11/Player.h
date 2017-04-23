@@ -19,7 +19,9 @@ namespace basecross {
 		shared_ptr<Collision_Sphere> m_Collision_Sphere;
 		//当たったオブジェクト取得
 		shared_ptr<GameObject> m_HitObject;
+		//コンストラクタメンバ
 		Vector3 m_StartPos;
+		wstring m_Player_Str;
 		//移動スピード
 		float Speed_F = 0.0f;
 		Vector3 Vec_Vec3 = Vector3(0, 0, 0);
@@ -61,12 +63,15 @@ namespace basecross {
 		float DubugSpeed_F = 100.0f;
 		//
 		void Rot();
-
+		//継続式の
+		//引き合うステートで使用
+		Vector3 Player2Pos = Vector3(0, 0, 0);
+		//攻撃前ステート
 
 	public:
 
 		//構築と破棄
-		Player(const shared_ptr<Stage>& StagePtr, const Vector3& StartPos);
+		Player(const shared_ptr<Stage>& StagePtr, const Vector3& StartPos, const wstring& PlayerLorPlayerR);
 		virtual ~Player() {}
 		//アクセサ ステートマシーン
 		shared_ptr<StateMachine<Player>>& GetStateMachine() {
@@ -109,8 +114,12 @@ namespace basecross {
 		void ExitToAttractBehavior();
 		void ExitLeaveBehavior();//離れる
 
+								 //自分はPlayerなのか？
+		bool MyPlayerL();
+		Vector3 Partner_Pos();
 
-								 //向きだけを取る
+
+		//向きだけを取る
 		Vector3 Direction(Vector3 MyPos, Vector3 PartnerPos);
 		//Aボタンが押されてるか？（引き合うステートで使用）
 		bool KeepPushed_A = true;
@@ -206,163 +215,6 @@ namespace basecross {
 		virtual void Execute(const shared_ptr<Player>& Obj)override;
 		//ステートにから抜けるときに呼ばれる関数
 		virtual void Exit(const shared_ptr<Player>& Obj)override;
-	};
-	////////////////////////////もう一体のプレイヤー/////////////////////////////////////////////////////////////////////////////
-
-	//--------------------------------------------------------------------------------------
-	///	プレイヤー2
-	//--------------------------------------------------------------------------------------
-	class Player_Second : public GameObject {
-
-	private:
-		//階層化ステートマシーン
-		shared_ptr<StateMachine<Player_Second>>  m_StatePlayer_SecondMachine;
-		Vector3 m_StartPos;
-		//移動スピード
-		float Speed_F = 0.0f;
-		Vector3 Vec_Vec3 = Vector3(0, 0, 0);
-		//自分の位置を取得
-		Vector3 m_PlayerPos_Vec3 = Vector3(0, 0, 0);
-
-
-		//自分の位置
-		Vector3 My_Pos_Vec3 = Vector3(0, 0, 0);
-		Vector3 New_Vec = Vector3(0, 0, 0);
-		//相手の位置
-		Vector3 Partner_Pos_Vec3 = Vector3(0, 0, 0);
-
-
-
-
-		float VelocityPower = 1.0f;
-		float AddVec = 2.0f;
-		bool FixedPos_b = true;
-		Vector3 Now_Pos_Vec3;
-
-		//
-		Vector3 SavePos_Vec3 = Vector3(0, 0, 0);
-		//向きを得る
-		Vector3 Direction_Vec3 = Vector3(0, 0, 0);
-	public:
-
-		//構築と破棄
-		Player_Second(const shared_ptr<Stage>& StagePtr, const Vector3& StartPos);
-		virtual ~Player_Second() {}
-		//アクセサ ステートマシーン
-		shared_ptr<StateMachine<Player_Second>>& GetStateSecondMachine() {
-			return m_StatePlayer_SecondMachine;
-		}
-		//初期化
-		virtual void OnCreate() override;
-		virtual void OnUpdate() override;
-		virtual void Player_Second::OnCollision(vector<shared_ptr<GameObject>>& OtherVec);
-		void InputStick();
-
-		//行動のスタート関数
-		//void EnterMoveBehavior();
-		void EnterBeforeAttractBehavior();//攻撃前　攻撃準備中
-		void EnterToAttractBehavior();
-		void EnterLeaveBehavior();//離れるステート
-								  //行動の継続関数
-		void ExecuteMoveBehavior();
-		void ExecuteBeforeAttractBehavior();//攻撃前　攻撃準備中
-		void ExecuteToAttractBehavior();
-		void ExecuteLeaveBehavior();//離れる
-									//行動の終了関数
-		void ExitMoveBehabior();
-		void ExitBeforeAttractBehavior();//攻撃前　攻撃準備
-		void ExitToAttractBehavior();
-		void ExitLeaveBehavior();//離れる
-
-								 //Aボタンが押されてるか？（引き合うステートで使用）
-		bool KeepPushed_A = true;
-
-		Vector3 Move_Velo(Vector3 MyPos, Vector3 PartnerPos);
-		void FixedPos();
-		//向きだけを取る
-		Vector3 Direction(Vector3 MyPos, Vector3 PartnerPos);
-
-		//回転
-		void InputRotation();
-		Vector3 def;
-		Vector3 CentrPos;
-		float angle;
-		int angle_int;
-		float RotSpeedSecond = 60.0f;
-		Vector3 MovePosVec3;
-		//
-		void Rot();
-
-	};
-
-	//--------------------------------------------------------------------------------------
-	//	class MoveState_Second : public ObjState<Player_Second>;
-	//	用途:　移動
-	//--------------------------------------------------------------------------------------
-	class MoveState_Second : public ObjState<Player_Second>
-	{
-		MoveState_Second() {}
-	public:
-		//ステートのインスタンス取得
-		static shared_ptr<MoveState_Second> Instance();
-		//ステートに入ったときに呼ばれる関数
-		virtual void Enter(const shared_ptr<Player_Second>& Obj)override;
-		//ステート実行中に毎ターン呼ばれる関数
-		virtual void Execute(const shared_ptr<Player_Second>& Obj)override;
-		//ステートにから抜けるときに呼ばれる関数
-		virtual void Exit(const shared_ptr<Player_Second>& Obj)override;
-	};
-
-	//--------------------------------------------------------------------------------------
-	//	class ToAttractState_Second : public ObjState<Player_Second>;
-	//	用途:　引き寄せ合う
-	//--------------------------------------------------------------------------------------
-	class ToAttractState_Second : public ObjState<Player_Second>
-	{
-		ToAttractState_Second() {}
-	public:
-		//ステートのインスタンス取得
-		static shared_ptr<ToAttractState_Second> Instance();
-		//ステートに入ったときに呼ばれる関数
-		virtual void Enter(const shared_ptr<Player_Second>& Obj)override;
-		//ステート実行中に毎ターン呼ばれる関数
-		virtual void Execute(const shared_ptr<Player_Second>& Obj)override;
-		//ステートにから抜けるときに呼ばれる関数
-		virtual void Exit(const shared_ptr<Player_Second>& Obj)override;
-	};
-	//--------------------------------------------------------------------------------------
-	//	class LeaveState_Second : public ObjState<Player>;
-	//	用途:　離れるステート
-	//--------------------------------------------------------------------------------------
-	class LeaveState_Second : public ObjState<Player_Second>
-	{
-		LeaveState_Second() {}
-	public:
-		//ステートのインスタンス取得
-		static shared_ptr<LeaveState_Second> Instance();
-		//ステートに入ったときに呼ばれる関数
-		virtual void Enter(const shared_ptr<Player_Second>& Obj)override;
-		//ステート実行中に毎ターン呼ばれる関数
-		virtual void Execute(const shared_ptr<Player_Second>& Obj)override;
-		//ステートにから抜けるときに呼ばれる関数
-		virtual void Exit(const shared_ptr<Player_Second>& Obj)override;
-	};
-	//--------------------------------------------------------------------------------------
-	//	class BeforeAttractState_Second : public ObjState<Player_Second>;
-	//	用途:　攻撃準備ステート
-	//--------------------------------------------------------------------------------------
-	class BeforeAttractState_Second : public ObjState<Player_Second>
-	{
-		BeforeAttractState_Second() {}
-	public:
-		//ステートのインスタンス取得
-		static shared_ptr<BeforeAttractState_Second> Instance();
-		//ステートに入ったときに呼ばれる関数
-		virtual void Enter(const shared_ptr<Player_Second>& Obj)override;
-		//ステート実行中に毎ターン呼ばれる関数
-		virtual void Execute(const shared_ptr<Player_Second>& Obj)override;
-		//ステートにから抜けるときに呼ばれる関数
-		virtual void Exit(const shared_ptr<Player_Second>& Obj)override;
 	};
 
 

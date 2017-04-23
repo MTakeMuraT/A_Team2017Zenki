@@ -7,15 +7,15 @@
 #include "Project.h"
 
 namespace basecross {
-
 	//--------------------------------------------------------------------------------------
 	//	class Player : public GameObject;
 	//	用途: プレイヤー
 	//--------------------------------------------------------------------------------------
 	//構築と破棄
-	Player::Player(const shared_ptr<Stage>& StagePtr, const Vector3& StartPos) :
+	Player::Player(const shared_ptr<Stage>& StagePtr, const Vector3& StartPos, const wstring& PlayerLorPlayerR) :
 		GameObject(StagePtr),
-		m_StartPos(StartPos)
+		m_StartPos(StartPos),
+		m_Player_Str(PlayerLorPlayerR)
 	{}
 	//初期化
 	void Player::OnCreate() {
@@ -239,10 +239,10 @@ namespace basecross {
 					//エネミーのフラグを変える
 				}
 				//Abe 20170412 14:56
-				auto Player2 = dynamic_pointer_cast<Player_Second>(A);
+				/*auto Player2 = dynamic_pointer_cast<Player_Second>(A);
 				if (Player2) {
-					GetStateMachine()->ChangeState(LeaveState::Instance());
-				}
+				GetStateMachine()->ChangeState(LeaveState::Instance());
+				}*/
 			}
 		}
 	}
@@ -276,8 +276,7 @@ namespace basecross {
 		auto Trans = GetComponent<Transform>();
 		//自分の位置
 		My_Pos_Vec3 = Trans->GetPosition();
-		//もう一つのプレイヤーの位置
-		Partner_Pos_Vec3 = GetStage()->GetSharedGameObject<Player_Second>(L"GamePlayer_R", false)->GetComponent<Transform>()->GetPosition();
+		Partner_Pos();
 		//進む向き
 		New_Vec = Move_Velo(My_Pos_Vec3, Partner_Pos_Vec3);
 
@@ -297,8 +296,8 @@ namespace basecross {
 		//初期位置の保存
 		SavePos_Vec3 = Trans->GetPosition();
 		DeBug3_Vec3 = SavePos_Vec3;
-		////もう一つのプレイヤーの位置
-		Partner_Pos_Vec3 = GetStage()->GetSharedGameObject<Player_Second>(L"GamePlayer_R", false)->GetComponent<Transform>()->GetPosition();
+		Partner_Pos();
+
 		My_Pos_Vec3 = Trans->GetPosition();
 		New_Vec = Direction(My_Pos_Vec3, Partner_Pos_Vec3);
 	}
@@ -319,9 +318,8 @@ namespace basecross {
 
 		auto Trans = GetComponent<Transform>();
 		auto Rig = GetComponent<Rigidbody>();
-		auto Player2Pos = GetStage()->GetSharedGameObject<Player_Second>(L"GamePlayer_R", false)->GetComponent<Transform>()->GetPosition();
-		Vector3 Distance_Vec3 = Player2Pos - Trans->GetPosition();
-
+		Partner_Pos();
+		Vector3 Distance_Vec3 = Partner_Pos_Vec3 - Trans->GetPosition();
 
 		float ElapsedTime_F = App::GetApp()->GetElapsedTime() * 20;
 		Speed_F += Rig->GetMaxSpeed() / 30;
@@ -359,15 +357,12 @@ namespace basecross {
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto Trans = GetComponent<Transform>();
 		auto Pos = Trans->GetPosition();
-
-		auto PtrPlayer2 = GetStage()->GetSharedGameObject<Player_Second>(L"GamePlayer_R", false);
-		auto Player2Pos = PtrPlayer2->GetComponent<Transform>()->GetPosition();
-		auto D = Vector3(Pos.x - Player2Pos.x, Pos.y - Player2Pos.y, Pos.z - Player2Pos.z);
+		Partner_Pos();
+		auto D = Vector3(Pos.x - Partner_Pos_Vec3.x, Pos.y - Partner_Pos_Vec3.y, Pos.z - Partner_Pos_Vec3.z);
 
 		//　離れる処理
 		float ElapsedTime_F = App::GetApp()->GetElapsedTime() * 10;
 		auto Rig = GetComponent<Rigidbody>();
-
 		//New_Vec = 進む方向　Speed_F = 移動スピード
 		Rig->SetVelocity(New_Vec * Speed_F * ElapsedTime_F);
 
@@ -378,9 +373,6 @@ namespace basecross {
 		else {
 			Speed_F += Rig->GetMaxSpeed() / 30;
 		}
-
-		//Aが押されてたら　自分の後ろに下がる
-
 
 		//Aが話されたら攻撃ステートに移動
 		if (!(CntlVec[0].wButtons& XINPUT_GAMEPAD_A)) {
@@ -426,8 +418,12 @@ namespace basecross {
 	}
 	void Player::InputRotation() {
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
-		auto PtrPlayerR = GetStage()->GetSharedGameObject<Player_Second>(L"GamePlayer_R", false);
-		CentrPos = PtrPlayerR->GetComponent<Transform>()->GetPosition();
+		if (MyPlayerL()) {
+			CentrPos = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_R", false)->GetComponent<Transform>()->GetPosition();
+		}
+		else {
+			CentrPos = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false)->GetComponent<Transform>()->GetPosition();
+		}
 		DeBug2_Vec3 = CentrPos;
 		CentrPos = (GetComponent<Transform>()->GetPosition() + CentrPos) / 2;
 		//まず中心からみた角度を求める
@@ -467,7 +463,6 @@ namespace basecross {
 		GetComponent<Transform>()->SetPosition(MovePosVec3);
 	}
 
-
 	//位置固定
 	void Player::FixedPos() {
 		if (FixedPos_b) {
@@ -493,7 +488,31 @@ namespace basecross {
 		Ptr->SetRotation(0.0f, 0.0f, 0.0f);
 		Ptr->SetPosition(Pos);
 	}
-
+	//PlayerL? PlayerR?
+	bool Player::MyPlayerL() {
+		if (m_Player_Str == L"PlayerL") {
+			return true;
+		}
+		else if (m_Player_Str == L"PlayerR") {
+			return false;
+		}
+		else {
+			throw BaseException(
+				L"Playerクラス",
+				L"MyPlayer関数",
+				L"ゲームステージのSetSharedGameObjectを確認してください"
+			);
+		}
+	}
+	Vector3 Player::Partner_Pos() {
+		if (MyPlayerL()) {
+			Partner_Pos_Vec3 = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_R", false)->GetComponent<Transform>()->GetPosition();
+		}
+		else {
+			Partner_Pos_Vec3 = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false)->GetComponent<Transform>()->GetPosition();
+		}
+		return Partner_Pos_Vec3;
+	}
 
 	//移動ステート
 	//--------------------------------------------------------------------------------------
@@ -597,386 +616,6 @@ namespace basecross {
 		Obj->ExitBeforeAttractBehavior();
 	}
 
-	////////////////////////////もう一体のプレイヤー////////////////////////////////////////////////////////////////////
-
-	//--------------------------------------------------------------------------------------
-	//	class Player_Second : public Player;
-	//	用途: プレイヤー2
-	//--------------------------------------------------------------------------------------
-	//構築と破棄
-	Player_Second::Player_Second(const shared_ptr<Stage>& StagePtr, const Vector3& StartPos) :
-		GameObject(StagePtr),
-		m_StartPos(StartPos)
-	{}
-	//初期化
-	void Player_Second::OnCreate() {
-
-		//初期位置などの設定
-		auto Ptr = AddComponent<Transform>();
-		Ptr->SetScale(1.0f, 1.0f, 1.0f);	//直径25センチの球体
-		Ptr->SetRotation(0.0f, 0.0f, 0.0f);
-		Ptr->SetPosition(m_StartPos);
-
-		//Rigidbodyをつける
-		auto PtrRedid = AddComponent<Rigidbody>();
-		//衝突判定をつける
-		//	auto PtrCol = AddComponent<CollisionSphere>();
-
-
-		//影をつける（シャドウマップを描画する）
-		auto ShadowPtr = AddComponent<Shadowmap>();
-		//影の形（メッシュ）を設定
-		ShadowPtr->SetMeshResource(L"DEFAULT_SPHERE");
-
-		//描画コンポーネントの設定
-		auto PtrDraw = AddComponent<PNTStaticDraw>();
-		//描画するメッシュを設定
-		PtrDraw->SetMeshResource(L"DEFAULT_SPHERE");
-		//描画するテクスチャを設定
-		PtrDraw->SetTextureResource(L"TRACE_TX");
-
-		//透明処理
-		SetAlphaActive(true);
-
-		m_StatePlayer_SecondMachine = make_shared<StateMachine<Player_Second> >(GetThis<Player_Second>());
-		m_StatePlayer_SecondMachine->ChangeState(MoveState_Second::Instance());
-	}
-	void Player_Second::OnUpdate() {
-		m_StatePlayer_SecondMachine->Update();
-		//InputRotation();
-		// Rot();
-	}
-	void Player_Second::OnCollision(vector<shared_ptr<GameObject>>& OtherVec) {
-		for (auto A : OtherVec) {
-			auto Fixd_Box = dynamic_pointer_cast<FixdBox>(A);
-			if (Fixd_Box) {
-				//処理
-				//GetStateSecondMachine()->ChangeState(PinchState_Second::Instance());
-			}
-		}
-	}
-
-
-	//スティック入力
-	void Player_Second::InputStick() {
-		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
-		auto Rig = GetComponent<Rigidbody>();
-		if (m_StatePlayer_SecondMachine->GetCurrentState() == MoveState_Second::Instance()) {
-			Speed_F = Rig->GetMaxSpeed() / 5.0f;
-			Vec_Vec3 = Vector3(CntlVec[0].fThumbLX, 0, CntlVec[0].fThumbLY);
-		}
-		/*else if(m_StatePlayer_SecondMachine->GetCurrentState() == SandwichState_Second::Instance()){
-		Speed_F = 3.0f;
-		Vec_Vec3 = Vector3(CntlVec[0].fThumbLX, 0, CntlVec[0].fThumbLY);
-		}*/
-
-		Rig->SetVelocity(Vec_Vec3 * Speed_F);
-
-	}
-
-	void Player_Second::InputRotation() {
-		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
-		auto PtrPlayer = GetStage()->GetSharedGameObject<Player>(L"GamePlayer", false);
-		CentrPos = PtrPlayer->GetComponent<Transform>()->GetPosition();
-		CentrPos = (GetComponent<Transform>()->GetPosition() + CentrPos) / 2;
-		//まず中心からみた角度を求める
-		def = GetComponent<Transform>()->GetPosition() - CentrPos;
-		angle = atan2(def.z, def.x) * 180 / XM_PI;
-		angle += 360;
-		angle_int = (int)angle % 360;
-
-		//
-		if (CntlVec[0].wButtons& XINPUT_GAMEPAD_RIGHT_SHOULDER)
-		{
-			angle_int += -RotSpeedSecond *  App::GetApp()->GetElapsedTime();
-		}
-		//
-		else if (CntlVec[0].wButtons& XINPUT_GAMEPAD_LEFT_SHOULDER)
-		{
-			angle_int += RotSpeedSecond *  App::GetApp()->GetElapsedTime();
-		}
-		angle_int %= 360;
-		//そこから移動量を求める
-		//ラジアン変換
-		angle = angle_int *  XM_PI / 180;
-
-		//距離算出
-		float direction = sqrt((def.x * def.x) + (def.z * def.z));
-		MovePosVec3 = CentrPos + Vector3(cos(angle) * direction, 0, sin(angle) * direction);
-		GetComponent<Transform>()->SetPosition(MovePosVec3);
-	}
-
-
-	////////////////////////ステートスタート関数///////////////////////////////////
-	//挟む
-	void Player_Second::EnterToAttractBehavior() {
-		auto Trans = GetComponent<Transform>();
-		//自分の位置
-		My_Pos_Vec3 = Trans->GetPosition();
-		//もう一つのプレイヤーの位置
-		Partner_Pos_Vec3 = GetStage()->GetSharedGameObject<Player>(L"GamePlayer", false)->GetComponent<Transform>()->GetPosition();
-		New_Vec = Move_Velo(My_Pos_Vec3, Partner_Pos_Vec3);
-		//初期位置の保存
-		//SavePos_Vec3 = GetComponent<Transform>()->GetPosition();
-
-	}
-
-	//離れる
-	void Player_Second::EnterLeaveBehavior() {
-		auto Trans = GetComponent<Transform>();
-		My_Pos_Vec3 = Trans->GetPosition();
-		New_Vec = Move_Velo(My_Pos_Vec3, SavePos_Vec3);
-
-	}
-	//挟む前　（攻撃前）
-	void Player_Second::EnterBeforeAttractBehavior() {
-		auto Trans = GetComponent<Transform>();
-		//初期位置の保存
-		SavePos_Vec3 = Trans->GetPosition();
-		////もう一つのプレイヤーの位置
-		Partner_Pos_Vec3 = GetStage()->GetSharedGameObject<Player>(L"GamePlayer", false)->GetComponent<Transform>()->GetPosition();
-		My_Pos_Vec3 = Trans->GetPosition();
-		New_Vec = Direction(My_Pos_Vec3, Partner_Pos_Vec3);
-	}
-	////////////////////////ステート継続関数///////////////////////////////////////
-	//ステートマシーンで使う関数
-	void Player_Second::ExecuteMoveBehavior() {
-		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
-		InputStick();
-		InputRotation();
-		if (CntlVec[0].wButtons &XINPUT_GAMEPAD_A) {
-			//ステート移動
-			GetStateSecondMachine()->ChangeState(BeforeAttractState_Second::Instance());
-
-		}
-	}
-	//挟むステート
-	void Player_Second::ExecuteToAttractBehavior() {
-		auto PlayerL = GetStage()->GetSharedGameObject<Player>(L"GamePlayer", false);
-		auto PlayerLPos = PlayerL->GetComponent<Transform>()->GetPosition();
-		Vector3 Distance_Vec3 = PlayerLPos - GetComponent<Transform>()->GetPosition();
-		auto Rig = GetComponent<Rigidbody>();
-		float ElapsedTime_F = App::GetApp()->GetElapsedTime() * 20;
-		Speed_F += Rig->GetMaxSpeed() / 30;
-		Rig->SetVelocity(Vector3(New_Vec * ElapsedTime_F * Speed_F));
-
-
-		if (1.0 > abs(Distance_Vec3.x) && 1.0 > abs(Distance_Vec3.z)) {
-			GetStateSecondMachine()->ChangeState(LeaveState_Second::Instance());
-		}
-
-
-	}
-	//離れる
-	void Player_Second::ExecuteLeaveBehavior() {
-		//　離れる処理
-		float ElapsedTime_F = App::GetApp()->GetElapsedTime() * 2;
-		auto Trans = GetComponent<Transform>();
-		auto Rig = GetComponent<Rigidbody>();
-		Vector3 Distance_Vec3 = SavePos_Vec3 - Trans->GetPosition();
-
-
-		Speed_F += Rig->GetMaxSpeed() / 3;
-		//New_Vec = 進む方向　Speed_F = 移動スピード
-		Rig->SetVelocity(New_Vec * Speed_F * ElapsedTime_F);
-
-
-		if (1.1 > abs(Distance_Vec3.x) && 1.1 > abs(Distance_Vec3.z)) {
-			Trans->SetPosition(SavePos_Vec3);
-
-			GetStateSecondMachine()->ChangeState(MoveState_Second::Instance());
-		}
-	}
-	//攻撃前　（攻撃準備）
-	void Player_Second::ExecuteBeforeAttractBehavior() {
-		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
-		auto Trans = GetComponent<Transform>();
-		auto Pos = Trans->GetPosition();
-
-		auto PtrPlayer2 = GetStage()->GetSharedGameObject<Player>(L"GamePlayer", false);
-		auto Player2Pos = PtrPlayer2->GetComponent<Transform>()->GetPosition();
-		auto D = Vector3(Pos.x - Player2Pos.x, Pos.y - Player2Pos.y, Pos.z - Player2Pos.z);
-
-		//　離れる処理
-		float ElapsedTime_F = App::GetApp()->GetElapsedTime() * 10;
-		auto Rig = GetComponent<Rigidbody>();
-		//New_Vec = 進む方向　Speed_F = 移動スピード
-		Rig->SetVelocity(New_Vec * Speed_F * ElapsedTime_F);
-		if (D.x*D.x + D.z + D.z > 1000) {
-			Speed_F = 0.0f;
-		}
-		else {
-			Speed_F += Rig->GetMaxSpeed() / 30;
-		}
-
-		//Aが話されたら攻撃ステートに移動
-		if (!(CntlVec[0].wButtons& XINPUT_GAMEPAD_A)) {
-			GetStateSecondMachine()->ChangeState(ToAttractState_Second::Instance());
-		}
-	}
-
-
-
-
-	/////////////////////////ステート終了関数/////////////////////////////////////////
-	void Player_Second::ExitMoveBehabior() {
-		auto Rig = GetComponent<Rigidbody>();
-		Rig->SetVelocity(0, 0, 0);
-	}
-	void Player_Second::ExitToAttractBehavior() {
-		auto Rig = GetComponent<Rigidbody>();
-		Rig->SetVelocity(0, 0, 0);
-
-	}
-	void Player_Second::ExitLeaveBehavior() {
-
-	}
-	//攻撃前　（攻撃準備）
-	void Player_Second::ExitBeforeAttractBehavior() {
-
-	}
-
-	//位置固定
-	void Player_Second::FixedPos() {
-		if (FixedPos_b) {
-			Now_Pos_Vec3 = GetComponent<Transform>()->GetPosition();
-			GetComponent<Transform>()->SetPosition(Now_Pos_Vec3);
-			GetComponent<Rigidbody>()->SetVelocity(0, 0, 0);
-		}
-		FixedPos_b = false;
-	}
-
-
-
-	//引き合うときに使用
-	Vector3 Player_Second::Move_Velo(Vector3 MyPos, Vector3 PartnerPos) {
-		Vector3 Default_Pos_Vec3 = PartnerPos - MyPos;
-		float Angle = atan2(Default_Pos_Vec3.z, Default_Pos_Vec3.x);
-		Vector3 Velo = Vector3(cos(Angle), 0, sin(Angle));
-		return Velo;
-	}
-	//離れる時に使用
-	Vector3 Player_Second::Direction(Vector3 MyPos, Vector3 PartnerPos) {
-		Direction_Vec3 = MyPos - PartnerPos;
-		Direction_Vec3.Normalize();
-		return Direction_Vec3;
-	}
-
-	//回転
-	void Player_Second::Rot() {
-		auto PlayerCenterPtr = GetStage()->GetSharedGameObject<PlayerCenter>(L"PlayerCenter");
-		auto PlayerCenterPos = PlayerCenterPtr->GetComponent<Transform>()->GetPosition();
-		auto PlayerCenterRot = PlayerCenterPtr->GetComponent<Transform>()->GetRotation();
-		float RotY = PlayerCenterRot.y;
-		RotY += XM_PIDIV2;
-		auto Pos = Vector3(sin(RotY), 0, cos(RotY));
-		Pos += PlayerCenterPos;
-		//初期位置などの設定
-		auto Ptr = GetComponent<Transform>();
-		Ptr->SetScale(1.0f, 1.0f, 1.0f);	//直径25センチの球体
-		Ptr->SetRotation(0.0f, 0.0f, 0.0f);
-		Ptr->SetPosition(Pos);
-	}
-	////移動ステート
-	////--------------------------------------------------------------------------------------
-	////	class MoveState_Second : public ObjState<Player_Second>;
-	////	用途:移動ステート　
-	////--------------------------------------------------------------------------------------
-	////ステートのインスタンス取得
-	shared_ptr<MoveState_Second> MoveState_Second::Instance() {
-		static shared_ptr<MoveState_Second> instance;
-		if (!instance) {
-			instance = shared_ptr<MoveState_Second>(new MoveState_Second);
-		}
-		return instance;
-	}
-	//ステートに入ったときに呼ばれる関数
-	void MoveState_Second::Enter(const shared_ptr<Player_Second>& Obj) {
-	}
-	//ステート実行中に毎ターン呼ばれる関数
-	void MoveState_Second::Execute(const shared_ptr<Player_Second>& Obj) {
-		Obj->ExecuteMoveBehavior();
-	}
-	//ステート実行中に毎ターン呼ばれる関数
-	void MoveState_Second::Exit(const shared_ptr<Player_Second>& Obj) {
-		Obj->ExitMoveBehabior();
-	}
-
-	////移動ステート
-	////--------------------------------------------------------------------------------------
-	////	class ToAttractState_Second : public ObjState<Player_Second>;
-	////	用途:引き寄せ合う
-	////--------------------------------------------------------------------------------------
-	////ステートのインスタンス取得
-	shared_ptr<ToAttractState_Second> ToAttractState_Second::Instance() {
-		static shared_ptr<ToAttractState_Second> instance;
-		if (!instance) {
-			instance = shared_ptr<ToAttractState_Second>(new ToAttractState_Second);
-		}
-		return instance;
-	}
-	//ステートに入ったときに呼ばれる関数
-	void ToAttractState_Second::Enter(const shared_ptr<Player_Second>& Obj) {
-		Obj->EnterToAttractBehavior();
-	}
-	//ステート実行中に毎ターン呼ばれる関数
-	void ToAttractState_Second::Execute(const shared_ptr<Player_Second>& Obj) {
-		Obj->ExecuteToAttractBehavior();
-	}
-	//ステート実行中に毎ターン呼ばれる関数
-	void ToAttractState_Second::Exit(const shared_ptr<Player_Second>& Obj) {
-		Obj->ExitToAttractBehavior();
-	}
-
-	//--------------------------------------------------------------------------------------
-	//	class LeaveState_Second : public ObjState<Player_Second>;
-	//	用途:離れるステート
-	//--------------------------------------------------------------------------------------
-	//ステートのインスタンス取得
-	shared_ptr<LeaveState_Second> LeaveState_Second::Instance() {
-		static shared_ptr<LeaveState_Second> instance;
-		if (!instance) {
-			instance = shared_ptr<LeaveState_Second>(new LeaveState_Second);
-		}
-		return instance;
-	}
-	//ステートに入ったときに呼ばれる関数
-	void LeaveState_Second::Enter(const shared_ptr<Player_Second>& Obj) {
-		Obj->EnterLeaveBehavior();
-	}
-	//ステート実行中に毎ターン呼ばれる関数
-	void LeaveState_Second::Execute(const shared_ptr<Player_Second>& Obj) {
-		Obj->ExecuteLeaveBehavior();
-	}
-	//ステート実行中に毎ターン呼ばれる関数
-	void LeaveState_Second::Exit(const shared_ptr<Player_Second>& Obj) {
-		Obj->ExitLeaveBehavior();
-	}
-
-	//--------------------------------------------------------------------------------------
-	//	class BeforeAttractState_Second : public ObjState<Player_Second>;
-	//	用途:攻撃準備前ステート
-	//--------------------------------------------------------------------------------------
-	//ステートのインスタンス取得
-	shared_ptr<BeforeAttractState_Second> BeforeAttractState_Second::Instance() {
-		static shared_ptr<BeforeAttractState_Second> instance;
-		if (!instance) {
-			instance = shared_ptr<BeforeAttractState_Second>(new BeforeAttractState_Second);
-		}
-		return instance;
-	}
-	//ステートに入ったときに呼ばれる関数
-	void BeforeAttractState_Second::Enter(const shared_ptr<Player_Second>& Obj) {
-		Obj->EnterBeforeAttractBehavior();
-	}
-	//ステート実行中に毎ターン呼ばれる関数
-	void BeforeAttractState_Second::Execute(const shared_ptr<Player_Second>& Obj) {
-		Obj->ExecuteBeforeAttractBehavior();
-	}
-	//ステート実行中に毎ターン呼ばれる関数
-	void BeforeAttractState_Second::Exit(const shared_ptr<Player_Second>& Obj) {
-		Obj->ExitBeforeAttractBehavior();
-	}
 
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
