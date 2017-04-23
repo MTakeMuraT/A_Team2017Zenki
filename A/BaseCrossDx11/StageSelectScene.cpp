@@ -15,11 +15,11 @@ namespace basecross {
 	//ビューとライトの作成
 	void StageSelectScene::CreateViewLight() {
 		auto PtrView = CreateView<SingleView>();
-		//ビューのカメラの設定
-		auto PtrLookAtCamera = ObjectFactory::Create<LookAtCamera>();
-		PtrView->SetCamera(PtrLookAtCamera);
-		PtrLookAtCamera->SetEye(Vector3(0.0f, 5.0f, -5.0f));
-		PtrLookAtCamera->SetAt(Vector3(0.0f, 0.0f, 0.0f));
+		//ビューのカメラの設定(カメラ固定)
+		auto PtrCamera = PtrView->GetCamera();
+		PtrCamera->SetEye(Vector3(0.0f, 30.0f, -5.0f));
+		PtrCamera->SetAt(Vector3(0.0f, 0.0f, 0.0f));
+
 		//シングルライトの作成
 		auto PtrSingleLight = CreateLight<SingleLight>();
 		//ライトの設定
@@ -36,16 +36,47 @@ namespace basecross {
 			);
 	}
 
-
-	 StageSelectScene::~StageSelectScene() {
-		
+	//Abe20170421
+	//フレーム作成
+	void StageSelectScene::CreateFlame()
+	{
+		AddGameObject<SelectFlame>(Vector2(0, 0), Vector2(1280, 720), 1);
 	}
+
+	//プレイヤー作成
+	void StageSelectScene::CreatePlayer()
+	{
+		SetSharedGameObject(L"SelectPlayer", AddGameObject<SelectPlayer>(Vector3(0, 0, 0), Vector3(1, 1, 1), 30));
+	}
+
+	//ステージボックス作成
+	void StageSelectScene::CreateStageBox()
+	{
+		AddGameObject<StageBox>(Vector3(0,0,0),Vector3(1,1,1),1);
+	}
+
+	//ステージ行くかチェックするスプライト
+	void StageSelectScene::CreateGoCheck()
+	{
+		SetSharedGameObject(L"GoStageCheck", AddGameObject<GoStageCheck>(Vector2(200, 200)));
+	}
+	//Abe20170421
 
 	void StageSelectScene::OnCreate()
 	{
 		try {
 			CreateViewLight();
-			CreatTestLin();
+			//CreatTestLin();
+			//Abe20170421
+			//フレーム作成
+			CreateFlame();
+			//プレイヤー作成
+			CreatePlayer();
+			//ステージボックス作成
+			CreateStageBox();
+			//ステージ行くかチェックするスプライト
+			CreateGoCheck();
+			//Abe20170421
 
 		}
 		catch (...) {

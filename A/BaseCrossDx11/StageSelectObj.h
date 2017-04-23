@@ -1,0 +1,138 @@
+#pragma once
+#include "stdafx.h"
+
+namespace basecross 
+{
+	//Abe20170421
+	//--------------------------------------------------------------------------------------
+	//	ステージセレクトのオブジェクト
+	//　プレイヤーが操作する部分あるのでちょっと多め
+	//--------------------------------------------------------------------------------------
+
+	//--------------------------------------------------------------------------------------
+	//	フレームスプライト
+	//--------------------------------------------------------------------------------------
+	class SelectFlame : public GameObject
+	{
+	private :
+		//座標（引数でVec2入れるけどSetPositionでVec3入れるし）
+		Vector3 m_InitPos;
+		//大きさ
+		Vector3 m_InitScale;
+		//レイヤー
+		int m_layer;
+	public:
+		SelectFlame(const shared_ptr<Stage>& StagePtr, Vector2 pos, Vector2 scale,int layer);
+
+		void OnCreate() override;
+	};
+
+	//--------------------------------------------------------------------------------------
+	//	プレイヤーの中心
+	//--------------------------------------------------------------------------------------
+	class SelectPlayer : public GameObject
+	{
+	private :
+		//初期座標
+		Vector3 m_InitPos;
+		//初期サイズ
+		Vector3 m_InitScale;
+		//速度
+		float m_Speed;
+
+		//初期で離れてる距離
+		float m_DifLength = 2;
+
+		//プレイヤーの実態
+		vector<shared_ptr<GameObject>> m_Player;
+
+		//プレイヤーが合体する状態になってるか
+		bool m_SandFlg = false;
+		//ある程度近づいた後戻ってる状態か
+		bool m_SandFinishFlg = false;
+		//関数群
+		void SandMove();
+	public :
+		SelectPlayer(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, float speed);
+
+		void OnCreate() override;
+		void OnUpdate() override;
+
+		//アップデート制御
+		void SetPlayerUpdate(bool flg);
+
+		//はさむフラグオン
+		void SandFlgOn() { m_SandFlg = true; }
+		//元の位置に戻るフラグオン
+		void SandFinishFlgOn() { m_SandFinishFlg = true; }
+	};
+
+	//--------------------------------------------------------------------------------------
+	//	ステージの箱
+	//--------------------------------------------------------------------------------------
+	class StageBox : public GameObject
+	{
+	private :
+		//初期座標
+		Vector3 m_InitPos;
+		//初期サイズ
+		Vector3 m_InitScale;
+		//ステージ番号
+		int m_stagenumber;
+		//プレイヤー当たってる数
+		int m_PlayerHitNum = 0;
+		//判定するフラグ
+		bool m_PlayerHitFlg = false;
+	public :
+		StageBox(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, int num);
+
+		void OnCreate()override;
+		void OnUpdate()override;
+
+		//アタリ判定(リブ)
+		virtual void OnCollisionExcute(vector<shared_ptr<GameObject>>& OtherVec) override;
+
+		//ステージに行くか確認する処理
+		void CheckGo();
+	};
+
+	//--------------------------------------------------------------------------------------
+	//	ステージ行くか確認するオブジェクト
+	//--------------------------------------------------------------------------------------
+	class GoStageCheck : public GameObject
+	{
+	private :
+		//位置は固定するので書かない
+		//大きさ(大きさ変えるアニメーション使うなら)
+		Vector3 m_InitScale;
+
+		//背景
+		shared_ptr<GameObject> m_CheckBack;
+		//Yes文字
+		shared_ptr<GameObject> m_CheckYes;
+		//No文字
+		shared_ptr<GameObject> m_CheckNo;
+		//確認文字
+		shared_ptr<GameObject> m_CheckLogo;
+		//カーソル
+		shared_ptr<GameObject> m_Cursor;
+
+		//選択してる番号 0でNo、1でYes
+		int m_selectnum = 0;
+
+		//表示されてるか
+		bool m_Dispflg = false;
+	public :
+		GoStageCheck(const shared_ptr<Stage>& StagePtr, Vector2 scale);
+
+		void OnCreate()override;
+		void OnUpdate()override;
+
+		//スプライトとか出す
+		void OpenCheck();
+
+		//スプライトとか消す
+		void CloseCheck();
+	};
+	//Abe20170421
+}

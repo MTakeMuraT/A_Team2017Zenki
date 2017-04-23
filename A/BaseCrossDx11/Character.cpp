@@ -925,6 +925,125 @@ namespace basecross {
 		}
 	}
 	//Abe20170418
+	//Abe20170421
+	//--------------------------------------------------------------------------------------
+	//	スプライトの大きさ、位置を確認するオブジェクト
+	//--------------------------------------------------------------------------------------
+	SpritePosScaleChecker::SpritePosScaleChecker(const shared_ptr<Stage>& StagePtr, Vector2 pos, Vector2 scale, int layer, wstring txtname) :
+		GameObject(StagePtr),
+		m_pos(pos),
+		m_scale(scale),
+		m_layer(layer),
+		m_texturename(txtname)
+	{}
+
+	void SpritePosScaleChecker::OnCreate()
+	{
+		auto Trans = AddComponent<Transform>();
+		Trans->SetPosition(m_pos);
+		Trans->SetScale(m_scale);
+		Trans->SetRotation(0, 0, 0);
+
+		auto Draw = AddComponent<PCTSpriteDraw>();
+		Draw->SetTextureResource(m_texturename);
+
+		SetDrawLayer(m_layer);
+
+		SetAlphaActive(true);
+
+		//文字列
+		auto PtrString = AddComponent<StringSprite>();
+		PtrString->SetText(L"");
+		PtrString->SetFont(L"", 40);
+		PtrString->SetTextRect(Rect2D<float>(16.0f, 16.0f, 640.0f, 480.0f));
+
+	}
+
+	void SpritePosScaleChecker::OnUpdate()
+	{
+		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		if (CntlVec[0].bConnected)
+		{
+			//サイズは十字キーで操作
+			//************************************
+			//	操作方法
+			//	十字キー：スケール [↑] +Y [↓] -Y [→] +X [←] -X
+			//	スティック：座標移動
+			//　A,B：減速
+			//　X,Y：加速
+			//************************************
+			//変化速度設定
+			float Speed = 1.0f;
+			//２回に分けとけばそれだけ変化するのであえてやってる
+			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_A)
+			{
+				Speed *= 0.5f;
+			}
+			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_B)
+			{
+				Speed *= 0.5f;
+			}
+
+			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_X)
+			{
+				Speed *= 2.0f;
+			}
+			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_Y)
+			{
+				Speed *= 2.0f;
+			}
+
+			//サイズ------------------------------------------------
+			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_DPAD_DOWN)
+			{
+				m_scale += Vector3(0, -1, 0) * Speed;
+				GetComponent<Transform>()->SetScale(m_scale);
+			}
+			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_DPAD_UP)
+			{
+				m_scale += Vector3(0, 1, 0) * Speed;
+				GetComponent<Transform>()->SetScale(m_scale);
+			}
+			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_DPAD_LEFT)
+			{
+				m_scale += Vector3(-1, 0, 0) * Speed;
+				GetComponent<Transform>()->SetScale(m_scale);
+			}
+			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_DPAD_RIGHT)
+			{
+				m_scale += Vector3(1, 0, 0) * Speed;
+				GetComponent<Transform>()->SetScale(m_scale);
+			}
+			//移動------------------------------------------------
+			if (CntlVec[0].fThumbLX > 0.5f)
+			{
+				m_pos += Vector3(1, 0, 0) * Speed;
+				GetComponent<Transform>()->SetPosition(m_pos);
+			}
+			if (CntlVec[0].fThumbLX < -0.5f)
+			{
+				m_pos += Vector3(-1, 0, 0) * Speed;
+				GetComponent<Transform>()->SetPosition(m_pos);
+			}
+
+			if (CntlVec[0].fThumbLY > 0.5f)
+			{
+				m_pos += Vector3(0, 1, 0) * Speed;
+				GetComponent<Transform>()->SetPosition(m_pos);
+			}
+			if (CntlVec[0].fThumbLY < -0.5f)
+			{
+				m_pos += Vector3(0, -1, 0) * Speed;
+				GetComponent<Transform>()->SetPosition(m_pos);
+			}
+
+			//表示
+			wstring txt = L"Pos\nX:" + Util::FloatToWStr(m_pos.x) + L"\nY:" + Util::FloatToWStr(m_pos.y);
+			txt += L"\nScale\nX:" + Util::FloatToWStr(m_scale.x) + L"\nY:" + Util::FloatToWStr(m_scale.y);
+			GetComponent<StringSprite>()->SetText(txt);
+		}
+	}
+	//Abe20170421
 
 }
 	

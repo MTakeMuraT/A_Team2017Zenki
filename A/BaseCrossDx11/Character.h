@@ -346,6 +346,28 @@ namespace basecross{
 		int GetLife() { return m_Life; }
 	};
 	//Abe20170418
+	//Abe20170421
+	//--------------------------------------------------------------------------------------
+	//	スプライトの大きさ、位置を確認するオブジェクト
+	//--------------------------------------------------------------------------------------
+	class SpritePosScaleChecker : public GameObject
+	{
+	private:
+		//座標
+		Vector3 m_pos;
+		//大きさ
+		Vector3 m_scale;
+		//レイヤー
+		int m_layer;
+		//テクスチャの名前
+		wstring m_texturename;
+	public:
+		SpritePosScaleChecker(const shared_ptr<Stage>& StagePtr, Vector2 pos, Vector2 scale, int layer, wstring txtname);
+
+		void OnCreate()override;
+		void OnUpdate()override;
+	};
+	//Abe20170421
 
 }
 //end basecross

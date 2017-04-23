@@ -14,13 +14,16 @@
 //アタリ判定
 #include "Collision_Sphere.h"
 #include "ProjectShader.h"
+//シーン
 #include "Scene.h"
 #include "TitleScene.h"
 #include "StageSelectScene.h"
 #include "GameStage.h"
+//オブジェ
 #include "Character.h"
 #include "Player.h"
 #include "GameMedia.h"
+#include "StageSelectObj.h"
 
 
 

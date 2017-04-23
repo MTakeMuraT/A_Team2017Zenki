@@ -50,9 +50,9 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"TEST_Serekuto_TX", strTexture);
 		strTexture = DataDir + L"TestTexture\\Taitoru.png";
 		App::GetApp()->RegisterTexture(L"TEST_Taitoru_TX", strTexture); 
-		//セレクト
-		strTexture = DataDir + L"Stage_Select_Lin\\STAGE_SELECT_TEST.png";
-		App::GetApp()->RegisterTexture(L"SELECT_TEST_TX", strTexture); 
+		////セレクト
+		//strTexture = DataDir + L"Stage_Select_Lin\\STAGE_SELECT_TEST.png";
+		//App::GetApp()->RegisterTexture(L"SELECT_TEST_TX", strTexture); 
 		//タイトル
 		strTexture = DataDir + L"Title_Lin\\TITLE_TEST.png";
 		App::GetApp()->RegisterTexture(L"Taitoru_TEST_TX", strTexture);
@@ -61,7 +61,26 @@ namespace basecross {
 		strTexture = DataDir + L"kuro.png";
 		App::GetApp()->RegisterTexture(L"KURO_TX", strTexture);
 
-		
+		//Abe20170421
+		//仮
+		//セレクトのフレーム
+		strTexture = DataDir + L"TestTexture\\Select_flameTEST.png";
+		App::GetApp()->RegisterTexture(L"SELECT_FLAME_TX", strTexture);
+		//セレクトのステージ行くか確認するときのYES
+		strTexture = DataDir + L"TestTexture\\CheckYes.png";
+		App::GetApp()->RegisterTexture(L"SELECT_YES_TX", strTexture);
+		//セレクトのステージ行くか確認するときのNO
+		strTexture = DataDir + L"TestTexture\\CheckNo.png";
+		App::GetApp()->RegisterTexture(L"SELECT_NO_TX", strTexture);
+		//仮のシロ
+		strTexture = DataDir + L"TestTexture\\siro.png";
+		App::GetApp()->RegisterTexture(L"SELECT_SIRO_TX", strTexture);
+		//仮のカーソル
+		strTexture = DataDir + L"TestTexture\\spark.png";
+		App::GetApp()->RegisterTexture(L"SELECT_CURSOR_TX", strTexture);
+
+		//Abe20170421
+
 		
 		////モデルの適用サンプル
 		//auto MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"名前.bmf");
