@@ -290,13 +290,13 @@ namespace basecross {
 	}
 	void FixdBox::OnUpdate() {
 		//プレイヤーL
-		auto PtrPlayer_L = GetStage()->GetSharedGameObject<Player>(L"GamePlayer", false);
+		auto PtrPlayer_L = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false);
 		auto PtrPlayer_L_Trans = PtrPlayer_L->GetComponent<Transform>();
 		Vector3 PtrPlayer_L_Pos = PtrPlayer_L_Trans->GetPosition();
 		Vector3 PtrPlayer_L_Scale = PtrPlayer_L_Trans->GetScale();
 		Vector3 PtrPlayer_L_ScaleHalf_Vec = Vector3(PtrPlayer_L_Scale.x / 2, PtrPlayer_L_Scale.y / 2, PtrPlayer_L_Scale.z / 2);
 		//プレイヤーR
-		auto PtrPlayer_R = GetStage()->GetSharedGameObject<Player_Second>(L"GamePlayer_R", false);
+		auto PtrPlayer_R = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_R", false);
 		auto PtrPlayer_R_Trans = PtrPlayer_R->GetComponent<Transform>();
 		Vector3 PtrPlayer_R_Pos = PtrPlayer_R_Trans->GetPosition();
 		Vector3 PtrPlayer_R_Scale = PtrPlayer_R_Trans->GetScale();

@@ -67,11 +67,13 @@ namespace basecross
 	//プレイヤー関係
 	void GameStage::CreatePlayerLin() {
 		auto PtrPlayer_L = AddGameObject<Player>(
-			Vector3(0, 1, 0)
+			Vector3(0, 1, 0),
+			wstring(L"PlayerL")
 			);
-		SetSharedGameObject(L"GamePlayer", PtrPlayer_L);
-		auto PtrPlayer_R = AddGameObject<Player_Second>(
-			Vector3(5, 1, 0)
+		SetSharedGameObject(L"GamePlayer_L", PtrPlayer_L);
+		auto PtrPlayer_R = AddGameObject<Player>(
+			Vector3(5, 1, 0),
+			wstring(L"PlayerR")
 			);
 		SetSharedGameObject(L"GamePlayer_R", PtrPlayer_R);
 
@@ -201,8 +203,8 @@ namespace basecross
 
 
 		//２体の座標もらう
-		Vector3 Player1Pos = GetSharedGameObject<Player>(L"GamePlayer", false)->GetComponent<Transform>()->GetPosition();
-		Vector3 Player2Pos = GetSharedGameObject<Player_Second>(L"GamePlayer_R", false)->GetComponent<Transform>()->GetPosition();
+		Vector3 Player1Pos = GetSharedGameObject<Player>(L"GamePlayer_L", false)->GetComponent<Transform>()->GetPosition();
+		Vector3 Player2Pos = GetSharedGameObject<Player>(L"GamePlayer_R", false)->GetComponent<Transform>()->GetPosition();
 
 		//見る点をプレイヤー間の中心
 		At = (Player1Pos + Player2Pos) / 2;
