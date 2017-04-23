@@ -99,6 +99,9 @@
     <ClInclude Include="Transform.h">
       <Filter>SourceCode\Header</Filter>
     </ClInclude>
+    <ClInclude Include="StageSelectObj.h">
+      <Filter>SourceCode\Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\StringComponents.cpp">
@@ -162,6 +165,9 @@
       <Filter>SourceCode\cpp</Filter>
     </ClCompile>
     <ClCompile Include="WinMain.cpp">
+      <Filter>SourceCode\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="StageSelectObj.cpp">
       <Filter>SourceCode\cpp</Filter>
     </ClCompile>
   </ItemGroup>

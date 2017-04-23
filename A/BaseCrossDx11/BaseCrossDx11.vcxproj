@@ -32,6 +32,7 @@
     <ClInclude Include="ProjectShader.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="StageSelectObj.h" />
     <ClInclude Include="StageSelectScene.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -56,6 +57,7 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="ProjectShader.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="StageSelectObj.cpp" />
     <ClCompile Include="StageSelectScene.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
