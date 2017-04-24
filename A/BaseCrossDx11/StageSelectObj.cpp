@@ -136,7 +136,7 @@ namespace basecross
 			//進む方向を決める
 			Vector3 difpos = m_Player[1]->GetComponent<Transform>()->GetPosition() - m_Player[0]->GetComponent<Transform>()->GetPosition();
 			//ある程度 半径1.5くらい以上
-			if (difpos.x*difpos.x + difpos.z*difpos.z > 2)
+			if (difpos.x*difpos.x + difpos.z*difpos.z > 4)
 			{
 				//absを使うとifで反転させるより遅くなるけどそんなに重い処理ないしおｋだよね？
 				float xPlusz = abs(difpos.x) + abs(difpos.z);
