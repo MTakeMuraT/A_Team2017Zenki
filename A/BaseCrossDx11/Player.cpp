@@ -306,7 +306,8 @@ namespace basecross {
 	void Player::ExecuteMoveBehavior() {
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		InputStick();
-		InputRotation();
+		//InputRotation();
+		Rot();
 		if (CntlVec[0].wButtons &XINPUT_GAMEPAD_A) {
 			//ステート移動
 			GetStateMachine()->ChangeState(BeforeAttractState::Instance());
@@ -367,7 +368,7 @@ namespace basecross {
 		Rig->SetVelocity(New_Vec * Speed_F * ElapsedTime_F);
 
 
-		if (D.x*D.x + D.z + D.z > 1000) {
+		if (D.x * D.x + D.z * D.z > 100) {
 			Speed_F = 0.0f;
 		}
 		else {
@@ -479,7 +480,12 @@ namespace basecross {
 		auto PlayerCenterPos = PlayerCenterPtr->GetComponent<Transform>()->GetPosition();
 		auto PlayerCenterRot = PlayerCenterPtr->GetComponent<Transform>()->GetRotation();
 		float RotY = PlayerCenterRot.y;
-		RotY -= XM_PIDIV2;
+		if (m_Player_Str == L"PlayerL") {
+			RotY -= XM_PIDIV2;
+		}
+		else {
+			RotY += XM_PIDIV2;
+		}
 		auto Pos = Vector3(sin(RotY), 0, cos(RotY));
 		Pos += PlayerCenterPos;
 		//初期位置などの設定
@@ -633,44 +639,51 @@ namespace basecross {
 		Ptr->SetScale(0.25f, 0.25f, 0.25f);	//直径25センチの球体
 		Ptr->SetRotation(0.0f, 0.0f, 0.0f);
 		Ptr->SetPosition(0.0f, 0.5f, 5.0f);
-		/*
-		//影をつける（シャドウマップを描画する）
-		auto ShadowPtr = AddComponent<Shadowmap>();
-		//影の形（メッシュ）を設定
-		ShadowPtr->SetMeshResource(L"DEFAULT_SPHERE");
-		//描画コンポーネントの設定
-		auto PtrDraw = AddComponent<BcPNTStaticDraw>();
-		//描画するメッシュを設定
-		PtrDraw->SetMeshResource(L"DEFAULT_SPHERE");
-		//描画するテクスチャを設定
-		PtrDraw->SetTextureResource(L"TRACE_TX");
-		//透明処理
-		SetAlphaActive(true);
-		*/
+		
+		////影をつける（シャドウマップを描画する）
+		//auto ShadowPtr = AddComponent<Shadowmap>();
+		////影の形（メッシュ）を設定
+		//ShadowPtr->SetMeshResource(L"DEFAULT_SPHERE");
+		////描画コンポーネントの設定
+		//auto PtrDraw = AddComponent<PNTStaticDraw>();
+		////描画するメッシュを設定
+		//PtrDraw->SetMeshResource(L"DEFAULT_SPHERE");
+		////描画するテクスチャを設定
+		//PtrDraw->SetTextureResource(L"TRACE_TX");
+		////透明処理
+		//SetAlphaActive(true);
+		auto PtrRig = AddComponent<Rigidbody>();
 
-
+		//初期位置を二体のプレイヤーの真ん中に設定
+		auto Trans = GetComponent<Transform>();
+		auto PtrPlayerL_Pos = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false)->GetComponent<Transform>()->GetPosition();
+		auto PtrPlayerR_Pos = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_R", false)->GetComponent<Transform>()->GetPosition();
+		auto PlayerHalf = (PtrPlayerL_Pos + PtrPlayerR_Pos) / 2;
+		Trans->SetPosition(PlayerHalf);
+		
 	}
 
 	void PlayerCenter::OnUpdate() {
-		auto Ptr = GetComponent<Transform>();
-		auto Qt = Ptr->GetQuaternion();
+		auto Trans = GetComponent<Transform>();
+		auto Rig  = GetComponent<Rigidbody>();
+		auto Qt = Trans->GetQuaternion();
 		float ElapsedTime = App::GetApp()->GetElapsedTime();
-
+		auto PtrPlayer_Vel = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false)->GetComponent<Rigidbody>()->GetVelocity();
+		Rig->SetVelocity(PtrPlayer_Vel);
+		
 
 		//コントローラの取得
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
-		if (CntlVec[0].bConnected) {
 			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) {
 				Quaternion SpanQt(Vector3(0, 1, 0), -ElapsedTime * 2.0f);
 				Qt *= SpanQt;
-				Ptr->SetQuaternion(Qt);
+				Trans->SetQuaternion(Qt);
 			}
 			else if (CntlVec[0].wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
 				Quaternion SpanQt(Vector3(0, 1, 0), ElapsedTime * 2.0f);
 				Qt *= SpanQt;
-				Ptr->SetQuaternion(Qt);
+				Trans->SetQuaternion(Qt);
 			}
-		}
 
 
 
