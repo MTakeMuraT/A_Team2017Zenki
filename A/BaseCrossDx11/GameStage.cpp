@@ -76,6 +76,8 @@ namespace basecross
 			wstring(L"PlayerR")
 			);
 		SetSharedGameObject(L"GamePlayer_R", PtrPlayer_R);
+		auto PtrPlayerCenter = AddGameObject<PlayerCenter>();
+		SetSharedGameObject(L"PlayerCenter", PtrPlayerCenter);
 
 		////HPŠÖŒW
 		//AddGameObject<HP>(
