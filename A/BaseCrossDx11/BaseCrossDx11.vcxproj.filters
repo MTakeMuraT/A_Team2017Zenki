@@ -102,6 +102,9 @@
     <ClInclude Include="StageSelectObj.h">
       <Filter>SourceCode\Header</Filter>
     </ClInclude>
+    <ClInclude Include="CSV.h">
+      <Filter>SourceCode\Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\StringComponents.cpp">
@@ -168,6 +171,9 @@
       <Filter>SourceCode\cpp</Filter>
     </ClCompile>
     <ClCompile Include="StageSelectObj.cpp">
+      <Filter>SourceCode\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="CSV.cpp">
       <Filter>SourceCode\cpp</Filter>
     </ClCompile>
   </ItemGroup>
