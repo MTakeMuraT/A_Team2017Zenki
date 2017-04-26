@@ -123,7 +123,7 @@ namespace basecross {
 		wstring str = alphaStr + flg;
 
 		auto PtrString = GetComponent<StringSprite>();
-		PtrString->SetText(str);
+		//PtrString->SetText(str);
 	}
 
 	//ゆーすけくん
@@ -423,6 +423,27 @@ namespace basecross {
 		m_InitPos(Pos),
 		m_Scale(Scale)
 	{}
+
+	Enemy01::Enemy01(const shared_ptr<Stage>& StagePtr, const wstring& line):
+		GameObject(StagePtr)
+	{
+		//トークン（カラム）の配列
+		vector<wstring> Tokens;
+		//トークン（カラム）単位で文字列を抽出(L','をデリミタとして区分け)
+		Util::WStrToTokenVector(Tokens, line, L',');
+		m_Scale = Vector3(
+			(float)_wtof(Tokens[4].c_str()),
+			(float)_wtof(Tokens[4].c_str()),
+			(float)_wtof(Tokens[4].c_str())
+		);
+		m_InitPos = Vector3(
+			(float)_wtof(Tokens[1].c_str()),
+			(float)_wtof(Tokens[2].c_str()),
+			(float)_wtof(Tokens[3].c_str())
+		);
+
+	}
+
 
 	void Enemy01::OnCreate()
 	{

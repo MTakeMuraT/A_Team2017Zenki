@@ -207,6 +207,7 @@ namespace basecross{
 		Vector3 m_Vel;
 	public :
 		Enemy01(const shared_ptr<Stage>& StagePtr,Vector3 Pos,Vector3 Scale);
+		Enemy01(const shared_ptr<Stage>& StagePtr, const wstring& line);
 
 		void OnCreate() override;
 		void OnUpdate() override;
