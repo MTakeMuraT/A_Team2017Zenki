@@ -24,7 +24,8 @@
 #include "Player.h"
 #include "GameMedia.h"
 #include "StageSelectObj.h"
-
+//CSV
+#include "CSV.h"
 
 
 //オブジェクトのデータ
