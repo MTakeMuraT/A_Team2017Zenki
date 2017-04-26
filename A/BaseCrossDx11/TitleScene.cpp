@@ -36,7 +36,8 @@ namespace basecross {
 			Vector2(512, 512),
 			Vector2(0, -180)
 			);
-
+		
+		//AddGameObject<InputCSV>();
 	}
 
 	void TitleScene::OnCreate() {
