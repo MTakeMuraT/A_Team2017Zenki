@@ -46,7 +46,7 @@ namespace basecross {
 	//プレイヤー作成
 	void StageSelectScene::CreatePlayer()
 	{
-		SetSharedGameObject(L"SelectPlayer", AddGameObject<SelectPlayer>(Vector3(0, 0, 0), Vector3(1, 1, 1), 30));
+		SetSharedGameObject(L"SelectPlayer", AddGameObject<SelectPlayer>(Vector3(0, 0, 0), Vector3(1, 1, 1),30.0f));
 	}
 
 	//ステージボックス作成
