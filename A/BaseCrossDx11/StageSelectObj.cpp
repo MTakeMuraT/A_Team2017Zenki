@@ -86,11 +86,14 @@ namespace basecross
 			Vector2 InputXY = Vector2(CntlVec[0].fThumbLX, CntlVec[0].fThumbLY) * m_Speed;
 			for (auto obj : m_Player)
 			{
+				//‹²‚ñ‚Å‚éŠÔ‚Í•Ê‚ÌVelocity‚ª“ü‚ê‚ç‚ê‚é‚Ì‚Å‚±‚±XV‚µ‚Ä‚à“®‚©‚È‚¢
 				obj->GetComponent<Rigidbody>()->SetVelocity(InputXY.x, 0, InputXY.y);
 			}
 
 			if (!m_SandFlg)
 			{
+				//‰ñ“]ˆ—
+				Rot();
 				//Aƒ{ƒ^ƒ“‰Ÿ‚µ‚Ä‚éŠÔ—£‚ê‚é
 				if (CntlVec[0].wButtons & XINPUT_GAMEPAD_A)
 				{
@@ -124,6 +127,77 @@ namespace basecross
 		if (m_SandFlg)
 		{
 			SandMove();
+		}
+	}
+
+	//‰ñ“]ˆ—
+	void SelectPlayer::Rot()
+	{
+		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		if (CntlVec[0].bConnected)
+		{
+			//¶Œ¨
+			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_LEFT_THUMB)
+			{
+				//À•WŽæ“¾
+				Vector3 pos1 = m_Player[0]->GetComponent<Transform>()->GetPosition();
+				Vector3 pos2 = m_Player[1]->GetComponent<Transform>()->GetPosition();
+				Vector3 centerpos = (pos1 + pos2) / 2;
+
+				//’†S‚©‚ç‚ÌŠp“xŽZo‚µ‚Ä‰ÁŽZ‚µ‚ÄŒvŽZ‚µ‚È‚¨‚µ‚ÄÀ•W‚É“ü‚ê‚é
+				Vector3 dif = pos1 - centerpos;
+				float angle1 = atan2(dif.z, dif.x) * 180/3.14159265f;
+				angle1 += 360;
+				int an1 = (int)angle1 % 360;
+				an1 += (int)(m_RotSpeedPerSec * App::GetApp()->GetElapsedTime());
+				//Šp“x‚©‚ç‹‚ß‚Ä’†S‚©‚ç‚Ì‹——£‚ð‚©‚¯‚é
+				Vector3 vel = Vector3(cos(an1*3.14159265f / 180), 0, sin(an1*3.14159265f / 180)) * m_DifLength;
+				pos1 = centerpos + vel;
+				m_Player[0]->GetComponent<Transform>()->SetPosition(pos1);
+
+				//‚Q‘Ì–Ú
+				dif = pos2 - centerpos;
+				float angle2 = atan2(dif.z, dif.x) * 180 / 3.14159265f;
+				angle2 += 360;
+				int an2 = (int)angle2 % 360;
+				an2 += (int)(m_RotSpeedPerSec * App::GetApp()->GetElapsedTime());
+				//Šp“x‚©‚ç‹‚ß‚Ä’†S‚©‚ç‚Ì‹——£‚ð‚©‚¯‚é
+				vel = Vector3(cos(an2*3.14159265f / 180), 0, sin(an2*3.14159265f / 180)) * m_DifLength;
+				pos2 = centerpos + vel;
+				m_Player[1]->GetComponent<Transform>()->SetPosition(pos2);
+
+			}
+			//‰EŒ¨
+			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_RIGHT_THUMB)
+			{
+				//À•WŽæ“¾
+				Vector3 pos1 = m_Player[0]->GetComponent<Transform>()->GetPosition();
+				Vector3 pos2 = m_Player[1]->GetComponent<Transform>()->GetPosition();
+				Vector3 centerpos = (pos1 + pos2) / 2;
+
+				//’†S‚©‚ç‚ÌŠp“xŽZo‚µ‚Ä‰ÁŽZ‚µ‚ÄŒvŽZ‚µ‚È‚¨‚µ‚ÄÀ•W‚É“ü‚ê‚é
+				Vector3 dif = pos1 - centerpos;
+				float angle1 = atan2(dif.z, dif.x) * 180 / 3.14159265f;
+				angle1 += 360;
+				int an1 = (int)angle1 % 360;
+				an1 += -(int)(m_RotSpeedPerSec * App::GetApp()->GetElapsedTime());
+				//Šp“x‚©‚ç‹‚ß‚Ä’†S‚©‚ç‚Ì‹——£‚ð‚©‚¯‚é
+				Vector3 vel = Vector3(cos(an1*3.14159265f / 180), 0, sin(an1*3.14159265f / 180)) * m_DifLength;
+				pos1 = centerpos + vel;
+				m_Player[0]->GetComponent<Transform>()->SetPosition(pos1);
+
+				//‚Q‘Ì–Ú
+				dif = pos2 - centerpos;
+				float angle2 = atan2(dif.z, dif.x) * 180 / 3.14159265f;
+				angle2 += 360;
+				int an2 = (int)angle2 % 360;
+				an2 += -(int)(m_RotSpeedPerSec * App::GetApp()->GetElapsedTime());
+				//Šp“x‚©‚ç‹‚ß‚Ä’†S‚©‚ç‚Ì‹——£‚ð‚©‚¯‚é
+				vel = Vector3(cos(an2*3.14159265f / 180), 0, sin(an2*3.14159265f / 180)) * m_DifLength;
+				pos2 = centerpos + vel;
+				m_Player[1]->GetComponent<Transform>()->SetPosition(pos2);
+
+			}
 		}
 	}
 
