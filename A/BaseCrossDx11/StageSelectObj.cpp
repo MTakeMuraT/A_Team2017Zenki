@@ -137,7 +137,7 @@ namespace basecross
 		if (CntlVec[0].bConnected)
 		{
 			//¶Œ¨
-			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_LEFT_THUMB)
+			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
 			{
 				//À•WŽæ“¾
 				Vector3 pos1 = m_Player[0]->GetComponent<Transform>()->GetPosition();
@@ -168,7 +168,7 @@ namespace basecross
 
 			}
 			//‰EŒ¨
-			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_RIGHT_THUMB)
+			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
 			{
 				//À•WŽæ“¾
 				Vector3 pos1 = m_Player[0]->GetComponent<Transform>()->GetPosition();
