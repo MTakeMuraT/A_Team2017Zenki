@@ -1065,6 +1065,56 @@ namespace basecross {
 		}
 	}
 	//Abe20170421
+	//Abe20170427
+	//--------------------------------------------------------------------------------------
+	//	デバッグ文字表示するオブジェクト
+	//--------------------------------------------------------------------------------------
+	DebugTxt::DebugTxt(const shared_ptr<Stage>& StagePtr):
+		GameObject(StagePtr)
+	{}
+
+	void DebugTxt::OnCreate()
+	{
+		auto sts = AddComponent<StringSprite>();
+		sts->SetText(L"");
+		sts->SetFont(L"", 20);
+		sts->SetTextRect(Rect2D<float>(16.0f, 16.0f, 640.0f, 480.0f));
+
+		m_Pos = Vector2(16.0f, 16.0f);
+		m_Scale = Vector2(624.0f, 624.0f);
+		m_ScaleTxt = 20;
+		SetDrawLayer(10);
+	}
+	//文字設定
+	void DebugTxt::SetText(wstring txt)
+	{
+		GetComponent<StringSprite>()->SetText(txt);
+	}
+
+	//大きさ(枠)設定
+	void DebugTxt::SetScale(Vector2 sca)
+	{
+		m_Scale = sca;
+		GetComponent<StringSprite>()->SetTextRect(Rect2D<float>(m_Pos.x, m_Pos.y, m_Pos.x + m_Scale.x, m_Pos.y + m_Scale.y));
+	}
+	//座標設定
+	void DebugTxt::SetPos(Vector2 pos)
+	{
+		m_Pos = pos;
+		GetComponent<StringSprite>()->SetTextRect(Rect2D<float>(m_Pos.x, m_Pos.y, m_Pos.x + m_Scale.x, m_Pos.y + m_Scale.y));
+	}
+	//大きさ(文字)設定
+	void DebugTxt::SetScaleTxt(int scatxt)
+	{
+		m_ScaleTxt = scatxt;
+		GetComponent<StringSprite>()->SetFont(L"", scatxt);
+	}
+	//レイヤー設定
+	void DebugTxt::SetLayer(int num)
+	{
+		SetDrawLayer(num);
+	}
+	//Abe20170427
 
 }
 	

@@ -562,4 +562,33 @@ namespace basecross
 	}
 	//Abe20170421
 
+	//Abe20170427
+	//--------------------------------------------------------------------------------------
+	//	’n–Ê
+	//--------------------------------------------------------------------------------------
+	SelectGroud::SelectGroud(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale):
+		GameObject(StagePtr),
+		m_Pos(pos),
+		m_Scale(scale)
+	{}
+
+	void SelectGroud::OnCreate()
+	{
+		auto TranP = AddComponent<Transform>();
+		TranP->SetPosition(m_Pos);
+		TranP->SetScale(m_Scale);
+		TranP->SetRotation(0, 0, 0);
+
+		auto Draw = AddComponent<PNTStaticDraw>();
+		Draw->SetTextureResource(L"SELECT_SIRO_TX");
+
+		
+	}
+
+	void SelectGroud::OnUpdate()
+	{
+
+	}
+	//Abe20170427
+
 }

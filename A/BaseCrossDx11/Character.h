@@ -370,5 +370,37 @@ namespace basecross{
 	};
 	//Abe20170421
 
+	//Abe20170427
+	//--------------------------------------------------------------------------------------
+	//	デバッグ文字表示するオブジェクト
+	//--------------------------------------------------------------------------------------
+	class DebugTxt : public GameObject 
+	{
+	private:
+		//大きさ(枠)
+		Vector2 m_Scale;
+		//座標
+		Vector2 m_Pos;
+		//大きさ(文字)
+		int m_ScaleTxt;
+	public :
+		DebugTxt(const shared_ptr<Stage>& StagePtr);
+
+		void OnCreate() override;
+		//文字設定
+		void SetText(wstring txt);
+		//大きさ(枠)設定
+		void SetScale(Vector2);
+		//座標設定
+		void SetPos(Vector2);
+		//大きさ(文字)設定
+		void SetScaleTxt(int);
+		//レイヤー設定
+		void SetLayer(int);
+	};
+
+	//Abe20170427
+
+
 }
 //end basecross

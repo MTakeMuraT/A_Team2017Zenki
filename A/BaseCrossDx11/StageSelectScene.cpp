@@ -78,6 +78,9 @@ namespace basecross {
 			CreateGoCheck();
 			//Abe20170421
 
+
+			//デバッグ用の文字
+			SetSharedGameObject(L"DebugTxt", AddGameObject<DebugTxt>());
 		}
 		catch (...) {
 
@@ -93,7 +96,62 @@ namespace basecross {
 
 			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToGameStage");
 		}
+
+		//Abe20170427
+		//カメラ移動
+		if (m_moveCameraFlg)
+		{
+			CameraMove();
+		}
+
+		/*カメラ座標確認用*/
+		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		if (CntlVec[0].bConnected)
+		{
+			Vector2 InputXY = Vector2(CntlVec[0].fThumbLX, CntlVec[0].fThumbLY);
+			auto View = GetView();
+			auto CameraP = View->GetTargetCamera();
+			m_CameraPos = CameraP->GetEye();
+			m_CameraAt = CameraP->GetAt();
+			m_CameraPos += Vector3(InputXY.x,0,InputXY.y);
+			m_CameraAt += Vector3(InputXY.x, 0, InputXY.y);
+			CameraP->SetEye(m_CameraPos);
+			CameraP->SetAt(m_CameraAt);
+			
+			wstring txt;
+			txt += L"X:" + Util::FloatToWStr(m_CameraPos.x) + L"Z:" + Util::FloatToWStr(m_CameraPos.z);
+			GetSharedGameObject<DebugTxt>(L"DebugTxt",false)->SetText(txt);
+		}
+		//Abe20170427
 	}
 
+	//Abe20170427
+	//カメラ移動関数
+	void StageSelectScene::CameraMove()
+	{
+		
+	}
+
+	void StageSelectScene::MoveCamera(int num)
+	{
+		auto View = GetView();
+		auto CameraP = View->GetTargetCamera();
+		//ターゲット設定
+		m_CameraPos = CameraP->GetEye();
+		m_CameraAt = CameraP->GetAt();
+		//カメラ移動0：上に　1：右に　2：下に　3：左に
+		switch (num)
+		{
+		case 0:
+			break;
+		case 1:
+			break;
+		case 2:
+			break;
+		case 3:
+			break;
+		}
+	}
+	//Abe20170427
 }
 //end basecross

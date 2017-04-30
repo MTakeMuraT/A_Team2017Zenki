@@ -43,6 +43,9 @@ namespace basecross
 		//初期で離れてる距離
 		float m_DifLength = 2;
 
+		//回転速度
+		float m_RotSpeedPerSec = 180;
+
 		//プレイヤーの実態
 		vector<shared_ptr<GameObject>> m_Player;
 
@@ -52,6 +55,8 @@ namespace basecross
 		bool m_SandFinishFlg = false;
 		//関数群
 		void SandMove();
+		//回転
+		void Rot();
 	public :
 		SelectPlayer(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, float speed);
 
@@ -135,4 +140,23 @@ namespace basecross
 		void CloseCheck();
 	};
 	//Abe20170421
+	//Abe20170427
+
+	//--------------------------------------------------------------------------------------
+	//	地面
+	//--------------------------------------------------------------------------------------
+	class SelectGroud : public GameObject
+	{
+	private :
+		Vector3 m_Pos;
+		Vector3 m_Scale;
+	public :
+		SelectGroud(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale);
+
+		void OnCreate() override;
+		void OnUpdate() override;
+
+	};
+	//Abe20170427
+
 }
