@@ -118,9 +118,11 @@ namespace basecross {
 			CameraP->SetEye(m_CameraPos);
 			CameraP->SetAt(m_CameraAt);
 			
+			/*
 			wstring txt;
 			txt += L"X:" + Util::FloatToWStr(m_CameraPos.x) + L"Z:" + Util::FloatToWStr(m_CameraPos.z);
 			GetSharedGameObject<DebugTxt>(L"DebugTxt",false)->SetText(txt);
+			*/
 		}
 		//Abe20170427
 	}

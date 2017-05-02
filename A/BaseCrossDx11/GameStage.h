@@ -33,6 +33,9 @@ namespace basecross
 
 		//カメラ更新
 		void UpdateCamera();
+
+		//アタリ判定作成
+		void CreateCollision();
 	public:
 		//構築と破棄
 		GameStage() :Stage() {}

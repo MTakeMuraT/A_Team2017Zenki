@@ -1114,6 +1114,12 @@ namespace basecross {
 	{
 		SetDrawLayer(num);
 	}
+
+	//êFê›íË
+	void DebugTxt::SetColor(Vector3 col)
+	{
+		GetComponent<StringSprite>()->SetFontColor(Color4(col.x, col.y, col.z, 1.0f));
+	}
 	//Abe20170427
 
 }

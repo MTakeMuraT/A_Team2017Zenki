@@ -226,6 +226,10 @@ namespace basecross{
 		virtual void OnCollision(vector<shared_ptr<GameObject>>& OtherVec) override;
 
 		bool GetStanFlg() { return m_StanFlg; }
+
+
+		//テスト用の挟まれた後の処理
+		void SandAfter() { SetDrawActive(false); };
 	};
 	//Abe20170412
 
@@ -397,6 +401,8 @@ namespace basecross{
 		void SetScaleTxt(int);
 		//レイヤー設定
 		void SetLayer(int);
+		//色設定
+		void SetColor(Vector3);
 	};
 
 	//Abe20170427

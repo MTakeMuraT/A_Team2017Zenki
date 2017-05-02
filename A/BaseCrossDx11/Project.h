@@ -11,8 +11,6 @@
 //行動クラス用.h
 #include "Behavior.h"
 
-//アタリ判定
-#include "Collision_Sphere.h"
 #include "ProjectShader.h"
 //シーン
 #include "Scene.h"
@@ -21,9 +19,16 @@
 #include "GameStage.h"
 //オブジェ
 #include "Character.h"
+//アタリ判定
+#include "Collision_Sphere.h"
+
 #include "Player.h"
 #include "GameMedia.h"
 #include "StageSelectObj.h"
+
+//アタリ判定
+#include "CollisionManager.h"
+
 //CSV
 #include "CSV.h"
 
