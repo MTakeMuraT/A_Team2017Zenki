@@ -139,7 +139,16 @@ namespace basecross
 		AddGameObject<CollisionSand>();
 	}
 	//アタリ判定作成--------------------------------------------
-
+	
+	//ミサイル子機
+	void GameStage::CreateChildMissile() {
+		auto PtrShotEnemyChild = AddGameObject<ShotEnemyChild>(
+			Vector3(0, 1, 0),
+			Vector3(1.0, 1.0, 3.0),
+			0.0f
+			);
+		SetSharedGameObject(L"ShotEnemyChild", PtrShotEnemyChild);
+	}
 	void GameStage::OnCreate()
 	{
 		try {
@@ -149,7 +158,6 @@ namespace basecross
 			CreatePlayerLin();
 			CreateGround();
 			CreateUILin();
-
 			//制限時間
 			CreateTimer();
 			//ライフ
@@ -160,6 +168,9 @@ namespace basecross
 
 			//アタリ判定作成
 			CreateCollision();
+
+			//子機ミサイル
+			CreateChildMissile();
 
 			//Abe20170412
 			//エネミー作ってみた

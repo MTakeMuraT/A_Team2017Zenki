@@ -22,7 +22,7 @@ namespace basecross
 		void CreatePlate();
 		void CreatePlayerLin();
 		void CreateUILin();
-
+		void CreateChildMissile();
 		//テスト時に使用
 		void CreateTestLin();
 
