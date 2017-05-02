@@ -408,5 +408,98 @@ namespace basecross{
 	//Abe20170427
 
 
+	//--------------------------------------------------------------------------------------
+	//	class ShotEnemyChild : public GameObject;
+	//	用途: ミサイルを撃つ子機
+	//--------------------------------------------------------------------------------------
+	class ShotEnemyChild : public GameObject
+	{
+	private:
+		Vector3 m_Scale = Vector3(0, 0, 0);
+		Vector3 m_Position;
+		Vector3 m_Rotation = Vector3(0, 0, 0);
+		Vector3 m_ReferencePoint_Vec3 = Vector3(0, 0, 0);//ミサイル発射の基準点　
+		Vector3 m_ReferencePoint2_Vec3 = Vector3(0, 0, 0);//ミサイル発射の基準点２
+		Vector3 m_CenterPoint_Vec3 = Vector3(0, 0, 0);//センター（向きを取得時に使用
+		Vector3 m_Distance = Vector3(0, 0, 0);//回転で使用
+		Vector3 m_NewReferencePoint_Vec3 = Vector3(0, 0, 0);
+		Vector3 m_NewReferencePoint2_Vec3 = Vector3(0, 0, 0);
+		Vector3 m_NewCenterPoint_Vec3 = Vector3(0, 0, 0);
+		Quaternion m_Angle;
+		Vector3 m_Direction_Vec3 = Vector3(0, 0, 0);
+		float m_T_Angle = 0.0f;
+		//発射間隔
+		float m_ShotInterval = 0.0f;
+		bool m_ShotFlg = false;
+
+		//デバックミサイル発射場所の位置確認用　（別クラスに値を送る用
+		Vector3 m_Debug = Vector3(0, 0, 0);
+		Vector3 m_getPos = Vector3(0, 0, 0);
+		Vector3 m_getPos2 = Vector3(0, 0, 0);
+		Vector3 m_getCenter = Vector3(0, 0, 0);
+		float m_Time = 0.0f;
+		int m_cout = 0;
+	public:
+		ShotEnemyChild(const shared_ptr<Stage>& StagePtr, const Vector3& Position, const Vector3& Scale, const float& ShotInterval);
+		ShotEnemyChild(const shared_ptr<Stage>& StagePtr, const wstring& line);
+		virtual ~ShotEnemyChild() {};
+		void OnCreate() override;
+		void OnUpdate() override;
+		void OnLastUpdate()override;
+		void ShotEnemyChildRot();
+		void PintNewPos();
+		void Shot();
+		Vector3 Direction();
+		void SetShotFlg(bool m_Shot) { m_ShotFlg = m_Shot; };
+		bool GetShotFlg() { return m_ShotFlg; };
+		float GetAngle() { return m_T_Angle; }
+		//デバックゲッター
+		Vector3 GetPos(bool flg) {
+			if (flg) {
+				return m_getPos;
+			}
+			else {
+				return m_getPos2;
+			}
+		}
+		Vector3 InitialPos(bool flg) {
+			if (flg) {
+				return m_ReferencePoint_Vec3;
+			}
+			else {
+				return m_ReferencePoint2_Vec3;
+			}
+		}
+		Vector3 GetDirection() {
+			return m_getCenter;
+		}
+	};
+	//--------------------------------------------------------------------------------------
+	//	class ShotEnemyChildMissile : public GameObject;
+	//	用途: ミサイルを撃つ子機（ミサイル）
+	//--------------------------------------------------------------------------------------
+	class ShotEnemyChildMissile : public GameObject {
+	private:
+		Vector3 m_Position;
+		Vector3 m_Scale;
+		Vector3 m_Rotation;
+		Vector3 m_Direction;
+		float m_Speed = 100;
+		float m_AttackDamage;
+		float m_DeleteTime;
+	public:
+		ShotEnemyChildMissile(const shared_ptr<Stage>& StagePtr, const Vector3& Position, const Vector3& Scale, const Vector3& Rotation, const Vector3& Direction);
+		virtual ~ShotEnemyChildMissile() {};
+		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
+		//移動
+		void ChildMissileMove();
+		//消える処理
+		void ObjDelete();
+		//攻撃力のアクセサ
+		float GetChildMissileAttackDamage() {
+			return  m_AttackDamage;
+		}
+	};
 }
 //end basecross

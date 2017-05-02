@@ -1122,6 +1122,187 @@ namespace basecross {
 	}
 	//Abe20170427
 
+
+	//--------------------------------------------------------------------------------------
+	//	class ShotEnemyChild : public GameObject;
+	//	用途: ミサイルを撃つ子機　
+	//--------------------------------------------------------------------------------------
+	ShotEnemyChild::ShotEnemyChild(const shared_ptr<Stage>& StagePtr, const wstring& Line) :
+		GameObject(StagePtr)
+	{
+		////トークン（カラム）の配列
+		//vector<wstring> Tokens;
+		////トークン（カラム）単位で文字列を抽出(L','をデリミタとして区分け)
+		//Util::WStrToTokenVector(Tokens, Line, L',');
+
+	}
+	ShotEnemyChild::ShotEnemyChild(const shared_ptr<Stage>& StagePtr, const Vector3& Position, const Vector3& Scale, const float& ShotInterval) :
+		GameObject(StagePtr),
+		m_Position(Position),
+		m_Scale(Scale),
+		m_ShotInterval(ShotInterval)
+	{}
+	void ShotEnemyChild::OnCreate() {
+		SetDrawLayer(10);
+		auto Trans = GetComponent<Transform>();
+		Trans->SetPosition(m_Position);
+		Trans->SetScale(m_Scale);
+		Trans->SetRotation(0, 0, 0);
+		AddComponent<Rigidbody>();
+		//描画設定
+		auto Draw = AddComponent<PNTStaticDraw>();
+		//メッシュ設定
+		Draw->SetMeshResource(L"DEFAULT_CUBE");
+		Draw->SetTextureResource(L"TRACE_TX");
+		//SetDrawActive(false);
+		//文字列をつける
+		auto PtrString = AddComponent<StringSprite>();
+		PtrString->SetText(L"");
+		PtrString->SetTextRect(Rect2D<float>(16.0f, 16.0f, 640.0f, 480.0f));
+		PtrString->SetFontColor(Color4(1.0f, 0.0f, 0.0f, 1.0f));
+		//基準Pos 
+		m_ReferencePoint_Vec3 = Vector3(m_Position.x - (m_Scale.x / 2) / 2, m_Position.y, m_Position.z - m_Scale.z / 2);//右
+		m_ReferencePoint2_Vec3 = Vector3(m_Position.x + (m_Scale.x / 2) / 2, m_Position.y, m_Position.z - m_Scale.z / 2);//左
+		m_CenterPoint_Vec3 = Vector3(m_Position.x, m_Position.y, m_Position.z - m_Scale.z / 2);
+
+	}
+	void ShotEnemyChild::OnUpdate() {
+
+		ShotEnemyChildRot();
+		PintNewPos();
+		Direction();
+		Shot();
+
+	}
+	void ShotEnemyChild::OnLastUpdate() {
+		//文字列表示
+		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
+		wstring FPS(L"FPS: ");
+		FPS += Util::UintToWStr(fps);
+		FPS += L"\n";
+
+
+		wstring  str = FPS;
+		auto PtrString = GetComponent<StringSprite>();
+		PtrString->SetText(str);
+	}
+	//ミサイルを撃つ子機の回転
+	void ShotEnemyChild::ShotEnemyChildRot() {
+		auto Trans = GetComponent<Transform>();
+		auto Qt = Trans->GetQuaternion();
+		auto Rig = GetComponent<Rigidbody>();
+		float ElapsedTime = App::GetApp()->GetElapsedTime();
+		m_T_Angle += -ElapsedTime * 0.5f;
+		Quaternion SpinQt(Vector3(0, 1, 0), ElapsedTime * 0.5f);
+		if (abs(m_T_Angle) >= XM_2PI) {
+			m_T_Angle = 0;
+		}
+		Qt *= SpinQt;
+		//回転する
+		Trans->SetQuaternion(Qt);
+		m_Angle = Qt;
+		//m_Debug = Rig->GetVelocity();
+	}
+	//弾発射場所の回転
+	void ShotEnemyChild::PintNewPos() {
+		auto Trans = GetComponent<Transform>();
+		auto Pos = Trans->GetPosition();
+		auto Scal = Trans->GetScale();
+		auto ScalHalf = Scal / 2;
+		float RotY = Trans->GetRotation().y;
+		RotY += XM_PIDIV2;
+		Vector3 m_Distance = Pos - InitialPos(true);
+		Vector3 m_Distance2 = Pos - InitialPos(false);
+		Vector3 m_CenteDistancer = Pos - m_CenterPoint_Vec3;
+		// (中心からA地点の距離＊Sin（回転軸+場所）) ボックスを中心として回転して自分の位置を移動させることが可能
+		//＋しているところの値が一緒でないと回転がおかしくなります
+		Vector3 NewAngle = Vector3(m_Distance.Length() *sin(RotY + 1.0), m_Position.y + 1.0, m_Distance.Length()* cos(RotY + (1.0)));
+		Vector3 New2Angle = Vector3(m_Distance2.Length()*sin(RotY + (-1.0)), m_Position.y + 1.0, m_Distance2.Length() *  cos(RotY + (-1.0)));
+		Vector3 NewCenter = Vector3(m_CenteDistancer.Length() * sin(RotY), m_Position.y, m_CenteDistancer.Length() * cos(RotY));
+		NewAngle.Normalize();
+		New2Angle.Normalize();
+		NewCenter.Normalize();
+		m_NewReferencePoint_Vec3 = NewAngle;
+		m_NewReferencePoint2_Vec3 = New2Angle;
+		m_NewCenterPoint_Vec3 = NewCenter;
+		//デバック
+		m_getPos = m_NewReferencePoint_Vec3;
+		m_getPos2 = m_NewReferencePoint2_Vec3;
+		m_getCenter = m_NewCenterPoint_Vec3;
+	}
+	//撃つ
+	void ShotEnemyChild::Shot() {
+		auto Ela = App::GetApp()->GetElapsedTime();
+		m_Time += Ela;
+		//二秒間隔で発射
+		if (m_Time > 2) {
+			m_cout += 2;
+			m_Time = 0.0;
+			//ゲームステージに作成　右と左のポジションを入れる
+			GetStage()->AddGameObject<ShotEnemyChildMissile>(
+				Vector3(GetPos(true)),
+				Vector3(1, 1, 1),
+				Vector3(0, 0, 0),
+				m_getCenter);
+			GetStage()->AddGameObject<ShotEnemyChildMissile>(
+				Vector3(GetPos(false)),
+				Vector3(1, 1, 1),
+				Vector3(0, 0, 0),
+				m_getCenter);
+		}
+	}
+	//向きの取得
+	Vector3 ShotEnemyChild::Direction() {
+		auto Trans = GetComponent<Transform>();
+		Vector3 Pos = Trans->GetPosition();
+		m_Direction_Vec3 = m_getCenter - Pos;
+		m_Direction_Vec3.Normalize();
+		return m_Direction_Vec3;
+	}
+	//--------------------------------------------------------------------------------------
+	//	class ShotEnemyChildMissile : public GameObject;
+	//	用途: ミサイルを撃つ子機（ミサイル）
+	//--------------------------------------------------------------------------------------
+	ShotEnemyChildMissile::ShotEnemyChildMissile(const shared_ptr<Stage>& StagePtr, const Vector3& Position, const Vector3& Scale, const Vector3& Rotation, const Vector3& Direction) :
+		GameObject(StagePtr),
+		m_Position(Position),
+		m_Scale(Scale),
+		m_Rotation(Rotation),
+		m_Direction(Direction)
+	{
+	}
+	void ShotEnemyChildMissile::OnCreate() {
+		auto Trans = AddComponent<Transform>();
+		Trans->SetPosition(m_Position);
+		Trans->SetScale(m_Scale);
+		Trans->SetRotation(m_Rotation);
+		AddComponent<Rigidbody>();
+		//描画設定
+		auto Draw = AddComponent<PNTStaticDraw>();
+		//メッシュ設定
+		Draw->SetMeshResource(L"DEFAULT_SPHERE");
+		Draw->SetTextureResource(L"TRACE_TX");
+	}
+	void ShotEnemyChildMissile::OnUpdate() {
+		ChildMissileMove();
+		ObjDelete();
+	}
+	void ShotEnemyChildMissile::ChildMissileMove() {
+		m_Speed = 10;
+		auto Rig = GetComponent<Rigidbody>();
+		m_Direction.y = 0.0f;
+		Rig->SetVelocity(m_Direction * m_Speed);
+
+	}
+	void ShotEnemyChildMissile::ObjDelete() {
+		auto Ela = App::GetApp()->GetElapsedTime();
+		m_DeleteTime += Ela;
+		if (m_DeleteTime > 10) {
+			SetDrawActive(false);
+			SetUpdateActive(false);
+
+		}
+	}
 }
 	
 	
