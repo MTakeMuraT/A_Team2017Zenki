@@ -105,6 +105,9 @@
     <ClInclude Include="CSV.h">
       <Filter>SourceCode\Header</Filter>
     </ClInclude>
+    <ClInclude Include="CollisionManager.h">
+      <Filter>SourceCode\Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\StringComponents.cpp">
@@ -174,6 +177,9 @@
       <Filter>SourceCode\cpp</Filter>
     </ClCompile>
     <ClCompile Include="CSV.cpp">
+      <Filter>SourceCode\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionManager.cpp">
       <Filter>SourceCode\cpp</Filter>
     </ClCompile>
   </ItemGroup>

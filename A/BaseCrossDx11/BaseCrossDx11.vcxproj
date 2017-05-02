@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClInclude Include="Behavior.h" />
     <ClInclude Include="Character.h" />
+    <ClInclude Include="CollisionManager.h" />
     <ClInclude Include="Collision_Sphere.h" />
     <ClInclude Include="Common\Action.h" />
     <ClInclude Include="Common\Collision.h" />
@@ -42,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Character.cpp" />
+    <ClCompile Include="CollisionManager.cpp" />
     <ClCompile Include="Collision_Sphere.cpp" />
     <ClCompile Include="Common\Action.cpp" />
     <ClCompile Include="Common\Collision.cpp" />
