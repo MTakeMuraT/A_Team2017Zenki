@@ -55,7 +55,9 @@ namespace basecross {
 		m_StatePlayerMachine = make_shared<StateMachine<Player> >(GetThis<Player>());
 		m_StatePlayerMachine->ChangeState(GamePrepareState::Instance());
 
-		//コリジョンマネージャを参照
+		//オーディオリソース登録
+		auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
+		pMultiSoundEffect->AddAudioResource(L"Collision_01_SE");
 	}
 	void Player::OnUpdate() {
 
@@ -350,6 +352,10 @@ namespace basecross {
 		Rig->SetVelocity(New_Vec * Speed_F * ElapsedTime_F);
 
 		if (1.5 > abs(Distance_Vec3.x) && 1.5 > abs(Distance_Vec3.z)) {
+			//SE
+			auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+			pMultiSoundEffect->Start(L"Collision_01_SE", 0, 0.4f);
+			
 			GetStateMachine()->ChangeState(LeaveState::Instance());
 		}
 	}

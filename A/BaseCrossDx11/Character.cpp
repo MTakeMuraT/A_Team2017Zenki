@@ -63,6 +63,9 @@ namespace basecross {
 		auto PtrString = AddComponent<StringSprite>();
 		PtrString->SetText(L"");
 		PtrString->SetTextRect(Rect2D<float>(16.0f, 16.0f, 640.0f, 480.0f));
+		//オーディオリソース登録
+		auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
+		pMultiSoundEffect->AddAudioResource(L"Decision_01_SE");
 	}
 	void PressSprite::OnUpdate() {
 		auto PtdDraw = AddComponent<PCTSpriteDraw>();
@@ -80,6 +83,8 @@ namespace basecross {
 
 		if (CntlVec[0].wPressedButtons &XINPUT_GAMEPAD_A) {
 			Max = 0.5f;
+			auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+			pMultiSoundEffect->Start(L"Decision_01_SE", 0, 1.0f);
 		}
 
 		if (m_alpha > Max) {
