@@ -86,10 +86,19 @@ namespace basecross {
 		//auto MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"名前.bmf");
 		//App::GetApp()->RegisterResource(L"プロジェクト内で使う名前", MadelMesh);
 
-		//BGMサンプル
-		/*wstring strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\nanika.wav";
-		App::GetApp()->RegisterWav(L"Nanika", strMusic); */
-		
+		//BGM
+		wstring strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Title\\Title_01.wav";
+		App::GetApp()->RegisterWav(L"Title_01_BGM", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\StageSelect\\StageSelect_01.wav";
+		App::GetApp()->RegisterWav(L"StageSelect_01_BGM", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\GameStage\\GameStage_01.wav";
+		App::GetApp()->RegisterWav(L"GameStage_01_BGM", strMusic);
+	
+		//SE
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Decision_01.wav";
+		App::GetApp()->RegisterWav(L"Decision_01_SE", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Collision_01.wav";
+		App::GetApp()->RegisterWav(L"Collision_01_SE", strMusic);
 	}
 	
 }
