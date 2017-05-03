@@ -42,7 +42,11 @@ namespace basecross {
 
 	void TitleScene::OnCreate() {
 		try {
-			
+			m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
+			m_AudioObjectPtr->AddAudioResource(L"Title_01_BGM");
+			m_AudioObjectPtr->Start(L"Title_01_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);
+
+
 			//ビューとライトの作成
 			CreateViewLight();
 			//背景の作成
@@ -59,15 +63,17 @@ namespace basecross {
 	void TitleScene::OnUpdate() {
 		//コントローラ
 		auto KeylVec = App::GetApp()->GetInputDevice().GetKeyState();
-		if (KeylVec.m_bPressedKeyTbl['A']) {
+		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+
+		if (KeylVec.m_bPressedKeyTbl['A'] || CntlVec[0].wPressedButtons &XINPUT_GAMEPAD_A) {
 			auto ScenePtr = App::GetApp()->GetScene<Scene>();
 
-			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToStageSelectScene");
+			PostEvent(2.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToStageSelectScene");
 		}
 	}
 	//破棄
 	 TitleScene::~TitleScene() {
-		
+		 m_AudioObjectPtr->Stop(L"Title_01_BGM");
 	}
 
 }

@@ -12,7 +12,8 @@ namespace basecross {
 	//	ゲームステージクラス
 	//--------------------------------------------------------------------------------------
 	class StageSelectScene : public Stage {
-		
+		shared_ptr<MultiAudioObject> m_AudioObjectPtr;
+
 
 		//ビューの作成
 		void CreateViewLight();
@@ -47,7 +48,7 @@ namespace basecross {
 	public:
 		//構築と破棄
 		StageSelectScene() :Stage() {}
-		virtual ~StageSelectScene() {}
+		virtual ~StageSelectScene();
 		//初期化
 		virtual void OnCreate()override;
 		virtual void OnUpdate()override;

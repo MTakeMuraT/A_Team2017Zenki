@@ -153,6 +153,10 @@ namespace basecross
 	void GameStage::OnCreate()
 	{
 		try {
+			m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
+			m_AudioObjectPtr->AddAudioResource(L"GameStage_01_BGM");
+			m_AudioObjectPtr->Start(L"GameStage_01_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);
+
 			//ビューとライトの作成
 			CreateViewLight();
 			CreatePlate();
@@ -257,6 +261,9 @@ namespace basecross
 		//カメラ更新
 		CameraP->SetEye(Pos);
 		CameraP->SetAt(At);
+	}
+	GameStage::~GameStage() {
+		m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
 	}
 
 	//////////////////////////////////////////////////////////////////

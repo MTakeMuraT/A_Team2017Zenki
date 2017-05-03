@@ -13,6 +13,8 @@ namespace basecross
 	//--------------------------------------------------------------------------------------
 	class GameStage : public Stage
 	{
+		shared_ptr<MultiAudioObject> m_AudioObjectPtr;
+
 
 		//ƒrƒ…[‚Ìì¬
 		void CreateViewLight();
@@ -39,7 +41,7 @@ namespace basecross
 	public:
 		//\’z‚Æ”jŠü
 		GameStage() :Stage() {}
-		virtual ~GameStage() {}
+		virtual ~GameStage();
 
 		//‰Šú‰»
 		virtual void OnCreate()override;
