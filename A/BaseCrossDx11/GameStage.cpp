@@ -136,7 +136,8 @@ namespace basecross
 	void GameStage::CreateCollision()
 	{
 		AddGameObject<CollisionManager>();
-		AddGameObject<CollisionSand>();
+		auto ColSandPtr = AddGameObject<CollisionSand>();
+		SetSharedGameObject(L"CollisionSand", ColSandPtr);
 	}
 	//ƒAƒ^ƒŠ”»’èì¬--------------------------------------------
 	
