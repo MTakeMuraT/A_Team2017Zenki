@@ -16,7 +16,8 @@ namespace basecross {
 	private:
 		//階層化ステートマシーン
 		shared_ptr<StateMachine<Player>>  m_StatePlayerMachine;
-		shared_ptr<Collision_Sphere> m_Collision_Sphere;
+		//shared_ptr<Collision_Sphere> m_Collision_Sphere;
+		
 		//当たったオブジェクト取得
 		shared_ptr<GameObject> m_HitObject;
 		//コンストラクタメンバ
@@ -99,23 +100,26 @@ namespace basecross {
 		Vector3 m_Direction = Vector3(0, 0, 0);
 
 		//行動のスタート関数
+		void EnterGamePrepare();//ゲーム前の準備ステート
 		void EnterMoveBehavior();//移動ステート
 		void EnterBeforeAttractBehavior();//攻撃前
 		void EnterToAttractBehavior();//引き付けるステート
 		void EnterLeaveBehavior();//離れるステート
-								  //行動の継続関数
+		//行動の継続関数			
+		void ExecuteGamePrepare();//ゲーム前の準備
 		void ExecuteMoveBehavior();
 		void ExecuteBeforeAttractBehavior();//攻撃前
 		void ExecuteToAttractBehavior();
 		void ExecuteLeaveBehavior();//離れる
-									//行動の終了関数
+		//行動の終了関数		
+		void ExitGamePrepare();//ゲーム前の準備
 		void ExitMoveBehabior();
 		void ExitBeforeAttractBehavior();//攻撃前
 		void ExitToAttractBehavior();
 		void ExitLeaveBehavior();//離れる
 
-								 //自分はPlayerなのか？
-		bool MyPlayerL();
+								 
+		bool MyPlayerL();//自分はPlayerなのか？
 		Vector3 Partner_Pos();
 
 
@@ -144,6 +148,23 @@ namespace basecross {
 
 
 
+	};
+	//--------------------------------------------------------------------------------------
+	//	class GamePrepareState : public ObjState<Player>;
+	//	用途:　ゲーム準備
+	//--------------------------------------------------------------------------------------
+	class GamePrepareState : public ObjState<Player>
+	{
+		GamePrepareState() {}
+	public:
+		//ステートのインスタンス取得
+		static shared_ptr<GamePrepareState> Instance();
+		//ステートに入ったときに呼ばれる関数
+		virtual void Enter(const shared_ptr<Player>& Obj)override;
+		//ステート実行中に毎ターン呼ばれる関数
+		virtual void Execute(const shared_ptr<Player>& Obj)override;
+		//ステートにから抜けるときに呼ばれる関数
+		virtual void Exit(const shared_ptr<Player>& Obj)override;
 	};
 
 	//--------------------------------------------------------------------------------------

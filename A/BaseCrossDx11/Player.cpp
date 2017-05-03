@@ -19,9 +19,8 @@ namespace basecross {
 	{}
 	//初期化
 	void Player::OnCreate() {
-
-		m_Collision_Sphere = GetStage()->AddGameObject<Collision_Sphere>();
-
+		shared_ptr<CollisionSand> m_CollisionSand;
+		//m_Collision_Sphere = GetStage()->AddGameObject<Collision_Sphere>();
 		//初期位置などの設定
 		auto Ptr = AddComponent<Transform>();
 		Ptr->SetScale(1.0f, 1.0f, 1.0f);	//直径25センチの球体
@@ -54,7 +53,9 @@ namespace basecross {
 		SetAlphaActive(true);
 
 		m_StatePlayerMachine = make_shared<StateMachine<Player> >(GetThis<Player>());
-		m_StatePlayerMachine->ChangeState(MoveState::Instance());
+		m_StatePlayerMachine->ChangeState(GamePrepareState::Instance());
+
+		//コリジョンマネージャを参照
 	}
 	void Player::OnUpdate() {
 
@@ -201,14 +202,14 @@ namespace basecross {
 		}
 
 		wstring Col(L"\nコリジョンHIT\n");
-		if (m_Collision_Sphere->GetStayCollisionFlg()) {
+		/*if (m_Collision_Sphere->GetStayCollisionFlg()) {
 			Col += L"true";
 		}
 		else {
 			Col += L"flase";
 		}
 
-		Col += L"\n";
+		Col += L"\n";*/
 
 		wstring  str = /*FPS  + m_FixedPos_b + m_Debug_StickDown_b + Col +*/ Col + State + STAN + Total + RotetoSpeedStr + angle_RotetionStr + DebugStr + Debug2Str + PositionStr + DebugDirectionStr + DeBug3_Vec3str;
 		auto PtrString = GetComponent<StringSprite>();
@@ -267,6 +268,9 @@ namespace basecross {
 
 
 	////////////////////////ステートスタート関数///////////////////////////////////
+	void Player::EnterGamePrepare() {
+		//処理なし
+	}
 	//移動
 	void Player::EnterMoveBehavior() {
 		m_sandwich = false;
@@ -279,7 +283,18 @@ namespace basecross {
 		Partner_Pos();
 		//進む向き
 		New_Vec = Move_Velo(My_Pos_Vec3, Partner_Pos_Vec3);
-
+		//当たり判定
+		auto PtrCollisionSand = GetStage()->GetSharedGameObject<CollisionSand>(L"CollisionSand", false);
+		if (PtrCollisionSand) {
+			PtrCollisionSand->SetActive(true);
+		}
+		else {
+			throw BaseException(
+				L"エラー",
+				L"スタート関数の中「EnterToAttractBehavior」",
+				L"PtrCollisionSandが存在していません"
+			);
+		}
 	}
 
 	//離れる
@@ -287,8 +302,6 @@ namespace basecross {
 		auto Trans = GetComponent<Transform>();
 		My_Pos_Vec3 = Trans->GetPosition();
 		New_Vec = Move_Velo(My_Pos_Vec3, SavePos_Vec3);
-		//処理なし
-
 	}
 	//挟む前　（攻撃前）
 	void Player::EnterBeforeAttractBehavior() {
@@ -300,9 +313,18 @@ namespace basecross {
 
 		My_Pos_Vec3 = Trans->GetPosition();
 		New_Vec = Direction(My_Pos_Vec3, Partner_Pos_Vec3);
+		
 	}
 	////////////////////////ステート継続関数///////////////////////////////////////
-	//ステートマシーンで使う関数
+	//ステートマシーンで使う関数 移動
+	void Player::ExecuteGamePrepare() {
+		auto PtrCollisionSand = GetStage()->GetSharedGameObject<CollisionSand>(L"CollisionSand", false);
+		if (PtrCollisionSand) {
+			PtrCollisionSand->SetActive(false);
+			GetStateMachine()->ChangeState(MoveState::Instance());
+		}
+	}
+
 	void Player::ExecuteMoveBehavior() {
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		InputStick();
@@ -381,6 +403,10 @@ namespace basecross {
 		}
 	}
 	/////////////////////////ステート終了関数/////////////////////////////////////////
+	//ゲーム開始前の準備
+	void Player::ExitGamePrepare() {
+		//処理なし
+	}
 	void Player::ExitMoveBehabior() {
 		auto Rig = GetComponent<Rigidbody>();
 		Rig->SetVelocity(0, 0, 0);
@@ -398,6 +424,17 @@ namespace basecross {
 		auto Rig = GetComponent<Rigidbody>();
 		Rig->SetVelocity(0, 0, 0);
 		Speed_F = 0.0f;
+		auto PtrCollisionSand = GetStage()->GetSharedGameObject<CollisionSand>(L"CollisionSand", false);
+		if (PtrCollisionSand) {
+			PtrCollisionSand->SetActive(false);
+		}
+		else {
+			throw BaseException(
+				L"エラー",
+				L"スタート関数の中「ExitLeaveBehavior」",
+				L"PtrCollisionSandが存在していません"
+			);
+		}
 	}
 	//攻撃前　（攻撃準備）
 	void Player::ExitBeforeAttractBehavior() {
@@ -518,6 +555,32 @@ namespace basecross {
 			Partner_Pos_Vec3 = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false)->GetComponent<Transform>()->GetPosition();
 		}
 		return Partner_Pos_Vec3;
+	}
+
+	//ゲーム開始前のステート
+	//--------------------------------------------------------------------------------------
+	//	class GamePrepareState : public ObjState<Player>;
+	//	用途:ゲーム開始前のステート
+	//--------------------------------------------------------------------------------------
+	//ステートのインスタンス取得
+	shared_ptr<GamePrepareState> GamePrepareState::Instance() {
+		static shared_ptr<GamePrepareState> instance;
+		if (!instance) {
+			instance = shared_ptr<GamePrepareState>(new GamePrepareState);
+		}
+		return instance;
+	}
+	//ステートに入ったときに呼ばれる関数
+	void GamePrepareState::Enter(const shared_ptr<Player>& Obj) {
+		Obj->EnterGamePrepare();
+	}
+	//ステート実行中に毎ターン呼ばれる関数
+	void GamePrepareState::Execute(const shared_ptr<Player>& Obj) {
+		Obj->ExecuteGamePrepare();
+	}
+	//ステート実行中に毎ターン呼ばれる関数
+	void GamePrepareState::Exit(const shared_ptr<Player>& Obj) {
+		Obj->ExitGamePrepare();
 	}
 
 	//移動ステート
