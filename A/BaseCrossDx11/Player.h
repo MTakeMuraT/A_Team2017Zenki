@@ -67,7 +67,8 @@ namespace basecross {
 		//継続式の
 		//引き合うステートで使用
 		Vector3 Player2Pos = Vector3(0, 0, 0);
-		//攻撃前ステート
+		
+	
 
 	public:
 
@@ -86,7 +87,6 @@ namespace basecross {
 		//スティック移動
 		void InputStick();
 		//回転
-		void InputRotation();
 		Vector3 def;
 		Vector3 CentrPos;
 		float angle;
@@ -146,7 +146,8 @@ namespace basecross {
 			return m_sandwichMove;
 		}
 
-
+		
+	
 
 	};
 	//--------------------------------------------------------------------------------------
@@ -272,6 +273,48 @@ namespace basecross {
 		//操作
 	};
 
+	//--------------------------------------------------------------------------------------
+	//	class PlayerHP : public GameObject;
+	//	用途: プレイヤーHPの処理
+	//--------------------------------------------------------------------------------------
+	class PlayerHP : public GameObject {
+	private:
+		//無敵用
+		bool m_invincible_b = false;
+		float InvinciblecCunt = 0.0f;
+		float InvinciblecLimit = 3.0f;
+		//敵との接触
+		bool m_Hit_b = false;
+		//ダメージ
+		int m_Damage_int = 0;
+	public:
+		//構築と破棄
+		PlayerHP(const shared_ptr<Stage>& StagePtr
+		);
+		virtual ~PlayerHP();
+		//初期化
+		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
+		//操作
+		bool GetInvincible() {
+			return m_invincible_b;
+		}
+		void SetInvincible(bool Hit_flg) {
+			m_invincible_b = Hit_flg;
+		}
+		bool GetHit() {
+			return m_Hit_b;
+		}
+		void SetHit(bool Hit) {
+			m_Hit_b = Hit;
+		}
+		int  GetDamage_int() {
+			return m_Damage_int;
+		}
+		void SetDamage_int(int Damage) {
+			m_Damage_int = Damage;
+		}
+	};
 }
 //end basecross
 

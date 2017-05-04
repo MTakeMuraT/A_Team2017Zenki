@@ -78,7 +78,8 @@ namespace basecross
 		SetSharedGameObject(L"GamePlayer_R", PtrPlayer_R);
 		auto PtrPlayerCenter = AddGameObject<PlayerCenter>();
 		SetSharedGameObject(L"PlayerCenter", PtrPlayerCenter);
-
+		auto PtrPlayerHP = AddGameObject<PlayerHP>();
+		SetSharedGameObject(L"PlayerHP", PtrPlayerHP);
 		////HPŠÖŒW
 		//AddGameObject<HP>(
 		//	Vector2(512, 512),

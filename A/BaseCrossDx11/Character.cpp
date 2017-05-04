@@ -1189,7 +1189,7 @@ namespace basecross {
 
 		wstring  str = FPS;
 		auto PtrString = GetComponent<StringSprite>();
-		PtrString->SetText(str);
+		//PtrString->SetText(str);
 	}
 	//ミサイルを撃つ子機の回転
 	void ShotEnemyChild::ShotEnemyChildRot() {
@@ -1300,12 +1300,26 @@ namespace basecross {
 
 	}
 	void ShotEnemyChildMissile::ObjDelete() {
+		auto PtrPlayer_L = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false);
+		auto PtrPlayer_R = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_R", false);
+		auto PtrPlayerHP = GetStage()->GetSharedGameObject<PlayerHP>(L"PlayerHP", false);
+		auto PlayerL_Pos = PtrPlayer_L->GetComponent<Transform>()->GetPosition();
+		auto PlayerR_Pos = PtrPlayer_R->GetComponent<Transform>()->GetPosition();
+		auto MyPos = GetComponent<Transform>()->GetPosition();
+		auto XYZ = PlayerL_Pos - MyPos;
+		auto XYZ_2 = PlayerR_Pos - MyPos;
 		auto Ela = App::GetApp()->GetElapsedTime();
 		m_DeleteTime += Ela;
 		if (m_DeleteTime > 10) {
 			SetDrawActive(false);
 			SetUpdateActive(false);
-
+		}
+		if (0.5 > abs(XYZ.x) && 0.5 > abs(XYZ.y) && 0.5 > abs(XYZ.z) ||
+			0.5 > abs(XYZ_2.x) && 0.5 > abs(XYZ_2.y) && 0.5 > abs(XYZ_2.z)) {
+			PtrPlayerHP->SetDamage_int(1);
+			PtrPlayerHP->SetHit(true);
+			SetDrawActive(false);
+			SetUpdateActive(false);
 		}
 	}
 }

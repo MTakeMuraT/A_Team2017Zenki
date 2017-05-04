@@ -36,7 +36,7 @@ namespace basecross {
 		auto PtrString = AddComponent<StringSprite>();
 		PtrString->SetText(L"");
 		PtrString->SetTextRect(Rect2D<float>(16.0f, 16.0f, 640.0f, 480.0f));
-
+		PtrString->SetFontColor(Color4(1.0f, 0.0f, 0.0f, 1.0f));
 		//影をつける（シャドウマップを描画する）
 		auto ShadowPtr = AddComponent<Shadowmap>();
 		//影の形（メッシュ）を設定
@@ -58,43 +58,14 @@ namespace basecross {
 		//オーディオリソース登録
 		auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
 		pMultiSoundEffect->AddAudioResource(L"Collision_01_SE");
+		
 	}
 	void Player::OnUpdate() {
 
 		m_StatePlayerMachine->Update();
-		//InputRotation();
-		//Rot();
+		
 
-
-		//コントローラ取得
-		/*	auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
-		if (CntlVec[0].wButtons& XINPUT_GAMEPAD_A && GetStanEnemy() == false) {
-		StanTime_F += 0.1f;
-		}
-		else {
-		StanTime_F = 0.0f;S
-		}
-
-		if (m_Collision_Sphere->GetStayCollisionFlg() && GetStanEnemy() == false) {
-		if (dynamic_pointer_cast<Enemy01>(m_HitObject)) {
-		dynamic_pointer_cast<Enemy01>(m_HitObject)->Damage(StanTime_F);
-		TotalEnemyStanTime = StanTime_F * 2;
-		SetStanEnemy(true);
-		}
-
-
-		}
-
-		else if (TotalEnemyStanTime <= 0.0f  || !(CntlVec[0].wButtons& XINPUT_GAMEPAD_A) || !(dynamic_pointer_cast<Enemy01>(m_HitObject)->GetStanFlg()) ) {
-		auto PtrEnemy01 = GetStage()->GetSharedGameObject<Enemy01>(L"Enemy01", false);
-		SetStanEnemy(false);
-		TotalEnemyStanTime = 0.0f;
-		PtrEnemy01->Release();
-		}
-		else {
-		TotalEnemyStanTime += -App::GetApp()->GetElapsedTime();
-		}*/
-
+		
 	}
 	void Player::OnLastUpdate() {
 		//文字列表示
@@ -226,26 +197,16 @@ namespace basecross {
 				auto Fixd_Box = dynamic_pointer_cast<FixdBox>(A);
 				if (Fixd_Box) {
 					m_HitObject = A;
-					//処理
-					//GetStateMachine()->ChangeState(PinchState::Instance());
 
-					//エネミーのフラグを変える
 				}
 				//Abe 20170412 14:56
 				auto Enemy_01 = dynamic_pointer_cast<Enemy01>(A);
 				if (Enemy_01) {
 					//Enemy_01->Damage(StanTime_F);
 					m_HitObject = A;
-					//処理
-					//	GetStateMachine()->ChangeState(PinchState::Instance());
-
-					//エネミーのフラグを変える
+					
 				}
-				//Abe 20170412 14:56
-				/*auto Player2 = dynamic_pointer_cast<Player_Second>(A);
-				if (Player2) {
-				GetStateMachine()->ChangeState(LeaveState::Instance());
-				}*/
+			
 			}
 		}
 	}
@@ -330,7 +291,6 @@ namespace basecross {
 	void Player::ExecuteMoveBehavior() {
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		InputStick();
-		//InputRotation();
 		Rot();
 		if (CntlVec[0].wButtons &XINPUT_GAMEPAD_A) {
 			//ステート移動
@@ -460,52 +420,7 @@ namespace basecross {
 		Direction_Vec3.Normalize();
 		return Direction_Vec3;
 	}
-	void Player::InputRotation() {
-		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
-		if (MyPlayerL()) {
-			CentrPos = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_R", false)->GetComponent<Transform>()->GetPosition();
-		}
-		else {
-			CentrPos = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false)->GetComponent<Transform>()->GetPosition();
-		}
-		DeBug2_Vec3 = CentrPos;
-		CentrPos = (GetComponent<Transform>()->GetPosition() + CentrPos) / 2;
-		//まず中心からみた角度を求める
-		def = GetComponent<Transform>()->GetPosition() - CentrPos;
-		//Dubug_Vec3 = def;
-		angle = atan2(def.z, def.x) * 180 / XM_PI;
-		if (Debug_flg) {
-			Debug_Rot_F = angle;
-			Debug_flg = false;
-		}
-		angle += 360;
-		angle_int = (int)angle % 360;
-
-
-		//
-		if (CntlVec[0].wButtons& XINPUT_GAMEPAD_RIGHT_SHOULDER)
-		{
-			angle_int += -RotSpeedSecond *  App::GetApp()->GetElapsedTime();
-			Debug_flg = true;
-		}
-		//
-		else if (CntlVec[0].wButtons& XINPUT_GAMEPAD_LEFT_SHOULDER)
-		{
-			angle_int += RotSpeedSecond *  App::GetApp()->GetElapsedTime();
-			Debug_flg = true;
-		}
-		angle_int %= 360;
-		DebugDirection = angle_int;
-		//そこから移動量を求める
-		//ラジアン変換
-		angle = angle_int *  XM_PI / 180;
-		//距離算出
-		float direction = sqrt((def.x * def.x) + (def.z * def.z));
-
-		MovePosVec3 = CentrPos + Vector3(cos(angle) * direction, 0, sin(angle) * direction);
-		//DeBug3_Vec3 = MovePosVec3;
-		GetComponent<Transform>()->SetPosition(MovePosVec3);
-	}
+	
 
 	//位置固定
 	void Player::FixedPos() {
@@ -793,6 +708,47 @@ namespace basecross {
 		PtrDraw->SetTextureResource(L"Background_TX");
 		SetAlphaActive(true);
 
+	}
+	//--------------------------------------------------------------------------------------
+	//	class PlayerHP : public GameObject;
+	//	用途: プレイヤーHP処理
+	//--------------------------------------------------------------------------------------
+	//構築と破棄
+	PlayerHP::PlayerHP(const shared_ptr<Stage>& StagePtr
+	) :
+		GameObject(StagePtr)
+	{
+	}
+	PlayerHP::~PlayerHP() {}
+
+	//初期化
+	void PlayerHP::OnCreate() {
+		auto PtrTransform = GetComponent<Transform>();
+
+		PtrTransform->SetScale(0,0,0);
+		PtrTransform->SetRotation(0, 0, 0);
+		PtrTransform->SetPosition(0, 0, 0);
+		SetInvincible(false);
+		SetHit(false);
+	}
+	void PlayerHP::OnUpdate() {
+		if (!GetInvincible() && GetHit()) {
+			GetStage()->GetSharedGameObject<Player_Life>(L"Life")->LifeDown(GetDamage_int());
+			SetInvincible(true);
+
+			if (GetDamage_int() > 0) {
+				SetDamage_int(0);
+			}
+		}
+		else if (GetInvincible()) {
+			float ElapsedTime_F = App::GetApp()->GetElapsedTime();
+			InvinciblecCunt += ElapsedTime_F;
+			if (InvinciblecCunt > InvinciblecLimit) {
+				SetInvincible(false);
+				SetHit(false);
+				InvinciblecCunt = 0.0f;
+			}
+		}
 	}
 }
 
