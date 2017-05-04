@@ -192,6 +192,16 @@ namespace basecross
 			EnemyGroup->IntoGroup(Enemy_02Ptr);
 			//Abe20170412
 
+			//Abe20170504
+			//アタリ判定テスト用
+			auto CollisionGroup = CreateSharedObjectGroup(L"CollisionGroup");
+			auto Enemy_03Ptr = AddGameObject<Enemy01>(Vector3(0, 1, 5), Vector3(1, 1, 1));
+			SetSharedGameObject(L"Enemy03", Enemy_01Ptr);
+			CollisionGroup->IntoGroup(Enemy_03Ptr);
+
+			//Abe20170504
+
+
 		}
 		catch (...) {
 

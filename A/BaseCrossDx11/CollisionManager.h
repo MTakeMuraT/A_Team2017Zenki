@@ -18,11 +18,26 @@ namespace basecross
 	class CollisionManager : public GameObject
 	{
 	private :
+		//プレイヤーのアクセサー的なの
+		shared_ptr<GameObject> m_Player1;		//左？たかいとこでやいてんの？
+		shared_ptr<GameObject> m_Player2;		//右？はっきりわかんだね
+
+		//判定するかどうか
+		bool m_ActiveFlg = true;
+
+		//デバッグ文字表示オブジェ
+		shared_ptr<DebugTxt> m_Debugtxt;
+
+		//ぶつかった後の処理、引数は挟んだオブジェクトと当たったプレイヤーの番号
+		void CollisionAfter(shared_ptr<GameObject>,int);
 	public :
 		CollisionManager(const shared_ptr<Stage>& StagePtr);
 
 		void OnCreate() override;
 		void OnUpdate() override;
+
+		//一応判定しないようにする関数も作っておく
+		void SetActive(bool flg) { m_ActiveFlg = flg; }
 	};
 
 	//************************************

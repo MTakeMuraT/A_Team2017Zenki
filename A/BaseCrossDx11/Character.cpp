@@ -1244,16 +1244,33 @@ namespace basecross {
 			m_cout += 2;
 			m_Time = 0.0;
 			//ゲームステージに作成　右と左のポジションを入れる
-			GetStage()->AddGameObject<ShotEnemyChildMissile>(
+			//GetStage()->AddGameObject<ShotEnemyChildMissile>(
+			//	Vector3(GetPos(true)),
+			//	Vector3(1, 1, 1),
+			//	Vector3(0, 0, 0),
+			//	m_getCenter);
+			//GetStage()->AddGameObject<ShotEnemyChildMissile>(
+			//	Vector3(GetPos(false)),
+			//	Vector3(1, 1, 1),
+			//	Vector3(0, 0, 0),
+			//	m_getCenter);
+			//Abe20170504
+			//アタリ判定するオブジェクトにいれてやるやり方やってみるのでちょいと変更します
+			auto ColGroup = GetStage()->GetSharedObjectGroup(L"CollisionGroup");
+			auto obj = GetStage()->AddGameObject<ShotEnemyChildMissile>(
 				Vector3(GetPos(true)),
 				Vector3(1, 1, 1),
 				Vector3(0, 0, 0),
 				m_getCenter);
-			GetStage()->AddGameObject<ShotEnemyChildMissile>(
+			ColGroup->IntoGroup(obj);
+			obj = GetStage()->AddGameObject<ShotEnemyChildMissile>(
 				Vector3(GetPos(false)),
 				Vector3(1, 1, 1),
 				Vector3(0, 0, 0),
 				m_getCenter);
+			ColGroup->IntoGroup(obj);
+			//Abe20170504
+
 		}
 	}
 	//向きの取得
@@ -1300,27 +1317,35 @@ namespace basecross {
 
 	}
 	void ShotEnemyChildMissile::ObjDelete() {
-		auto PtrPlayer_L = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false);
-		auto PtrPlayer_R = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_R", false);
-		auto PtrPlayerHP = GetStage()->GetSharedGameObject<PlayerHP>(L"PlayerHP", false);
-		auto PlayerL_Pos = PtrPlayer_L->GetComponent<Transform>()->GetPosition();
-		auto PlayerR_Pos = PtrPlayer_R->GetComponent<Transform>()->GetPosition();
-		auto MyPos = GetComponent<Transform>()->GetPosition();
-		auto XYZ = PlayerL_Pos - MyPos;
-		auto XYZ_2 = PlayerR_Pos - MyPos;
+		//Abe20170504 別の場所でアタリ判定やるからコメントアウトさせてもらうで
+
+		//auto PtrPlayer_L = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false);
+		//auto PtrPlayer_R = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_R", false);
+		//auto PtrPlayerHP = GetStage()->GetSharedGameObject<PlayerHP>(L"PlayerHP", false);
+		//auto PlayerL_Pos = PtrPlayer_L->GetComponent<Transform>()->GetPosition();
+		//auto PlayerR_Pos = PtrPlayer_R->GetComponent<Transform>()->GetPosition();
+		//auto MyPos = GetComponent<Transform>()->GetPosition();
+		//auto XYZ = PlayerL_Pos - MyPos;
+		//auto XYZ_2 = PlayerR_Pos - MyPos;
+		//Abe20170504
+
 		auto Ela = App::GetApp()->GetElapsedTime();
 		m_DeleteTime += Ela;
 		if (m_DeleteTime > 10) {
 			SetDrawActive(false);
 			SetUpdateActive(false);
 		}
-		if (0.5 > abs(XYZ.x) && 0.5 > abs(XYZ.y) && 0.5 > abs(XYZ.z) ||
-			0.5 > abs(XYZ_2.x) && 0.5 > abs(XYZ_2.y) && 0.5 > abs(XYZ_2.z)) {
-			PtrPlayerHP->SetDamage_int(1);
-			PtrPlayerHP->SetHit(true);
-			SetDrawActive(false);
-			SetUpdateActive(false);
-		}
+
+		//Abe20170504
+		//if (0.5 > abs(XYZ.x) && 0.5 > abs(XYZ.y) && 0.5 > abs(XYZ.z) ||
+		//	0.5 > abs(XYZ_2.x) && 0.5 > abs(XYZ_2.y) && 0.5 > abs(XYZ_2.z)) {
+		//	PtrPlayerHP->SetDamage_int(1);
+		//	PtrPlayerHP->SetHit(true);
+		//	SetDrawActive(false);
+		//	SetUpdateActive(false);
+		//}
+		//Abe20170504
+
 	}
 }
 	
