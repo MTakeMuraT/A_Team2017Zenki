@@ -65,10 +65,11 @@ namespace basecross {
 	void StageSelectScene::OnCreate()
 	{
 		try {
+			/*//検証するのに重いので一時的に消します Abe20170505
 			m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
 			m_AudioObjectPtr->AddAudioResource(L"StageSelect_01_BGM");
 			m_AudioObjectPtr->Start(L"StageSelect_01_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);
-
+			*/
 			CreateViewLight();
 			//CreatTestLin();
 			//Abe20170421
@@ -105,7 +106,7 @@ namespace basecross {
 		//カメラ移動
 		if (m_moveCameraFlg)
 		{
-			CameraMove();
+			//CameraMove();
 		}
 
 		/*カメラ座標確認用*/
@@ -161,7 +162,7 @@ namespace basecross {
 	//Abe20170427
 
 	 StageSelectScene::~StageSelectScene() {
-		 m_AudioObjectPtr->Stop(L"StageSelect_01_BGM");
+		// m_AudioObjectPtr->Stop(L"StageSelect_01_BGM");
 	}
 }
 //end basecross

@@ -21,11 +21,11 @@
 #include "Character.h"
 //アタリ判定
 #include "Collision_Sphere.h"
-
+//オブジェ
 #include "Player.h"
 #include "GameMedia.h"
 #include "StageSelectObj.h"
-
+#include "Enemys.h"
 //アタリ判定
 #include "CollisionManager.h"
 

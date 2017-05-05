@@ -81,11 +81,18 @@ namespace basecross {
 
 		//Abe20170421
 
-		
+		//Abe20170505
+		//エネミー
+		//索敵サークル
+		strTexture = DataDir + L"Enemy\\SearchCircle.png";
+		App::GetApp()->RegisterTexture(L"SEARCHCIRCLE_TX", strTexture);
+		//Abe20170505
+
 		////モデルの適用サンプル
 		//auto MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"名前.bmf");
 		//App::GetApp()->RegisterResource(L"プロジェクト内で使う名前", MadelMesh);
 
+		/*//検証するのに重いので一時的に消します Abe20170505
 		//BGM
 		wstring strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Title\\Title_01.wav";
 		App::GetApp()->RegisterWav(L"Title_01_BGM", strMusic);
@@ -93,12 +100,13 @@ namespace basecross {
 		App::GetApp()->RegisterWav(L"StageSelect_01_BGM", strMusic);
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\GameStage\\GameStage_01.wav";
 		App::GetApp()->RegisterWav(L"GameStage_01_BGM", strMusic);
-	
+	*/
 		//SE
-		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Decision_01.wav";
+		wstring strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Decision_01.wav";
 		App::GetApp()->RegisterWav(L"Decision_01_SE", strMusic);
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Collision_01.wav";
 		App::GetApp()->RegisterWav(L"Collision_01_SE", strMusic);
+		
 	}
 	
 }

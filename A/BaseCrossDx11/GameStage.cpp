@@ -154,10 +154,11 @@ namespace basecross
 	void GameStage::OnCreate()
 	{
 		try {
+			/*//検証するのに重いので一時的に消します Abe20170505
 			m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
 			m_AudioObjectPtr->AddAudioResource(L"GameStage_01_BGM");
 			m_AudioObjectPtr->Start(L"GameStage_01_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);
-
+			*/
 			//ビューとライトの作成
 			CreateViewLight();
 			CreatePlate();
@@ -179,7 +180,7 @@ namespace basecross
 			CreateChildMissile();
 
 			//Abe20170412
-			//エネミー作ってみた
+			//エネミー作ってみた[アタリ判定とかテストするための仮のやつなのでCSVで出せるようになったら消してください]
 
 			auto EnemyGroup = CreateSharedObjectGroup(L"EnemyGroup");
 
@@ -193,7 +194,7 @@ namespace basecross
 			//Abe20170412
 
 			//Abe20170504
-			//アタリ判定テスト用
+			//アタリ判定テスト用[とりあえずグループにだけ入れてくれればそれでおｋです]
 			auto CollisionGroup = CreateSharedObjectGroup(L"CollisionGroup");
 			auto Enemy_03Ptr = AddGameObject<Enemy01>(Vector3(0, 1, 5), Vector3(1, 1, 1));
 			SetSharedGameObject(L"Enemy03", Enemy_01Ptr);
@@ -201,6 +202,17 @@ namespace basecross
 
 			//Abe20170504
 
+			//Abe20170505
+			//エネミーテスト
+			//引数 位置、大きさ、HP、索敵距離、クールタイム、速度、攻撃力、突撃回数
+			AddGameObject<TackleEnemy>(Vector3(10,1,10),1,3,3,3,6,3,2);
+			//引数 位置、大きさ、HP、索敵距離、クールタイム、攻撃力、子機発射間隔、発射数
+			//AddGameObject<ShotEnemy>(Vector3(10, 1, -10),1,3,5,6,3,10,2);
+			//引数 位置、大きさ、HP、索敵距離、クールタイム、発射数
+			//AddGameObject<TeleportEnemy>(Vector3(-10, 1, 10),2,1,5,8,3);
+			//引数 位置、大きさ、HP、索敵距離、速度、攻撃力
+			//AddGameObject<BombEnemy>(Vector3(-10,1,-10),1,1,3,2,8);
+			//Abe20170505
 
 		}
 		catch (...) {
@@ -274,7 +286,7 @@ namespace basecross
 		CameraP->SetAt(At);
 	}
 	GameStage::~GameStage() {
-		m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
+		//m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
 	}
 
 	//////////////////////////////////////////////////////////////////
