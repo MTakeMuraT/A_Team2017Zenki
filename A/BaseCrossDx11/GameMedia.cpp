@@ -88,9 +88,10 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"SEARCHCIRCLE_TX", strTexture);
 		//Abe20170505
 
-		////モデルの適用サンプル
-		//auto MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"名前.bmf");
-		//App::GetApp()->RegisterResource(L"プロジェクト内で使う名前", MadelMesh);
+	
+		////モデル（ボーンあり
+		auto MadelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Player\\PlayerModel\\Player_animation.bmf");
+		App::GetApp()->RegisterResource(L"Player_Model", MadelMesh);
 
 		/*//検証するのに重いので一時的に消します Abe20170505
 		//BGM
