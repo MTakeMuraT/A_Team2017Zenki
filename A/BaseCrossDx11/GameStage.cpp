@@ -75,6 +75,8 @@ namespace basecross
 			Vector3(5, 1, 0),
 			wstring(L"PlayerR")
 			);
+		auto PtrPlayerManager = AddGameObject<PlayerManager>();
+		SetSharedGameObject(L"PtrPlayerManager", false);
 		SetSharedGameObject(L"GamePlayer_R", PtrPlayer_R);
 		auto PtrPlayerCenter = AddGameObject<PlayerCenter>();
 		SetSharedGameObject(L"PlayerCenter", PtrPlayerCenter);
