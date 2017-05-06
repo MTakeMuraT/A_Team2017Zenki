@@ -117,12 +117,21 @@ namespace basecross
 		//==============================================
 		if (dynamic_pointer_cast<Enemy01>(obj))
 		{
-			m_Debugtxt->SetText(L"DAMAGE!!");
+			//m_Debugtxt->SetText(L"DAMAGE!!");
 		}
 		//==============================================
 		//************************************************************
 		//	↑みたいな感じで(ry
 		//************************************************************
+
+		//==============================================
+		//突撃エネミー(TackleEnemy)
+		if (dynamic_pointer_cast<TackleEnemy>(obj))
+		{
+			dynamic_pointer_cast<TackleEnemy>(obj)->ToDamagePlayer();
+		}
+		//==============================================
+
 
 		//ミサイルにあたったら
 		if (dynamic_pointer_cast<ShotEnemyChildMissile>(obj))
