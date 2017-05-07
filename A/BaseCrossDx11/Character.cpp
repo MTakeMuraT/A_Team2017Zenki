@@ -1170,9 +1170,10 @@ namespace basecross {
 		m_ReferencePoint2_Vec3 = Vector3(m_Position.x + (m_Scale.x / 2) / 2, m_Position.y, m_Position.z - m_Scale.z / 2);//左
 		m_CenterPoint_Vec3 = Vector3(m_Position.x, m_Position.y, m_Position.z - m_Scale.z / 2);
 
+
 	}
 	void ShotEnemyChild::OnUpdate() {
-
+		DoingSandRotation();
 		ShotEnemyChildRot();
 		PintNewPos();
 		Direction();
@@ -1191,22 +1192,51 @@ namespace basecross {
 		auto PtrString = GetComponent<StringSprite>();
 		//PtrString->SetText(str);
 	}
-	//ミサイルを撃つ子機の回転
+	//ミサイルを撃つ子機の回転 挟まれていないとき
 	void ShotEnemyChild::ShotEnemyChildRot() {
-		auto Trans = GetComponent<Transform>();
-		auto Qt = Trans->GetQuaternion();
-		auto Rig = GetComponent<Rigidbody>();
-		float ElapsedTime = App::GetApp()->GetElapsedTime();
-		m_T_Angle += -ElapsedTime * 0.5f;
-		Quaternion SpinQt(Vector3(0, 1, 0), ElapsedTime * 0.5f);
-		if (abs(m_T_Angle) >= XM_2PI) {
-			m_T_Angle = 0;
+		if (GetShotEnemyChildSandFlg() == false && m_DefaultRot_F) {
+			auto Trans = GetComponent<Transform>();
+			auto Qt = Trans->GetQuaternion();
+			auto Rig = GetComponent<Rigidbody>();
+			float ElapsedTime = App::GetApp()->GetElapsedTime();
+			m_T_Angle += -ElapsedTime * 0.5f;
+			Quaternion SpinQt(Vector3(0, 1, 0), ElapsedTime * 0.5f);
+			if (abs(m_T_Angle) >= XM_2PI) {
+				m_T_Angle = 0;
+			}
+			Qt *= SpinQt;
+			//回転する
+			Trans->SetQuaternion(Qt);
+			m_Angle = Qt;
+			//m_Debug = Rig->GetVelocity();
 		}
-		Qt *= SpinQt;
-		//回転する
-		Trans->SetQuaternion(Qt);
-		m_Angle = Qt;
-		//m_Debug = Rig->GetVelocity();
+	}
+	//挟まれているとき
+	void ShotEnemyChild::DoingSandRotation() {
+		if (GetShotEnemyChildSandFlg()) {
+			auto Trans = GetComponent<Transform>();
+			auto Rig = GetComponent<Rigidbody>();
+			auto Qt = Trans->GetQuaternion();
+			float ElapsedTime = App::GetApp()->GetElapsedTime();
+
+
+			//コントローラの取得
+			auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) {
+				Quaternion SpanQt(Vector3(0, 1, 0), -ElapsedTime * 2.0f);
+				Qt *= SpanQt;
+				Trans->SetQuaternion(Qt);
+			}
+			else if (CntlVec[0].wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
+				Quaternion SpanQt(Vector3(0, 1, 0), ElapsedTime * 2.0f);
+				Qt *= SpanQt;
+				Trans->SetQuaternion(Qt);
+			}
+			m_DefaultRot_F = false;
+			if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B) {
+				SetShotEnemyChildSandFlg(false);
+			}
+		}
 	}
 	//弾発射場所の回転
 	void ShotEnemyChild::PintNewPos() {
@@ -1243,29 +1273,19 @@ namespace basecross {
 		if (m_Time > 2) {
 			m_cout += 2;
 			m_Time = 0.0;
-			//ゲームステージに作成　右と左のポジションを入れる
-			//GetStage()->AddGameObject<ShotEnemyChildMissile>(
-			//	Vector3(GetPos(true)),
-			//	Vector3(1, 1, 1),
-			//	Vector3(0, 0, 0),
-			//	m_getCenter);
-			//GetStage()->AddGameObject<ShotEnemyChildMissile>(
-			//	Vector3(GetPos(false)),
-			//	Vector3(1, 1, 1),
-			//	Vector3(0, 0, 0),
-			//	m_getCenter);
+
 			//Abe20170504
 			//アタリ判定するオブジェクトにいれてやるやり方やってみるのでちょいと変更します
 			auto ColGroup = GetStage()->GetSharedObjectGroup(L"CollisionGroup");
 			auto obj = GetStage()->AddGameObject<ShotEnemyChildMissile>(
 				Vector3(GetPos(true)),
-				Vector3(1, 1, 1),
+				Vector3(0.5, 0.5, 0.5),
 				Vector3(0, 0, 0),
 				m_getCenter);
 			ColGroup->IntoGroup(obj);
 			obj = GetStage()->AddGameObject<ShotEnemyChildMissile>(
 				Vector3(GetPos(false)),
-				Vector3(1, 1, 1),
+				Vector3(0.5, 0.5, 0.5),
 				Vector3(0, 0, 0),
 				m_getCenter);
 			ColGroup->IntoGroup(obj);
@@ -1273,6 +1293,7 @@ namespace basecross {
 
 		}
 	}
+
 	//向きの取得
 	Vector3 ShotEnemyChild::Direction() {
 		auto Trans = GetComponent<Transform>();
@@ -1281,6 +1302,7 @@ namespace basecross {
 		m_Direction_Vec3.Normalize();
 		return m_Direction_Vec3;
 	}
+
 	//--------------------------------------------------------------------------------------
 	//	class ShotEnemyChildMissile : public GameObject;
 	//	用途: ミサイルを撃つ子機（ミサイル）
@@ -1317,17 +1339,6 @@ namespace basecross {
 
 	}
 	void ShotEnemyChildMissile::ObjDelete() {
-		//Abe20170504 別の場所でアタリ判定やるからコメントアウトさせてもらうで
-
-		//auto PtrPlayer_L = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false);
-		//auto PtrPlayer_R = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_R", false);
-		//auto PtrPlayerHP = GetStage()->GetSharedGameObject<PlayerHP>(L"PlayerHP", false);
-		//auto PlayerL_Pos = PtrPlayer_L->GetComponent<Transform>()->GetPosition();
-		//auto PlayerR_Pos = PtrPlayer_R->GetComponent<Transform>()->GetPosition();
-		//auto MyPos = GetComponent<Transform>()->GetPosition();
-		//auto XYZ = PlayerL_Pos - MyPos;
-		//auto XYZ_2 = PlayerR_Pos - MyPos;
-		//Abe20170504
 
 		auto Ela = App::GetApp()->GetElapsedTime();
 		m_DeleteTime += Ela;
@@ -1335,16 +1346,6 @@ namespace basecross {
 			SetDrawActive(false);
 			SetUpdateActive(false);
 		}
-
-		//Abe20170504
-		//if (0.5 > abs(XYZ.x) && 0.5 > abs(XYZ.y) && 0.5 > abs(XYZ.z) ||
-		//	0.5 > abs(XYZ_2.x) && 0.5 > abs(XYZ_2.y) && 0.5 > abs(XYZ_2.z)) {
-		//	PtrPlayerHP->SetDamage_int(1);
-		//	PtrPlayerHP->SetHit(true);
-		//	SetDrawActive(false);
-		//	SetUpdateActive(false);
-		//}
-		//Abe20170504
 
 	}
 }

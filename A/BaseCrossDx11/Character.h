@@ -439,6 +439,11 @@ namespace basecross{
 		Vector3 m_getCenter = Vector3(0, 0, 0);
 		float m_Time = 0.0f;
 		int m_cout = 0;
+
+		//ã≤Ç‹ÇÍÇƒÇΩÇÁ
+		bool m_ShotEnemyChildSandFlg = false;
+		//å¸Ç´ïœçX äÆóπtoreÅ@ñ¢äÆóπfalse
+		bool m_DefaultRot_F = true;
 	public:
 		ShotEnemyChild(const shared_ptr<Stage>& StagePtr, const Vector3& Position, const Vector3& Scale, const float& ShotInterval);
 		ShotEnemyChild(const shared_ptr<Stage>& StagePtr, const wstring& line);
@@ -448,6 +453,7 @@ namespace basecross{
 		void OnLastUpdate()override;
 		void ShotEnemyChildRot();
 		void PintNewPos();
+		void DoingSandRotation();
 		void Shot();
 		Vector3 Direction();
 		void SetShotFlg(bool m_Shot) { m_ShotFlg = m_Shot; };
@@ -473,6 +479,13 @@ namespace basecross{
 		Vector3 GetDirection() {
 			return m_getCenter;
 		}
+		bool GetShotEnemyChildSandFlg() {
+			return m_ShotEnemyChildSandFlg;
+		}
+		void SetShotEnemyChildSandFlg(bool flg) {
+			m_ShotEnemyChildSandFlg = flg;
+		}
+
 	};
 	//--------------------------------------------------------------------------------------
 	//	class ShotEnemyChildMissile : public GameObject;
