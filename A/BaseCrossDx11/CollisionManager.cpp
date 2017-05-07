@@ -397,5 +397,12 @@ namespace basecross
 		}
 		//==============================================
 
+		//==============================================
+		//ミサイルを撃つ子機
+		if (dynamic_pointer_cast<ShotEnemyChild>(obj)) {
+			//ShotEnemyChildへのフラグ
+			dynamic_pointer_cast<ShotEnemyChild>(obj)->SetShotEnemyChildSandFlg(true);
+		}
+		//==============================================
 	}
 }
