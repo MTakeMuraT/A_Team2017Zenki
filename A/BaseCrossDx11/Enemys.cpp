@@ -348,6 +348,10 @@ namespace basecross
 			m_Hp = 0;
 			m_ActiveFlg = false;
 		}
+		else
+		{
+			m_Hp--;
+		}
 	}
 
 	void TackleEnemy::Damage(int num)
