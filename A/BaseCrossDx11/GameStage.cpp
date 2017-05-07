@@ -146,12 +146,14 @@ namespace basecross
 	
 	//ミサイル子機
 	void GameStage::CreateChildMissile() {
+		auto ColGroup = GetSharedObjectGroup(L"EnemyGroup");
 		auto PtrShotEnemyChild = AddGameObject<ShotEnemyChild>(
 			Vector3(0, 1, 0),
-			Vector3(1.0, 1.0, 3.0),
+			Vector3(1.0, 1.0, 1.0),
 			0.0f
 			);
 		SetSharedGameObject(L"ShotEnemyChild", PtrShotEnemyChild);
+		ColGroup->IntoGroup(PtrShotEnemyChild);
 	}
 	void GameStage::OnCreate()
 	{
@@ -178,8 +180,7 @@ namespace basecross
 			//アタリ判定作成
 			CreateCollision();
 
-			//子機ミサイル
-			CreateChildMissile();
+			
 
 			//Abe20170412
 			//エネミー作ってみた[アタリ判定とかテストするための仮のやつなのでCSVで出せるようになったら消してください]
@@ -194,6 +195,9 @@ namespace basecross
 			EnemyGroup->IntoGroup(Enemy_01Ptr);
 			EnemyGroup->IntoGroup(Enemy_02Ptr);
 			//Abe20170412
+
+			//子機ミサイル
+			CreateChildMissile();
 
 			//Abe20170504
 			//アタリ判定テスト用[とりあえずグループにだけ入れてくれればそれでおｋです]
