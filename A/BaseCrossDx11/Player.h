@@ -46,10 +46,19 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	class PlayerManager : public GameObject {
 	private:
+		//初期Pos戻るステートPlayerが戻る目安
+		Vector3 PlayerL_Initial_Vec3 = Vector3(0, 0, 0);
+		Vector3 PLayerR_Initial_Vec3 = Vector3(0, 0, 0);
+		Vector3 PlayerL_Distance_Vec3 = Vector3(0, 0, 0);
+		Vector3 PlayerR_Distance_Vec3 = Vector3(0, 0, 0);
+		//デバッグ文字表示オブジェ
+		shared_ptr<DebugTxt> m_Debugtxt;
+		//別のスピード
+		float Speed_F = 0.0f;
 		shared_ptr<StateMachine<PlayerManager>> m_StateManagerMachine;
 		//InputStick関数内の使用変数/////
 		//移動スピード
-		float Speed_F = 0.0f;
+		float Move_Speed = 0.0f;
 		Vector3 Vec_Vec3 = Vector3(0.0f, 0.0f, 0.0f);
 		/////////////////////////////////
 		//InputRotation関数内の使用変数///
@@ -72,11 +81,12 @@ namespace basecross {
 		//戻るステートから移動ステート
 		bool m_StateChangeMover_B = false;
 	public:
-
+		
 		PlayerManager(const shared_ptr<Stage>& StagePtr);
 		virtual ~PlayerManager() {}
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
+		virtual void OnLastUpdate() override;
 		void InputStick();//コントローラでの移動
 		void InputRotation();//プレイヤーの回転
 		void PlayerAngle();//プレイヤーのモデルの向き
@@ -125,6 +135,16 @@ namespace basecross {
 		}
 		void SetStateChangeMover(bool flg) {
 			m_StateChangeMover_B = flg;
+		}
+
+		Vector3 m_PlaeyrLDebug = Vector3(0.0f,0.0f,0.0f);
+		Vector3 m_PlayerRDebug = Vector3(0.0f, 0.0f, 0.0f);
+		//デバック
+		Vector3 GetDebugPlayerL() {
+			return m_PlaeyrLDebug;
+		}
+		Vector3 GetDebugPlayerR() {
+			return m_PlayerRDebug;
 		}
 	};
 	//--------------------------------------------------------------------------------------

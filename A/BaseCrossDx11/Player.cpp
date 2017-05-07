@@ -134,9 +134,12 @@ namespace basecross {
 			Trans->SetQuaternion(Qt);
 		}
 
-
-
+		auto PtrPlayerL_Pos = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false)->GetComponent<Transform>()->GetPosition();
+		auto PtrPlayerR_Pos = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_R", false)->GetComponent<Transform>()->GetPosition();
+		auto PlayerHalf = (PtrPlayerL_Pos + PtrPlayerR_Pos) / 2;
+		Trans->SetPosition(PlayerHalf);
 	}
+	
 
 
 	//--------------------------------------------------------------------------------------
@@ -197,9 +200,34 @@ namespace basecross {
 		//オーディオリソース登録
 		auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
 		pMultiSoundEffect->AddAudioResource(L"Collision_01_SE");
+
+	
+		//デバッグ文字生成
+	    m_Debugtxt = GetStage()->AddGameObject<DebugTxt>();
+		m_Debugtxt->SetLayer(10);
+		//色黒に変更
+		m_Debugtxt->SetColor(Vector3(0, 0, 0));
+		//大きさ変更
+		m_Debugtxt->SetScaleTxt(40);
+
+	
+		
 	}
 	void PlayerManager::OnUpdate() {
 		m_StateManagerMachine->Update();
+	}
+	void PlayerManager::OnLastUpdate() {
+		
+
+		wstring PosStr(L"デバック初期位置L：:\t");
+		PosStr += L"X=" + Util::FloatToWStr(GetDebugPlayerL().x, 6, Util::FloatModify::Fixed) + L",\t";
+		PosStr += L"Y=" + Util::FloatToWStr(GetDebugPlayerL().y, 6, Util::FloatModify::Fixed) + L",\t";
+		PosStr += L"Z=" + Util::FloatToWStr(GetDebugPlayerL().z, 6, Util::FloatModify::Fixed) + L"\n";
+
+	
+
+		wstring  str = PosStr;
+		m_Debugtxt->SetText(str);
 	}
 	//////////////ステート以外の関数群///////////////////////////////////////////////
 	//スティック入力
@@ -210,15 +238,18 @@ namespace basecross {
 		auto PlayerL_Rig = PlayerL_Ptr->GetComponent<Rigidbody>();
 		auto PlayerR_Rig = PlayerR_Ptr->GetComponent<Rigidbody>();
 		auto Rig = GetComponent<Rigidbody>();
+		auto Trans = GetComponent<Transform>();
 		if (m_StateManagerMachine->GetCurrentState() == MoveState_Manager::Instance()) {
-			Speed_F = Rig->GetMaxSpeed() / 5.0f;
+			Move_Speed = Rig->GetMaxSpeed() / 5.0f;
 		}
 		else {
-			Speed_F = Rig->GetMaxSpeed() / 5.0f;
+			Move_Speed = Rig->GetMaxSpeed() / 5.0f;
 		}
 		Vec_Vec3 = Vector3(CntlVec[0].fThumbLX, 0, CntlVec[0].fThumbLY);
-		PlayerL_Rig->SetVelocity(Vec_Vec3 * Speed_F);
-		PlayerR_Rig->SetVelocity(Vec_Vec3 * Speed_F);
+		PlayerL_Rig->SetVelocity(Vec_Vec3 * Move_Speed);
+		PlayerR_Rig->SetVelocity(Vec_Vec3 * Move_Speed);
+		
+		
 	}
 	//回転
 	void PlayerManager::InputRotation() {
@@ -314,7 +345,6 @@ namespace basecross {
 		auto PlayerR_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_R", false);
 		PlayerR_SavePos_Vec3 = PlayerR_Ptr->GetComponent<Transform>()->GetPosition();
 
-
 		PlayerL_Direction_Vec3 = Direction(PlayerL_SavePos_Vec3, PlayerR_SavePos_Vec3);
 		PlayerR_Direction_Vec3 = Direction(PlayerR_SavePos_Vec3, PlayerL_SavePos_Vec3);
 	}
@@ -360,8 +390,20 @@ namespace basecross {
 	////////////////////////継続式関数///////////////////////////////////
 	void PlayerManager::ExecuteGamePrepare() {
 		auto PtrCollisionSand = GetStage()->GetSharedGameObject<CollisionSand>(L"CollisionSand", false);
-		if (PtrCollisionSand) {
+		auto PlayerL_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false);
+		auto PlayerR_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_R", false);
+		auto PlayerCenterPtr = GetStage()->GetSharedGameObject<PlayerCenter>(L"PlayerCenter",false);
+		auto PlayerCenterPos = PlayerCenterPtr->GetComponent<Transform>()->GetPosition();
+
+		
+		if (PtrCollisionSand && PlayerCenterPtr) {
 			PtrCollisionSand->SetActive(false);
+			//戻るときの目安
+			PlayerL_Initial_Vec3 = PlayerL_Ptr->GetComponent<Transform>()->GetPosition();
+			PLayerR_Initial_Vec3 = PlayerR_Ptr->GetComponent<Transform>()->GetPosition();
+			PlayerL_Distance_Vec3 = PlayerL_Initial_Vec3 - PlayerCenterPos;
+			PlayerR_Distance_Vec3 = PLayerR_Initial_Vec3 - PlayerCenterPos;
+			m_PlaeyrLDebug = PlayerL_Distance_Vec3;
 			GetStateMachine_Manager()->ChangeState(MoveState_Manager::Instance());
 		}
 		//		GetStateMachine_Manager()->ChangeState(MoveState_Manager::Instance());
@@ -384,6 +426,7 @@ namespace basecross {
 	}
 	//離れる
 	void PlayerManager::ExecuteLeaveBehavior() {
+		
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto PlayerL_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false);
 		auto PlayerL_Pos = PlayerL_Ptr->GetComponent<Transform>()->GetPosition();
@@ -398,8 +441,15 @@ namespace basecross {
 		PlayerL_Direction_Vec3.y = 0;
 		PlayerR_Direction_Vec3.y = 0;
 		//New_Vec = 進む方向　Speed_F = 移動スピード
-		PlayerL_Ptr->GetComponent<Rigidbody>()->SetVelocity(Vector3(PlayerL_Direction_Vec3.x, 0, PlayerL_Direction_Vec3.z)* Speed_F * ElapsedTime_F);
-		PlayerR_Ptr->GetComponent<Rigidbody>()->SetVelocity(Vector3(PlayerR_Direction_Vec3.x, 0, PlayerR_Direction_Vec3.z)* Speed_F * ElapsedTime_F);
+		
+		if (CntlVec[0].fThumbLX || CntlVec[0].fThumbLY) {
+			InputStick();
+		}
+		else {
+			PlayerL_Ptr->GetComponent<Rigidbody>()->SetVelocity(Vector3(PlayerL_Direction_Vec3.x, 0, PlayerL_Direction_Vec3.z)* Speed_F * ElapsedTime_F);
+			PlayerR_Ptr->GetComponent<Rigidbody>()->SetVelocity(Vector3(PlayerR_Direction_Vec3.x, 0, PlayerR_Direction_Vec3.z)* Speed_F * ElapsedTime_F);
+
+		}
 
 		if (Distance.x * Distance.x + Distance.z * Distance.z > 100) {
 			Speed_F = 0.0f;
@@ -449,16 +499,16 @@ namespace basecross {
 		auto Trans = GetComponent<Transform>();
 		auto Rig = GetComponent<Rigidbody>();
 		Vector3 Distance_L_Vec3 = PlayerL_SavePos_Vec3 - PlayerL_Pos;
-		//	Vector3 Distance_R_Vec3 = PlayerR_SavePos_Vec3 - PlaeyrR_Pos;
+		Vector3 Distance_R_Vec3 = PlayerR_SavePos_Vec3 - PlaeyrR_Pos;
 
 		Speed_F += Rig->GetMaxSpeed() / 3;
 		//New_Vec = 進む方向　Speed_F = 移動スピード
 		PlayerL_Ptr->GetComponent<Rigidbody>()->SetVelocity(PlayerL_Velocity_Vec3 * Speed_F * ElapsedTime_F);
 		PlayerR_Ptr->GetComponent<Rigidbody>()->SetVelocity(PlayerR_Velocity_Vec3 * Speed_F * ElapsedTime_F);
 
-		if (1.1 > abs(Distance_L_Vec3.x) && 1.1 > abs(Distance_L_Vec3.z)) {
-			PlayerL_Ptr->GetComponent<Transform>()->SetPosition(PlayerL_SavePos_Vec3);
-			PlayerR_Ptr->GetComponent<Transform>()->SetPosition(PlayerR_SavePos_Vec3);
+		if (abs(PlayerL_Pos.x) > abs(PlayerL_Initial_Vec3.x) && abs(PlayerL_Pos.z) > abs(PlayerL_Initial_Vec3.z)) {
+		//	PlayerL_Ptr->GetComponent<Transform>()->SetPosition(PlayerL_SavePos_Vec3);
+			//PlayerR_Ptr->GetComponent<Transform>()->SetPosition(PlayerR_SavePos_Vec3);
 			GetStateMachine_Manager()->ChangeState(MoveState_Manager::Instance());
 		}
 	}
