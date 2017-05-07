@@ -211,10 +211,18 @@ namespace basecross
 			//Abe20170505
 			//エネミーテスト
 			//引数 位置、大きさ、HP、索敵距離、クールタイム、速度、攻撃力、突撃回数
-			CollisionGroup->IntoGroup(AddGameObject<TackleEnemy>(Vector3(10, 1, 10), 1, 3, 3, 3, 6, 3, 2));
-			CollisionGroup->IntoGroup(AddGameObject<TackleEnemy>(Vector3(-10, 1, 10), 1, 3, 3, 3, 6, 3, 2));
-			CollisionGroup->IntoGroup(AddGameObject<TackleEnemy>(Vector3(10, 1, -10), 1, 3, 3, 3, 6, 3, 2));
-			CollisionGroup->IntoGroup(AddGameObject<TackleEnemy>(Vector3(-10, 1, -10), 1, 3, 3, 3, 6, 3, 2));
+			auto PtrTacklEnemy = AddGameObject<TackleEnemy>(Vector3(10, 1, 10), 1, 0, 3, 3, 6, 3, 2);
+			CollisionGroup->IntoGroup(PtrTacklEnemy);
+			EnemyGroup->IntoGroup(PtrTacklEnemy);
+			PtrTacklEnemy = AddGameObject<TackleEnemy>(Vector3(-10, 1, 10), 1, 0, 3, 3, 6, 3, 2);
+			CollisionGroup->IntoGroup(PtrTacklEnemy);
+			EnemyGroup->IntoGroup(PtrTacklEnemy);
+			PtrTacklEnemy = AddGameObject<TackleEnemy>(Vector3(10, 1, -10), 1, 1, 3, 3, 6, 3, 2);
+			CollisionGroup->IntoGroup(PtrTacklEnemy);
+			EnemyGroup->IntoGroup(PtrTacklEnemy);
+			PtrTacklEnemy = AddGameObject<TackleEnemy>(Vector3(-10, 1, -10), 1, 1, 3, 3, 6, 3, 2);
+			CollisionGroup->IntoGroup(PtrTacklEnemy);
+			EnemyGroup->IntoGroup(PtrTacklEnemy);
 
 			//引数 位置、大きさ、HP、索敵距離、クールタイム、攻撃力、子機発射間隔、発射数
 			//AddGameObject<ShotEnemy>(Vector3(10, 1, -10),1,3,5,6,3,10,2);
