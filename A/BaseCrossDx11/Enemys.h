@@ -41,6 +41,9 @@ namespace basecross
 		//移動時Velocity
 		Vector3 m_Velocity;
 
+		//生きてるか
+		bool m_ActiveFlg = true;
+
 		//時間測る用
 		float m_time = 0;
 
@@ -114,6 +117,12 @@ namespace basecross
 
 		//プレイヤーへの攻撃判定
 		void ToDamagePlayer();
+
+		//自分がダメージ受けたときの関数
+		//プレイヤーから
+		void DamagePlayer();
+		//ミサイルとか爆弾とかプレイヤー以外
+		void Damage(int num);
 	};
 
 	//************************************

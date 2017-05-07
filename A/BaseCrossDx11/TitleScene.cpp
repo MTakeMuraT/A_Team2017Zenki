@@ -69,7 +69,7 @@ namespace basecross {
 		if (KeylVec.m_bPressedKeyTbl['A'] || CntlVec[0].wPressedButtons &XINPUT_GAMEPAD_A) {
 			auto ScenePtr = App::GetApp()->GetScene<Scene>();
 
-			PostEvent(2.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToStageSelectScene");
+			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToStageSelectScene");
 		}
 	}
 	//”jŠü

@@ -28,8 +28,23 @@ namespace basecross
 		//デバッグ文字表示オブジェ
 		shared_ptr<DebugTxt> m_Debugtxt;
 
-		//ぶつかった後の処理、引数は挟んだオブジェクトと当たったプレイヤーの番号
+		//プレイヤーがぶつかった後の処理、引数は挟んだオブジェクトと当たったプレイヤーの番号
 		void CollisionAfter(shared_ptr<GameObject>,int);
+
+		//コリジョングループに入ってるオブジェクト同士のあたり、引数はオブジェクトと角度
+		void CollisionAfterObjs(shared_ptr<GameObject>,int, shared_ptr<GameObject>, int);
+
+		//プレイヤーとオブジェの判定
+		void CollisionPlayer();
+
+		//アタリ判定グループに入ってる全部の判定
+		void AllCollision();
+
+		//なんかわかりずらいんでvectorコンテナに突っ込む
+		vector<shared_ptr<GameObject>> m_ColObjs;
+
+		//当たる判定
+		bool HitTest(Vector3 pos1, float half1, Vector3 pos2, float half2);
 	public :
 		CollisionManager(const shared_ptr<Stage>& StagePtr);
 

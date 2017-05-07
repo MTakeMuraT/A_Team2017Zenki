@@ -109,26 +109,27 @@ namespace basecross {
 			//CameraMove();
 		}
 
-		/*カメラ座標確認用*/
-		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
-		if (CntlVec[0].bConnected)
-		{
-			Vector2 InputXY = Vector2(CntlVec[0].fThumbLX, CntlVec[0].fThumbLY);
-			auto View = GetView();
-			auto CameraP = View->GetTargetCamera();
-			m_CameraPos = CameraP->GetEye();
-			m_CameraAt = CameraP->GetAt();
-			m_CameraPos += Vector3(InputXY.x,0,InputXY.y);
-			m_CameraAt += Vector3(InputXY.x, 0, InputXY.y);
-			CameraP->SetEye(m_CameraPos);
-			CameraP->SetAt(m_CameraAt);
-			
-			/*
-			wstring txt;
-			txt += L"X:" + Util::FloatToWStr(m_CameraPos.x) + L"Z:" + Util::FloatToWStr(m_CameraPos.z);
-			GetSharedGameObject<DebugTxt>(L"DebugTxt",false)->SetText(txt);
-			*/
-		}
+		
+		///*カメラ座標確認用*/
+		//auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		//if (CntlVec[0].bConnected)
+		//{
+		//	Vector2 InputXY = Vector2(CntlVec[0].fThumbLX, CntlVec[0].fThumbLY);
+		//	auto View = GetView();
+		//	auto CameraP = View->GetTargetCamera();
+		//	m_CameraPos = CameraP->GetEye();
+		//	m_CameraAt = CameraP->GetAt();
+		//	m_CameraPos += Vector3(InputXY.x,0,InputXY.y);
+		//	m_CameraAt += Vector3(InputXY.x, 0, InputXY.y);
+		//	CameraP->SetEye(m_CameraPos);
+		//	CameraP->SetAt(m_CameraAt);
+		//	
+		//	/*
+		//	wstring txt;
+		//	txt += L"X:" + Util::FloatToWStr(m_CameraPos.x) + L"Z:" + Util::FloatToWStr(m_CameraPos.z);
+		//	GetSharedGameObject<DebugTxt>(L"DebugTxt",false)->SetText(txt);
+		//	*/
+		//}
 		//Abe20170427
 	}
 

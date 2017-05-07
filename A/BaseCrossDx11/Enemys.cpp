@@ -72,29 +72,31 @@ namespace basecross
 
 	void TackleEnemy::OnUpdate()
 	{
-		//m_Debugtxt->SetText(Util::IntToWStr(m_State));
-
-		switch (m_State)
+		//生きてれば
+		if (m_ActiveFlg)
 		{
-			//索敵
-		case SearchS:
-			Search();
-			break;
-			//探索
-		case MoveS:
-			Move();
-			break;
-			//攻撃
-		case AttackS:
-			Attack();
-			break;
-			//クールタイム
-		case CoolTimeS:
-			CoolTime();
-			break;
+			//m_Debugtxt->SetText(Util::IntToWStr(m_State));
+
+			switch (m_State)
+			{
+				//索敵
+			case SearchS:
+				Search();
+				break;
+				//探索
+			case MoveS:
+				Move();
+				break;
+				//攻撃
+			case AttackS:
+				Attack();
+				break;
+				//クールタイム
+			case CoolTimeS:
+				CoolTime();
+				break;
+			}
 		}
-
-
 	}
 
 	void TackleEnemy::Search()
@@ -247,7 +249,7 @@ namespace basecross
 		m_SearchCircle->SetDrawActive(true);
 	}
 
-	//なんかにぶつかったら速度反転横と縦どっちがあたったかだけほしぃ
+	//なんかにぶつかったら速度反転、横と縦どっちがあたったかだけほしぃ
 	void TackleEnemy::TurnVecolity(bool flgx, bool flgz)
 	{
 		if (flgx)
@@ -332,6 +334,29 @@ namespace basecross
 			PtrPlayerHP->SetDamage_int(1);
 			PtrPlayerHP->SetHit(true);
 			ToCoolTime();
+		}
+	}
+
+	//攻撃受けたとき
+	void TackleEnemy::DamagePlayer()
+	{
+		//もしHPが1以下なら
+		if (m_Hp <= 1)
+		{
+			//タヒぬ
+			SetDrawActive(false);
+			m_Hp = 0;
+			m_ActiveFlg = false;
+		}
+	}
+
+	void TackleEnemy::Damage(int num)
+	{
+		//HP減らしてなくなってれば1残す
+		m_Hp += -num;
+		if (m_Hp < 0)
+		{
+			m_Hp = 1;
 		}
 	}
 	//************************************

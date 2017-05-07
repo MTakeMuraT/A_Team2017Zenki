@@ -1,14 +1,14 @@
 #include "stdafx.h"
 #include "Project.h"
 
-namespace basecross 
+namespace basecross
 {
 	//************************************
 	//	円形アタリ判定
 	//	距離で判定、座標のマイナス反転して加算した分が2(プレイヤーの半径[1]*2)以下のもののみ判定
 	//************************************
 	//Abe20170504
-	CollisionManager::CollisionManager(const shared_ptr<Stage>& StagePtr):
+	CollisionManager::CollisionManager(const shared_ptr<Stage>& StagePtr) :
 		GameObject(StagePtr)
 	{}
 
@@ -32,17 +32,30 @@ namespace basecross
 	{
 		if (m_ActiveFlg)
 		{
-			//プレイヤーの座標を持ってくる
-			Vector3 ppos1 = m_Player1->GetComponent<Transform>()->GetPosition();
-			Vector3 ppos2 = m_Player2->GetComponent<Transform>()->GetPosition();
+			//プレイヤーとアタリとるグループに入ってるもの
+			CollisionPlayer();
 
-			//アタリ判定を行うオブジェクトが入ってるグループを持ってくる
-			auto ColGroupVec = GetStage()->GetSharedObjectGroup(L"CollisionGroup")->GetGroupVector();
+			//アタリとるグループに入ってるもの全部
+			AllCollision();
+		}
+	}
 
-			//オブジェクト数分ループ
-			for (auto obj : ColGroupVec)
+	void CollisionManager::CollisionPlayer()
+	{
+		//プレイヤーの座標を持ってくる
+		Vector3 ppos1 = m_Player1->GetComponent<Transform>()->GetPosition();
+		Vector3 ppos2 = m_Player2->GetComponent<Transform>()->GetPosition();
+
+		//アタリ判定を行うオブジェクトが入ってるグループを持ってくる
+		auto ColGroupVec = GetStage()->GetSharedObjectGroup(L"CollisionGroup")->GetGroupVector();
+
+		//オブジェクト数分ループ
+		for (auto obj : ColGroupVec)
+		{
+			auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+			//描画されてれば判定
+			if (ptr->GetDrawActive())
 			{
-				auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
 				//距離を測る(プレイヤー同士の体の大きさは変わらないと思うので1体目を参照)
 				float half = m_Player1->GetComponent<Transform>()->GetScale().x / 2 + ptr->GetComponent<Transform>()->GetScale().x / 2;
 				//平方根とらないように
@@ -51,25 +64,7 @@ namespace basecross
 				Vector3 dist1 = ptr->GetComponent<Transform>()->GetPosition() - m_Player1->GetComponent<Transform>()->GetPosition();
 				Vector3 dist2 = ptr->GetComponent<Transform>()->GetPosition() - m_Player2->GetComponent<Transform>()->GetPosition();
 				dist1 = dist1 * dist1;
-				//軽い計算で反転
-				if (dist1.x < 0)
-				{
-					dist1.x *= -1;
-				}
-				if (dist1.z < 0)
-				{
-					dist1.z *= -1;
-				}
-				//dist2 *= dist2;		//どうやら、ないみたいだね
 				dist2 = dist2 * dist2;
-				if (dist2.x < 0)
-				{
-					dist2.x *= -1;
-				}
-				if (dist2.z < 0)
-				{
-					dist2.z *= -1;
-				}
 
 				//一体目があたる
 				if (half > dist1.x + dist1.z)
@@ -83,6 +78,151 @@ namespace basecross
 				}
 			}
 		}
+	}
+
+	void CollisionManager::AllCollision()
+	{
+		//アタリ判定を行うオブジェクトが入ってるグループを持ってくる
+		auto ColGroupVec = GetStage()->GetSharedObjectGroup(L"CollisionGroup")->GetGroupVector();
+		//コンテナ初期化
+		m_ColObjs.clear();
+		//いったんvectorコンテナに入れる
+		for (auto obj : ColGroupVec)
+		{
+			//描画されてれば判定
+			if (obj.lock()->GetDrawActive())
+			{
+				m_ColObjs.push_back(dynamic_pointer_cast<GameObject>(obj.lock()));
+			}
+		}
+
+		//一番目から[1,2][1,3]って感じで検証、もし当たってたらそいつをvector配列から除去
+		while (m_ColObjs.size() > 1)
+		{
+			//当たったか
+			bool HitFlg = false;
+
+			int VecSize = m_ColObjs.size() - 1;
+			for (int i = 1; i < VecSize;i++)
+			{		
+				
+				//アタリ確認
+				bool ColFlg = HitTest(m_ColObjs[0]->GetComponent<Transform>()->GetPosition(), m_ColObjs[0]->GetComponent<Transform>()->GetScale().x, 
+									  m_ColObjs[i]->GetComponent<Transform>()->GetPosition(), m_ColObjs[i]->GetComponent<Transform>()->GetScale().x);
+				//当たった
+				if (ColFlg)
+				{
+					//当たったフラグOn
+					HitFlg = true;
+					//角度計算
+					//0のほう
+					Vector3 dis = m_ColObjs[i]->GetComponent<Transform>()->GetPosition() - m_ColObjs[0]->GetComponent<Transform>()->GetPosition();
+					int angle = (int)(atan2(dis.z, dis.x) * 180/3.14159265f + 360);
+					angle %= 360;
+
+					//iのほう
+					Vector3 dis2 = m_ColObjs[0]->GetComponent<Transform>()->GetPosition() - m_ColObjs[i]->GetComponent<Transform>()->GetPosition();
+					int angle2 = (int)(atan2(dis2.z, dis2.x) * 180 / 3.14159265f + 360);
+					angle2 %= 360;
+
+					CollisionAfterObjs(m_ColObjs[0], angle, m_ColObjs[i], angle2);
+
+
+					//あたったものをvectorコンテナから消す
+					m_ColObjs.erase(m_ColObjs.begin());
+					m_ColObjs.erase(m_ColObjs.begin() + i);
+
+					break;
+				}
+				
+			}
+			//もし当たったものがなければ一番先頭から消す
+			if (!HitFlg)
+			{
+				m_ColObjs.erase(m_ColObjs.begin()+0);
+			}
+		}
+	}
+
+	bool CollisionManager::HitTest(Vector3 pos1, float half1, Vector3 pos2, float half2)
+	{
+		//距離を測る
+		float half = half1 + half2;
+		//平方根とらないように
+		half *= half;
+		//それぞれの差を計算
+		Vector3 dist = pos2 - pos1;
+		dist = dist * dist;
+
+		//当たる
+		if (half > dist.x + dist.z)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+		
+	}
+
+	void CollisionManager::CollisionAfterObjs(shared_ptr<GameObject> obj,int angle, shared_ptr<GameObject> obj2, int angle2)
+	{
+		if (dynamic_pointer_cast<TackleEnemy>(obj))
+		{
+			//横が当たってる
+			if ((angle > 135.0f && angle < 225.0f) || (angle > 315.0f && angle < 45.0f))
+			{
+				dynamic_pointer_cast<TackleEnemy>(obj)->TurnVecolity(true, false);
+			}
+			//縦の判定[!横]でいけるんじゃね？
+			else
+			{
+				dynamic_pointer_cast<TackleEnemy>(obj)->TurnVecolity(false, true);
+			}
+		}
+		if (dynamic_pointer_cast<ShotEnemyChildMissile>(obj))
+		{
+			//それぞれのエネミーにダメージを与える
+			auto ptr = dynamic_pointer_cast<TackleEnemy>(obj2);
+			if (ptr)
+			{
+				//--------------------------------------------------------------------
+				//					ここにミサイルの攻撃力入れる
+				//--------------------------------------------------------------------
+				ptr->Damage((int)dynamic_pointer_cast<ShotEnemyChildMissile>(obj)->GetChildMissileAttackDamage());
+			}
+		}
+
+		//上と同じもの
+		if (dynamic_pointer_cast<TackleEnemy>(obj2))
+		{
+			//横が当たってる
+			if ((angle > 135.0f && angle < 225.0f) || (angle > 315.0f && angle < 45.0f))
+			{
+				dynamic_pointer_cast<TackleEnemy>(obj2)->TurnVecolity(true, false);
+			}
+			//縦の判定[!横]でいけるんじゃね？
+			else
+			{
+				dynamic_pointer_cast<TackleEnemy>(obj2)->TurnVecolity(false, true);
+			}
+		}
+		if (dynamic_pointer_cast<ShotEnemyChildMissile>(obj2))
+		{
+			//それぞれのエネミーにダメージを与える
+			auto ptr = dynamic_pointer_cast<TackleEnemy>(obj);
+			if (ptr)
+			{
+				//--------------------------------------------------------------------
+				//					ここにミサイルの攻撃力入れる
+				//--------------------------------------------------------------------
+				ptr->Damage((int)dynamic_pointer_cast<ShotEnemyChildMissile>(obj2)->GetChildMissileAttackDamage());
+			}
+
+		}
+
+
 	}
 
 	void CollisionManager::CollisionAfter(shared_ptr<GameObject> obj , int num)
@@ -112,7 +252,8 @@ namespace basecross
 			//}
 			//==============================================
 		}
-		//共通する部分---------------------------------------------------------
+
+		//以下共通する部分---------------------------------------------------------
 
 		//==============================================
 		if (dynamic_pointer_cast<Enemy01>(obj))
@@ -242,9 +383,19 @@ namespace basecross
 	//挟んだ後
 	void CollisionSand::SandAfter(shared_ptr<GameObject> obj)
 	{
+		//==============================================
 		if (dynamic_pointer_cast<Enemy01>(obj))
 		{
 			dynamic_pointer_cast<Enemy01>(obj)->SandAfter();
 		}
+		//==============================================
+
+		//==============================================
+		if (dynamic_pointer_cast<TackleEnemy>(obj))
+		{
+			dynamic_pointer_cast<TackleEnemy>(obj)->DamagePlayer();
+		}
+		//==============================================
+
 	}
 }
