@@ -61,9 +61,6 @@ namespace basecross {
 		float Move_Speed = 0.0f;
 		Vector3 Vec_Vec3 = Vector3(0.0f, 0.0f, 0.0f);
 		/////////////////////////////////
-		//InputRotation関数内の使用変数///
-
-		/////////////////////////////////
 		//Direction関数内の使用変数/////
 		Vector3 Direction_Vec3 = Vector3(0, 0, 0);
 		/////////////////////////////////
@@ -76,12 +73,11 @@ namespace basecross {
 		//戻るステートでの変数
 		Vector3 PlayerL_Velocity_Vec3 = Vector3(0, 0, 0);
 		Vector3 PlayerR_Velocity_Vec3 = Vector3(0, 0, 0);
-		//プレイヤーに知らせる　（引き合うステートから元に戻るステートへの変更フラグ
-		bool m_StateChangeReturn_B = false;
-		//戻るステートから移動ステート
-		bool m_StateChangeMover_B = false;
+
+
+
 	public:
-		
+
 		PlayerManager(const shared_ptr<Stage>& StagePtr);
 		virtual ~PlayerManager() {}
 		virtual void OnCreate() override;
@@ -99,22 +95,23 @@ namespace basecross {
 		shared_ptr<StateMachine<PlayerManager>>& GetStateMachine_Manager() {
 			return m_StateManagerMachine;
 		}
-
+		//ステートチェンジ関数
+		void StateChangeDoingInterpose();
 		//行動のスタート関数
 		void EnterGamePrepare();//ゲーム前の準備ステート
 		void EnterMoveBehavior();//移動ステート 
 		void EnterLeaveBehavior();//離れるステート
 		void EnterToAttractBehavior();//引き付けるステート
 		void EnterReturnBehavior();//戻る
+		void EneterDoingInterpose();//挟んでいるとき
 
-
-								   //行動の継続関数			
+									//行動の継続関数			
 		void ExecuteGamePrepare();//ゲーム前の準備
 		void ExecuteMoveBehavior();
 		void ExecuteLeaveBehavior();//離れる
 		void ExecuteToAttractBehavior();//引き付ける
 		void ExecuteReturnBehavior();//戻る
-
+		void ExecuteDoingInterpose();//挟んでいるとき
 
 									 //行動の終了関数		
 		void ExitGamePrepare();//ゲーム前の準備
@@ -122,30 +119,9 @@ namespace basecross {
 		void ExitLeaveBehavior();//離れる
 		void ExitToAttractBehavior();//引き付ける
 		void ExitReturnBehavior();//戻る
+		void ExitDoingInterpose();//挟んでいるとき
 
-								  //プレイヤーへのアクセサー
-		bool GetStateChangeReturn() {
-			return m_StateChangeReturn_B;
-		}
-		void SetStateChangeReturn(bool flg) {
-			m_StateChangeReturn_B = flg;
-		}
-		bool GetStateChangeMover() {
-			return m_StateChangeMover_B;
-		}
-		void SetStateChangeMover(bool flg) {
-			m_StateChangeMover_B = flg;
-		}
 
-		Vector3 m_PlaeyrLDebug = Vector3(0.0f,0.0f,0.0f);
-		Vector3 m_PlayerRDebug = Vector3(0.0f, 0.0f, 0.0f);
-		//デバック
-		Vector3 GetDebugPlayerL() {
-			return m_PlaeyrLDebug;
-		}
-		Vector3 GetDebugPlayerR() {
-			return m_PlayerRDebug;
-		}
 	};
 	//--------------------------------------------------------------------------------------
 	//	class GamePrepareState_Manager : public ObjState<PlayerManager>;
@@ -226,6 +202,23 @@ namespace basecross {
 	public:
 		//ステートのインスタンス取得
 		static shared_ptr<ReturnState_Manager> Instance();
+		//ステートに入ったときに呼ばれる関数
+		virtual void Enter(const shared_ptr<PlayerManager>& Obj)override;
+		//ステート実行中に毎ターン呼ばれる関数
+		virtual void Execute(const shared_ptr<PlayerManager>& Obj)override;
+		//ステートにから抜けるときに呼ばれる関数
+		virtual void Exit(const shared_ptr<PlayerManager>& Obj)override;
+	};
+	//--------------------------------------------------------------------------------------
+	//	class DoingInterposeState_Manager : public ObjState<PlayerManager>;
+	//	用途:　挟んでいるときのステート
+	//--------------------------------------------------------------------------------------
+	class DoingInterposeState_Manager : public ObjState<PlayerManager>
+	{
+		DoingInterposeState_Manager() {}
+	public:
+		//ステートのインスタンス取得
+		static shared_ptr<DoingInterposeState_Manager> Instance();
 		//ステートに入ったときに呼ばれる関数
 		virtual void Enter(const shared_ptr<PlayerManager>& Obj)override;
 		//ステート実行中に毎ターン呼ばれる関数
