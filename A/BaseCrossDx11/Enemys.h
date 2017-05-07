@@ -21,7 +21,7 @@ namespace basecross
 {
 	//************************************
 	//	突撃エネミー
-	//	追記なし？
+	//	索敵で引っかかったプレイヤーを狙う。たぶん同時に入ったら２体目を狙う
 	//************************************
 	class TackleEnemy : public GameObject
 	{
@@ -42,7 +42,24 @@ namespace basecross
 		Vector3 m_Velocity;
 
 		//時間測る用
-		float m_time;
+		float m_time = 0;
+
+		//攻撃までのタメ時間
+		float m_AttackTime = 2.0f;
+		//突撃した回数
+		int m_AttackCount = 0;
+		//攻撃中(これ、攻撃状態でもあるんで、DamageFlgっても呼ぶかも)
+		bool m_TackleFlg = false;
+		//攻撃してる対象
+		int m_TargetNum = 0;
+		//突撃してる時間
+		float m_TackleTime = 3.0f;
+
+
+		/*ぶれぶれするかどうかわからんから放置！ これに関係するものは1Aでコメントアウト
+		//ぶれぶれさせる用の座標
+		Vector3 m_BurePos;
+		*/
 
 		//以下パラメータ
 		//大きさ
@@ -81,6 +98,22 @@ namespace basecross
 
 		//サークル移動
 		void CircleMove();
+
+		//Velocityを反転する 引数(x,z)にtrue入れると反転
+		//同時にいろいろあたったら知らん。もう仕様だわそれ、やればわかる
+		void TurnVecolity(bool, bool);
+
+		//ダメージ受けるかどうかのフラグ受け渡し用
+		bool GetDamageFlg() { return m_TackleFlg; }
+
+		//状態変更
+		void ToSearch();
+		void ToMove();
+		void ToAttack(int);		//攻撃する対象(1なら１体目2なら２体目)
+		void ToCoolTime();
+
+		//プレイヤーへの攻撃判定
+		void ToDamagePlayer();
 	};
 
 	//************************************
