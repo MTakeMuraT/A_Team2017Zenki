@@ -71,15 +71,6 @@ namespace basecross {
 		auto PtdDraw = AddComponent<PCTSpriteDraw>();
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 
-		//m_alpha += 0.05f;
-
-
-		/*if (m_alpha > 2) {
-		lighton = false;
-		}
-		else if (m_alpha < 0) {
-		lighton = true;
-		}*/
 
 		if (CntlVec[0].wPressedButtons &XINPUT_GAMEPAD_A) {
 			Max = 0.5f;
@@ -93,9 +84,6 @@ namespace basecross {
 		else if (m_alpha < 0) {
 			lighton = true;
 		}
-
-
-
 
 
 

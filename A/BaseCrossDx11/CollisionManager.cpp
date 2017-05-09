@@ -272,6 +272,13 @@ namespace basecross
 			dynamic_pointer_cast<TackleEnemy>(obj)->ToDamagePlayer();
 		}
 		//==============================================
+		//自爆エネミー(BombEnemy)
+		if (dynamic_pointer_cast<BombEnemy>(obj))
+		{
+			dynamic_pointer_cast<BombEnemy>(obj)->ToDamagePlayer();
+		}
+		//==============================================
+
 
 
 		//ミサイルにあたったら

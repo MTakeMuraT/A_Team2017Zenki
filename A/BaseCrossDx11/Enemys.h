@@ -199,6 +199,18 @@ namespace basecross
 		//時間測る用
 		float m_time;
 
+
+		//攻撃までのタメ時間
+		float m_AttackTime = 2.0f;
+		//突撃した回数
+		int m_AttackCount = 0;
+		//攻撃中(これ、攻撃状態でもあるんで、DamageFlgっても呼ぶかも)
+		bool m_TackleFlg = false;
+		//攻撃してる対象
+		int m_TargetNum = 0;
+		//突撃してる時間
+		float m_TackleTime = 3.0f;
+
 		//以下パラメータ
 		//大きさ
 		float m_ParScale;
@@ -247,8 +259,31 @@ namespace basecross
 		//索敵範囲の画像(スクエア)
 		shared_ptr<GameObject> m_SearchCircle;
 
+		
+		//探索までの間隔
+		float m_moveInterval = 2;
+		//移動時Velocity
+		Vector3 m_Velocity;
+
+		//生きてるか
+		bool m_ActiveFlg = true;
+
+
 		//時間測る用
 		float m_time;
+
+
+
+		//攻撃までのタメ時間
+		float m_AttackTime = 2.0f;
+		//攻撃中(これ、攻撃状態でもあるんで、DamageFlgっても呼ぶかも)
+		bool m_TackleFlg = false;
+		//攻撃してる対象
+		int m_TargetNum = 0;
+		//突撃してる時間
+		float m_TackleTime = 3.0f;
+
+
 
 		//以下パラメータ
 		//大きさ
@@ -261,6 +296,9 @@ namespace basecross
 		float m_Speed;
 		//攻撃力
 		int m_Power;
+		//突撃回数
+		int m_TackleCount;
+
 
 	public:
 		//引数 位置(pos)、大きさ(parscale)、HP(hp)、索敵距離(serchdistance)、速度(speed)、攻撃力(power)
@@ -275,5 +313,18 @@ namespace basecross
 		void Move();
 		//攻撃
 		void Attack();
+		
+		//サークル移動
+		void CircleMove();
+
+
+		//状態変更
+		void ToSearch();
+		void ToMove();
+		void ToAttack(int);		//攻撃する対象(1なら１体目2なら２体目)
+
+		//プレイヤーへの攻撃判定
+		void ToDamagePlayer();
+
 	};
 }
