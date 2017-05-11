@@ -363,6 +363,7 @@ namespace basecross
 			m_Hp = 1;
 		}
 	}
+
 	//************************************
 	//	玉撃つエネミー
 	//	追記なし？
@@ -462,6 +463,7 @@ namespace basecross
 
 	}
 
+	//Abe20170508
 	//************************************
 	//	爆弾置いてテレポートエネミー
 	//	追記なし？
@@ -514,6 +516,13 @@ namespace basecross
 
 		circle->SetAlphaActive(true);
 		m_SearchCircle = circle;
+
+		//テレポートポイントを作成
+		auto TereportGroup = GetStage()->GetSharedObjectGroup(L"TereportPointGroup");
+		auto TereportPtr = GetStage()->AddGameObject<TereportPoint>(posci);
+		TereportPtr->SetOnEnemy(true);
+		TereportGroup->IntoGroup(TereportPtr);
+
 	}
 
 	void TeleportEnemy::OnUpdate()
@@ -542,6 +551,25 @@ namespace basecross
 
 	void TeleportEnemy::Search()
 	{
+		//位置情報取得
+		Vector3 mypos = GetComponent<Transform>()->GetPosition();
+		Vector3 pos1 = m_Player1->GetComponent<Transform>()->GetPosition();
+		Vector3 pos2 = m_Player2->GetComponent<Transform>()->GetPosition();
+		float distance = m_Player1->GetComponent<Transform>()->GetScale().x / 2 + m_SearchDistance / 2;
+
+		//距離を測る
+		//１体目
+		Vector3 dis = pos1 - mypos;
+		if ((dis.x*dis.x) + (dis.z*dis.z) < distance*distance)
+		{
+			ToAttack(1);
+		}
+		//２体目
+		dis = pos2 - mypos;
+		if ((dis.x*dis.x) + (dis.z*dis.z) < distance*distance)
+		{
+			ToAttack(2);
+		}
 
 	}
 
@@ -552,13 +580,174 @@ namespace basecross
 
 	void TeleportEnemy::Attack()
 	{
+		m_time += App::GetApp()->GetElapsedTime();
+		//爆弾置く状態になるまで待機
+		if (!m_BombPutFlg)
+		{
+			//攻撃までの時間過ぎたらテレポート
+			if (m_time > m_AttackWaitTime)
+			{
+				//１体目攻撃
+				if (m_TargetNum == 1)
+				{
+					Vector3 pos = m_Player1->GetComponent<Transform>()->GetPosition();
+					pos.x += (rand() % 20 - 10) / 10;
+					pos.y = m_InitPos.y;
+					pos.z += (rand() % 20 - 10) / 10;
+					GetComponent<Transform>()->SetPosition(pos);
+				}
+				//２体目攻撃
+				else if (m_TargetNum == 2)
+				{
+					Vector3 pos = m_Player2->GetComponent<Transform>()->GetPosition();
+					pos.x += (rand() % 20 - 10) / 10;
+					pos.y = m_InitPos.y;
+					pos.z += (rand() % 20 - 10) / 10;
+					GetComponent<Transform>()->SetPosition(pos);
+				}
+
+				//爆弾置くフラグたてる
+				m_BombPutFlg = true;
+
+				//時間リセット
+				m_time = 0;
+			}
+		}
+		//爆弾置く
+		else
+		{
+			//爆弾置く前
+			if (!m_BombAfterFlg)
+			{
+				if (m_time > m_BombPutTime)
+				{
+					//爆弾を生成
+					auto BombGroup = GetStage()->GetSharedObjectGroup(L"BombGroup")->GetGroupVector();
+					//置いたかどうか
+					bool PutFlg = false;
+					for (auto obj : BombGroup)
+					{
+						auto ptr = dynamic_pointer_cast<Bomb>(obj.lock());
+						if (!ptr->GetDrawActive())
+						{
+							Vector3 topos = GetComponent<Transform>()->GetPosition();
+							topos.y = 1;
+							ptr->SetActivePosition(topos);
+							PutFlg = true;
+						}
+						if (!PutFlg)
+						{
+							GetStage()->AddGameObject<Bomb>(GetComponent<Transform>()->GetPosition());
+						}
+					}
+					//爆弾置いたフラグをオン
+					m_BombAfterFlg = true;
+
+					//時間リセット
+					m_time = 0;
+				}
+			}
+			//爆弾置いた後
+			else
+			{
+				auto Group = GetStage()->GetSharedObjectGroup(L"TereportPointGroup")->GetGroupVector();
+				//中身の数を数える
+				int count = 0;
+				//ちょっと汚いけどまあいいべ
+				vector<shared_ptr<GameObject>> Target;
+				for (auto obj : Group)
+				{
+					auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+					//自分の足元のテレポートポインtじゃなかったら追加
+					if (ptr != m_UnderTereportPoint)
+					{
+						Target.push_back(ptr);
+						count++;
+					}
+					//足元のなら自分いないことにする
+					else
+					{
+						dynamic_pointer_cast<TereportPoint>(ptr)->SetOnEnemy(false);
+					}
+				}
+				//移動先を決定
+				int randnum = rand() % count;
+				//移動
+				Vector3 targetpos = Target[randnum]->GetComponent<Transform>()->GetPosition();
+				targetpos.y = m_InitPos.y;
+				GetComponent<Transform>()->SetPosition(targetpos);
+				//足元のポイント設定
+				m_UnderTereportPoint = Target[randnum];
+				dynamic_pointer_cast<TereportPoint>(m_UnderTereportPoint)->SetOnEnemy(true);
+
+				//クールタイムへ
+				ToCoolTime();
+			}
+		}
 
 	}
 
 	void TeleportEnemy::CoolTime()
 	{
+		//クールタイム過ぎたら索敵状態へ
+		m_time += App::GetApp()->GetElapsedTime();
+		if (m_time > m_CoolTime)
+		{
+			ToSearch();
+			m_time = 0;
+		}
+	}
+
+	void TeleportEnemy::CircleMove()
+	{
+		Vector3 pos = GetComponent<Transform>()->GetPosition();
+		//足元へ移動
+		pos.y += -m_ParScale / 2;
+		m_SearchCircle->GetComponent<Transform>()->SetPosition(pos);
+		m_SearchCircle->SetDrawActive(true);
+	}
+
+	void TeleportEnemy::ToSearch()
+	{
+		//計算時間初期化
+		m_time = 0;
+
+		//状態変更
+		m_State = SearchS;
+
+		//サークル移動
+		CircleMove();
 
 	}
+
+	void TeleportEnemy::ToAttack(int num)
+	{
+		m_time = 0;
+
+		m_TargetNum = num;
+
+		//サークル除去
+		m_SearchCircle->SetDrawActive(false);
+
+		m_State = AttackS;
+	}
+
+
+	void TeleportEnemy::ToCoolTime()
+	{
+		//計算時間初期化
+		m_time = 0;
+
+		//爆弾置く状態初期化
+		m_BombPutFlg = false;
+		//爆弾置いた状態初期化
+		m_BombAfterFlg = false;
+
+		//状態変更
+		m_State = CoolTimeS;
+
+	}
+	//Abe20170508
 
 	//************************************
 	//	自爆エネミー
@@ -835,4 +1024,133 @@ namespace basecross
 
 		}
 	}
+
+	//Abe20170508
+	//======================以下子機群=======================
+	//************************************
+	//	爆弾
+	//	一定時間で起動
+	//************************************
+	Bomb::Bomb(const shared_ptr<Stage>& StagePtr, Vector3 pos, float scale, float bombdistance, float power, float explosiontime) :
+		GameObject(StagePtr),
+		m_InitPos(pos),
+		m_Scale(Vector3(scale, scale, scale)),
+		m_BombDistance(bombdistance),
+		m_Power(power),
+		m_ExplosionTime(explosiontime)
+	{}
+
+	//引数ポジションのみ。ていうか基本こっち使ってほしい
+	Bomb::Bomb(const shared_ptr<Stage>& StagePtr, Vector3 pos) :
+		GameObject(StagePtr),
+		m_InitPos(pos)
+	{
+		//その他決定
+		m_Scale = Vector3(1, 1, 1);
+		m_BombDistance = 3.0f;
+		m_Power = 3.0f;
+		m_ExplosionTime = 3.0f;
+	}
+
+	void Bomb::OnCreate()
+	{
+		//座標、大きさ、回転
+		auto Trans = AddComponent<Transform>();
+		Trans->SetPosition(m_InitPos);
+		Trans->SetScale(m_Scale);
+		Trans->SetRotation(0, 0, 0);
+
+		auto Draw = AddComponent<PNTStaticDraw>();
+		Draw->SetTextureResource(L"BOMB_TX");
+		Draw->SetMeshResource(L"DEFAULT_QUBE");
+
+		m_time = 0;
+	}
+
+	void Bomb::OnUpdate()
+	{
+		if (m_Activeflg)
+		{
+			m_time += App::GetApp()->GetElapsedTime();
+			if (m_time > m_ExplosionTime)
+			{
+				BombExplosion();
+			}
+		}
+	}
+
+	//挟まれたら爆発
+	void Bomb::BombExplosion()
+	{
+		//動かなく
+		m_Activeflg = false;
+		SetDrawActive(false);
+
+		//判定
+		//プレイヤーのアクセサー的なのをはじめにもってきておく
+		auto Player1 = GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_L");
+		auto Player2 = GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_R");
+
+		//プレイヤーの座標を持ってくる
+		Vector3 ppos1 = Player1->GetComponent<Transform>()->GetPosition();
+		Vector3 ppos2 = Player2->GetComponent<Transform>()->GetPosition();
+
+		//距離を測る(プレイヤー同士の体の大きさは変わらないと思うので1体目を参照)
+		float half = Player1->GetComponent<Transform>()->GetScale().x / 2 + m_BombDistance / 2;
+		//平方根とらないように
+		half *= half;
+		//それぞれの差を計算
+		Vector3 dist1 = GetComponent<Transform>()->GetPosition() - Player1->GetComponent<Transform>()->GetPosition();
+		Vector3 dist2 = GetComponent<Transform>()->GetPosition() - Player2->GetComponent<Transform>()->GetPosition();
+		dist1 = dist1 * dist1;
+		dist2 = dist2 * dist2;
+
+		//どっちか当たる
+		if (half > dist1.x + dist1.z || half > dist2.x + dist2.z)
+		{
+			//ダメージを与える
+			//HPを減らす
+			auto PtrPlayerHP = GetStage()->GetSharedGameObject<PlayerHP>(L"PlayerHP", false);
+			PtrPlayerHP->SetDamage_int(m_Power);
+			PtrPlayerHP->SetHit(true);
+		}
+	}
+
+	//再利用
+	void Bomb::SetActivePosition(Vector3 pos)
+	{
+		m_time = 0;
+		m_Activeflg = true;
+
+		SetDrawActive(true);
+
+		GetComponent<Transform>()->SetPosition(pos);
+	}
+
+
+	//************************************
+	//	テレポートエネミーのテレポート先
+	//	一定時間で起動
+	//************************************
+	TereportPoint::TereportPoint(const shared_ptr<Stage>& StagePtr, Vector3 pos) :
+		GameObject(StagePtr),
+		m_Pos(pos)
+	{}
+
+	void TereportPoint::OnCreate()
+	{
+		//座標、大きさ、回転
+		auto Trans = AddComponent<Transform>();
+		Trans->SetPosition(m_Pos);
+		Trans->SetScale(2, 2, 2);
+		Trans->SetRotation(90 * 3.14159265 / 180, 0, 0);
+
+		auto Draw = AddComponent<PNTStaticDraw>();
+		Draw->SetTextureResource(L"TEREPORTPOINT_TX");
+		Draw->SetMeshResource(L"DEFAULT_SQUARE");
+
+		SetAlphaActive(true);
+
+	}
+	//Abe20170508
 }

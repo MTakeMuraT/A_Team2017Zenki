@@ -87,6 +87,12 @@ namespace basecross {
 		strTexture = DataDir + L"Enemy\\SearchCircle.png";
 		App::GetApp()->RegisterTexture(L"SEARCHCIRCLE_TX", strTexture);
 		//Abe20170505
+		//Abe20170508
+		strTexture = DataDir + L"Enemy\\TereportPoint.png";
+		App::GetApp()->RegisterTexture(L"TEREPORTPOINT_TX", strTexture);
+		strTexture = DataDir + L"Enemy\\Bomb.png";
+		App::GetApp()->RegisterTexture(L"BOMB_TX", strTexture);
+		//Abe20170508
 
 	
 		////モデル（ボーンあり
