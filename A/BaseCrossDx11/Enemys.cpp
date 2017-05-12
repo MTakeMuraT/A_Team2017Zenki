@@ -527,26 +527,28 @@ namespace basecross
 
 	void TeleportEnemy::OnUpdate()
 	{
-		switch (m_State)
+		if (m_ActiveFlg)
 		{
-			//索敵
-		case SearchS:
-			Search();
-			break;
-			//探索
-		case MoveS:
-			Move();
-			break;
-			//攻撃
-		case AttackS:
-			Attack();
-			break;
-			//クールタイム
-		case CoolTimeS:
-			CoolTime();
-			break;
+			switch (m_State)
+			{
+				//索敵
+			case SearchS:
+				Search();
+				break;
+				//探索
+			case MoveS:
+				Move();
+				break;
+				//攻撃
+			case AttackS:
+				Attack();
+				break;
+				//クールタイム
+			case CoolTimeS:
+				CoolTime();
+				break;
+			}
 		}
-
 	}
 
 	void TeleportEnemy::Search()
@@ -748,6 +750,35 @@ namespace basecross
 
 	}
 	//Abe20170508
+
+	//Abe20170512
+	//攻撃受けたとき
+	void TeleportEnemy::DamagePlayer()
+	{
+		//もしHPが1以下なら
+		if (m_Hp <= 1)
+		{
+			//タヒぬ
+			SetDrawActive(false);
+			m_Hp = 0;
+			m_ActiveFlg = false;
+		}
+		else
+		{
+			m_Hp--;
+		}
+	}
+
+	void TeleportEnemy::Damage(int num)
+	{
+		//HP減らしてなくなってれば1残す
+		m_Hp += -num;
+		if (m_Hp < 0)
+		{
+			m_Hp = 1;
+		}
+	}
+	//Abe20170512
 
 	//************************************
 	//	自爆エネミー

@@ -215,6 +215,8 @@ namespace basecross
 		//自分の足元のテレポートポイント
 		shared_ptr<GameObject> m_UnderTereportPoint;
 
+		//アクティブフラグ
+		bool m_ActiveFlg = true;
 		//以下パラメータ
 		//大きさ
 		float m_ParScale;
@@ -253,6 +255,10 @@ namespace basecross
 		void ToAttack(int);		//攻撃する対象(1なら１体目2なら２体目)
 		void ToCoolTime();
 
+		//プレイヤーから
+		void DamagePlayer();
+		//ダメージ受ける関数
+		void Damage(int);
 	};
 
 	//************************************

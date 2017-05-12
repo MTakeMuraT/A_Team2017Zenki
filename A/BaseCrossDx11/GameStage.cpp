@@ -243,12 +243,14 @@ namespace basecross
 
 			//テレポートエネミー
 			//引数 位置、大きさ、HP、索敵距離、クールタイム、発射数
-			AddGameObject<TeleportEnemy>(Vector3(-10, 1, 10), 1, 1, 5, 1, 3);
+			auto TeEnObj = AddGameObject<TeleportEnemy>(Vector3(-10, 1, 10), 1, 1, 5, 1, 3);
+			//Abe20170512
+			CollisionGroup->IntoGroup(TeEnObj);
+			EnemyGroup->IntoGroup(TeEnObj);
+			//Abe20170512
 			//爆弾グループ
 			CreateSharedObjectGroup(L"BombGroup");
 			//Abe20170508
-
-
 
 		}
 		catch (...) {
