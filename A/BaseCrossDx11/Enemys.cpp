@@ -523,6 +523,15 @@ namespace basecross
 		TereportPtr->SetOnEnemy(true);
 		TereportGroup->IntoGroup(TereportPtr);
 
+
+		//デバッグ文字生成
+		m_Debugtxt = GetStage()->AddGameObject<DebugTxt>();
+		m_Debugtxt->SetLayer(10);
+		//色赤に変更
+		m_Debugtxt->SetColor(Vector3(1, 0, 0));
+		//大きさ変更
+		m_Debugtxt->SetScaleTxt(40);
+
 	}
 
 	void TeleportEnemy::OnUpdate()
@@ -593,18 +602,18 @@ namespace basecross
 				if (m_TargetNum == 1)
 				{
 					Vector3 pos = m_Player1->GetComponent<Transform>()->GetPosition();
-					pos.x += (rand() % 20 - 10) / 10;
+					pos.x += (rand() % 50 - 25) / 10;
 					pos.y = m_InitPos.y;
-					pos.z += (rand() % 20 - 10) / 10;
+					pos.z += (rand() % 50 - 25) / 10;
 					GetComponent<Transform>()->SetPosition(pos);
 				}
 				//２体目攻撃
 				else if (m_TargetNum == 2)
 				{
 					Vector3 pos = m_Player2->GetComponent<Transform>()->GetPosition();
-					pos.x += (rand() % 20 - 10) / 10;
+					pos.x += (rand() % 50 - 25) / 10;
 					pos.y = m_InitPos.y;
-					pos.z += (rand() % 20 - 10) / 10;
+					pos.z += (rand() % 50 - 25) / 10;
 					GetComponent<Transform>()->SetPosition(pos);
 				}
 
@@ -627,8 +636,15 @@ namespace basecross
 					auto BombGroup = GetStage()->GetSharedObjectGroup(L"BombGroup")->GetGroupVector();
 					//置いたかどうか
 					bool PutFlg = false;
+					//Abe20170512
+					int count = 0;
+					//Abe20170512
 					for (auto obj : BombGroup)
 					{
+						//Abe20170512
+						count++;
+						//Abe20170512
+
 						auto ptr = dynamic_pointer_cast<Bomb>(obj.lock());
 						if (!ptr->GetDrawActive())
 						{
@@ -637,11 +653,17 @@ namespace basecross
 							ptr->SetActivePosition(topos);
 							PutFlg = true;
 						}
-						if (!PutFlg)
-						{
-							GetStage()->AddGameObject<Bomb>(GetComponent<Transform>()->GetPosition());
-						}
 					}
+					//使えるやつがなかったら作る
+					if (!PutFlg)
+					{
+						GetStage()->AddGameObject<Bomb>(GetComponent<Transform>()->GetPosition());
+					}
+
+					//Abe20170512
+					m_Debugtxt->SetText(Util::IntToWStr(count));
+					//Abe20170512
+
 					//爆弾置いたフラグをオン
 					m_BombAfterFlg = true;
 
@@ -1059,6 +1081,86 @@ namespace basecross
 	//Abe20170508
 	//======================以下子機群=======================
 	//************************************
+	//	爆弾の爆発の部分
+	//	拡縮だけでいいかな？
+	//************************************
+	BombEffect::BombEffect(const shared_ptr<Stage>& StagePtr):
+		GameObject(StagePtr)
+	{}
+
+	void BombEffect::OnCreate()
+	{
+		auto Trans = AddComponent<Transform>();
+		Trans->SetPosition(0,0,0);
+		Trans->SetScale(1, 1, 1);
+		Trans->SetRotation(0, 0, 45 * 3.14159265f / 180);
+
+		auto Draw = AddComponent<PNTStaticDraw>();
+		Draw->SetMeshResource(L"DEFAULT_SQUARE");
+		Draw->SetTextureResource(L"BOMBEFFECT_TX");
+
+		SetAlphaActive(true);
+	}
+
+	void BombEffect::OnUpdate()
+	{
+		if (m_ActiveFlg)
+		{
+			switch (m_State)
+			{
+			case 0:
+				//でっかくなる状態
+				if (true)
+				{
+					Vector3 Scale = GetComponent<Transform>()->GetScale();
+					if (Scale.x < 5.0f)
+					{
+						Scale *= 1.5f;
+						GetComponent<Transform>()->SetScale(Scale);
+					}
+					else
+					{
+						m_State = 1;
+					}
+				}
+				break;
+				//ちっちゃくなる
+			case 1:
+				if (true)
+				{
+					Vector3 Scale = GetComponent<Transform>()->GetScale();
+					if (Scale.x > 0.2f)
+					{
+						Scale *= 0.8f;
+						GetComponent<Transform>()->SetScale(Scale);
+					}
+					else
+					{
+						m_State = 2;
+					}
+				}
+				break;
+				//終了処理
+			case 2:
+				//起動終了
+				m_ActiveFlg = false;
+				//状態初期化
+				m_State = 0;
+				SetDrawActive(false);
+				break;
+			}
+		}
+	}
+
+	void BombEffect::SetPosActive(Vector3 pos)
+	{
+		m_ActiveFlg = true;
+		SetDrawActive(true);
+
+		GetComponent<Transform>()->SetPosition(pos);
+	}
+
+	//************************************
 	//	爆弾
 	//	一定時間で起動
 	//************************************
@@ -1078,7 +1180,7 @@ namespace basecross
 	{
 		//その他決定
 		m_Scale = Vector3(1, 1, 1);
-		m_BombDistance = 3.0f;
+		m_BombDistance = 6.0f;
 		m_Power = 3.0f;
 		m_ExplosionTime = 3.0f;
 	}
@@ -1093,9 +1195,14 @@ namespace basecross
 
 		auto Draw = AddComponent<PNTStaticDraw>();
 		Draw->SetTextureResource(L"BOMB_TX");
-		Draw->SetMeshResource(L"DEFAULT_QUBE");
+		Draw->SetMeshResource(L"DEFAULT_SPHERE");
+
+		//透明度有効
+		SetAlphaActive(true);
 
 		m_time = 0;
+
+		m_Effect = GetStage()->AddGameObject<BombEffect>();
 	}
 
 	void Bomb::OnUpdate()
@@ -1116,6 +1223,9 @@ namespace basecross
 		//動かなく
 		m_Activeflg = false;
 		SetDrawActive(false);
+		//爆風作成
+		m_Effect->SetPosActive(GetComponent<Transform>()->GetPosition());
+
 
 		//判定
 		//プレイヤーのアクセサー的なのをはじめにもってきておく

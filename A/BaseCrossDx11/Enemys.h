@@ -208,7 +208,7 @@ namespace basecross
 		//爆弾置いた状態
 		bool m_BombAfterFlg = false;
 		//爆弾置いてる間の時間
-		float m_BombPutTime = 2;
+		float m_BombPutTime = 1;
 		//置いた後逃げるまでの時間
 		float m_TereportTime = 1;
 
@@ -217,6 +217,11 @@ namespace basecross
 
 		//アクティブフラグ
 		bool m_ActiveFlg = true;
+
+		//デバッグ文字
+		shared_ptr<DebugTxt> m_Debugtxt;
+
+
 		//以下パラメータ
 		//大きさ
 		float m_ParScale;
@@ -291,8 +296,6 @@ namespace basecross
 		//時間測る用
 		float m_time;
 
-
-
 		//攻撃までのタメ時間
 		float m_AttackTime = 2.0f;
 		//攻撃中(これ、攻撃状態でもあるんで、DamageFlgっても呼ぶかも)
@@ -350,6 +353,26 @@ namespace basecross
 	//Abe20170508
 	//======================以下子機群=======================
 	//************************************
+	//	爆弾の爆発の部分
+	//	拡縮だけでいいかな？
+	//************************************
+	class BombEffect : public GameObject
+	{
+	private:
+		//状態
+		int m_State = 0;
+		//アクティブフラグ
+		bool m_ActiveFlg = false;
+	public:
+		BombEffect(const shared_ptr<Stage>& StagePtr);
+
+		void OnCreate() override;
+		void OnUpdate() override;
+
+		void SetPosActive(Vector3);
+	};
+
+	//************************************
 	//	爆弾
 	//	一定時間で起動
 	//************************************
@@ -372,7 +395,9 @@ namespace basecross
 		//攻撃力
 		int m_Power;
 		//爆発までの時間
-		float m_ExplosionTime;
+		float m_ExplosionTime = 3.0f;
+
+		shared_ptr<BombEffect> m_Effect;
 	public:
 		//座標、大きさ、爆発範囲、攻撃力、爆発までの時間
 		Bomb(const shared_ptr<Stage>& StagePtr, Vector3 pos, float scale, float bombdistance, float power, float explosiontime);

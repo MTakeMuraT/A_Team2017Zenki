@@ -97,12 +97,6 @@ namespace basecross
 
 	//実装したいものをテストする時に使用
 	void GameStage::CreateTestLin() {
-		AddGameObject<FixdBox>(
-			Vector3(1, 1, 1),
-			Vector3(0, 0, 0),
-			Vector3(0, 1, -5),
-			wstring(L"TRACE_TX")
-			);
 		AddGameObject<SkySphere>(
 			Vector3(300,300,300),
 			Vector3(0,0,0));
@@ -187,13 +181,13 @@ namespace basecross
 
 			auto EnemyGroup = CreateSharedObjectGroup(L"EnemyGroup");
 
-			auto Enemy_01Ptr = AddGameObject<Enemy01>(Vector3(0, 1, 5), Vector3(1, 1, 1));
-			SetSharedGameObject(L"Enemy01", Enemy_01Ptr);
-			auto Enemy_02Ptr = AddGameObject<Enemy01>(Vector3(0, 1, -5), Vector3(1, 1, 1));
-			SetSharedGameObject(L"Enemy02", Enemy_02Ptr);
+			//auto Enemy_01Ptr = AddGameObject<Enemy01>(Vector3(0, 1, 5), Vector3(1, 1, 1));
+			//SetSharedGameObject(L"Enemy01", Enemy_01Ptr);
+			//auto Enemy_02Ptr = AddGameObject<Enemy01>(Vector3(0, 1, -5), Vector3(1, 1, 1));
+			//SetSharedGameObject(L"Enemy02", Enemy_02Ptr);
 
-			EnemyGroup->IntoGroup(Enemy_01Ptr);
-			EnemyGroup->IntoGroup(Enemy_02Ptr);
+			//EnemyGroup->IntoGroup(Enemy_01Ptr);
+			//EnemyGroup->IntoGroup(Enemy_02Ptr);
 			//Abe20170412
 
 			//子機ミサイル
@@ -202,9 +196,9 @@ namespace basecross
 			//Abe20170504
 			//アタリ判定テスト用[とりあえずグループにだけ入れてくれればそれでおｋです]
 			auto CollisionGroup = CreateSharedObjectGroup(L"CollisionGroup");
-			auto Enemy_03Ptr = AddGameObject<Enemy01>(Vector3(0, 1, 5), Vector3(1, 1, 1));
-			SetSharedGameObject(L"Enemy03", Enemy_01Ptr);
-			CollisionGroup->IntoGroup(Enemy_03Ptr);
+			//auto Enemy_03Ptr = AddGameObject<Enemy01>(Vector3(0, 1, 5), Vector3(1, 1, 1));
+			//SetSharedGameObject(L"Enemy03", Enemy_01Ptr);
+			//CollisionGroup->IntoGroup(Enemy_03Ptr);
 
 			//Abe20170504
 
@@ -243,7 +237,7 @@ namespace basecross
 
 			//テレポートエネミー
 			//引数 位置、大きさ、HP、索敵距離、クールタイム、発射数
-			auto TeEnObj = AddGameObject<TeleportEnemy>(Vector3(-10, 1, 10), 1, 1, 5, 1, 3);
+			auto TeEnObj = AddGameObject<TeleportEnemy>(Vector3(-10, 1, 10), 1, 1, 5, 3, 3);
 			//Abe20170512
 			CollisionGroup->IntoGroup(TeEnObj);
 			EnemyGroup->IntoGroup(TeEnObj);

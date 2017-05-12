@@ -219,11 +219,11 @@ namespace basecross
 			//それぞれのエネミーにダメージを与える
 			if (dynamic_pointer_cast<TackleEnemy>(obj))
 			{
-				dynamic_pointer_cast<TackleEnemy>(obj)->Damage((int)dynamic_pointer_cast<ShotEnemyChildMissile>(obj)->GetChildMissileAttackDamage());
+				dynamic_pointer_cast<TackleEnemy>(obj)->Damage((int)dynamic_pointer_cast<ShotEnemyChildMissile>(obj2)->GetChildMissileAttackDamage());
 			}
 			if (dynamic_pointer_cast<TeleportEnemy>(obj))
 			{
-				dynamic_pointer_cast<TeleportEnemy>(obj)->Damage((int)dynamic_pointer_cast<ShotEnemyChildMissile>(obj)->GetChildMissileAttackDamage());
+				dynamic_pointer_cast<TeleportEnemy>(obj)->Damage((int)dynamic_pointer_cast<ShotEnemyChildMissile>(obj2)->GetChildMissileAttackDamage());
 			}
 		}
 	}
