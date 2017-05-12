@@ -62,16 +62,21 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"KURO_TX", strTexture);
 
 		//Abe20170421
-		//仮
+		//仮ステセレ
 		//セレクトのフレーム
 		strTexture = DataDir + L"TestTexture\\Select_flameTEST.png";
-		App::GetApp()->RegisterTexture(L"SELECT_FLAME_TX", strTexture);
+		App::GetApp()->RegisterTexture(L"SELECT_FLAME_TX", strTexture);		
+		//Abe20170512
+		//本番
 		//セレクトのステージ行くか確認するときのYES
-		strTexture = DataDir + L"TestTexture\\CheckYes.png";
+		strTexture = DataDir + L"StageSelect\\Go.png";
 		App::GetApp()->RegisterTexture(L"SELECT_YES_TX", strTexture);
 		//セレクトのステージ行くか確認するときのNO
-		strTexture = DataDir + L"TestTexture\\CheckNo.png";
+		strTexture = DataDir + L"StageSelect\\Back.png";
 		App::GetApp()->RegisterTexture(L"SELECT_NO_TX", strTexture);
+		//本番
+		//Abe20170512
+
 		//仮のシロ
 		strTexture = DataDir + L"TestTexture\\siro.png";
 		App::GetApp()->RegisterTexture(L"SELECT_SIRO_TX", strTexture);
