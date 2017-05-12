@@ -231,13 +231,18 @@ namespace basecross {
 	//////////////ステート以外の関数群///////////////////////////////////////////////
 	//スティック入力
 	void PlayerManager::InputStick() {
-		auto PlayerL_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false);
-		auto PlayerR_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_R", false);
-		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+
+		//at：配列の指定場所を見る
+		//auto PlayerL_Ptr = dynamic_pointer_cast<GameStage>(GetStage())->GetPlayerVec().at(0);
+		auto PlayerL_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L",false);
 		auto PlayerL_Rig = PlayerL_Ptr->GetComponent<Rigidbody>();
+		//auto PlayerR_Ptr = dynamic_pointer_cast<GameStage>(GetStage())->GetPlayerVec().at(1);
+		auto PlayerR_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_R", false);
 		auto PlayerR_Rig = PlayerR_Ptr->GetComponent<Rigidbody>();
 		auto Rig = GetComponent<Rigidbody>();
 		auto Trans = GetComponent<Transform>();
+		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+
 		if (m_StateManagerMachine->GetCurrentState() == MoveState_Manager::Instance()) {
 			Move_Speed = Rig->GetMaxSpeed() / 5.0f;
 		}
@@ -259,20 +264,55 @@ namespace basecross {
 		float RotY = RotY_Initialization;
 		auto PlayerL_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false);
 		auto PlayerL_Trans = PlayerL_Ptr->GetComponent<Transform>();
+		auto PlayerLPos = PlayerL_Trans->GetPosition();
 		auto PlayerR_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_R", false);
 		auto PlayerR_Trans = PlayerR_Ptr->GetComponent<Transform>();
+		auto PlayerRPos = PlayerR_Trans->GetPosition();
+		auto PosL = Vector3(0, 0, 0);
+		auto PosR = Vector3(0, 0, 0);
+		auto testL = PlayerCenterPos - PlayerLPos;
+		auto testLD = testL.x * testL.x + testL.z * testL.z;
+		auto testR = PlayerCenterPos - PlayerRPos;
+		auto testRD = testR.x * testR.x + testR.z * testR.z;
+
+		if (m_StateManagerMachine->GetCurrentState() == LeaveState_Manager::Instance()) {
+			if (5 <testLD) {
+				testLD = 5;
+			}
+			if (5 < testRD) {
+				testRD = 5;
+			}
+		}
+		else {
+			testLD = 1;
+			testRD = 1;
+		}
+
 		if (PlayerL_Ptr) {
 			RotY -= XM_PIDIV2;
+			PosL = Vector3(sin(RotY) * testLD, 0, cos(RotY) * testLD);
+
+			/*if (m_StateManagerMachine->GetCurrentState() == LeaveState_Manager::Instance()) {
+			PosL = Vector3((sin(RotY)* testLD.x), 0, (cos(RotY)* testLD.z));
+			}
+			else {
+			PosL = Vector3(sin(RotY), 0, cos(RotY));
+			}*/
 		}
-		auto PosL = Vector3(sin(RotY), 0, cos(RotY));
 		//初期化//
 		RotY = RotY_Initialization;
 		//////////
 		if (PlayerR_Ptr) {
 			RotY += XM_PIDIV2;
-		}
-		auto PosR = Vector3(sin(RotY), 0, cos(RotY));
+			PosR = Vector3(sin(RotY)*testRD, 0, cos(RotY)*testRD);
 
+			/*	if (m_StateManagerMachine->GetCurrentState() == LeaveState_Manager::Instance()) {
+			PosR = Vector3((sin(RotY)*testRL.x), 0, (cos(RotY)*testRL.z));
+			}
+			else {
+			PosR = Vector3(sin(RotY), 0, cos(RotY));
+			}*/
+		}
 		PosL += PlayerCenterPos;
 		PosR += PlayerCenterPos;
 		PlayerL_Trans->SetScale(1.0, 1.0, 1.0);
@@ -304,7 +344,7 @@ namespace basecross {
 		Vector3 Velo = Vector3(cos(Angle), 0, sin(Angle));
 		return Velo;
 	}
-	//モデルのプレイヤー方向
+	//モデル　プレイヤー方向
 	void PlayerManager::PlayerAngle() {
 		auto PlayerL_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false);
 		auto PlayerL_Pos = PlayerL_Ptr->GetComponent<Transform>()->GetPosition();
@@ -324,6 +364,21 @@ namespace basecross {
 
 		PlayerL_Ptr->GetComponent<Transform>()->SetQuaternion(Qt);
 		PlayerR_Ptr->GetComponent<Transform>()->SetQuaternion(Qt2);
+	}
+	//当たり判定の有無
+	void PlayerManager::SetActiveCollision(bool flg) {
+		//当たり判定
+		auto PtrCollisionSand = GetStage()->GetSharedGameObject<CollisionSand>(L"CollisionSand", false);
+		if (PtrCollisionSand) {
+			PtrCollisionSand->SetActive(flg);
+		}
+		else {
+			throw BaseException(
+				L"エラー",
+				L"スタート関数の中「SetActiveCollision」",
+				L"PtrCollisionSandが存在していません"
+			);
+		}
 	}
 	/////////////////////////////////////////////////////////////////////////////////
 	////////////////////////ステートシェンジ関数///////////////////////////////////
@@ -347,7 +402,6 @@ namespace basecross {
 	//離れる
 	void PlayerManager::EnterLeaveBehavior() {
 
-
 		////初期位置の保存
 		auto PlayerL_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false);
 		PlayerL_SavePos_Vec3 = PlayerL_Ptr->GetComponent<Transform>()->GetPosition();
@@ -359,37 +413,20 @@ namespace basecross {
 	}
 	//引き付ける
 	void PlayerManager::EnterToAttractBehavior() {
-		//当たり判定
-		auto PtrCollisionSand = GetStage()->GetSharedGameObject<CollisionSand>(L"CollisionSand", false);
-		if (PtrCollisionSand) {
-			PtrCollisionSand->SetActive(true);
-		}
-		else {
-			throw BaseException(
-				L"エラー",
-				L"スタート関数の中「EnterToAttractBehavior」",
-				L"PtrCollisionSandが存在していません"
-			);
-		}
-		////進む向き
-		PlayerL_Direction_Vec3 = Move_Velo(PlayerL_SavePos_Vec3, PlayerR_SavePos_Vec3);
-		PlayerR_Direction_Vec3 = Move_Velo(PlayerR_SavePos_Vec3, PlayerL_SavePos_Vec3);
+		auto PtrPlayerL_Pos = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false)->GetComponent<Transform>()->GetPosition();
+		auto PtrPlayerR_Pos = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_R", false)->GetComponent<Transform>()->GetPosition();
 
+		//当たり判定の有無
+		SetActiveCollision(true);
+		////進む向き
+		PlayerL_Direction_Vec3 = Move_Velo(PtrPlayerL_Pos, PtrPlayerR_Pos);
+		PlayerR_Direction_Vec3 = Move_Velo(PtrPlayerR_Pos, PtrPlayerL_Pos);
+		Speed_F = 0.0f;
 
 	}
 	//最初の位置に戻る
 	void PlayerManager::EnterReturnBehavior() {
-		auto PtrCollisionSand = GetStage()->GetSharedGameObject<CollisionSand>(L"CollisionSand", false);
-		if (PtrCollisionSand) {
-			PtrCollisionSand->SetActive(false);
-		}
-		else {
-			throw BaseException(
-				L"エラー",
-				L"スタート関数の中「ExitLeaveBehavior」",
-				L"PtrCollisionSandが存在していません"
-			);
-		}
+		SetActiveCollision(false);
 		auto PlayerL_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false);
 		auto PlayerR_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_R", false);
 		auto PlayerL_Pos = PlayerL_Ptr->GetComponent<Transform>()->GetPosition();
@@ -404,6 +441,7 @@ namespace basecross {
 	}
 	////////////////////////継続式関数///////////////////////////////////
 	void PlayerManager::ExecuteGamePrepare() {
+		//ゲーム開始時の初期化ゲームに必要なPLayerがいるのかの確認
 		auto PtrCollisionSand = GetStage()->GetSharedGameObject<CollisionSand>(L"CollisionSand", false);
 		auto PlayerL_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false);
 		auto PlayerR_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_R", false);
@@ -413,12 +451,15 @@ namespace basecross {
 
 		if (PtrCollisionSand && PlayerCenterPtr) {
 			PtrCollisionSand->SetActive(false);
-			//戻るときの目安
+			//戻るときの目安　初期位置の保存
 			PlayerL_Initial_Vec3 = PlayerL_Ptr->GetComponent<Transform>()->GetPosition();
 			PLayerR_Initial_Vec3 = PlayerR_Ptr->GetComponent<Transform>()->GetPosition();
 			PlayerL_Distance_Vec3 = PlayerL_Initial_Vec3 - PlayerCenterPos;
 			PlayerR_Distance_Vec3 = PLayerR_Initial_Vec3 - PlayerCenterPos;
-			GetStateMachine_Manager()->ChangeState(MoveState_Manager::Instance());
+			auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+			if (!(CntlVec[0].wButtons &XINPUT_GAMEPAD_A)) {
+				GetStateMachine_Manager()->ChangeState(MoveState_Manager::Instance());
+			}
 		}
 		//		GetStateMachine_Manager()->ChangeState(MoveState_Manager::Instance());
 	}
@@ -441,12 +482,13 @@ namespace basecross {
 	//離れる
 	void PlayerManager::ExecuteLeaveBehavior() {
 
+
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto PlayerL_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false);
 		auto PlayerL_Pos = PlayerL_Ptr->GetComponent<Transform>()->GetPosition();
 		auto PlayerR_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_R", false);
 		auto PlayerR_Pos = PlayerR_Ptr->GetComponent<Transform>()->GetPosition();
-		auto Distance = PlayerL_Pos - PlayerR_Pos;
+		Distance = PlayerL_Pos - PlayerR_Pos;
 
 		//　離れる処理
 		float ElapsedTime_F = App::GetApp()->GetElapsedTime() * 10;
@@ -456,15 +498,21 @@ namespace basecross {
 		PlayerR_Direction_Vec3.y = 0;
 		//New_Vec = 進む方向　Speed_F = 移動スピード
 
+		//離れている時の移動　
 		if (CntlVec[0].fThumbLX || CntlVec[0].fThumbLY) {
 			InputStick();
+			Speed_F - 0.0f;
+		}
+		else if (CntlVec[0].wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER || CntlVec[0].wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
+			InitializationVelocity();
+			InputRotation();
+			PlayerAngle();
 		}
 		else {
 			PlayerL_Ptr->GetComponent<Rigidbody>()->SetVelocity(Vector3(PlayerL_Direction_Vec3.x, 0, PlayerL_Direction_Vec3.z)* Speed_F * ElapsedTime_F);
 			PlayerR_Ptr->GetComponent<Rigidbody>()->SetVelocity(Vector3(PlayerR_Direction_Vec3.x, 0, PlayerR_Direction_Vec3.z)* Speed_F * ElapsedTime_F);
-
 		}
-
+		//離れるの上限
 		if (Distance.x * Distance.x + Distance.z * Distance.z > 100) {
 			Speed_F = 0.0f;
 		}
@@ -474,11 +522,14 @@ namespace basecross {
 
 		//Aが話されたら攻撃ステートに移動
 		if (!(CntlVec[0].wButtons& XINPUT_GAMEPAD_A)) {
+
 			GetStateMachine_Manager()->ChangeState(ToAttractState_Manager::Instance());
 		}
 	}
 	//引き付ける
 	void PlayerManager::ExecuteToAttractBehavior() {
+
+
 		auto Rig = GetComponent<Rigidbody>();
 		auto PlayerL_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false);
 		auto PlayerL_Pos = PlayerL_Ptr->GetComponent<Transform>()->GetPosition();
@@ -530,13 +581,13 @@ namespace basecross {
 	}
 	//挟んでいるとき
 	void PlayerManager::ExecuteDoingInterpose() {
-		InputStick();
+
 		InputRotation();
 		PlayerAngle();
 
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
-		if (CntlVec[0].wPressedButtons& XINPUT_GAMEPAD_B) {
-			GetStateMachine_Manager()->ChangeState(MoveState_Manager::Instance());
+		if (CntlVec[0].wPressedButtons& XINPUT_GAMEPAD_A) {
+			GetStateMachine_Manager()->ChangeState(LeaveState_Manager::Instance());
 		}
 
 	}
@@ -548,6 +599,8 @@ namespace basecross {
 		InitializationVelocity();
 	}
 	void PlayerManager::ExitLeaveBehavior() {
+		InitializationVelocity();
+		Speed_F = 0.0f;
 		//処理なし
 	}
 	void PlayerManager::ExitToAttractBehavior() {
@@ -558,18 +611,10 @@ namespace basecross {
 		InitializationVelocity();
 	}
 	void PlayerManager::ExitDoingInterpose() {
+		auto PtrShotEnemyChild = GetStage()->GetSharedGameObject<ShotEnemyChild>(L"ShotEnemyChild", false);
+		PtrShotEnemyChild->SetShotEnemyChildSandFlg(false);
 		InitializationVelocity();
-		auto PtrCollisionSand = GetStage()->GetSharedGameObject<CollisionSand>(L"CollisionSand", false);
-		if (PtrCollisionSand) {
-			PtrCollisionSand->SetActive(false);
-		}
-		else {
-			throw BaseException(
-				L"エラー",
-				L"スタート関数の中「ExitLeaveBehavior」",
-				L"PtrCollisionSandが存在していません"
-			);
-		}
+		SetActiveCollision(false);
 	}
 	/////////////////////////ステート////////////////////////////////
 	//ゲーム開始前のステート

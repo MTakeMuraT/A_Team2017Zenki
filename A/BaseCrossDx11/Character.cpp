@@ -1180,9 +1180,9 @@ namespace basecross {
 		auto PtrString = GetComponent<StringSprite>();
 		//PtrString->SetText(str);
 	}
-	//ミサイルを撃つ子機の回転 挟まれていないとき
+		//ミサイルを撃つ子機の回転 挟まれていないとき
 	void ShotEnemyChild::ShotEnemyChildRot() {
-		if (GetShotEnemyChildSandFlg() == false && m_DefaultRot_F) {
+		if (GetShotEnemyChildSandFlg() == false ) {
 			auto Trans = GetComponent<Transform>();
 			auto Qt = Trans->GetQuaternion();
 			auto Rig = GetComponent<Rigidbody>();
@@ -1234,9 +1234,10 @@ namespace basecross {
 		auto ScalHalf = Scal / 2;
 		float RotY = Trans->GetRotation().y;
 		RotY += XM_PIDIV2;
-		Vector3 m_Distance = Pos - InitialPos(true);
-		Vector3 m_Distance2 = Pos - InitialPos(false);
-		Vector3 m_CenteDistancer = Pos - m_CenterPoint_Vec3;
+		//距離の算出
+		Vector3 m_Distance = m_Position - m_ReferencePoint_Vec3;
+		Vector3 m_Distance2 = m_Position - m_ReferencePoint2_Vec3;
+		Vector3 m_CenteDistancer = m_Position;
 		// (中心からA地点の距離＊Sin（回転軸+場所）) ボックスを中心として回転して自分の位置を移動させることが可能
 		//＋しているところの値が一緒でないと回転がおかしくなります
 		Vector3 NewAngle = Vector3(m_Distance.Length() *sin(RotY + 1.0), m_Position.y + 1.0, m_Distance.Length()* cos(RotY + (1.0)));
@@ -1245,6 +1246,9 @@ namespace basecross {
 		NewAngle.Normalize();
 		New2Angle.Normalize();
 		NewCenter.Normalize();
+		Pos.y = 0.0f;
+		NewAngle += Pos;
+		New2Angle += Pos;
 		m_NewReferencePoint_Vec3 = NewAngle;
 		m_NewReferencePoint2_Vec3 = New2Angle;
 		m_NewCenterPoint_Vec3 = NewCenter;

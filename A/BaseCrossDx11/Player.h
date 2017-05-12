@@ -74,7 +74,8 @@ namespace basecross {
 		Vector3 PlayerL_Velocity_Vec3 = Vector3(0, 0, 0);
 		Vector3 PlayerR_Velocity_Vec3 = Vector3(0, 0, 0);
 
-
+		//プレイヤー同士の距離
+		Vector3 Distance = Vector3(0, 0, 0);
 
 	public:
 
@@ -90,6 +91,8 @@ namespace basecross {
 
 		Vector3 Direction(Vector3 MyPos, Vector3 PartnerPos);
 		Vector3 Move_Velo(Vector3 MyPos, Vector3 PartnerPos);
+		//コリジョンのアクティブ
+		void SetActiveCollision(bool flg);
 
 		//アクセサ ステートマシーン
 		shared_ptr<StateMachine<PlayerManager>>& GetStateMachine_Manager() {

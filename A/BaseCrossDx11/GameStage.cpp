@@ -146,8 +146,15 @@ namespace basecross
 			Vector3(1.0, 1.0, 1.0),
 			0.0f
 			);
-		SetSharedGameObject(L"ShotEnemyChild", PtrShotEnemyChild);
+	//	SetSharedGameObject(L"ShotEnemyChild", PtrShotEnemyChild);
 		ColGroup->IntoGroup(PtrShotEnemyChild);
+		PtrShotEnemyChild = AddGameObject<ShotEnemyChild>(
+			Vector3(5, 1, 5),
+			Vector3(1.0, 1.0, 1.0),
+			2.0f
+			);
+		ColGroup->IntoGroup(PtrShotEnemyChild);
+		SetSharedGameObject(L"ShotEnemyChild", PtrShotEnemyChild);
 	}
 	void GameStage::OnCreate()
 	{
@@ -205,12 +212,12 @@ namespace basecross
 			//Abe20170505
 			//エネミーテスト
 			//引数 位置、大きさ、HP、索敵距離、クールタイム、速度、攻撃力、突撃回数
-<<<<<<< HEAD
+
 			CollisionGroup->IntoGroup(AddGameObject<TackleEnemy>(Vector3(10, 1, 10), 1, 3, 3, 3, 6, 3, 2));
 			CollisionGroup->IntoGroup(AddGameObject<TackleEnemy>(Vector3(-10, 1, 10), 1, 3, 3, 3, 6, 3, 2));
 			CollisionGroup->IntoGroup(AddGameObject<TackleEnemy>(Vector3(10, 1, -10), 1, 3, 3, 3, 6, 3, 2));
 			CollisionGroup->IntoGroup(AddGameObject<TackleEnemy>(Vector3(-10, 1, -10), 1, 3, 3, 3, 6, 3, 2));
-=======
+
 			auto PtrTacklEnemy = AddGameObject<TackleEnemy>(Vector3(10, 1, 10), 1, 0, 3, 3, 6, 3, 2);
 			CollisionGroup->IntoGroup(PtrTacklEnemy);
 			EnemyGroup->IntoGroup(PtrTacklEnemy);
@@ -223,7 +230,6 @@ namespace basecross
 			//PtrTacklEnemy = AddGameObject<TackleEnemy>(Vector3(-10, 1, -10), 1, 1, 3, 3, 6, 3, 2);
 			//CollisionGroup->IntoGroup(PtrTacklEnemy);
 			//EnemyGroup->IntoGroup(PtrTacklEnemy);
->>>>>>> 4cc8cf026aa640684a6f127a7738cf2e4fc28a7b
 
 			//引数 位置、大きさ、HP、索敵距離、クールタイム、攻撃力、子機発射間隔、発射数
 			//AddGameObject<ShotEnemy>(Vector3(10, 1, -10),1,3,5,6,3,10,2);
