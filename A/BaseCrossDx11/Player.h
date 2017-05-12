@@ -16,6 +16,7 @@ namespace basecross {
 		//コンストラクタメンバ
 		Vector3 m_StartPos;
 		wstring m_Player_Str;
+		shared_ptr<BombEffect> m_Effect;
 	public:
 
 		//構築と破棄
@@ -76,6 +77,8 @@ namespace basecross {
 
 		//プレイヤー同士の距離
 		Vector3 Distance = Vector3(0, 0, 0);
+		//回転フラグ
+		bool m_RotateFlg = false;
 
 	public:
 
@@ -100,6 +103,7 @@ namespace basecross {
 		}
 		//ステートチェンジ関数
 		void StateChangeDoingInterpose();
+		void StateChangeDie();
 		//行動のスタート関数
 		void EnterGamePrepare();//ゲーム前の準備ステート
 		void EnterMoveBehavior();//移動ステート 
@@ -107,6 +111,7 @@ namespace basecross {
 		void EnterToAttractBehavior();//引き付けるステート
 		void EnterReturnBehavior();//戻る
 		void EneterDoingInterpose();//挟んでいるとき
+		void EneterDieBehavior();
 
 									//行動の継続関数			
 		void ExecuteGamePrepare();//ゲーム前の準備
@@ -115,6 +120,7 @@ namespace basecross {
 		void ExecuteToAttractBehavior();//引き付ける
 		void ExecuteReturnBehavior();//戻る
 		void ExecuteDoingInterpose();//挟んでいるとき
+		void ExecuteDieBehavior();
 
 									 //行動の終了関数		
 		void ExitGamePrepare();//ゲーム前の準備
@@ -123,7 +129,14 @@ namespace basecross {
 		void ExitToAttractBehavior();//引き付ける
 		void ExitReturnBehavior();//戻る
 		void ExitDoingInterpose();//挟んでいるとき
+		void ExitDieBehavior();
 
+		bool GetRotateFlg() {
+			return m_RotateFlg;
+		}
+		void SetRotateFlg(bool flg) {
+			m_RotateFlg = flg;
+		}
 
 	};
 	//--------------------------------------------------------------------------------------
@@ -229,6 +242,23 @@ namespace basecross {
 		//ステートにから抜けるときに呼ばれる関数
 		virtual void Exit(const shared_ptr<PlayerManager>& Obj)override;
 	};
+	//--------------------------------------------------------------------------------------
+	//	class DieState_Manager : public ObjState<PlayerManager>;
+	//	用途:　死んだステート
+	//--------------------------------------------------------------------------------------
+	class DieState_Manager : public ObjState<PlayerManager>
+	{
+		DieState_Manager() {}
+	public:
+		//ステートのインスタンス取得
+		static shared_ptr<DieState_Manager> Instance();
+		//ステートに入ったときに呼ばれる関数
+		virtual void Enter(const shared_ptr<PlayerManager>& Obj)override;
+		//ステート実行中に毎ターン呼ばれる関数
+		virtual void Execute(const shared_ptr<PlayerManager>& Obj)override;
+		//ステートにから抜けるときに呼ばれる関数
+		virtual void Exit(const shared_ptr<PlayerManager>& Obj)override;
+	};
 
 	//--------------------------------------------------------------------------------------
 	//	class SkySphere : public GameObject;
@@ -263,7 +293,7 @@ namespace basecross {
 		bool m_Hit_b = false;
 		//ダメージ
 		int m_Damage_int = 0;
-	public:
+		public:
 		//構築と破棄
 		PlayerHP(const shared_ptr<Stage>& StagePtr
 		);
@@ -291,5 +321,6 @@ namespace basecross {
 			m_Damage_int = Damage;
 		}
 	};
+	
 }
 //end basecross

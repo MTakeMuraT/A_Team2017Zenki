@@ -66,10 +66,28 @@ namespace basecross {
 		//透明処理
 		SetAlphaActive(true);
 		PtrDraw->SetMeshToTransformMatrix(PlayerMat);
-
+		//オーディオリソース登録
+		auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
+		pMultiSoundEffect->AddAudioResource(L"PlayerDie_SE");
+		m_Effect = GetStage()->AddGameObject<BombEffect>();
 	}
 	void Player::OnUpdate() {
-		
+		auto PtrDraw = GetComponent<PNTBoneModelDraw>();
+		auto PlayerLifePtr = GetStage()->GetSharedGameObject<Player_Life>(L"Life",false);
+		if (PlayerLifePtr ) {
+			if (PlayerLifePtr->GetDieFlg() == false) {
+				if (m_Player_Str == L"PlayerL") {
+					m_Effect->SetPosActive(GetComponent<Transform>()->GetPosition());
+				}
+				else {
+					m_Effect->SetPosActive(GetComponent<Transform>()->GetPosition());
+				}
+				/*auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+				pMultiSoundEffect->Start(L"PlayerDie_SE", 0, 1.0f);*/
+				PtrDraw->SetDrawActive(false);
+				SetUpdateActive(false);
+			}
+		}
 	}
 
 	
@@ -113,13 +131,14 @@ namespace basecross {
 	}
 
 	void PlayerCenter::OnUpdate() {
+	//	auto PtrPlayer_M = GetStage()->GetSharedGameObject<PlayerManager>(L"PtrPlayerManager", false);
+
 		auto Trans = GetComponent<Transform>();
 		auto Rig = GetComponent<Rigidbody>();
 		auto Qt = Trans->GetQuaternion();
 		float ElapsedTime = App::GetApp()->GetElapsedTime();
 		auto PtrPlayer_Vel = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false)->GetComponent<Rigidbody>()->GetVelocity();
 		Rig->SetVelocity(PtrPlayer_Vel);
-
 
 		//コントローラの取得
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
@@ -139,44 +158,9 @@ namespace basecross {
 		auto PlayerHalf = (PtrPlayerL_Pos + PtrPlayerR_Pos) / 2;
 		Trans->SetPosition(PlayerHalf);
 	}
+		
 	
 
-
-	//--------------------------------------------------------------------------------------
-	//	class SkySphere : public GameObject;
-	//	用途: スカイスフィア
-	//--------------------------------------------------------------------------------------
-	//構築と破棄
-	SkySphere::SkySphere(const shared_ptr<Stage>& StagePtr,
-		const Vector3& Scale,
-		const Vector3& Position
-	) :
-		GameObject(StagePtr),
-		m_Scale(Scale),
-		m_Position(Position)
-	{
-	}
-	SkySphere::~SkySphere() {}
-
-	//初期化
-	void SkySphere::OnCreate() {
-		auto PtrTransform = GetComponent<Transform>();
-
-		PtrTransform->SetScale(m_Scale);
-		PtrTransform->SetRotation(0, 0, 0);
-		PtrTransform->SetPosition(m_Position);
-
-
-		//影をつける
-		auto ShadowPtr = AddComponent<Shadowmap>();
-		ShadowPtr->SetMeshResource(L"DEFAULT_SPHERE");
-
-		auto PtrDraw = AddComponent<PNTStaticDraw>();
-		PtrDraw->SetMeshResource(L"DEFAULT_SPHERE");
-		PtrDraw->SetTextureResource(L"Background_TX");
-		SetAlphaActive(true);
-
-	}
 	//--------------------------------------------------------------------------------------
 	//	class PlayerManager : public GameObject;
 	//	用途: プレイヤーマネージャー
@@ -276,7 +260,7 @@ namespace basecross {
 		auto testRD = testR.x * testR.x + testR.z * testR.z;
 
 		if (m_StateManagerMachine->GetCurrentState() == LeaveState_Manager::Instance()) {
-			if (5 <testLD) {
+			if (5 < testLD) {
 				testLD = 5;
 			}
 			if (5 < testRD) {
@@ -321,7 +305,6 @@ namespace basecross {
 		PlayerR_Trans->SetScale(1.0, 1.0, 1.0);
 		PlayerR_Trans->SetRotation(0, 0, 0);
 		PlayerR_Trans->SetPosition(PosR);
-
 	}
 	//初期化
 	void PlayerManager::InitializationVelocity() {
@@ -390,7 +373,15 @@ namespace basecross {
 
 		}
 	}
+	void PlayerManager::StateChangeDie() {
+		auto PlayerLifePtr = GetStage()->GetSharedGameObject<Player_Life>(L"Life", false);
+		if (PlayerLifePtr) {
+			if (PlayerLifePtr->GetDieFlg() == false) {
+				GetStateMachine_Manager()->ChangeState(DieState_Manager::Instance());
+			}
+		}
 
+	}
 	////////////////////////ステートスタート関数///////////////////////////////////
 	void PlayerManager::EnterGamePrepare() {
 		//処理なし
@@ -439,6 +430,10 @@ namespace basecross {
 	void PlayerManager::EneterDoingInterpose() {
 
 	}
+	//死んだとき
+	void PlayerManager::EneterDieBehavior() {
+
+	}
 	////////////////////////継続式関数///////////////////////////////////
 	void PlayerManager::ExecuteGamePrepare() {
 		//ゲーム開始時の初期化ゲームに必要なPLayerがいるのかの確認
@@ -461,6 +456,8 @@ namespace basecross {
 				GetStateMachine_Manager()->ChangeState(MoveState_Manager::Instance());
 			}
 		}
+		//死んだとき
+		StateChangeDie();
 		//		GetStateMachine_Manager()->ChangeState(MoveState_Manager::Instance());
 	}
 	//移動
@@ -478,6 +475,8 @@ namespace basecross {
 			//ステート移動
 			GetStateMachine_Manager()->ChangeState(LeaveState_Manager::Instance());
 		}
+		//死んだとき
+		StateChangeDie();
 	}
 	//離れる
 	void PlayerManager::ExecuteLeaveBehavior() {
@@ -522,9 +521,11 @@ namespace basecross {
 
 		//Aが話されたら攻撃ステートに移動
 		if (!(CntlVec[0].wButtons& XINPUT_GAMEPAD_A)) {
-
+		
 			GetStateMachine_Manager()->ChangeState(ToAttractState_Manager::Instance());
 		}
+		//死んだとき
+		StateChangeDie();
 	}
 	//引き付ける
 	void PlayerManager::ExecuteToAttractBehavior() {
@@ -554,6 +555,8 @@ namespace basecross {
 
 			GetStateMachine_Manager()->ChangeState(ReturnState_Manager::Instance());
 		}
+		//死んだとき
+		StateChangeDie();
 	}
 	//最初の位置に戻る
 	void PlayerManager::ExecuteReturnBehavior() {
@@ -578,6 +581,8 @@ namespace basecross {
 			//PlayerR_Ptr->GetComponent<Transform>()->SetPosition(PlayerR_SavePos_Vec3);
 			GetStateMachine_Manager()->ChangeState(MoveState_Manager::Instance());
 		}
+		//死んだとき
+		StateChangeDie();
 	}
 	//挟んでいるとき
 	void PlayerManager::ExecuteDoingInterpose() {
@@ -589,6 +594,11 @@ namespace basecross {
 		if (CntlVec[0].wPressedButtons& XINPUT_GAMEPAD_A) {
 			GetStateMachine_Manager()->ChangeState(LeaveState_Manager::Instance());
 		}
+		//死んだとき
+		StateChangeDie();
+	}
+	//死んだとき
+	void PlayerManager::ExecuteDieBehavior() {
 
 	}
 	////////////////////////終了関数///////////////////////////////////
@@ -615,6 +625,10 @@ namespace basecross {
 		PtrShotEnemyChild->SetShotEnemyChildSandFlg(false);
 		InitializationVelocity();
 		SetActiveCollision(false);
+	}
+	void PlayerManager::ExitDieBehavior() {
+		InitializationVelocity();
+		Speed_F = 0.0f;
 	}
 	/////////////////////////ステート////////////////////////////////
 	//ゲーム開始前のステート
@@ -765,6 +779,30 @@ namespace basecross {
 	void DoingInterposeState_Manager::Exit(const shared_ptr<PlayerManager>& Obj) {
 		Obj->ExitDoingInterpose();
 	}
+	//--------------------------------------------------------------------------------------
+	//	class DieState_Manager : public ObjState<MoveState_Manager>;
+	//	用途:死んだステート
+	//--------------------------------------------------------------------------------------
+	//ステートのインスタンス取得
+	shared_ptr<DieState_Manager> DieState_Manager::Instance() {
+		static shared_ptr<DieState_Manager> instance;
+		if (!instance) {
+			instance = shared_ptr<DieState_Manager>(new DieState_Manager);
+		}
+		return instance;
+	}
+	//ステートに入ったときに呼ばれる関数
+	void DieState_Manager::Enter(const shared_ptr<PlayerManager>& Obj) {
+		Obj->EneterDieBehavior();
+	}
+	//ステート実行中に毎ターン呼ばれる関数
+	void DieState_Manager::Execute(const shared_ptr<PlayerManager>& Obj) {
+		Obj->ExecuteDieBehavior();
+	}
+	//ステート実行中に毎ターン呼ばれる関数
+	void DieState_Manager::Exit(const shared_ptr<PlayerManager>& Obj) {
+		Obj->ExitDieBehavior();
+	}
 	//////////////////////////////////////////////////////////////
 
 	//--------------------------------------------------------------------------------------
@@ -807,6 +845,42 @@ namespace basecross {
 				InvinciblecCunt = 0.0f;
 			}
 		}
+	}
+	
+	//--------------------------------------------------------------------------------------
+	//	class SkySphere : public GameObject;
+	//	用途: スカイスフィア
+	//--------------------------------------------------------------------------------------
+	//構築と破棄
+	SkySphere::SkySphere(const shared_ptr<Stage>& StagePtr,
+		const Vector3& Scale,
+		const Vector3& Position
+	) :
+		GameObject(StagePtr),
+		m_Scale(Scale),
+		m_Position(Position)
+	{
+	}
+	SkySphere::~SkySphere() {}
+
+	//初期化
+	void SkySphere::OnCreate() {
+		auto PtrTransform = GetComponent<Transform>();
+
+		PtrTransform->SetScale(m_Scale);
+		PtrTransform->SetRotation(0, 0, 0);
+		PtrTransform->SetPosition(m_Position);
+
+
+		//影をつける
+		auto ShadowPtr = AddComponent<Shadowmap>();
+		ShadowPtr->SetMeshResource(L"DEFAULT_SPHERE");
+
+		auto PtrDraw = AddComponent<PNTStaticDraw>();
+		PtrDraw->SetMeshResource(L"DEFAULT_SPHERE");
+		PtrDraw->SetTextureResource(L"Background_TX");
+		SetAlphaActive(true);
+
 	}
 }
 

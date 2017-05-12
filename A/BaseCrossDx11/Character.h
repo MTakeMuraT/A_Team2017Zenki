@@ -323,6 +323,9 @@ namespace basecross{
 	class Player_Life :public GameObject
 	{
 	private:
+	
+		bool m_DieFlg = true;
+
 		//åªç›ín
 		int m_Life = 10;
 		//ç≈ëÂíl
@@ -349,6 +352,11 @@ namespace basecross{
 		void LifeDown(int num);
 
 		int GetLife() { return m_Life; }
+		bool GetDieFlg() {
+			return m_DieFlg;
+		}
+		
+		
 	};
 	//Abe20170418
 	//Abe20170421

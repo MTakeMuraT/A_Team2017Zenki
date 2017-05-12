@@ -115,14 +115,22 @@ namespace basecross {
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\StageSelect\\StageSelect_01.wav";
 		App::GetApp()->RegisterWav(L"StageSelect_01_BGM", strMusic);
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\GameStage\\GameStage_01.wav";
-		App::GetApp()->RegisterWav(L"GameStage_01_BGM", strMusic);
+		App::GetApp()->RegisterWav(L"GameStage_01_BGM", strMusic)
 	*/
 		//SE
 		wstring strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Decision_01.wav";
 		App::GetApp()->RegisterWav(L"Decision_01_SE", strMusic);
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Collision_01.wav";
 		App::GetApp()->RegisterWav(L"Collision_01_SE", strMusic);
-		
+		//ƒeƒXƒgSE
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Decision_02.wav";
+		App::GetApp()->RegisterWav(L"Decision_02_SE", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\PlayerDie.wav";
+		App::GetApp()->RegisterWav(L"PlayerDie_SE", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\CursorMove.wav";
+		App::GetApp()->RegisterWav(L"CursorMove_SE", strMusic);
+
+
 	}
 	
 }

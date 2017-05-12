@@ -920,6 +920,7 @@ namespace basecross {
 			HP_Flame->SetDrawLayer(m_layer);
 
 		}
+		m_DieFlg = true;
 	}
 
 	void Player_Life::LifeDown(int num)
@@ -929,6 +930,7 @@ namespace basecross {
 		if (m_Life <= 0)
 		{
 			m_Life = 0;
+			m_DieFlg = false;
 		}
 
 		//HPÁ‚·
