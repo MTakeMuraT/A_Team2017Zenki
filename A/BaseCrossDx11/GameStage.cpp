@@ -97,12 +97,6 @@ namespace basecross
 
 	//実装したいものをテストする時に使用
 	void GameStage::CreateTestLin() {
-		AddGameObject<FixdBox>(
-			Vector3(1, 1, 1),
-			Vector3(0, 0, 0),
-			Vector3(0, 1, -5),
-			wstring(L"TRACE_TX")
-			);
 		AddGameObject<SkySphere>(
 			Vector3(300,300,300),
 			Vector3(0,0,0));
@@ -187,13 +181,13 @@ namespace basecross
 
 			auto EnemyGroup = CreateSharedObjectGroup(L"EnemyGroup");
 
-			auto Enemy_01Ptr = AddGameObject<Enemy01>(Vector3(0, 1, 5), Vector3(1, 1, 1));
-			SetSharedGameObject(L"Enemy01", Enemy_01Ptr);
-			auto Enemy_02Ptr = AddGameObject<Enemy01>(Vector3(0, 1, -5), Vector3(1, 1, 1));
-			SetSharedGameObject(L"Enemy02", Enemy_02Ptr);
+			//auto Enemy_01Ptr = AddGameObject<Enemy01>(Vector3(0, 1, 5), Vector3(1, 1, 1));
+			//SetSharedGameObject(L"Enemy01", Enemy_01Ptr);
+			//auto Enemy_02Ptr = AddGameObject<Enemy01>(Vector3(0, 1, -5), Vector3(1, 1, 1));
+			//SetSharedGameObject(L"Enemy02", Enemy_02Ptr);
 
-			EnemyGroup->IntoGroup(Enemy_01Ptr);
-			EnemyGroup->IntoGroup(Enemy_02Ptr);
+			//EnemyGroup->IntoGroup(Enemy_01Ptr);
+			//EnemyGroup->IntoGroup(Enemy_02Ptr);
 			//Abe20170412
 
 			//子機ミサイル
@@ -202,27 +196,62 @@ namespace basecross
 			//Abe20170504
 			//アタリ判定テスト用[とりあえずグループにだけ入れてくれればそれでおｋです]
 			auto CollisionGroup = CreateSharedObjectGroup(L"CollisionGroup");
-			auto Enemy_03Ptr = AddGameObject<Enemy01>(Vector3(0, 1, 5), Vector3(1, 1, 1));
-			SetSharedGameObject(L"Enemy03", Enemy_01Ptr);
-			CollisionGroup->IntoGroup(Enemy_03Ptr);
+			//auto Enemy_03Ptr = AddGameObject<Enemy01>(Vector3(0, 1, 5), Vector3(1, 1, 1));
+			//SetSharedGameObject(L"Enemy03", Enemy_01Ptr);
+			//CollisionGroup->IntoGroup(Enemy_03Ptr);
 
 			//Abe20170504
 
 			//Abe20170505
 			//エネミーテスト
 			//引数 位置、大きさ、HP、索敵距離、クールタイム、速度、攻撃力、突撃回数
+<<<<<<< HEAD
 			CollisionGroup->IntoGroup(AddGameObject<TackleEnemy>(Vector3(10, 1, 10), 1, 3, 3, 3, 6, 3, 2));
 			CollisionGroup->IntoGroup(AddGameObject<TackleEnemy>(Vector3(-10, 1, 10), 1, 3, 3, 3, 6, 3, 2));
 			CollisionGroup->IntoGroup(AddGameObject<TackleEnemy>(Vector3(10, 1, -10), 1, 3, 3, 3, 6, 3, 2));
 			CollisionGroup->IntoGroup(AddGameObject<TackleEnemy>(Vector3(-10, 1, -10), 1, 3, 3, 3, 6, 3, 2));
+=======
+			auto PtrTacklEnemy = AddGameObject<TackleEnemy>(Vector3(10, 1, 10), 1, 0, 3, 3, 6, 3, 2);
+			CollisionGroup->IntoGroup(PtrTacklEnemy);
+			EnemyGroup->IntoGroup(PtrTacklEnemy);
+			//PtrTacklEnemy = AddGameObject<TackleEnemy>(Vector3(-10, 1, 10), 1, 0, 3, 3, 6, 3, 2);
+			//CollisionGroup->IntoGroup(PtrTacklEnemy);
+			//EnemyGroup->IntoGroup(PtrTacklEnemy);
+			//PtrTacklEnemy = AddGameObject<TackleEnemy>(Vector3(10, 1, -10), 1, 1, 3, 3, 6, 3, 2);
+			//CollisionGroup->IntoGroup(PtrTacklEnemy);
+			//EnemyGroup->IntoGroup(PtrTacklEnemy);
+			//PtrTacklEnemy = AddGameObject<TackleEnemy>(Vector3(-10, 1, -10), 1, 1, 3, 3, 6, 3, 2);
+			//CollisionGroup->IntoGroup(PtrTacklEnemy);
+			//EnemyGroup->IntoGroup(PtrTacklEnemy);
+>>>>>>> 4cc8cf026aa640684a6f127a7738cf2e4fc28a7b
 
 			//引数 位置、大きさ、HP、索敵距離、クールタイム、攻撃力、子機発射間隔、発射数
 			//AddGameObject<ShotEnemy>(Vector3(10, 1, -10),1,3,5,6,3,10,2);
 			//引数 位置、大きさ、HP、索敵距離、クールタイム、発射数
 			//AddGameObject<TeleportEnemy>(Vector3(-10, 1, 10),2,1,5,8,3);
 			//引数 位置、大きさ、HP、索敵距離、速度、攻撃力
-			//AddGameObject<BombEnemy>(Vector3(-10,1,-10),1,1,3,2,8);
 			//Abe20170505
+			auto objbomb = AddGameObject<BombEnemy>(Vector3(20, 1, 20), 1, 1, 3, 2, 8);
+			CollisionGroup->IntoGroup(objbomb);
+			EnemyGroup->IntoGroup(objbomb);
+			
+			//Abe20170508
+			//テレポート先作成
+			auto TereportGroup = CreateSharedObjectGroup(L"TereportPointGroup");
+			//適当に２か所作っておく
+			TereportGroup->IntoGroup(AddGameObject<TereportPoint>(Vector3(3, 0.5f, 3)));
+			TereportGroup->IntoGroup(AddGameObject<TereportPoint>(Vector3(-3, 0.5f, -3)));
+
+			//テレポートエネミー
+			//引数 位置、大きさ、HP、索敵距離、クールタイム、発射数
+			auto TeEnObj = AddGameObject<TeleportEnemy>(Vector3(-10, 1, 10), 1, 1, 5, 3, 3);
+			//Abe20170512
+			CollisionGroup->IntoGroup(TeEnObj);
+			EnemyGroup->IntoGroup(TeEnObj);
+			//Abe20170512
+			//爆弾グループ
+			CreateSharedObjectGroup(L"BombGroup");
+			//Abe20170508
 
 		}
 		catch (...) {

@@ -94,31 +94,44 @@ namespace basecross
 			{
 				//回転処理
 				Rot();
-				//Aボタン押してる間離れる
-				if (CntlVec[0].wButtons & XINPUT_GAMEPAD_A)
+				if (!m_CancelFlg)
 				{
-					//進む方向を決める
-					Vector3 difpos = m_Player[0]->GetComponent<Transform>()->GetPosition() - m_Player[1]->GetComponent<Transform>()->GetPosition();
-					//ある程度離れてないかを確認 半径10以下
-					if (difpos.x*difpos.x + difpos.z*difpos.z < 100)
+					//Aボタン押してる間離れる
+					if (CntlVec[0].wButtons & XINPUT_GAMEPAD_A)
 					{
-						//absを使うとifで反転させるより遅くなるけどそんなに重い処理ないしおｋだよね？
-						float xPlusz = abs(difpos.x) + abs(difpos.z);
-						difpos = Vector3(difpos.x / xPlusz, 0, difpos.z / xPlusz);
-						difpos *= m_Speed;
-
-						for (auto obj : m_Player)
+						//進む方向を決める
+						Vector3 difpos = m_Player[0]->GetComponent<Transform>()->GetPosition() - m_Player[1]->GetComponent<Transform>()->GetPosition();
+						//ある程度離れてないかを確認 半径10以下
+						if (difpos.x*difpos.x + difpos.z*difpos.z < 100)
 						{
-							obj->GetComponent<Rigidbody>()->SetVelocity(difpos);
-							difpos *= -1;
+							//absを使うとifで反転させるより遅くなるけどそんなに重い処理ないしおｋだよね？
+							float xPlusz = abs(difpos.x) + abs(difpos.z);
+							difpos = Vector3(difpos.x / xPlusz, 0, difpos.z / xPlusz);
+							difpos *= m_Speed;
+
+							for (auto obj : m_Player)
+							{
+								obj->GetComponent<Rigidbody>()->SetVelocity(difpos);
+								difpos *= -1;
+							}
 						}
 					}
 				}
 
-				//Aボタン離したら
-				if (CntlVec[0].wReleasedButtons & XINPUT_GAMEPAD_A)
+				if (m_CancelFlg)
 				{
-					m_SandFlg = true;
+					if (CntlVec[0].wReleasedButtons & XINPUT_GAMEPAD_A)
+					{
+						m_CancelFlg = false;
+					}
+				}
+				else
+				{
+					//Aボタン離したら
+					if (CntlVec[0].wReleasedButtons & XINPUT_GAMEPAD_A)
+					{
+						m_SandFlg = true;
+					}
 				}
 			}
 		}
@@ -264,6 +277,9 @@ namespace basecross
 	{
 		SetUpdateActive(flg);
 
+		//キャンセルしたときに動くの防止
+		m_CancelFlg = true;
+
 		//すぐバグ出るから念のため
 		for (auto obj : m_Player)
 		{
@@ -366,8 +382,8 @@ namespace basecross
 		
 		//座標
 		auto Trans = CheckBack->AddComponent<Transform>();
-		Trans->SetPosition(0, 0, 0);
-		Trans->SetScale(Vector3(660,360,1));
+		Trans->SetPosition(0, -30, 0);
+		Trans->SetScale(Vector3(660,600,1));
 		Trans->SetRotation(0, 0, 0);
 
 		//描画
@@ -390,7 +406,7 @@ namespace basecross
 
 		//座標
 		auto YTrans = YesSprite->AddComponent<Transform>();
-		YTrans->SetPosition(150, -70, 0);
+		YTrans->SetPosition(-150, -260, 0);
 		YTrans->SetScale(240, 120, 1);
 		YTrans->SetRotation(0, 0, 0);
 
@@ -399,7 +415,7 @@ namespace basecross
 		YDraw->SetTextureResource(L"SELECT_YES_TX");
 		
 		//レイヤー設定
-		YesSprite->SetDrawLayer(3);
+		YesSprite->SetDrawLayer(4);
 
 		//透明度有効化
 		YesSprite->SetAlphaActive(true);
@@ -414,16 +430,16 @@ namespace basecross
 
 		//座標
 		auto NTrans = NoSprite->AddComponent<Transform>();
-		NTrans->SetPosition(-150, -70, 0);
+		NTrans->SetPosition(150, -260, 0);
 		NTrans->SetScale(240, 120, 1);
 		NTrans->SetRotation(0, 0, 0);
 
 		//描画
 		auto NDraw = NoSprite->AddComponent<PCTSpriteDraw>();
-		NDraw->SetTextureResource(L"SELECT_YES_TX");
+		NDraw->SetTextureResource(L"SELECT_NO_TX");
 
 		//レイヤー設定
-		NoSprite->SetDrawLayer(3);
+		NoSprite->SetDrawLayer(4);
 
 		//透明度有効化
 		NoSprite->SetAlphaActive(true);
@@ -437,7 +453,7 @@ namespace basecross
 		auto CheckLogo = GetStage()->AddGameObject<GameObject>();
 		//座標
 		auto CLTrans = CheckLogo->AddComponent<Transform>();
-		CLTrans->SetPosition(0, 80, 0);
+		CLTrans->SetPosition(0, 220, 0);
 		CLTrans->SetScale(550, 120, 1);
 		CLTrans->SetRotation(0, 0, 0);
 
@@ -446,7 +462,7 @@ namespace basecross
 		CLDraw->SetTextureResource(L"SELECT_YES_TX");
 
 		//レイヤー設定
-		CheckLogo->SetDrawLayer(3);
+		CheckLogo->SetDrawLayer(4);
 
 		//透明度有効化
 		CheckLogo->SetAlphaActive(true);
@@ -460,8 +476,8 @@ namespace basecross
 		auto CursorSprite = GetStage()->AddGameObject<GameObject>();
 		//座標
 		auto CTrans = CursorSprite->AddComponent<Transform>();
-		CTrans->SetPosition(150, -70, 0);
-		CTrans->SetScale(100, 100, 1);
+		CTrans->SetPosition(150, -270, 0);
+		CTrans->SetScale(500, 100, 1);
 		CTrans->SetRotation(0, 0, 0);
 
 		//描画
@@ -469,7 +485,7 @@ namespace basecross
 		CDraw->SetTextureResource(L"SELECT_CURSOR_TX");
 
 		//レイヤー設定
-		CursorSprite->SetDrawLayer(4);
+		CursorSprite->SetDrawLayer(3);
 
 		//透明度有効化
 		CursorSprite->SetAlphaActive(true);
@@ -500,13 +516,13 @@ namespace basecross
 				{
 					//選択項目Yes
 					m_selectnum = 1;
-					m_Cursor->GetComponent<Transform>()->SetPosition(Vector3(-150, -70, 0));
+					m_Cursor->GetComponent<Transform>()->SetPosition(Vector3(-150, -270, 0));
 				}
 				//右
 				else if (CntlVec[0].fThumbLX > 0.5f)
 				{
 					m_selectnum = 0;
-					m_Cursor->GetComponent<Transform>()->SetPosition(Vector3(150, -70, 0));
+					m_Cursor->GetComponent<Transform>()->SetPosition(Vector3(150, -270, 0));
 				}
 
 				//AかBボタン押されたら
@@ -552,7 +568,7 @@ namespace basecross
 
 		//次起動するとき用に初期化
 		//Noに初期化
-		m_Cursor->GetComponent<Transform>()->SetPosition(Vector3(150, -70, 0));
+		m_Cursor->GetComponent<Transform>()->SetPosition(Vector3(150, -270, 0));
 		m_selectnum = 0;
 
 		//プレイヤーのアップデート再開

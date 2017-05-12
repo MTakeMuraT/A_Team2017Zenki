@@ -57,6 +57,9 @@ namespace basecross
 		void SandMove();
 		//‰ñ“]
 		void Rot();
+
+		//ƒLƒƒƒ“ƒZƒ‹‚µ‚½‚Æ‚«‚É‚­‚Á‚Â‚©‚È‚¢‚æ‚¤‚É
+		bool m_CancelFlg = false;
 	public :
 		SelectPlayer(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, float speed);
 

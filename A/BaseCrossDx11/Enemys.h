@@ -185,7 +185,7 @@ namespace basecross
 
 	class TeleportEnemy : public GameObject
 	{
-	private :
+	private:
 		//初期位置
 		Vector3 m_InitPos;
 		//現在の状態
@@ -198,6 +198,29 @@ namespace basecross
 
 		//時間測る用
 		float m_time;
+
+		//攻撃する対象
+		int m_TargetNum = 0;
+		//攻撃(テレポート)までの時間
+		float m_AttackWaitTime = 0.5f;
+		//爆弾置く状態
+		bool m_BombPutFlg = false;
+		//爆弾置いた状態
+		bool m_BombAfterFlg = false;
+		//爆弾置いてる間の時間
+		float m_BombPutTime = 1;
+		//置いた後逃げるまでの時間
+		float m_TereportTime = 1;
+
+		//自分の足元のテレポートポイント
+		shared_ptr<GameObject> m_UnderTereportPoint;
+
+		//アクティブフラグ
+		bool m_ActiveFlg = true;
+
+		//デバッグ文字
+		shared_ptr<DebugTxt> m_Debugtxt;
+
 
 		//以下パラメータ
 		//大きさ
@@ -213,7 +236,7 @@ namespace basecross
 		//発射数(子機)
 		int m_ShotAmount;
 
-	public :
+	public:
 		//引数 位置(pos)、大きさ(parscale)、HP(hp)、索敵距離(serchdistance)、クールタイム(cooltime)、発射数(shotamount)
 		TeleportEnemy(const shared_ptr<Stage>& StagePtr, Vector3 pos, float parscale, int hp, float searchdistance, float cooltime, int shotamount);
 
@@ -228,6 +251,19 @@ namespace basecross
 		void Attack();
 		//クールタイム
 		void CoolTime();
+
+		//サークル移動
+		void CircleMove();
+
+		//状態変更
+		void ToSearch();
+		void ToAttack(int);		//攻撃する対象(1なら１体目2なら２体目)
+		void ToCoolTime();
+
+		//プレイヤーから
+		void DamagePlayer();
+		//ダメージ受ける関数
+		void Damage(int);
 	};
 
 	//************************************
@@ -247,8 +283,29 @@ namespace basecross
 		//索敵範囲の画像(スクエア)
 		shared_ptr<GameObject> m_SearchCircle;
 
+		
+		//探索までの間隔
+		float m_moveInterval = 2;
+		//移動時Velocity
+		Vector3 m_Velocity;
+
+		//生きてるか
+		bool m_ActiveFlg = true;
+
+
 		//時間測る用
 		float m_time;
+
+		//攻撃までのタメ時間
+		float m_AttackTime = 2.0f;
+		//攻撃中(これ、攻撃状態でもあるんで、DamageFlgっても呼ぶかも)
+		bool m_TackleFlg = false;
+		//攻撃してる対象
+		int m_TargetNum = 0;
+		//突撃してる時間
+		float m_TackleTime = 3.0f;
+
+
 
 		//以下パラメータ
 		//大きさ
@@ -261,6 +318,9 @@ namespace basecross
 		float m_Speed;
 		//攻撃力
 		int m_Power;
+		//突撃回数
+		int m_TackleCount;
+
 
 	public:
 		//引数 位置(pos)、大きさ(parscale)、HP(hp)、索敵距離(serchdistance)、速度(speed)、攻撃力(power)
@@ -275,5 +335,113 @@ namespace basecross
 		void Move();
 		//攻撃
 		void Attack();
+		
+		//サークル移動
+		void CircleMove();
+
+
+		//状態変更
+		void ToSearch();
+		void ToMove();
+		void ToAttack(int);		//攻撃する対象(1なら１体目2なら２体目)
+
+		//プレイヤーへの攻撃判定
+		void ToDamagePlayer();
+
 	};
+
+	//Abe20170508
+	//======================以下子機群=======================
+	//************************************
+	//	爆弾の爆発の部分
+	//	拡縮だけでいいかな？
+	//************************************
+	class BombEffect : public GameObject
+	{
+	private:
+		//状態
+		int m_State = 0;
+		//アクティブフラグ
+		bool m_ActiveFlg = false;
+	public:
+		BombEffect(const shared_ptr<Stage>& StagePtr);
+
+		void OnCreate() override;
+		void OnUpdate() override;
+
+		void SetPosActive(Vector3);
+	};
+
+	//************************************
+	//	爆弾
+	//	一定時間で起動
+	//************************************
+	class Bomb : public GameObject
+	{
+	private:
+		//座標
+		Vector3 m_InitPos;
+		//大きさ
+		Vector3 m_Scale;
+
+		//計算用時間
+		float m_time = 0;
+		//生きてるか
+		bool m_Activeflg = true;
+
+		//以下パラメータ
+		//爆発範囲
+		float m_BombDistance;
+		//攻撃力
+		int m_Power;
+		//爆発までの時間
+		float m_ExplosionTime = 3.0f;
+
+		shared_ptr<BombEffect> m_Effect;
+	public:
+		//座標、大きさ、爆発範囲、攻撃力、爆発までの時間
+		Bomb(const shared_ptr<Stage>& StagePtr, Vector3 pos, float scale, float bombdistance, float power, float explosiontime);
+
+		//引数ポジションのみ。ていうか基本こっち使ってほしい
+		Bomb(const shared_ptr<Stage>& StagePtr, Vector3 pos);
+		void OnCreate() override;
+		void OnUpdate() override;
+
+		//挟まれたら爆発
+		void BombExplosion();
+
+		//再利用
+		void SetActivePosition(Vector3 pos);
+
+		bool GetActive() { return m_Activeflg; }
+	};
+
+	//************************************
+	//	テレポートエネミーのテレポート先
+	//	一定時間で起動
+	//************************************
+	class TereportPoint : public GameObject
+	{
+	private:
+		//座標
+		Vector3 m_Pos;
+		//今エネミー乗ってるか
+		bool m_OnEnemy = false;
+	public:
+		TereportPoint(const shared_ptr<Stage>& StagePtr, Vector3 pos);
+
+		void OnCreate() override;
+
+		void SetOnEnemy(bool flg) { m_OnEnemy = flg; };
+		bool GetOnEnemy() { return m_OnEnemy; };
+	};
+	//Abe20170508
+	//Abe20170512
+	//************************************
+	//	索敵ドローン
+	//	プレイヤー見つけるまで探索
+	//************************************
+
+	//Abe20170512
+
 }

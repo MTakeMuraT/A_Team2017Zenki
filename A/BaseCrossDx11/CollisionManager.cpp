@@ -168,6 +168,9 @@ namespace basecross
 
 	void CollisionManager::CollisionAfterObjs(shared_ptr<GameObject> obj,int angle, shared_ptr<GameObject> obj2, int angle2)
 	{
+		//================================================
+		//					１体目
+		//================================================
 		if (dynamic_pointer_cast<TackleEnemy>(obj))
 		{
 			//横が当たってる
@@ -184,17 +187,20 @@ namespace basecross
 		if (dynamic_pointer_cast<ShotEnemyChildMissile>(obj))
 		{
 			//それぞれのエネミーにダメージを与える
-			auto ptr = dynamic_pointer_cast<TackleEnemy>(obj2);
-			if (ptr)
+			if (dynamic_pointer_cast<TackleEnemy>(obj2))
 			{
-				//--------------------------------------------------------------------
-				//					ここにミサイルの攻撃力入れる
-				//--------------------------------------------------------------------
-				ptr->Damage((int)dynamic_pointer_cast<ShotEnemyChildMissile>(obj)->GetChildMissileAttackDamage());
+				dynamic_pointer_cast<TackleEnemy>(obj2)->Damage((int)dynamic_pointer_cast<ShotEnemyChildMissile>(obj)->GetChildMissileAttackDamage());
+			}
+			if (dynamic_pointer_cast<TeleportEnemy>(obj2))
+			{
+				dynamic_pointer_cast<TeleportEnemy>(obj2)->Damage((int)dynamic_pointer_cast<ShotEnemyChildMissile>(obj)->GetChildMissileAttackDamage());
 			}
 		}
 
 		//上と同じもの
+		//================================================
+		//					２体目
+		//================================================
 		if (dynamic_pointer_cast<TackleEnemy>(obj2))
 		{
 			//横が当たってる
@@ -211,18 +217,15 @@ namespace basecross
 		if (dynamic_pointer_cast<ShotEnemyChildMissile>(obj2))
 		{
 			//それぞれのエネミーにダメージを与える
-			auto ptr = dynamic_pointer_cast<TackleEnemy>(obj);
-			if (ptr)
+			if (dynamic_pointer_cast<TackleEnemy>(obj))
 			{
-				//--------------------------------------------------------------------
-				//					ここにミサイルの攻撃力入れる
-				//--------------------------------------------------------------------
-				ptr->Damage((int)dynamic_pointer_cast<ShotEnemyChildMissile>(obj2)->GetChildMissileAttackDamage());
+				dynamic_pointer_cast<TackleEnemy>(obj)->Damage((int)dynamic_pointer_cast<ShotEnemyChildMissile>(obj2)->GetChildMissileAttackDamage());
 			}
-
+			if (dynamic_pointer_cast<TeleportEnemy>(obj))
+			{
+				dynamic_pointer_cast<TeleportEnemy>(obj)->Damage((int)dynamic_pointer_cast<ShotEnemyChildMissile>(obj2)->GetChildMissileAttackDamage());
+			}
 		}
-
-
 	}
 
 	void CollisionManager::CollisionAfter(shared_ptr<GameObject> obj , int num)
@@ -270,6 +273,12 @@ namespace basecross
 		if (dynamic_pointer_cast<TackleEnemy>(obj))
 		{
 			dynamic_pointer_cast<TackleEnemy>(obj)->ToDamagePlayer();
+		}
+		//==============================================
+		//自爆エネミー(BombEnemy)
+		if (dynamic_pointer_cast<BombEnemy>(obj))
+		{
+			dynamic_pointer_cast<BombEnemy>(obj)->ToDamagePlayer();
 		}
 		//==============================================
 
@@ -404,5 +413,12 @@ namespace basecross
 			dynamic_pointer_cast<ShotEnemyChild>(obj)->SetShotEnemyChildSandFlg(true);
 		}
 		//==============================================
+		//テレポートエネミー
+		if (dynamic_pointer_cast<TeleportEnemy>(obj)) {
+			//ShotEnemyChildへのフラグ
+			dynamic_pointer_cast<TeleportEnemy>(obj)->DamagePlayer();
+		}
+		//==============================================
+
 	}
 }
