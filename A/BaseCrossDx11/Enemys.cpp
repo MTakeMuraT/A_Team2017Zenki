@@ -1106,14 +1106,23 @@ namespace basecross
 			auto PtrPlayerHP = GetStage()->GetSharedGameObject<PlayerHP>(L"PlayerHP", false);
 			PtrPlayerHP->SetDamage_int(3);
 			PtrPlayerHP->SetHit(true);
-			
+
 			//©”š‚Ìˆ×Á–Å
 			SetDrawActive(false);
 			m_Hp = 0;
 			m_ActiveFlg = false;
 
 		}
+
 	}
+		void BombEnemy::DamagePlayer()
+		{	
+				//ƒ^ƒq‚Ê
+				SetDrawActive(false);
+				m_Hp = 0;
+				m_ActiveFlg = false;
+		
+		}
 
 	//Abe20170508
 	//======================ˆÈ‰ºq‹@ŒQ=======================

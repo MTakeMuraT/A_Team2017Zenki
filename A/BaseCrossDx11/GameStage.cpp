@@ -105,6 +105,8 @@ namespace basecross
 			Vector3(0, -50, 0),
 			wstring(L"Background_TX")
 			);
+
+		AddGameObject<Enemycount>();
 		/*AddGameObject<FixdBox>(
 			Vector3(1, 1, 1),
 			Vector3(0, 0, 0),
@@ -212,15 +214,23 @@ namespace basecross
 			//Abe20170505
 			//エネミーテスト
 			//引数 位置、大きさ、HP、索敵距離、クールタイム、速度、攻撃力、突撃回数
-
-			CollisionGroup->IntoGroup(AddGameObject<TackleEnemy>(Vector3(10, 1, 10), 1, 3, 3, 3, 6, 3, 2));
-			CollisionGroup->IntoGroup(AddGameObject<TackleEnemy>(Vector3(-10, 1, 10), 1, 3, 3, 3, 6, 3, 2));
-			CollisionGroup->IntoGroup(AddGameObject<TackleEnemy>(Vector3(10, 1, -10), 1, 3, 3, 3, 6, 3, 2));
-			CollisionGroup->IntoGroup(AddGameObject<TackleEnemy>(Vector3(-10, 1, -10), 1, 3, 3, 3, 6, 3, 2));
+			auto TackleEnemy01 = AddGameObject<TackleEnemy>(Vector3(10, 1, 10), 1, 3, 3, 3, 6, 3, 2);
+			auto TackleEnemy02 = AddGameObject<TackleEnemy>(Vector3(-10, 1, 10), 1, 3, 3, 3, 6, 3, 2);
+			auto TackleEnemy03 = AddGameObject<TackleEnemy>(Vector3(10, 1, -10), 1, 3, 3, 3, 6, 3, 2);
+			auto TackleEnemy04 = AddGameObject<TackleEnemy>(Vector3(-10, 1, -10), 1, 3, 3, 3, 6, 3, 2);
+			
+			CollisionGroup->IntoGroup(TackleEnemy01);
+			CollisionGroup->IntoGroup(TackleEnemy02);
+			CollisionGroup->IntoGroup(TackleEnemy03);
+			CollisionGroup->IntoGroup(TackleEnemy04);
 
 			auto PtrTacklEnemy = AddGameObject<TackleEnemy>(Vector3(10, 1, 10), 1, 0, 3, 3, 6, 3, 2);
 			CollisionGroup->IntoGroup(PtrTacklEnemy);
 			EnemyGroup->IntoGroup(PtrTacklEnemy);
+			EnemyGroup->IntoGroup(TackleEnemy01);
+			EnemyGroup->IntoGroup(TackleEnemy02);
+			EnemyGroup->IntoGroup(TackleEnemy03);
+			EnemyGroup->IntoGroup(TackleEnemy04);
 			//PtrTacklEnemy = AddGameObject<TackleEnemy>(Vector3(-10, 1, 10), 1, 0, 3, 3, 6, 3, 2);
 			//CollisionGroup->IntoGroup(PtrTacklEnemy);
 			//EnemyGroup->IntoGroup(PtrTacklEnemy);
@@ -373,6 +383,6 @@ namespace basecross
 		PtrTrans->SetPosition(m_Positon);
 		//PtrDraw->SetDrawActive(false);
 	}
-
 }
+
 //end basecross

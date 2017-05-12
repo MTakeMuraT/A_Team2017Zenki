@@ -1342,7 +1342,50 @@ namespace basecross {
 		}
 
 	}
-}
+
+	Enemycount::Enemycount(const shared_ptr<Stage>& StagePtr):
+	GameObject(StagePtr)
+	{
+	}
+	void Enemycount::OnCreate() {
+		//デバッグ文字生成
+	    m_Debugtxt = GetStage()->AddGameObject<DebugTxt>();
+		m_Debugtxt->SetLayer(10);
+		//色黒に変更
+		m_Debugtxt->SetColor(Vector3(0, 0, 0));
+		//大きさ変更
+		m_Debugtxt->SetScaleTxt(50);
+		EnemyCunt = 0;
+	}
+
+	void Enemycount::OnUpdate() {
+		wstring CountStr(L"Enemyの数::\t");
+		CountStr += Util::IntToWStr(EnemyCunt);
+
+		auto Group = GetStage()->GetSharedObjectGroup(L"EnemyGroup");
+	//	auto ShellVec = Group->GetGroupVector();
+		if (m_TestFlg == false) {
+			for (auto i = 0; i < Group->size(); i++) {
+				auto Obj = Group->at(i);
+				if (Obj && Obj->IsUpdateActive()) {
+					EnemyCunt++;
+				}
+			}
+			//for (auto Ptr : ShellVec) {
+			//	auto shptr = Ptr.lock();
+			//	if (shptr && shptr->IsUpdateActive()) {
+			//		EnemyCunt++;
+			//	}
+			//}
+			m_TestFlg = true;
+		}
+
+
+
+		wstring  str = CountStr;
+		m_Debugtxt->SetText(str);
+	}
+	}
 	
 	
 	

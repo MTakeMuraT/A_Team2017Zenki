@@ -522,5 +522,20 @@ namespace basecross{
 			return  m_AttackDamage;
 		}
 	};
+
+	class Enemycount : public GameObject {
+	private:
+		//デバッグ文字表示オブジェ
+		shared_ptr<DebugTxt> m_Debugtxt;
+		int EnemyCunt = 0;
+		bool m_TestFlg = false;
+	public:
+		Enemycount(const shared_ptr<Stage>& StagePtr);
+
+		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
+
+	};
+
 }
 //end basecross

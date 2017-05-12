@@ -357,6 +357,10 @@ namespace basecross
 		//プレイヤーへの攻撃判定
 		void ToDamagePlayer();
 
+		//自分がダメージ受けたときの関数
+		//プレイヤーから
+		void DamagePlayer();
+
 	};
 
 	//Abe20170508

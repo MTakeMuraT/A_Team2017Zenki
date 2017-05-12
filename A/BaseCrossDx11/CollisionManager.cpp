@@ -407,6 +407,13 @@ namespace basecross
 		//==============================================
 
 		//==============================================
+		if (dynamic_pointer_cast<BombEnemy>(obj))
+		{
+			dynamic_pointer_cast<BombEnemy>(obj)->DamagePlayer();
+		}
+		//==============================================
+
+		//==============================================
 		//ミサイルを撃つ子機
 		if (dynamic_pointer_cast<ShotEnemyChild>(obj)) {
 			//ShotEnemyChildへのフラグ
