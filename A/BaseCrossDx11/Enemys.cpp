@@ -493,9 +493,6 @@ namespace basecross
 		Draw->SetMeshResource(L"DEFAULT_CUBE");
 		Draw->SetTextureResource(L"SKY_TX");
 
-		//ステート初期化
-		m_State = SearchS;
-
 		//プレイヤーのアクセサー的なのをはじめにもってきておく
 		m_Player1 = GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_L");
 		m_Player2 = GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_R");
@@ -517,12 +514,14 @@ namespace basecross
 		circle->SetAlphaActive(true);
 		m_SearchCircle = circle;
 
+		//ステート初期化
+		ToSearch();
+
 		//テレポートポイントを作成
 		auto TereportGroup = GetStage()->GetSharedObjectGroup(L"TereportPointGroup");
 		auto TereportPtr = GetStage()->AddGameObject<TereportPoint>(posci);
 		TereportPtr->SetOnEnemy(true);
 		TereportGroup->IntoGroup(TereportPtr);
-
 
 		//デバッグ文字生成
 		m_Debugtxt = GetStage()->AddGameObject<DebugTxt>();
@@ -532,6 +531,18 @@ namespace basecross
 		//大きさ変更
 		m_Debugtxt->SetScaleTxt(40);
 
+		//自分を認識させる番号を決定
+		auto Group = GetStage()->GetSharedObjectGroup(L"EnemyGroup")->GetGroupVector();
+		int count = 0;
+		for (auto obj : Group)
+		{
+			if (dynamic_pointer_cast<TeleportEnemy>(obj.lock()))
+			{
+				count++;
+			}
+		}
+		//識別番号入れる
+		m_number = count;
 	}
 
 	void TeleportEnemy::OnUpdate()
@@ -544,10 +555,6 @@ namespace basecross
 			case SearchS:
 				Search();
 				break;
-				//探索
-			case MoveS:
-				Move();
-				break;
 				//攻撃
 			case AttackS:
 				Attack();
@@ -557,6 +564,31 @@ namespace basecross
 				CoolTime();
 				break;
 			}
+		}
+	}
+
+	void TeleportEnemy::GoDrawns()
+	{
+		if (m_Drawns.size() == 0)
+		{
+			//ドローン作成
+			for (int i = 0; i < m_ShotAmount; i++)
+			{
+				auto Drawn = GetStage()->AddGameObject<SearchDrawn>();
+				m_Drawns.push_back(Drawn);
+			}
+		}
+
+		float angle = 360/m_ShotAmount;
+		float TarAngle = 0;
+		for (auto obj : m_Drawns)
+		{
+			auto ptr = dynamic_pointer_cast<SearchDrawn>(obj);
+			Vector3 inVel = Vector3(cos(TarAngle*3.14159265f / 180), 0, sin(TarAngle*3.14159265f / 180));
+			Vector3 pos = GetComponent<Transform>()->GetPosition();
+			pos.y += 1;
+			ptr->GoDrawn(pos, inVel,m_number);
+			TarAngle += angle;
 		}
 	}
 
@@ -581,11 +613,6 @@ namespace basecross
 		{
 			ToAttack(2);
 		}
-
-	}
-
-	void TeleportEnemy::Move()
-	{
 
 	}
 
@@ -742,6 +769,9 @@ namespace basecross
 		//サークル移動
 		CircleMove();
 
+		//子機放出
+		GoDrawns();
+
 	}
 
 	void TeleportEnemy::ToAttack(int num)
@@ -754,6 +784,13 @@ namespace basecross
 		m_SearchCircle->SetDrawActive(false);
 
 		m_State = AttackS;
+
+		//子機収納
+		for (auto obj : m_Drawns)
+		{
+			dynamic_pointer_cast<SearchDrawn>(obj)->UpDrawns();
+
+		}
 	}
 
 
@@ -1294,4 +1331,189 @@ namespace basecross
 
 	}
 	//Abe20170508
+
+	//Abe20170512
+	//************************************
+	//	索敵ドローン
+	//	プレイヤー見つけるまで探索
+	//************************************
+	SearchDrawn::SearchDrawn(const shared_ptr<Stage>& StagePtr):
+		GameObject(StagePtr)
+	{}
+	
+	void SearchDrawn::OnCreate()
+	{
+		//座標、大きさ、回転
+		auto Trans = AddComponent<Transform>();
+		Trans->SetPosition(0,0,0);
+		Trans->SetScale(0.25f, 0.25f, 0.25f);
+		Trans->SetRotation(0, 0, 0);
+
+		auto Draw = AddComponent<PNTStaticDraw>();
+		Draw->SetTextureResource(L"TEREPORTPOINT_TX");
+		Draw->SetMeshResource(L"DEFAULT_SPHERE");
+
+		SetAlphaActive(true);
+
+		//プレイヤーのアクセサー的なのをはじめにもってきておく
+		m_Player1 = GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_L");
+		m_Player2 = GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_R");
+
+		//索敵範囲作成
+		auto circle = GetStage()->AddGameObject<GameObject>();
+		auto TransCi = circle->AddComponent<Transform>();
+		TransCi->SetPosition(0,0,0);
+		TransCi->SetScale(Vector3(m_SearchDistance, m_SearchDistance, m_SearchDistance));
+		TransCi->SetRotation(90 * 3.14159265 / 180, 0, 0);
+
+		auto DrawCi = circle->AddComponent<PNTStaticDraw>();
+		DrawCi->SetTextureResource(L"SEARCHCIRCLE_TX");
+		DrawCi->SetMeshResource(L"DEFAULT_SQUARE");
+
+		circle->SetAlphaActive(true);
+		circle->SetDrawActive(false);
+		m_SearchCircle = circle;
+
+
+	}
+
+	void SearchDrawn::OnUpdate()
+	{
+		if (m_ActiveFlg)
+		{
+			//プレイヤーを見つけていないとき
+			if (!m_FindPlayerFlg)
+			{
+				//切り替え時間越えたら向き替え
+				m_time += App::GetApp()->GetElapsedTime();
+				if (m_time > m_ChangeTime)
+				{
+					m_Velocity = Vector3(rand() % 100, 0, rand() % 100) / 100;
+
+					m_time = 0;
+				}
+
+				//移動
+				Vector3 pos = GetComponent<Transform>()->GetPosition();
+				pos += m_Velocity * App::GetApp()->GetElapsedTime() * m_Speed;
+				GetComponent<Transform>()->SetPosition(pos);
+
+				//サークル移動
+				pos.y = 1;
+				m_SearchCircle->GetComponent<Transform>()->SetPosition(pos);
+
+				//見つける判定
+				Search();
+			}
+			//見つけた
+			else
+			{
+				//上に移動
+				Vector3 pos = GetComponent<Transform>()->GetPosition();
+				pos.y += 5*m_Speed * App::GetApp()->GetElapsedTime();
+				GetComponent<Transform>()->SetPosition(pos);
+
+				//20以上行ったら
+				if (pos.y > 20)
+				{
+					SetDrawActive(false);
+					m_ActiveFlg = false;
+					m_FindPlayerFlg = false;
+				}
+			}
+		}
+	}
+
+	void SearchDrawn::Search()
+	{
+		//位置情報取得
+		Vector3 mypos = GetComponent<Transform>()->GetPosition();
+		Vector3 pos1 = m_Player1->GetComponent<Transform>()->GetPosition();
+		Vector3 pos2 = m_Player2->GetComponent<Transform>()->GetPosition();
+		float distance = m_Player1->GetComponent<Transform>()->GetScale().x / 2 + m_SearchDistance / 2;
+
+		//距離を測る
+		//１体目
+		Vector3 dis = pos1 - mypos;
+		if ((dis.x*dis.x) + (dis.z*dis.z) < distance*distance)
+		{
+			m_FindPlayerFlg = true;
+			//自分の番号と一致するテレポートのやつを起動
+			auto EnemyGrouP = GetStage()->GetSharedObjectGroup(L"EnemyGroup")->GetGroupVector();
+			for (auto obj : EnemyGrouP)
+			{
+				//テレポートエネミーにキャスト
+				auto ptr = dynamic_pointer_cast<TeleportEnemy>(obj.lock());
+				if (ptr)
+				{
+					//自分の番号と一致
+					if (ptr->GetNumber() == m_number)
+					{
+						ptr->ToAttack(1);
+					}
+				}
+			}
+		}
+		//２体目
+		dis = pos2 - mypos;
+		if ((dis.x*dis.x) + (dis.z*dis.z) < distance*distance)
+		{
+			m_FindPlayerFlg = true;
+
+			//自分の番号と一致するテレポートのやつを起動
+			auto EnemyGrouP = GetStage()->GetSharedObjectGroup(L"EnemyGroup")->GetGroupVector();
+			for (auto obj : EnemyGrouP)
+			{
+				//テレポートエネミーにキャスト
+				auto ptr = dynamic_pointer_cast<TeleportEnemy>(obj.lock());
+				if (ptr)
+				{
+					//自分の番号と一致
+					if (ptr->GetNumber() == m_number)
+					{
+						ptr->ToAttack(2);
+					}
+				}
+			}
+
+		}
+
+	}
+
+	void SearchDrawn::GoDrawn(Vector3 pos,Vector3 vel, int num)
+	{
+		//座標移動
+		Vector3 pos1 = pos;
+		pos1.y += 1;
+		GetComponent<Transform>()->SetPosition(pos);
+		//移動力設定
+		m_Velocity = vel;
+
+		//番号
+		m_number = num;
+
+		//起動
+		m_ActiveFlg = true;
+		
+		//可視化
+		SetDrawActive(true);
+
+		m_time = 0;
+		
+		//サークル描画
+		m_SearchCircle->SetDrawActive(true);
+		Vector3 pos2 = pos;
+		pos2.y = 1;
+		m_SearchCircle->GetComponent<Transform>()->SetPosition(pos2);
+
+	}
+
+	void SearchDrawn::UpDrawns()
+	{
+		m_FindPlayerFlg = true;
+		//サークル消す
+		m_SearchCircle->SetDrawActive(false);
+
+	}
+	//Abe20170512
 }

@@ -221,6 +221,13 @@ namespace basecross
 		//デバッグ文字
 		shared_ptr<DebugTxt> m_Debugtxt;
 
+		//子機
+		vector<shared_ptr<GameObject>> m_Drawns;
+		//子機打ち出す処理
+		void GoDrawns();
+
+		//子機に自分を認識させるための番号
+		int m_number;
 
 		//以下パラメータ
 		//大きさ
@@ -236,6 +243,7 @@ namespace basecross
 		//発射数(子機)
 		int m_ShotAmount;
 
+
 	public:
 		//引数 位置(pos)、大きさ(parscale)、HP(hp)、索敵距離(serchdistance)、クールタイム(cooltime)、発射数(shotamount)
 		TeleportEnemy(const shared_ptr<Stage>& StagePtr, Vector3 pos, float parscale, int hp, float searchdistance, float cooltime, int shotamount);
@@ -245,8 +253,6 @@ namespace basecross
 
 		//索敵
 		void Search();
-		//探索
-		void Move();
 		//攻撃
 		void Attack();
 		//クールタイム
@@ -264,6 +270,9 @@ namespace basecross
 		void DamagePlayer();
 		//ダメージ受ける関数
 		void Damage(int);
+
+		//番号取得
+		int GetNumber() {return m_number; }
 	};
 
 	//************************************
@@ -369,6 +378,7 @@ namespace basecross
 		void OnCreate() override;
 		void OnUpdate() override;
 
+		//起動、止まってれば再起動される。引数は座標
 		void SetPosActive(Vector3);
 	};
 
@@ -441,7 +451,53 @@ namespace basecross
 	//	索敵ドローン
 	//	プレイヤー見つけるまで探索
 	//************************************
+	class SearchDrawn : public GameObject
+	{
+	private :
+		//計算用時間
+		float m_time = 0;
+		//向き切り替え時間
+		float m_ChangeTime = 3.0f;
 
+		//プレイヤーのアクセサー的なの
+		shared_ptr<GameObject> m_Player1;
+		shared_ptr<GameObject> m_Player2;
+		//索敵範囲の画像(スクエア)
+		shared_ptr<GameObject> m_SearchCircle;
+
+		//移動速度
+		Vector3 m_Velocity;
+
+		//起動してるかどうか
+		bool m_ActiveFlg = false;
+		//プレイヤー見つけたフラグ
+		bool m_FindPlayerFlg = false;
+
+		//識別番号
+		int m_number;
+
+		//以下パラメータ
+		//索敵距離
+		float m_SearchDistance = 2.0f;
+		//移動速度
+		float m_Speed = 5.0f;
+
+	public :
+		SearchDrawn(const shared_ptr<Stage>& StagePtr);
+
+		void OnCreate()override;
+		void OnUpdate()override;
+
+		//見つける判定
+		void Search();
+		//放出
+		void GoDrawn(Vector3 pos, Vector3 vel,int num);
+
+		bool GetActiveFlg() { return m_ActiveFlg; }
+
+		//収納
+		void UpDrawns();
+	};
 	//Abe20170512
 
 }
