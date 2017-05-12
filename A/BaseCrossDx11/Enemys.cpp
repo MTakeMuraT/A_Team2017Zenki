@@ -1388,7 +1388,7 @@ namespace basecross
 				m_time += App::GetApp()->GetElapsedTime();
 				if (m_time > m_ChangeTime)
 				{
-					m_Velocity = Vector3(rand() % 100, 0, rand() % 100) / 100;
+					m_Velocity = Vector3(rand() % 200-100, 0, rand() % 200-100) / 100;
 
 					m_time = 0;
 				}
