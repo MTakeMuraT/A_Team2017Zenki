@@ -1320,11 +1320,11 @@ namespace basecross {
 		//ƒƒbƒVƒ…Ý’è
 		Draw->SetMeshResource(L"DEFAULT_SPHERE");
 		Draw->SetTextureResource(L"TRACE_TX");
-		//Œ‚‚½‚È‚¢
-		SetShotActive(true);
+		//Œ‚‚Â
+		m_ShotActive = true;
 	}
 	void ShotEnemyChildMissile::OnUpdate() {
-		if (GetShotActive()) {
+		if (m_ShotActive) {
 			ChildMissileMove();
 			ObjDelete();
 		}
