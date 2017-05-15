@@ -327,10 +327,10 @@ namespace basecross
 		//ã¸•ª
 		float Yup = sqrt(def.x + def.z) - 6;
 		//ã¸•ª‚ÉƒJƒƒ‰‚Ì‰Šú‚‚³‚ğ’Ç‰Á
-		Yup += 10;
-		if (Yup < 10)
+		Yup += 15;
+		if (Yup < 15)
 		{
-			Yup = 10;
+			Yup = 15;
 		}
 		Pos.y += Yup;
 		//“¯‚¶’l‚ğZ‚É‚à
