@@ -58,9 +58,9 @@ namespace basecross
 	void GameStage::CreateGround() {
 		//Vector3:S・P  wstring:TX_Name
 		AddGameObject<Ground_GameStage>(
-			Vector3(25, 25, 25),
+			Vector3(50, 50, 50),
 			Vector3(0, 0, 0),
-			wstring(L"TEST_Game_TX")
+			wstring(L"Glass_TX")
 			);
 	}
 
@@ -161,11 +161,11 @@ namespace basecross
 	void GameStage::OnCreate()
 	{
 		try {
-			/*//検証するのに重いので一時的に消します Abe20170505
-			m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
-			m_AudioObjectPtr->AddAudioResource(L"GameStage_01_BGM");
-			m_AudioObjectPtr->Start(L"GameStage_01_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);
-			*/
+			////検証するのに重いので一時的に消します Abe20170505
+			//m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
+			//m_AudioObjectPtr->AddAudioResource(L"GameStage_01_BGM");
+			//m_AudioObjectPtr->Start(L"GameStage_01_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);
+			
 			//ビューとライトの作成
 			CreateViewLight();
 			CreatePlate();
@@ -363,11 +363,11 @@ namespace basecross
 		if (m_TX_Name == L"Background_TX") {
 			PtrDraw->SetTextureResource(m_TX_Name);
 		}
-		else if(m_TX_Name == L"TEST_Game_TX"){
+		else if(m_TX_Name == L"Glass_TX"){
 			PtrDraw->SetTextureResource(m_TX_Name);
 		}
 
-
+		
 		auto PtrTrans = AddComponent<Transform>();
 		Quaternion Qt;
 		Qt.RotationRollPitchYawFromVector(Vector3(XM_PIDIV2, 0, 0));
@@ -382,6 +382,7 @@ namespace basecross
 		PtrTrans->SetQuaternion(Qt);
 		PtrTrans->SetPosition(m_Positon);
 		//PtrDraw->SetDrawActive(false);
+		SetAlphaActive(true);
 	}
 }
 

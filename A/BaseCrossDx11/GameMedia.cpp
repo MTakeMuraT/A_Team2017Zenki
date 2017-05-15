@@ -34,7 +34,9 @@ namespace basecross {
 
 		//ゲームステージ画面
 		strTexture = DataDir + L"GameStage\\Background.png";
-		App::GetApp()->RegisterTexture(L"Background_TX", strTexture);
+		App::GetApp()->RegisterTexture(L"Background_TX", strTexture); 
+		strTexture = DataDir + L"GameStage\\Glass.png";
+		App::GetApp()->RegisterTexture(L"Glass_TX", strTexture); 
 		//プレイヤー関係
 		//HPのフレーム
 		strTexture = DataDir + L"HP_Flame.png";
@@ -108,15 +110,15 @@ namespace basecross {
 		auto MadelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Player\\PlayerModel\\Player_animation.bmf");
 		App::GetApp()->RegisterResource(L"Player_Model", MadelMesh);
 
-		/*//検証するのに重いので一時的に消します Abe20170505
+		//検証するのに重いので一時的に消します Abe20170505
 		//BGM
-		wstring strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Title\\Title_01.wav";
+	/*	wstring strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Title\\Title_01.wav";
 		App::GetApp()->RegisterWav(L"Title_01_BGM", strMusic);
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\StageSelect\\StageSelect_01.wav";
 		App::GetApp()->RegisterWav(L"StageSelect_01_BGM", strMusic);
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\GameStage\\GameStage_01.wav";
-		App::GetApp()->RegisterWav(L"GameStage_01_BGM", strMusic)
-	*/
+		App::GetApp()->RegisterWav(L"GameStage_01_BGM", strMusic);*/
+	
 		//SE
 		wstring strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Decision_01.wav";
 		App::GetApp()->RegisterWav(L"Decision_01_SE", strMusic);
