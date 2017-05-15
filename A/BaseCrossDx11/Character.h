@@ -508,6 +508,7 @@ namespace basecross{
 		float m_Speed = 100;
 		float m_AttackDamage;
 		float m_DeleteTime;
+		bool m_ShotActive;
 	public:
 		ShotEnemyChildMissile(const shared_ptr<Stage>& StagePtr, const Vector3& Position, const Vector3& Scale, const Vector3& Rotation, const Vector3& Direction);
 		virtual ~ShotEnemyChildMissile() {};
@@ -520,6 +521,13 @@ namespace basecross{
 		//攻撃力のアクセサ
 		float GetChildMissileAttackDamage() {
 			return  m_AttackDamage;
+		}
+		//撃つか撃たないか
+		void SetShotActive(bool ShotTrue) {
+			m_ShotActive = ShotTrue;
+		}
+		bool GetShotActive() {
+			return m_ShotActive;
 		}
 	};
 
