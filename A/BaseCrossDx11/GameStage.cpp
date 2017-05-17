@@ -208,13 +208,15 @@ namespace basecross
 			//auto Enemy_03Ptr = AddGameObject<Enemy01>(Vector3(0, 1, 5), Vector3(1, 1, 1));
 			//SetSharedGameObject(L"Enemy03", Enemy_01Ptr);
 			//CollisionGroup->IntoGroup(Enemy_03Ptr);
-
+			//2017/05/17今泉CSV//
+			AddGameObject<InputCSV>();
+			/////////////////////////
 			//Abe20170504
 
 			//Abe20170505
 			//エネミーテスト
 			//引数 位置、大きさ、HP、索敵距離、クールタイム、速度、攻撃力、突撃回数
-			auto TackleEnemy01 = AddGameObject<TackleEnemy>(Vector3(10, 1, 10), 1, 3, 3, 3, 6, 3, 2);
+			/*auto TackleEnemy01 = AddGameObject<TackleEnemy>(Vector3(10, 1, 10), 1, 3, 3, 3, 6, 3, 2);
 			auto TackleEnemy02 = AddGameObject<TackleEnemy>(Vector3(-10, 1, 10), 1, 3, 3, 3, 6, 3, 2);
 			auto TackleEnemy03 = AddGameObject<TackleEnemy>(Vector3(10, 1, -10), 1, 3, 3, 3, 6, 3, 2);
 			auto TackleEnemy04 = AddGameObject<TackleEnemy>(Vector3(-10, 1, -10), 1, 3, 3, 3, 6, 3, 2);
@@ -230,7 +232,7 @@ namespace basecross
 			EnemyGroup->IntoGroup(TackleEnemy01);
 			EnemyGroup->IntoGroup(TackleEnemy02);
 			EnemyGroup->IntoGroup(TackleEnemy03);
-			EnemyGroup->IntoGroup(TackleEnemy04);
+			EnemyGroup->IntoGroup(TackleEnemy04);*/
 			//PtrTacklEnemy = AddGameObject<TackleEnemy>(Vector3(-10, 1, 10), 1, 0, 3, 3, 6, 3, 2);
 			//CollisionGroup->IntoGroup(PtrTacklEnemy);
 			//EnemyGroup->IntoGroup(PtrTacklEnemy);
@@ -247,9 +249,9 @@ namespace basecross
 			//AddGameObject<TeleportEnemy>(Vector3(-10, 1, 10),2,1,5,8,3);
 			//引数 位置、大きさ、HP、索敵距離、速度、攻撃力
 			//Abe20170505
-			auto objbomb = AddGameObject<BombEnemy>(Vector3(20, 1, 20), 1, 1, 3, 2, 8);
+			/*auto objbomb = AddGameObject<BombEnemy>(Vector3(20, 1, 20), 1, 1, 3, 2, 8);
 			CollisionGroup->IntoGroup(objbomb);
-			EnemyGroup->IntoGroup(objbomb);
+			EnemyGroup->IntoGroup(objbomb);*/
 			
 			//Abe20170508
 			//テレポート先作成

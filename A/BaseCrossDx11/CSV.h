@@ -10,6 +10,8 @@ namespace basecross {
 
 		//CSVファイルそのA
 		CsvFile m_InputCSV;
+		//ランダム
+		int m_RnadNum;
 	public:
 		//構築と破棄
 		InputCSV(const shared_ptr<Stage>& StagePtr);
@@ -17,6 +19,8 @@ namespace basecross {
 		//初期化
 		virtual void OnCreate() override;
 		//操作
+		//記述範囲内からランダムで整数を返す
+		int Random(const int Min, const int Max);
 	};
 
 
@@ -60,6 +64,7 @@ namespace basecross {
 		virtual ~TestEnemy() {};
 		virtual void OnCreate()override;
 		virtual void OnLastUpdate()override;
+		
 	};
 	
 }
