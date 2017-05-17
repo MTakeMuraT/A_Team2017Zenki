@@ -1163,13 +1163,40 @@ namespace basecross {
 
 	}
 	void ShotEnemyChild::OnUpdate() {
-		DoingSandRotation();
-		ShotEnemyChildRot();
-		PintNewPos();
-		Direction();
-		Shot();
-
+		//Abe20170517
+		if (m_ShotFlg)
+		//Abe20170517
+		{
+			DoingSandRotation();
+			ShotEnemyChildRot();
+			PintNewPos();
+			Direction();
+			Shot();
+		}
+		else
+		{
+			Tobu();
+		}
 	}
+	//Abe20170517
+	void ShotEnemyChild::Tobu()
+	{
+		//ç¿ïWà⁄ìÆ
+		Vector3 pos = GetComponent<Transform>()->GetPosition();
+		pos += m_Velocity * App::GetApp()->GetElapsedTime();
+		GetComponent<Transform>()->SetPosition(pos);
+
+		//ÇøÇÂÇ¡Ç∆íxÇﬂÇ…óéÇ∆Ç∑
+		m_Velocity.y += -9.8f * App::GetApp()->GetElapsedTime();
+
+		//è∞Ç…ãﬂÇ≠Ç»Ç¡ÇΩÇÁè¡Ç∑
+		if (GetComponent<Transform>()->GetPosition().y <= 0.5f)
+		{
+			m_ShotFlg = true;
+		}
+	}
+	//Abe20170517
+
 	void ShotEnemyChild::OnLastUpdate() {
 		//ï∂éöóÒï\é¶
 		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();

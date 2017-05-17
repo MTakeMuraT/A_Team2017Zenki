@@ -472,6 +472,12 @@ namespace basecross
 			dynamic_pointer_cast<TeleportEnemy>(obj)->DamagePlayer();
 		}
 		//==============================================
+		//ミサイルうつエネミー
+		if (dynamic_pointer_cast<ShotEnemy>(obj)) {
+			//ShotEnemyChildへのフラグ
+			dynamic_pointer_cast<ShotEnemy>(obj)->DamagePlayer();
+		}
+		//==============================================
 
 	}
 }

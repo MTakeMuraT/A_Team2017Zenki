@@ -438,7 +438,7 @@ namespace basecross{
 		float m_T_Angle = 0.0f;
 		//発射間隔
 		float m_ShotInterval = 0.0f;
-		bool m_ShotFlg = false;
+		//bool m_ShotFlg = false;
 
 		//デバックミサイル発射場所の位置確認用　（別クラスに値を送る用
 		Vector3 m_Debug = Vector3(0, 0, 0);
@@ -452,6 +452,15 @@ namespace basecross{
 		bool m_ShotEnemyChildSandFlg = false;
 		//向き変更 完了tore　未完了false
 		bool m_DefaultRot_F = true;
+
+		//Abe20170517
+		//撃ち始めるかどうか
+		bool m_ShotFlg = false;
+		//投げられてる最中
+		void Tobu();
+		//加速度
+		Vector3 m_Velocity;
+		//Abe20170517
 	public:
 		ShotEnemyChild(const shared_ptr<Stage>& StagePtr, const Vector3& Position, const Vector3& Scale, const float& ShotInterval);
 		ShotEnemyChild(const shared_ptr<Stage>& StagePtr, const wstring& line);
@@ -493,6 +502,15 @@ namespace basecross{
 		void SetShotEnemyChildSandFlg(bool flg) {
 			m_ShotEnemyChildSandFlg = flg;
 		}
+
+
+		//Abe20170517
+		//加速度設定
+		void SetVelocity(Vector3 vel)
+		{
+			m_Velocity = vel;
+		}
+		//Abe20170517
 
 	};
 	//--------------------------------------------------------------------------------------

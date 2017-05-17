@@ -601,7 +601,25 @@ namespace basecross
 			//‚¢‚È‚©‚Á‚½‚çì‚é
 			if (!flgg)
 			{
-				m_ChildS.push_back(GetStage()->AddGameObject<ShotEnemyChild>(GetComponent<Transform>()->GetPosition(), Vector3(1, 1, 1), 2));
+				Vector3 PPOS = GetComponent<Transform>()->GetPosition();
+				PPOS.y += GetComponent<Transform>()->GetScale().y/2;
+				auto pptr = GetStage()->AddGameObject<ShotEnemyChild>(PPOS, Vector3(1, 1, 1), 2);
+				angle *= 180 / 1.14159265f;
+				angle += 360;
+				int Tangle = (int)angle % 360;
+				//‚Æ‚è‚ ‚¦‚¸10`20A-10`-20“x‚Ì”ÍˆÍ‚Å”ò‚Î‚·
+				if (rand() % 2 == 0)
+				{
+					Tangle += rand() % 11 + 10;
+				}
+				else
+				{
+					Tangle += rand() % 11 - 20;
+				}
+
+				Tangle *= 3.15159265f / 180;
+				pptr->SetVelocity(Vector3(cos(Tangle),rand()% 5 + 5,sin(Tangle)));
+				m_ChildS.push_back(pptr);
 			}
 
 		}
