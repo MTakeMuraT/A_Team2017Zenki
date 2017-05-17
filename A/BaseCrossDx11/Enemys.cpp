@@ -535,46 +535,84 @@ namespace basecross
 			angle = atan2(dif.z, dif.x);
 			GetComponent<Transform>()->SetRotation(0, angle, 0);
 		}
+
 		//ミサイル打つ処理
 		m_time += App::GetApp()->GetElapsedTime();
 		if (m_time > m_CoolTime)
 		{
+			//アングル変換
+			angle *= 180 / 3.14159265f;
+			angle += 360;
+			angle = (int)angle % 360;
+
 			//計算用時間初期化
 			m_time = 0;
 
 			bool sflg = false;
 			//起動してないのあれば再利用
-			for (auto obj : m_MissileS)
+			//同時発射
+			for (int i = 0; i < m_ShotAmount; i++)
 			{
-				if (!obj->GetDrawActive())
+				for (auto obj : m_MissileS)
 				{
+					if (!obj->GetDrawActive())
+					{
+						int Tangle = (int)angle % 360;
+						//とりあえず10～20、-10～-20度の範囲で飛ばす
+						if (rand() % 2 == 0)
+						{
+							Tangle += rand() % 11 + 10;
+						}
+						else
+						{
+							Tangle += rand() % 11 - 20;
+						}
+						
+						float angle2 = Tangle * 3.14159265f / 180;
+
+						//飛ばす向きを決める yは2～6
+						Vector3 tovelo = Vector3(cos(angle2) * m_ShotPower, rand() % 5 + 2, sin(angle2) * m_ShotPower);
+						//頭の上から発射
+						Vector3 topos = GetComponent<Transform>()->GetPosition();
+						topos.y += GetComponent<Transform>()->GetScale().y / 2;
+						dynamic_pointer_cast<Missile>(obj)->SetMissileActive(topos, m_MissileScale, tovelo, true, 1);
+
+						//撃ったフラグオン
+						sflg = true;
+
+						//狙うプレイヤーを決める
+						m_TargetPlayer = rand() % 2 + 1;
+
+						break;
+					}
+				}
+				if (!sflg)
+				{
+					//作成
+					auto objm = GetStage()->AddGameObject<Missile>();
+					GetStage()->GetSharedObjectGroup(L"CollisionGroup")->IntoGroup(objm);
+
+					int Tangle = (int)angle % 360;
+					//とりあえず10～20、-10～-20度の範囲で飛ばす
+					if (rand() % 2 == 0)
+					{
+						Tangle += rand() % 11 + 10;
+					}
+					else
+					{
+						Tangle += rand() % 11 - 20;
+					}
+
+					float angle2 = Tangle * 3.14159265f / 180;
+
+
 					//飛ばす向きを決める yは2～6
-					Vector3 tovelo = Vector3(cos(angle) * m_ShotPower, rand() % 5 + 2, sin(angle) * m_ShotPower);
+					Vector3 tovelo = Vector3(cos(angle2) * m_ShotPower, rand() % 5 + 2, sin(angle2) * m_ShotPower);
 					//頭の上から発射
 					Vector3 topos = GetComponent<Transform>()->GetPosition();
 					topos.y += GetComponent<Transform>()->GetScale().y / 2;
-					dynamic_pointer_cast<Missile>(obj)->SetMissileActive(topos, m_MissileScale, tovelo,true,1);
-
-					//撃ったフラグオン
-					sflg = true;
-
-					//狙うプレイヤーを決める
-					m_TargetPlayer = rand() % 2 + 1;
-
-					break;
+					objm->SetMissileActive(topos, m_MissileScale, tovelo, true, 1);
 				}
-			}
-			if (!sflg)
-			{
-				//作成
-				auto objm = GetStage()->AddGameObject<Missile>();
-				GetStage()->GetSharedObjectGroup(L"CollisionGroup")->IntoGroup(objm);
-				//飛ばす向きを決める yは2～6
-				Vector3 tovelo = Vector3(cos(angle) * m_ShotPower, rand() % 5 + 2, sin(angle) * m_ShotPower);
-				//頭の上から発射
-				Vector3 topos = GetComponent<Transform>()->GetPosition();
-				topos.y += GetComponent<Transform>()->GetScale().y / 2;
-				objm->SetMissileActive(topos, m_MissileScale, tovelo,true,1);
 			}
 		}
 
@@ -604,8 +642,6 @@ namespace basecross
 				Vector3 PPOS = GetComponent<Transform>()->GetPosition();
 				PPOS.y += GetComponent<Transform>()->GetScale().y/2;
 				auto pptr = GetStage()->AddGameObject<ShotEnemyChild>(PPOS, Vector3(1, 1, 1), 2);
-				angle *= 180 / 1.14159265f;
-				angle += 360;
 				int Tangle = (int)angle % 360;
 				//とりあえず10～20、-10～-20度の範囲で飛ばす
 				if (rand() % 2 == 0)
@@ -617,8 +653,8 @@ namespace basecross
 					Tangle += rand() % 11 - 20;
 				}
 
-				Tangle *= 3.15159265f / 180;
-				pptr->SetVelocity(Vector3(cos(Tangle),rand()% 5 + 5,sin(Tangle)));
+				float angle2 = Tangle * 3.14159265f / 180;
+				pptr->SetVelocity(Vector3(cos(angle2) * (float)(rand()%3+1), rand() % 5 + 5, sin(angle2) * (float)(rand() % 3 + 1)));
 				m_ChildS.push_back(pptr);
 			}
 

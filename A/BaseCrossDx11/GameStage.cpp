@@ -273,7 +273,7 @@ namespace basecross
 
 			//Abe20170515
 			//引数 位置、大きさ、HP、索敵距離、クールタイム、攻撃力、子機発射間隔、発射数
-			auto ShotEnemyPtr = AddGameObject<ShotEnemy>(Vector3(0, 1, 5), 1, 3, 10, 2, 3, 10, 2);
+			auto ShotEnemyPtr = AddGameObject<ShotEnemy>(Vector3(0, 1, 5), 1, 3, 10, 2, 3, 10, 4);
 			CollisionGroup->IntoGroup(ShotEnemyPtr);
 			EnemyGroup->IntoGroup(ShotEnemyPtr);
 			//Abe20170515
