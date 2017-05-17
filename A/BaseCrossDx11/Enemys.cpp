@@ -55,6 +55,9 @@ namespace basecross
 		DrawCi->SetMeshResource(L"DEFAULT_SQUARE");
 
 		circle->SetAlphaActive(true);
+		//レイヤー設定
+		circle->SetDrawLayer(2);
+
 		m_SearchCircle = circle;
 
 
@@ -466,6 +469,9 @@ namespace basecross
 		DrawCi->SetMeshResource(L"DEFAULT_SQUARE");
 
 		circle->SetAlphaActive(true);
+		//レイヤー設定
+		circle->SetDrawLayer(2);
+
 		m_SearchCircle = circle;
 	}
 
@@ -793,6 +799,9 @@ namespace basecross
 		DrawCi->SetMeshResource(L"DEFAULT_SQUARE");
 
 		circle->SetAlphaActive(true);
+		//レイヤー設定
+		circle->SetDrawLayer(2);
+
 		m_SearchCircle = circle;
 
 		//ステート初期化
@@ -1176,6 +1185,9 @@ namespace basecross
 		DrawCi->SetMeshResource(L"DEFAULT_SQUARE");
 
 		circle->SetAlphaActive(true);
+		//レイヤー設定
+		circle->SetDrawLayer(2);
+
 		m_SearchCircle = circle;
 
 	}
@@ -1626,6 +1638,8 @@ namespace basecross
 
 		SetAlphaActive(true);
 
+		//レイヤー設定
+		SetDrawLayer(1);
 	}
 	//Abe20170508
 
@@ -1669,6 +1683,9 @@ namespace basecross
 
 		circle->SetAlphaActive(true);
 		circle->SetDrawActive(false);
+		//レイヤー設定
+		circle->SetDrawLayer(2);
+
 		m_SearchCircle = circle;
 
 		//Abe20170515
