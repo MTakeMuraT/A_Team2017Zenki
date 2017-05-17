@@ -38,6 +38,12 @@ namespace basecross
 
 		//アタリ判定作成
 		void CreateCollision();
+
+		//Abe20170515
+		//ステージの幅
+		Vector2 m_StageSize;
+		//Abe20170515
+
 	public:
 		//構築と破棄
 		GameStage() :Stage() {}

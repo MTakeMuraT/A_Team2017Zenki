@@ -18,7 +18,8 @@ namespace basecross{
 			//こいつが呼ばれてからステージが呼ばれる
 			m_GameMedia  = ObjectFactory::Create<GameMedia>();
 
-			
+			//とりあえず乱数のやつここでやるか
+			srand((unsigned)time(NULL));
 
 			//最初のアクティブステージの設定
 			ResetActiveStage<TitleScene>();
@@ -48,5 +49,15 @@ namespace basecross{
 	
 	}
 
+
+	//ステージ番号と大きさ設定
+	void Scene::SetStageNumAndStageSize(int stagenum, Vector2 stagesize)
+	{
+		//ステージ番号設定
+		m_StageNum = stagenum;
+
+		//ステージサイズ設定
+		m_StageSize = stagesize;
+	}
 }
 //end basecross

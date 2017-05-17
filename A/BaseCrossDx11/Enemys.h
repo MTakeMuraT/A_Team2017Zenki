@@ -64,6 +64,14 @@ namespace basecross
 		Vector3 m_BurePos;
 		*/
 
+		//Abe20170515
+		//ステージの幅
+		Vector2 m_StageSize;
+
+		//ステージの端に行ったか判定して向きを変える関数
+		void StageEndCheck();
+		//Abe20170515
+
 		//以下パラメータ
 		//大きさ
 		float m_ParScale;
@@ -143,8 +151,33 @@ namespace basecross
 		//索敵範囲の画像(スクエア)
 		shared_ptr<GameObject> m_SearchCircle;
 
+		//回転速度
+		float m_rotSpeed = 180.0f;
+
 		//時間測る用
-		float m_time;
+		float m_time = 0;
+		float m_Childtime = 0;
+
+		//ミサイル
+		vector<shared_ptr<GameObject>> m_MissileS;
+		//ミサイルの大きさ
+		Vector3 m_MissileScale = Vector3(0.5f, 0.5f, 0.5f);
+		//子機
+		vector<shared_ptr<GameObject>> m_ChildS;
+
+		//子機吐き出す関数
+		void ShotChild();
+		//一回の索敵中に子機を吐き出したか
+		bool m_ShotChild = false;
+
+		//Abe20170517
+		//動くフラグ
+		bool m_ActiveFlg = true;
+		//ランダムで狙うほうを決める
+		int m_TargetPlayer = 0;
+		//飛ばす力
+		float m_ShotPower = 3.0f;
+		//Abe20170517
 
 		//以下パラメータ
 		//大きさ
@@ -170,12 +203,17 @@ namespace basecross
 
 		//索敵
 		void Search();
-		//探索
-		void Move();
 		//攻撃
 		void Attack();
-		//クールタイム
-		void CoolTime();
+		//状態変更
+		void ToSearch();
+		void ToAttack();
+
+		//自分がダメージ受けたときの関数
+		//プレイヤーから
+		void DamagePlayer();
+		//ミサイルとか爆弾とか
+		void Damage(int power);
 	};
 
 	//************************************
@@ -480,6 +518,14 @@ namespace basecross
 		//識別番号
 		int m_number;
 
+		//Abe20170515
+		//ステージの幅
+		Vector2 m_StageSize;
+
+		//ステージの端に行ったか判定して向きを変える関数
+		void StageEndCheck();
+		//Abe20170515
+
 		//以下パラメータ
 		//索敵距離
 		float m_SearchDistance = 2.0f;
@@ -503,5 +549,60 @@ namespace basecross
 		void UpDrawns();
 	};
 	//Abe20170512
+
+	//Abe20170515
+	//************************************
+	//	ミサイル
+	//	ステージの端に行くか物に当たるまで
+	//	向いてる方向に移動
+	//************************************
+	class Missile : public GameObject
+	{
+	private:
+		//位置
+		Vector3 m_Pos;
+		//大きさ
+		Vector3 m_Scale;
+		//移動向き
+		Vector3 m_Velocity;
+		//生きてるか
+		bool m_ActiveFlg = false;
+
+		//爆発エフェクト
+		shared_ptr<BombEffect> m_Effect;
+		//Abe20170517
+		//落ちるフラグ
+		bool m_FallFlg = false;
+		//Abe20170517
+
+		//Abe20170515
+		//ステージの幅
+		Vector2 m_StageSize;
+
+		//ステージの端に行ったか判定して向きを変える関数
+		void StageEndCheck();
+		//Abe20170515
+
+		//以下パラメータ
+		//攻撃力
+		int m_power = 0;
+	public :
+		Missile(const shared_ptr<Stage>& StagePtr);
+
+		void OnCreate()override;
+		void OnUpdate()override;
+
+		//ミサイルを起動。最後のフラグをオンにすると落ちるようになる
+		void SetMissileActive(Vector3 pos, Vector3 scale, Vector3 velocity,bool falltype,int power);
+
+		//ミサイル消滅
+		void DeleteMissile();
+
+		//プレイヤーに攻撃した場合
+		void ToDamagePleyer();
+
+		int GetPower() { return m_power; }
+	};
+	//Abe20170515
 
 }

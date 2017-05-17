@@ -265,9 +265,21 @@ namespace basecross
 			CollisionGroup->IntoGroup(TeEnObj);
 			EnemyGroup->IntoGroup(TeEnObj);
 			//Abe20170512
-			//爆弾グループ
+			//爆弾グループ・・・(爆弾だけグループ使うのびみょくね？)
 			CreateSharedObjectGroup(L"BombGroup");
 			//Abe20170508
+
+			//Abe20170515
+			//引数 位置、大きさ、HP、索敵距離、クールタイム、攻撃力、子機発射間隔、発射数
+			auto ShotEnemyPtr = AddGameObject<ShotEnemy>(Vector3(0, 1, 5), 1, 3, 10, 2, 3, 10, 2);
+			//Abe20170515
+
+			//Abe20170517
+			//試しにミサイルを単体で飛ばしてみる
+			//auto misptr = AddGameObject<Missile>();
+			//misptr->SetMissileActive(Vector3(1, 1, -3), Vector3(1, 1, 1), Vector3(0, 0, 3),false);
+			//CollisionGroup->IntoGroup(misptr);
+			//Abe20170517
 
 		}
 		catch (...) {

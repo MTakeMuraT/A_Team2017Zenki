@@ -17,6 +17,13 @@ namespace basecross{
 		//リソースを最初に呼ぶため作成
 		shared_ptr<GameMedia> m_GameMedia;
 
+		//Abe20170515
+		//ステージ番号
+		int m_StageNum = 0;
+		//ステージの幅
+		Vector2 m_StageSize = Vector2(50,50);
+		//Abe20170515
+
 	public:
 
 		//--------------------------------------------------------------------------------------
@@ -41,6 +48,14 @@ namespace basecross{
 
 		virtual void OnEvent(const shared_ptr<Event>& event) override;
 		
+		//Abe20170515
+		//ステージ番号とステージサイズを設定
+		void SetStageNumAndStageSize(int stagenum, Vector2 stagesize);
+		//ステージサイズアクセサー
+		Vector2 GetStageSize() { return m_StageSize; }
+
+		//Abe20170515
+
 	};
 
 }

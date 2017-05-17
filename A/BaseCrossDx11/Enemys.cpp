@@ -3,11 +3,10 @@
 
 namespace basecross
 {
-
-	//************************************
+	//************************************************************************
 	//	突撃エネミー
 	//	追記なし？
-	//************************************
+	//************************************************************************
 	TackleEnemy::TackleEnemy(const shared_ptr<Stage>& StagePtr, Vector3 pos, float parscale, int hp, float searchdistance, float cooltime, float speed, int power, int tacklecount) :
 		GameObject(StagePtr),
 		m_InitPos(pos),
@@ -68,6 +67,13 @@ namespace basecross
 		//大きさ変更
 		m_Debugtxt->SetScaleTxt(40);
 
+		//Abe20170515
+		//ステージの大きさ取得
+		auto ScenePtr = App::GetApp()->GetScene<Scene>();
+		m_StageSize = ScenePtr->GetStageSize() / 2;
+		//Abe20170515
+
+
 	}
 
 	void TackleEnemy::OnUpdate()
@@ -86,10 +92,12 @@ namespace basecross
 				//探索
 			case MoveS:
 				Move();
+				StageEndCheck();
 				break;
 				//攻撃
 			case AttackS:
 				Attack();
+				StageEndCheck();
 				break;
 				//クールタイム
 			case CoolTimeS:
@@ -98,6 +106,43 @@ namespace basecross
 			}
 		}
 	}
+
+	//Abe20170515
+	//ステージの端にいったか判定して向き反転するやつ
+	void TackleEnemy::StageEndCheck()
+	{
+		//位置[右]、[上]、[左]、[下]
+		Vector3 pos = GetComponent<Transform>()->GetPosition();
+		Vector3 scale = GetComponent<Transform>()->GetScale();
+		Vector4 PositionPXYMXY = Vector4(pos.x+scale.x,pos.z + scale.z,pos.x - scale.x,pos.z - scale.z);
+		//ステージの端に当たってるか判定
+		//右
+		if (m_StageSize.x < PositionPXYMXY.x)
+		{
+			pos.x = m_StageSize.x - scale.x;
+			m_Velocity.x *= -1;
+		}
+		//上
+		if (m_StageSize.y < PositionPXYMXY.y)
+		{
+			pos.z = m_StageSize.y - scale.z;
+			m_Velocity.z *= -1;
+		}
+		//左
+		if (-m_StageSize.x > PositionPXYMXY.z)
+		{
+			pos.x = -m_StageSize.x + scale.x;
+			m_Velocity.x *= -1;
+		}
+		//下
+		if (-m_StageSize.y > PositionPXYMXY.w)
+		{
+			pos.z = -m_StageSize.y + scale.z;
+			m_Velocity.z *= -1;
+		}
+
+	}
+	//Abe20170515
 
 	void TackleEnemy::Search()
 	{
@@ -347,6 +392,10 @@ namespace basecross
 			SetDrawActive(false);
 			m_Hp = 0;
 			m_ActiveFlg = false;
+
+			//サークル除去
+			m_SearchCircle->SetDrawActive(false);
+
 		}
 		else
 		{
@@ -364,10 +413,10 @@ namespace basecross
 		}
 	}
 
-	//************************************
+	//************************************************************************
 	//	玉撃つエネミー
 	//	追記なし？
-	//************************************
+	//************************************************************************
 
 	ShotEnemy::ShotEnemy(const shared_ptr<Stage>& StagePtr, Vector3 pos, float parscale, int hp, float searchdistance, float cooltime, int power, float shotchildinterval, int shotamount) :
 		GameObject(StagePtr),
@@ -422,52 +471,230 @@ namespace basecross
 
 	void ShotEnemy::OnUpdate()
 	{
-		switch (m_State)
+		if (m_ActiveFlg)
 		{
-			//索敵
-		case SearchS:
-			Search();
-			break;
-			//探索
-		case MoveS:
-			Move();
-			break;
-			//攻撃
-		case AttackS:
-			Attack();
-			break;
-			//クールタイム
-		case CoolTimeS:
-			CoolTime();
-			break;
+			switch (m_State)
+			{
+				//索敵
+			case SearchS:
+				Search();
+				break;
+				//攻撃
+			case AttackS:
+				Attack();
+				break;
+			}
 		}
 	}
 
+	//状態群----------------------------------------------------------
 	void ShotEnemy::Search()
 	{
+		//位置情報取得
+		Vector3 mypos = GetComponent<Transform>()->GetPosition();
+		Vector3 pos1 = m_Player1->GetComponent<Transform>()->GetPosition();
+		Vector3 pos2 = m_Player2->GetComponent<Transform>()->GetPosition();
+		float distance = m_Player1->GetComponent<Transform>()->GetScale().x / 2 + m_SearchDistance / 2;
 
-	}
+		//距離を測る、どっちか入ったら状態変化
+		Vector3 dis = pos1 - mypos;
+		Vector3 dis2 = pos2 - mypos;
+		if ((dis.x*dis.x) + (dis.z*dis.z) < distance*distance || ((dis2.x*dis.x) + (dis2.z*dis.z) < distance*distance))
+		{
+			ToAttack();
+		}
 
-	void ShotEnemy::Move()
-	{
-
+		//一定時間ごとに停止するように
+		m_time += App::GetApp()->GetElapsedTime();
+		if (m_time < 0.8f)
+		{
+			//回転
+			Vector3 rot = Vector3(0, GetComponent<Transform>()->GetRotation().y, 0);
+			rot.y += m_rotSpeed * 3.14159265f / 180 * App::GetApp()->GetElapsedTime();
+			GetComponent<Transform>()->SetRotation(rot);
+		}
+		else if (m_time > 2.0f)
+		{
+			m_time = 0;
+		}
 	}
 
 	void ShotEnemy::Attack()
 	{
+		float angle = 0;
+		//狙ったプレイヤーに向く
+		if (m_TargetPlayer == 1)
+		{
+			Vector3 dif = m_Player1->GetComponent<Transform>()->GetPosition() - GetComponent<Transform>()->GetPosition();
+			angle = atan2(dif.z, dif.x);
+			GetComponent<Transform>()->SetRotation(0, angle, 0);
+		}
+		else
+		{
+			Vector3 dif = m_Player2->GetComponent<Transform>()->GetPosition() - GetComponent<Transform>()->GetPosition();
+			angle = atan2(dif.z, dif.x);
+			GetComponent<Transform>()->SetRotation(0, angle, 0);
+		}
+		//ミサイル打つ処理
+		m_time += App::GetApp()->GetElapsedTime();
+		if (m_time > m_CoolTime)
+		{
+			//計算用時間初期化
+			m_time = 0;
+
+			bool sflg = false;
+			//起動してないのあれば再利用
+			for (auto obj : m_MissileS)
+			{
+				if (!obj->GetDrawActive())
+				{
+					//飛ばす向きを決める yは2～6
+					Vector3 tovelo = Vector3(cos(angle) * m_ShotPower, rand() % 5 + 2, sin(angle) * m_ShotPower);
+					//頭の上から発射
+					Vector3 topos = GetComponent<Transform>()->GetPosition();
+					topos.y += GetComponent<Transform>()->GetScale().y / 2;
+					dynamic_pointer_cast<Missile>(obj)->SetMissileActive(topos, m_MissileScale, tovelo,true,1);
+
+					//撃ったフラグオン
+					sflg = true;
+
+					//狙うプレイヤーを決める
+					m_TargetPlayer = rand() % 2 + 1;
+
+					break;
+				}
+			}
+			if (!sflg)
+			{
+				//作成
+				auto objm = GetStage()->AddGameObject<Missile>();
+				GetStage()->GetSharedObjectGroup(L"CollisionGroup")->IntoGroup(objm);
+				//飛ばす向きを決める yは2～6
+				Vector3 tovelo = Vector3(cos(angle) * m_ShotPower, rand() % 5 + 2, sin(angle) * m_ShotPower);
+				//頭の上から発射
+				Vector3 topos = GetComponent<Transform>()->GetPosition();
+				topos.y += GetComponent<Transform>()->GetScale().y / 2;
+				objm->SetMissileActive(topos, m_MissileScale, tovelo,true,1);
+			}
+		}
+
+		//子機を打ち出す間隔になったら
+		m_Childtime += App::GetApp()->GetElapsedTime();
+		if(m_Childtime > m_ShotChildInterval)
+		{ 
+			//計算用時間初期化
+			m_Childtime = 0;
+			//子機はいたフラグオン
+			m_ShotChild = true;
+			//起動してないのあれば再利用
+			bool flgg = false;
+			for (auto obj : m_ChildS)
+			{
+				auto ptr = dynamic_pointer_cast<ShotEnemyChild>(obj);
+				//死んでたら再利用
+				if (ptr)
+				{
+					flgg = true;
+					break;
+				}
+			}
+			//いなかったら作る
+			if (!flgg)
+			{
+				m_ChildS.push_back(GetStage()->AddGameObject<ShotEnemyChild>(GetComponent<Transform>()->GetPosition(), Vector3(1, 1, 1), 2));
+			}
+
+		}
+
+		//もしある程度離れたら
+		//位置情報取得
+		Vector3 mypos = GetComponent<Transform>()->GetPosition();
+		Vector3 pos1 = m_Player1->GetComponent<Transform>()->GetPosition();
+		Vector3 pos2 = m_Player2->GetComponent<Transform>()->GetPosition();
+		float distance = m_Player1->GetComponent<Transform>()->GetScale().x / 2 + m_SearchDistance / 2;
+
+		//距離を測る、索敵範囲の1.3倍以上離れたらかつ子機を吐き出してたら索敵状態へ
+		Vector3 dis = pos1 - mypos;
+		Vector3 dis2 = pos2 - mypos;
+		if ((dis.x*dis.x) + (dis.z*dis.z) > distance*distance * 1.3f && ((dis2.x*dis.x) + (dis2.z*dis.z) > distance*distance * 1.3f) && m_ShotChild)
+		{
+			ToSearch();
+		}
 
 	}
 
-	void ShotEnemy::CoolTime()
+	//状態変更群----------------------------------------------------------
+	void ShotEnemy::ToSearch()
 	{
+		//時間初期化
+		m_time = 0;
+
+		//状態変更
+		m_State = SearchS;
+
+		//吐き出したフラグ解除
+		m_ShotChild = false;
+
+		//サークル描画
+		m_SearchCircle->SetDrawActive(true);
 
 	}
+
+	void ShotEnemy::ToAttack()
+	{
+		//時間初期化
+		m_time = 0;
+		
+		//状態変更
+		m_State = AttackS;
+
+		//サークル除去
+		m_SearchCircle->SetDrawActive(false);
+
+		//狙うプレイヤーを決める
+		m_TargetPlayer = rand() % 2+1;
+	}
+
+	//Abe20170517
+	void ShotEnemy::DamagePlayer()
+	{
+		//もしHPが1以下なら
+		if (m_Hp <= 1)
+		{
+			//タヒぬ
+			SetDrawActive(false);
+			m_Hp = 0;
+			m_ActiveFlg = false;
+
+			//サークル除去
+			m_SearchCircle->SetDrawActive(false);
+
+		}
+		else
+		{
+			m_Hp--;
+		}
+
+	}
+
+	void ShotEnemy::Damage(int num)
+	{
+		//HP減らしてなくなってれば1残す
+		m_Hp += -num;
+		if (m_Hp < 0)
+		{
+			m_Hp = 1;
+		}
+
+	}
+	//Abe20170517
+
 
 	//Abe20170508
-	//************************************
+	//************************************************************************
 	//	爆弾置いてテレポートエネミー
 	//	追記なし？
-	//************************************
+	//************************************************************************
 
 	TeleportEnemy::TeleportEnemy(const shared_ptr<Stage>& StagePtr, Vector3 pos, float parscale, int hp, float searchdistance, float cooltime, int shotamount) :
 		GameObject(StagePtr),
@@ -543,6 +770,7 @@ namespace basecross
 		}
 		//識別番号入れる
 		m_number = count;
+
 	}
 
 	void TeleportEnemy::OnUpdate()
@@ -679,16 +907,17 @@ namespace basecross
 							topos.y = 1;
 							ptr->SetActivePosition(topos);
 							PutFlg = true;
+							break;
 						}
 					}
 					//使えるやつがなかったら作る
 					if (!PutFlg)
 					{
-						GetStage()->AddGameObject<Bomb>(GetComponent<Transform>()->GetPosition());
+						GetStage()->GetSharedObjectGroup(L"BombGroup")->IntoGroup(GetStage()->AddGameObject<Bomb>(GetComponent<Transform>()->GetPosition()));
 					}
 
 					//Abe20170512
-					m_Debugtxt->SetText(Util::IntToWStr(count));
+					//m_Debugtxt->SetText(Util::IntToWStr(count));
 					//Abe20170512
 
 					//爆弾置いたフラグをオン
@@ -821,6 +1050,10 @@ namespace basecross
 			SetDrawActive(false);
 			m_Hp = 0;
 			m_ActiveFlg = false;
+
+			//サークル除去
+			m_SearchCircle->SetDrawActive(false);
+
 		}
 		else
 		{
@@ -839,10 +1072,10 @@ namespace basecross
 	}
 	//Abe20170512
 
-	//************************************
+	//************************************************************************
 	//	自爆エネミー
 	//	追記なし？
-	//************************************
+	//************************************************************************
 	BombEnemy::BombEnemy(const shared_ptr<Stage>& StagePtr, Vector3 pos, float parscale, int hp, float searchdistance, float speed, int power) :
 		GameObject(StagePtr),
 		m_InitPos(pos),
@@ -1126,10 +1359,10 @@ namespace basecross
 
 	//Abe20170508
 	//======================以下子機群=======================
-	//************************************
+	//************************************************************************
 	//	爆弾の爆発の部分
 	//	拡縮だけでいいかな？
-	//************************************
+	//************************************************************************
 	BombEffect::BombEffect(const shared_ptr<Stage>& StagePtr):
 		GameObject(StagePtr)
 	{}
@@ -1146,6 +1379,7 @@ namespace basecross
 		Draw->SetTextureResource(L"BOMBEFFECT_TX");
 
 		SetAlphaActive(true);
+		SetDrawActive(false);
 	}
 
 	void BombEffect::OnUpdate()
@@ -1206,10 +1440,10 @@ namespace basecross
 		GetComponent<Transform>()->SetPosition(pos);
 	}
 
-	//************************************
+	//************************************************************************
 	//	爆弾
 	//	一定時間で起動
-	//************************************
+	//************************************************************************
 	Bomb::Bomb(const shared_ptr<Stage>& StagePtr, Vector3 pos, float scale, float bombdistance, float power, float explosiontime) :
 		GameObject(StagePtr),
 		m_InitPos(pos),
@@ -1315,10 +1549,10 @@ namespace basecross
 	}
 
 
-	//************************************
+	//************************************************************************
 	//	テレポートエネミーのテレポート先
 	//	一定時間で起動
-	//************************************
+	//************************************************************************
 	TereportPoint::TereportPoint(const shared_ptr<Stage>& StagePtr, Vector3 pos) :
 		GameObject(StagePtr),
 		m_Pos(pos)
@@ -1342,10 +1576,10 @@ namespace basecross
 	//Abe20170508
 
 	//Abe20170512
-	//************************************
+	//************************************************************************
 	//	索敵ドローン
 	//	プレイヤー見つけるまで探索
-	//************************************
+	//************************************************************************
 	SearchDrawn::SearchDrawn(const shared_ptr<Stage>& StagePtr):
 		GameObject(StagePtr)
 	{}
@@ -1383,6 +1617,11 @@ namespace basecross
 		circle->SetDrawActive(false);
 		m_SearchCircle = circle;
 
+		//Abe20170515
+		//ステージの大きさ取得
+		auto ScenePtr = App::GetApp()->GetScene<Scene>();
+		m_StageSize = ScenePtr->GetStageSize() / 2;
+		//Abe20170515
 
 	}
 
@@ -1413,6 +1652,8 @@ namespace basecross
 
 				//見つける判定
 				Search();
+				//ステージの端の判定
+				StageEndCheck();
 			}
 			//見つけた
 			else
@@ -1459,6 +1700,7 @@ namespace basecross
 					if (ptr->GetNumber() == m_number)
 					{
 						ptr->ToAttack(1);
+						break;
 					}
 				}
 			}
@@ -1481,6 +1723,7 @@ namespace basecross
 					if (ptr->GetNumber() == m_number)
 					{
 						ptr->ToAttack(2);
+						break;
 					}
 				}
 			}
@@ -1517,6 +1760,43 @@ namespace basecross
 
 	}
 
+	//Abe20170515
+	//ステージの端にいったか判定して向き反転するやつ
+	void SearchDrawn::StageEndCheck()
+	{
+		//位置[右]、[上]、[左]、[下]
+		Vector3 pos = GetComponent<Transform>()->GetPosition();
+		Vector3 scale = GetComponent<Transform>()->GetScale();
+		Vector4 PositionPXYMXY = Vector4(pos.x + scale.x, pos.z + scale.z, pos.x - scale.x, pos.z - scale.z);
+		//ステージの端に当たってるか判定
+		//右
+		if (m_StageSize.x < PositionPXYMXY.x)
+		{
+			pos.x = m_StageSize.x - scale.x;
+			m_Velocity.x *= -1;
+		}
+		//上
+		if (m_StageSize.y < PositionPXYMXY.y)
+		{
+			pos.z = m_StageSize.y - scale.z;
+			m_Velocity.z *= -1;
+		}
+		//左
+		if (-m_StageSize.x > PositionPXYMXY.z)
+		{
+			pos.x = -m_StageSize.x + scale.x;
+			m_Velocity.x *= -1;
+		}
+		//下
+		if (-m_StageSize.y > PositionPXYMXY.w)
+		{
+			pos.z = -m_StageSize.y + scale.z;
+			m_Velocity.z *= -1;
+		}
+
+	}
+	//Abe20170515
+
 	void SearchDrawn::UpDrawns()
 	{
 		m_FindPlayerFlg = true;
@@ -1525,4 +1805,151 @@ namespace basecross
 
 	}
 	//Abe20170512
+
+	//Abe20170515
+	//************************************
+	//	ミサイル
+	//	ステージの端に行くか物に当たるまで
+	//	向いてる方向に移動
+	//************************************
+	Missile::Missile(const shared_ptr<Stage>& StagePtr):
+		GameObject(StagePtr)
+	{}
+
+	void Missile::OnCreate()
+	{
+		auto Trans = AddComponent<Transform>();
+		Trans->SetPosition(0, 0, 0);
+		Trans->SetScale(0, 0, 0);
+		Trans->SetRotation(0, 0, 0);
+
+		auto Draw = AddComponent<PNTStaticDraw>();
+		Draw->SetTextureResource(L"MISSILE_TX");
+		Draw->SetMeshResource(L"DEFAULT_SPHERE");
+
+		SetAlphaActive(true);
+		SetDrawActive(false);
+
+		//Abe20170515
+		//ステージの大きさ取得
+		auto ScenePtr = App::GetApp()->GetScene<Scene>();
+		m_StageSize = ScenePtr->GetStageSize() / 2;
+		//Abe20170515
+
+		//Abe20170517
+		m_Effect = GetStage()->AddGameObject<BombEffect>();
+		//Abe20170517
+
+	}
+
+	void Missile::OnUpdate()
+	{
+		if (m_ActiveFlg)
+		{
+			//座標移動
+			Vector3 pos = GetComponent<Transform>()->GetPosition();
+			pos += m_Velocity * App::GetApp()->GetElapsedTime();
+			GetComponent<Transform>()->SetPosition(pos);
+
+			if (m_FallFlg)
+			{
+				//ちょっと遅めに落とす
+				m_Velocity.y += -9.8f * App::GetApp()->GetElapsedTime() / 3;
+
+				//床に近くなったら消す
+				if (GetComponent<Transform>()->GetPosition().y <= 0.5f)
+				{
+					DeleteMissile();
+				}
+			}
+			StageEndCheck();
+		}
+	}
+
+	//ステージの端に行ったかを判定する
+	void Missile::StageEndCheck()
+	{
+		//位置[右]、[上]、[左]、[下]
+		Vector3 pos = GetComponent<Transform>()->GetPosition();
+		Vector3 scale = GetComponent<Transform>()->GetScale();
+		Vector4 PositionPXYMXY = Vector4(pos.x + scale.x, pos.z + scale.z, pos.x - scale.x, pos.z - scale.z);
+		//ステージの端に当たってるか判定
+		//右
+		if (m_StageSize.x < PositionPXYMXY.x ||
+			m_StageSize.y < PositionPXYMXY.y ||
+			-m_StageSize.x > PositionPXYMXY.z ||
+			-m_StageSize.y > PositionPXYMXY.w
+			)
+		{
+			//当たってたら消す
+			DeleteMissile();
+		}
+
+	}
+	void Missile::SetMissileActive(Vector3 pos, Vector3 scale, Vector3 velocity,bool falltype,int power)
+	{
+		//座標移動
+		auto Trans = GetComponent<Transform>();
+		Trans->SetPosition(pos);
+		Trans->SetScale(scale);
+		
+		//加速度追加
+		m_Velocity = velocity;
+
+		//起動
+		m_ActiveFlg = true;
+
+		//描画
+		SetDrawActive(true);
+
+		//落ちるフラグ設定
+		m_FallFlg = falltype;
+
+		//攻撃力設定
+		m_power = power;
+	}
+
+	void Missile::DeleteMissile()
+	{
+		if (m_ActiveFlg)
+		{
+			//爆風作成
+			m_Effect->SetPosActive(GetComponent<Transform>()->GetPosition());
+
+			//終了
+			m_ActiveFlg = false;
+
+			//描画消す
+			SetDrawActive(false);
+		}
+	}
+	//Abe20170515
+
+	//Abe20170517
+	void Missile::ToDamagePleyer()
+	{
+		//落ちる設定にされてるときはy座標を測る
+		if (m_FallFlg)
+		{
+			float PlayerY = GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_L")->GetComponent<Transform>()->GetPosition().y;
+			//ちょっと上に
+			PlayerY += GetComponent<Transform>()->GetScale().y / 2;
+			//プレイヤーより結構上のほうにいたら判定しない
+			if (GetComponent<Transform>()->GetPosition().y > PlayerY)
+			{
+				return;
+			}
+		}
+
+		//HPを減らす
+		auto PtrPlayerHP = GetStage()->GetSharedGameObject<PlayerHP>(L"PlayerHP", false);
+		PtrPlayerHP->SetDamage_int(1);
+		PtrPlayerHP->SetHit(true);
+
+		//ミサイルを消去
+		DeleteMissile();
+	}
+	//Abe20170517
+
+
 }

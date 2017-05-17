@@ -197,6 +197,25 @@ namespace basecross
 			}
 		}
 
+		//ミサイルがあたった
+		if (dynamic_pointer_cast<Missile>(obj))
+		{
+			//それぞれのエネミーにダメージを与える
+			if (dynamic_pointer_cast<TackleEnemy>(obj2))
+			{
+				dynamic_pointer_cast<TackleEnemy>(obj2)->Damage((int)dynamic_pointer_cast<Missile>(obj)->GetPower());
+			}
+			if (dynamic_pointer_cast<TeleportEnemy>(obj2))
+			{
+				dynamic_pointer_cast<TeleportEnemy>(obj2)->Damage((int)dynamic_pointer_cast<Missile>(obj)->GetPower());
+			}
+			if (dynamic_pointer_cast<ShotEnemy>(obj2))
+			{
+				dynamic_pointer_cast<ShotEnemy>(obj2)->Damage((int)dynamic_pointer_cast<Missile>(obj)->GetPower());
+			}
+
+		}
+
 		//上と同じもの
 		//================================================
 		//					２体目
@@ -226,6 +245,27 @@ namespace basecross
 				dynamic_pointer_cast<TeleportEnemy>(obj)->Damage((int)dynamic_pointer_cast<ShotEnemyChildMissile>(obj2)->GetChildMissileAttackDamage());
 			}
 		}
+
+
+		//ミサイルがあたった
+		if (dynamic_pointer_cast<Missile>(obj2))
+		{
+			//それぞれのエネミーにダメージを与える
+			if (dynamic_pointer_cast<TackleEnemy>(obj))
+			{
+				dynamic_pointer_cast<TackleEnemy>(obj)->Damage((int)dynamic_pointer_cast<Missile>(obj2)->GetPower());
+			}
+			if (dynamic_pointer_cast<TeleportEnemy>(obj))
+			{
+				dynamic_pointer_cast<TeleportEnemy>(obj)->Damage((int)dynamic_pointer_cast<Missile>(obj2)->GetPower());
+			}
+			if (dynamic_pointer_cast<ShotEnemy>(obj))
+			{
+				dynamic_pointer_cast<ShotEnemy>(obj)->Damage((int)dynamic_pointer_cast<Missile>(obj2)->GetPower());
+			}
+
+		}
+
 	}
 
 	void CollisionManager::CollisionAfter(shared_ptr<GameObject> obj , int num)
@@ -259,10 +299,10 @@ namespace basecross
 		//以下共通する部分---------------------------------------------------------
 
 		//==============================================
-		if (dynamic_pointer_cast<Enemy01>(obj))
-		{
-			//m_Debugtxt->SetText(L"DAMAGE!!");
-		}
+		//if (dynamic_pointer_cast<Enemy01>(obj))
+		//{
+		//	m_Debugtxt->SetText(L"DAMAGE!!");
+		//}
 		//==============================================
 		//************************************************************
 		//	↑みたいな感じで(ry
@@ -292,6 +332,12 @@ namespace basecross
 			PtrPlayerHP->SetHit(true);
 		}
 
+		//ミサイルに当たったら(本)
+		if (dynamic_pointer_cast<Missile>(obj))
+		{
+			//HPを減らしてミサイルを除去
+			dynamic_pointer_cast<Missile>(obj)->ToDamagePleyer();
+		}
 		//共通する部分---------------------------------------------------------
 
 	}

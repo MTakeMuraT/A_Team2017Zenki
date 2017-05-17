@@ -104,7 +104,12 @@ namespace basecross {
 		strTexture = DataDir + L"Enemy\\BombEffect.png";
 		App::GetApp()->RegisterTexture(L"BOMBEFFECT_TX", strTexture);
 		//Abe20170512
-		
+		//Abe20170517
+		//ミサイル
+		strTexture = DataDir + L"Enemy\\Missile.png";
+		App::GetApp()->RegisterTexture(L"MISSILE_TX", strTexture);
+		//Abe20170517
+
 	
 		////モデル（ボーンあり
 		auto MadelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Player\\PlayerModel\\Player_animation.bmf");
