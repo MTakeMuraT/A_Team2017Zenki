@@ -521,9 +521,6 @@ namespace basecross
 		if (dynamic_pointer_cast<ShotEnemyChild>(obj)) {
 			//ShotEnemyChildへのフラグ
 			dynamic_pointer_cast<ShotEnemyChild>(obj)->SetShotEnemyChildSandFlg(true);
-
-			//プレイヤー側で物をはさむ特殊状態へ
-			GetStage()->GetSharedGameObject<PlayerManager>(L"PtrPlayerManager", false)->StateChangeDoingInterpose();
 		}
 		//==============================================
 		//テレポートエネミー
