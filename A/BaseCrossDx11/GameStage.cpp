@@ -140,24 +140,7 @@ namespace basecross
 	}
 	//アタリ判定作成--------------------------------------------
 	
-	//ミサイル子機
-	void GameStage::CreateChildMissile() {
-		auto ColGroup = GetSharedObjectGroup(L"EnemyGroup");
-		auto PtrShotEnemyChild = AddGameObject<ShotEnemyChild>(
-			Vector3(0, 1, 0),
-			Vector3(1.0, 1.0, 1.0),
-			0.0f
-			);
-	//	SetSharedGameObject(L"ShotEnemyChild", PtrShotEnemyChild);
-		ColGroup->IntoGroup(PtrShotEnemyChild);
-		PtrShotEnemyChild = AddGameObject<ShotEnemyChild>(
-			Vector3(5, 1, 5),
-			Vector3(1.0, 1.0, 1.0),
-			2.0f
-			);
-		ColGroup->IntoGroup(PtrShotEnemyChild);
-		SetSharedGameObject(L"ShotEnemyChild", PtrShotEnemyChild);
-	}
+	
 	void GameStage::OnCreate()
 	{
 		try {
@@ -182,108 +165,15 @@ namespace basecross
 
 			//アタリ判定作成
 			CreateCollision();
-
-			
-
-			//Abe20170412
-			//エネミー作ってみた[アタリ判定とかテストするための仮のやつなのでCSVで出せるようになったら消してください]
-
+			auto TereportGroup = CreateSharedObjectGroup(L"TereportPointGroup");
+			auto BomGroup = CreateSharedObjectGroup(L"BombGroup");
 			auto EnemyGroup = CreateSharedObjectGroup(L"EnemyGroup");
-
-			//auto Enemy_01Ptr = AddGameObject<Enemy01>(Vector3(0, 1, 5), Vector3(1, 1, 1));
-			//SetSharedGameObject(L"Enemy01", Enemy_01Ptr);
-			//auto Enemy_02Ptr = AddGameObject<Enemy01>(Vector3(0, 1, -5), Vector3(1, 1, 1));
-			//SetSharedGameObject(L"Enemy02", Enemy_02Ptr);
-
-			//EnemyGroup->IntoGroup(Enemy_01Ptr);
-			//EnemyGroup->IntoGroup(Enemy_02Ptr);
-			//Abe20170412
-
-			//子機ミサイル
-			CreateChildMissile();
-
-			//Abe20170504
-			//アタリ判定テスト用[とりあえずグループにだけ入れてくれればそれでおｋです]
 			auto CollisionGroup = CreateSharedObjectGroup(L"CollisionGroup");
-			//auto Enemy_03Ptr = AddGameObject<Enemy01>(Vector3(0, 1, 5), Vector3(1, 1, 1));
-			//SetSharedGameObject(L"Enemy03", Enemy_01Ptr);
-			//CollisionGroup->IntoGroup(Enemy_03Ptr);
+
 			//2017/05/17今泉CSV//
 			AddGameObject<InputCSV>();
 			/////////////////////////
-			//Abe20170504
 
-			//Abe20170505
-			//エネミーテスト
-			//引数 位置、大きさ、HP、索敵距離、クールタイム、速度、攻撃力、突撃回数
-			/*auto TackleEnemy01 = AddGameObject<TackleEnemy>(Vector3(10, 1, 10), 1, 3, 3, 3, 6, 3, 2);
-			auto TackleEnemy02 = AddGameObject<TackleEnemy>(Vector3(-10, 1, 10), 1, 3, 3, 3, 6, 3, 2);
-			auto TackleEnemy03 = AddGameObject<TackleEnemy>(Vector3(10, 1, -10), 1, 3, 3, 3, 6, 3, 2);
-			auto TackleEnemy04 = AddGameObject<TackleEnemy>(Vector3(-10, 1, -10), 1, 3, 3, 3, 6, 3, 2);
-			
-			CollisionGroup->IntoGroup(TackleEnemy01);
-			CollisionGroup->IntoGroup(TackleEnemy02);
-			CollisionGroup->IntoGroup(TackleEnemy03);
-			CollisionGroup->IntoGroup(TackleEnemy04);
-
-			auto PtrTacklEnemy = AddGameObject<TackleEnemy>(Vector3(10, 1, 10), 1, 0, 3, 3, 6, 3, 2);
-			CollisionGroup->IntoGroup(PtrTacklEnemy);
-			EnemyGroup->IntoGroup(PtrTacklEnemy);
-			EnemyGroup->IntoGroup(TackleEnemy01);
-			EnemyGroup->IntoGroup(TackleEnemy02);
-			EnemyGroup->IntoGroup(TackleEnemy03);
-			EnemyGroup->IntoGroup(TackleEnemy04);*/
-			//PtrTacklEnemy = AddGameObject<TackleEnemy>(Vector3(-10, 1, 10), 1, 0, 3, 3, 6, 3, 2);
-			//CollisionGroup->IntoGroup(PtrTacklEnemy);
-			//EnemyGroup->IntoGroup(PtrTacklEnemy);
-			//PtrTacklEnemy = AddGameObject<TackleEnemy>(Vector3(10, 1, -10), 1, 1, 3, 3, 6, 3, 2);
-			//CollisionGroup->IntoGroup(PtrTacklEnemy);
-			//EnemyGroup->IntoGroup(PtrTacklEnemy);
-			//PtrTacklEnemy = AddGameObject<TackleEnemy>(Vector3(-10, 1, -10), 1, 1, 3, 3, 6, 3, 2);
-			//CollisionGroup->IntoGroup(PtrTacklEnemy);
-			//EnemyGroup->IntoGroup(PtrTacklEnemy);
-
-			//引数 位置、大きさ、HP、索敵距離、クールタイム、攻撃力、子機発射間隔、発射数
-			//AddGameObject<ShotEnemy>(Vector3(10, 1, -10),1,3,5,6,3,10,2);
-			//引数 位置、大きさ、HP、索敵距離、クールタイム、発射数
-			//AddGameObject<TeleportEnemy>(Vector3(-10, 1, 10),2,1,5,8,3);
-			//引数 位置、大きさ、HP、索敵距離、速度、攻撃力
-			//Abe20170505
-			/*auto objbomb = AddGameObject<BombEnemy>(Vector3(20, 1, 20), 1, 1, 3, 2, 8);
-			CollisionGroup->IntoGroup(objbomb);
-			EnemyGroup->IntoGroup(objbomb);*/
-			
-			//Abe20170508
-			//テレポート先作成
-			auto TereportGroup = CreateSharedObjectGroup(L"TereportPointGroup");
-			//適当に２か所作っておく
-			TereportGroup->IntoGroup(AddGameObject<TereportPoint>(Vector3(3, 0.5f, 3)));
-			TereportGroup->IntoGroup(AddGameObject<TereportPoint>(Vector3(-3, 0.5f, -3)));
-
-			//テレポートエネミー
-			//引数 位置、大きさ、HP、索敵距離、クールタイム、発射数
-			auto TeEnObj = AddGameObject<TeleportEnemy>(Vector3(-10, 1, 10), 1, 1, 5, 3, 3);
-			//Abe20170512
-			CollisionGroup->IntoGroup(TeEnObj);
-			EnemyGroup->IntoGroup(TeEnObj);
-			//Abe20170512
-			//爆弾グループ・・・(爆弾だけグループ使うのびみょくね？)
-			CreateSharedObjectGroup(L"BombGroup");
-			//Abe20170508
-
-			//Abe20170515
-			//引数 位置、大きさ、HP、索敵距離、クールタイム、攻撃力、子機発射間隔、発射数
-			auto ShotEnemyPtr = AddGameObject<ShotEnemy>(Vector3(0, 1, 5), 1, 3, 10, 2, 3, 10, 4);
-			CollisionGroup->IntoGroup(ShotEnemyPtr);
-			EnemyGroup->IntoGroup(ShotEnemyPtr);
-			//Abe20170515
-
-			//Abe20170517
-			//試しにミサイルを単体で飛ばしてみる
-			//auto misptr = AddGameObject<Missile>();
-			//misptr->SetMissileActive(Vector3(1, 1, -3), Vector3(1, 1, 1), Vector3(0, 0, 3),false);
-			//CollisionGroup->IntoGroup(misptr);
-			//Abe20170517
 
 		}
 		catch (...) {
