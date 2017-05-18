@@ -275,6 +275,35 @@ namespace basecross
 		//一体目に当たる
 		if (num == 1)
 		{
+			//押し出し処理==================================
+			//まず座標を取ってきて当たったオブジェからプレイヤーへの差を取る
+			Vector3 obpos = obj->GetComponent<Transform>()->GetPosition();
+			Vector3 ppos = m_Player1->GetComponent<Transform>()->GetPosition();
+			Vector3 topos = ppos - obpos;
+
+			//XとZを割合に変換
+			//まずマイナス反転
+			//XZnormはXPlusZを計算するためだけに使う
+			Vector3 XZnorm = topos;
+			if (topos.x < 0)
+			{
+				XZnorm.x *= -1;
+			}
+			if (topos.z < 0)
+			{
+				XZnorm.z *= -1;
+			}
+			//XとZの合計でXとZを割って割合を取る
+			float XPlusZ = XZnorm.x + XZnorm.z;
+
+			topos /= XPlusZ;
+
+			//当たったオブジェクトを中心にして、あたったオブジェクトとプレイヤーの半径をかけて押し出す
+			//この時ちょっとだけ大きめ(Player側依存)に半径を取る
+			topos = obpos + topos * (obj->GetComponent<Transform>()->GetScale().x / 2 + m_Player1->GetComponent<Transform>()->GetScale().x);
+
+			m_Player1->GetComponent<Transform>()->SetPosition(topos);
+
 			//==============================================
 			//if (dynamic_pointer_cast<Enemy01>(obj))
 			//{
@@ -288,6 +317,34 @@ namespace basecross
 		//二体目に当たる
 		else if (num == 2)
 		{
+			//押し出し処理==================================
+			//まず座標を取ってきて当たったオブジェからプレイヤーへの差を取る
+			Vector3 obpos = obj->GetComponent<Transform>()->GetPosition();
+			Vector3 ppos = m_Player2->GetComponent<Transform>()->GetPosition();
+			Vector3 topos = ppos - obpos;
+
+			//XとZを割合に変換
+			//まずマイナス反転
+			//XZnormはXPlusZを計算するためだけに使う
+			Vector3 XZnorm = topos;
+			if (topos.x < 0)
+			{
+				XZnorm.x *= -1;
+			}
+			if (topos.z < 0)
+			{
+				XZnorm.z *= -1;
+			}
+			//XとZの合計でXとZを割って割合を取る
+			float XPlusZ = XZnorm.x + XZnorm.z;
+
+			topos /= XPlusZ;
+
+			//当たったオブジェクトを中心にして、あたったオブジェクトとプレイヤーの半径をかけて押し出す
+			topos = obpos + topos * (obj->GetComponent<Transform>()->GetScale().x / 2 + m_Player2->GetComponent<Transform>()->GetScale().x);
+
+			m_Player2->GetComponent<Transform>()->SetPosition(topos);
+
 			//==============================================
 			//if (dynamic_pointer_cast<Enemy01>(obj))
 			//{
