@@ -7,6 +7,8 @@
 #pragma once
 #include "stdafx.h"
 
+
+
 namespace basecross {
 	//--------------------------------------------------------------------------------------
 	///	プレイヤー
@@ -17,6 +19,11 @@ namespace basecross {
 		Vector3 m_StartPos;
 		wstring m_Player_Str;
 		shared_ptr<BombEffect> m_Effect;
+		int m_ChangeAnimaNumber = 0;
+		//アニメーションを変更できるかの判断用フラグ
+		bool ChangeAnimaFlg = false;
+
+		
 	public:
 
 		//構築と破棄
@@ -25,7 +32,20 @@ namespace basecross {
 		//初期化
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
-
+		
+		bool UpdateAnyAnimation();
+		void PlayerDieEffect();
+		//アニメーション関数群
+		void ChangeAnima();
+		void AnimationWait();
+		void AnimationRotL();
+		void AnimationRotR();
+		void AnimationDamage();
+		///////////////////////
+		//アニメーションの変更セット関数
+		void SetChangeAnima(int Num) {
+			m_ChangeAnimaNumber = Num;
+		}
 	};
 
 
@@ -54,6 +74,8 @@ namespace basecross {
 		Vector3 PlayerR_Distance_Vec3 = Vector3(0, 0, 0);
 		//デバッグ文字表示オブジェ
 		shared_ptr<DebugTxt> m_Debugtxt;
+		Vector3 m_DebugL = Vector3(0, 0, 0);
+		Vector3 m_DebugR = Vector3(0, 0, 0);
 		//別のスピード
 		float Speed_F = 0.0f;
 		shared_ptr<StateMachine<PlayerManager>> m_StateManagerMachine;
@@ -79,6 +101,7 @@ namespace basecross {
 		Vector3 Distance = Vector3(0, 0, 0);
 		//回転フラグ
 		bool m_RotateFlg = false;
+
 
 	public:
 
@@ -137,6 +160,7 @@ namespace basecross {
 		void SetRotateFlg(bool flg) {
 			m_RotateFlg = flg;
 		}
+		
 
 	};
 	//--------------------------------------------------------------------------------------

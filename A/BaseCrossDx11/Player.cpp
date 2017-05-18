@@ -70,11 +70,29 @@ namespace basecross {
 		auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
 		pMultiSoundEffect->AddAudioResource(L"PlayerDie_SE");
 		m_Effect = GetStage()->AddGameObject<BombEffect>();
+		
+		//アニメーション
+		PtrDraw->AddAnimation(L"AllAnima", 0, 150, 30.0f);
+		PtrDraw->AddAnimation(L"Wait", 0, 30, true, 30.0f);
+		PtrDraw->AddAnimation(L"Damage", 30, 30, false, 30.0f);
+		PtrDraw->AddAnimation(L"LeftRot", 80, 15, false, 30.0f);
+		//PtrDraw->AddAnimation(L"LeftReturn", 95,20,false,30.0f);
+		PtrDraw->AddAnimation(L"RightRot", 120, 15, false, 30.0f);
+		//PtrDraw->AddAnimation(L"RightReturn",135,15,false,30.0f);
+
+		m_ChangeAnimaNumber = 0;
 	}
 	void Player::OnUpdate() {
+		ChangeAnima();
+		PlayerDieEffect();
+		
+	}
+
+	//プレイヤーが死ぬときのエフェクト
+	void Player::PlayerDieEffect() {
 		auto PtrDraw = GetComponent<PNTBoneModelDraw>();
-		auto PlayerLifePtr = GetStage()->GetSharedGameObject<Player_Life>(L"Life",false);
-		if (PlayerLifePtr ) {
+		auto PlayerLifePtr = GetStage()->GetSharedGameObject<Player_Life>(L"Life", false);
+		if (PlayerLifePtr) {
 			if (PlayerLifePtr->GetDieFlg() == false) {
 				if (m_Player_Str == L"PlayerL") {
 					m_Effect->SetPosActive(GetComponent<Transform>()->GetPosition());
@@ -89,6 +107,69 @@ namespace basecross {
 			}
 		}
 	}
+
+///アニメーション関数群////////////////////
+	//アニメーション更新関数
+	bool Player::UpdateAnyAnimation() {
+		auto PtrDraw = GetComponent<PNTBoneModelDraw>();
+		float ElapsedTime = App::GetApp()->GetElapsedTime();
+		return PtrDraw->UpdateAnimation(ElapsedTime);
+	}
+	
+	void Player::ChangeAnima() {
+		switch (m_ChangeAnimaNumber)
+		{
+		case 0:
+			AnimationWait();
+			break;
+		case 1:
+			AnimationRotL();
+			break;
+		case 2:
+			AnimationRotR();
+			break;
+		case 3:
+			AnimationDamage();
+			break;
+		}
+	}
+
+	//待機アニメーション
+	void Player::AnimationWait() {
+		auto PtrDraw = GetComponent<PNTBoneModelDraw>();
+			if (!(PtrDraw->GetCurrentAnimation() == L"Wait")) {
+				PtrDraw->ChangeCurrentAnimation(L"Wait");
+			}
+			UpdateAnyAnimation();
+	}
+
+	//回転アニメション関数 左
+	void Player::AnimationRotL() {
+		auto PtrDraw = GetComponent<PNTBoneModelDraw>();
+			if (!(PtrDraw->GetCurrentAnimation() == L"LeftRot")) {
+				PtrDraw->ChangeCurrentAnimation(L"LeftRot");
+			}
+			UpdateAnyAnimation();
+	}
+	//右
+	void Player::AnimationRotR() {
+		auto PtrDraw = GetComponent<PNTBoneModelDraw>();
+			if (!(PtrDraw->GetCurrentAnimation() == L"RightRot")) {
+				PtrDraw->ChangeCurrentAnimation(L"RightRot");
+			}
+			UpdateAnyAnimation();
+	}
+
+	//ダメージアニメーション関数
+	void Player::AnimationDamage() {
+		auto PtrDraw = GetComponent<PNTBoneModelDraw>();
+		if (!(PtrDraw->GetCurrentAnimation() == L"Damage")) {
+			PtrDraw->ChangeCurrentAnimation(L"Damage");
+		}
+		UpdateAnyAnimation();
+	}
+
+	///////////////////////////////////////////
 
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////
@@ -132,6 +213,9 @@ namespace basecross {
 
 	void PlayerCenter::OnUpdate() {
 	//	auto PtrPlayer_M = GetStage()->GetSharedGameObject<PlayerManager>(L"PtrPlayerManager", false);
+		auto PlayerL_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false);
+		auto PlayerR_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_R", false);
+	
 
 		auto Trans = GetComponent<Transform>();
 		auto Rig = GetComponent<Rigidbody>();
@@ -146,11 +230,15 @@ namespace basecross {
 			Quaternion SpanQt(Vector3(0, 1, 0), -ElapsedTime * 2.0f);
 			Qt *= SpanQt;
 			Trans->SetQuaternion(Qt);
+			PlayerL_Ptr->SetChangeAnima(1);
+			PlayerR_Ptr->SetChangeAnima(1);
 		}
 		else if (CntlVec[0].wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
 			Quaternion SpanQt(Vector3(0, 1, 0), ElapsedTime * 2.0f);
 			Qt *= SpanQt;
 			Trans->SetQuaternion(Qt);
+			PlayerL_Ptr->SetChangeAnima(2);
+			PlayerR_Ptr->SetChangeAnima(2);
 		}
 
 		auto PtrPlayerL_Pos = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false)->GetComponent<Transform>()->GetPosition();
@@ -202,15 +290,18 @@ namespace basecross {
 	void PlayerManager::OnLastUpdate() {
 
 
-		/*wstring PosStr(L"デバック初期位置L：:\t");
-		PosStr += L"X=" + Util::FloatToWStr(GetDebugPlayerL().x, 6, Util::FloatModify::Fixed) + L",\t";
-		PosStr += L"Y=" + Util::FloatToWStr(GetDebugPlayerL().y, 6, Util::FloatModify::Fixed) + L",\t";
-		PosStr += L"Z=" + Util::FloatToWStr(GetDebugPlayerL().z, 6, Util::FloatModify::Fixed) + L"\n";
-		*/
+		wstring RotL(L"デバック回転L：:\t");
+		RotL += L"X=" + Util::FloatToWStr(m_DebugL.x, 6, Util::FloatModify::Fixed) + L",\t";
+		RotL += L"Y=" + Util::FloatToWStr(m_DebugL.y, 6, Util::FloatModify::Fixed) + L",\t";
+		RotL += L"Z=" + Util::FloatToWStr(m_DebugL.z, 6, Util::FloatModify::Fixed) + L"\n";
+		
+		wstring RotR(L"デバック回転R：:\t");
+		RotR += L"X=" + Util::FloatToWStr(m_DebugR.x, 6, Util::FloatModify::Fixed) + L",\t";
+		RotR += L"Y=" + Util::FloatToWStr(m_DebugR.y, 6, Util::FloatModify::Fixed) + L",\t";
+		RotR += L"Z=" + Util::FloatToWStr(m_DebugR.z, 6, Util::FloatModify::Fixed) + L"\n";
 
-
-		/*wstring  str = PosStr;
-		m_Debugtxt->SetText(str)*/;
+		wstring  str = RotL + RotR;
+		//m_Debugtxt->SetText(str);
 	}
 	//////////////ステート以外の関数群///////////////////////////////////////////////
 	//スティック入力
@@ -220,18 +311,20 @@ namespace basecross {
 		//auto PlayerL_Ptr = dynamic_pointer_cast<GameStage>(GetStage())->GetPlayerVec().at(0);
 		auto PlayerL_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L",false);
 		auto PlayerL_Rig = PlayerL_Ptr->GetComponent<Rigidbody>();
+		PlayerL_Ptr->SetChangeAnima(0);
 		//auto PlayerR_Ptr = dynamic_pointer_cast<GameStage>(GetStage())->GetPlayerVec().at(1);
 		auto PlayerR_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_R", false);
 		auto PlayerR_Rig = PlayerR_Ptr->GetComponent<Rigidbody>();
+		PlayerR_Ptr->SetChangeAnima(0);
 		auto Rig = GetComponent<Rigidbody>();
 		auto Trans = GetComponent<Transform>();
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 
 		if (m_StateManagerMachine->GetCurrentState() == MoveState_Manager::Instance()) {
-			Move_Speed = Rig->GetMaxSpeed() / 5.0f;
+			Move_Speed = Rig->GetMaxSpeed() / 7.0f;
 		}
 		else {
-			Move_Speed = Rig->GetMaxSpeed() / 5.0f;
+			Move_Speed = Rig->GetMaxSpeed() / 7.0f;
 		}
 		Vec_Vec3 = Vector3(CntlVec[0].fThumbLX, 0, CntlVec[0].fThumbLY);
 		PlayerL_Rig->SetVelocity(Vec_Vec3 * Move_Speed);
@@ -249,16 +342,18 @@ namespace basecross {
 		auto PlayerL_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false);
 		auto PlayerL_Trans = PlayerL_Ptr->GetComponent<Transform>();
 		auto PlayerLPos = PlayerL_Trans->GetPosition();
+		//PlayerL_Ptr->SetChangeAnima(1);
 		auto PlayerR_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_R", false);
 		auto PlayerR_Trans = PlayerR_Ptr->GetComponent<Transform>();
 		auto PlayerRPos = PlayerR_Trans->GetPosition();
+		//PlayerR_Ptr->SetChangeAnima(1);
 		auto PosL = Vector3(0, 0, 0);
 		auto PosR = Vector3(0, 0, 0);
 		auto testL = PlayerCenterPos - PlayerLPos;
 		auto testLD = testL.x * testL.x + testL.z * testL.z;
 		auto testR = PlayerCenterPos - PlayerRPos;
 		auto testRD = testR.x * testR.x + testR.z * testR.z;
-
+		//センターからの距離をステートが離れるだったで５を超えたら５にする　それ以外は１にする　
 		if (m_StateManagerMachine->GetCurrentState() == LeaveState_Manager::Instance()) {
 			if (5 < testLD) {
 				testLD = 5;
@@ -275,7 +370,7 @@ namespace basecross {
 		if (PlayerL_Ptr) {
 			RotY -= XM_PIDIV2;
 			PosL = Vector3(sin(RotY) * testLD, 0, cos(RotY) * testLD);
-
+			m_DebugL = PosL;
 			/*if (m_StateManagerMachine->GetCurrentState() == LeaveState_Manager::Instance()) {
 			PosL = Vector3((sin(RotY)* testLD.x), 0, (cos(RotY)* testLD.z));
 			}
@@ -289,7 +384,7 @@ namespace basecross {
 		if (PlayerR_Ptr) {
 			RotY += XM_PIDIV2;
 			PosR = Vector3(sin(RotY)*testRD, 0, cos(RotY)*testRD);
-
+			m_DebugR = PosR;
 			/*	if (m_StateManagerMachine->GetCurrentState() == LeaveState_Manager::Instance()) {
 			PosR = Vector3((sin(RotY)*testRL.x), 0, (cos(RotY)*testRL.z));
 			}
@@ -366,11 +461,11 @@ namespace basecross {
 	/////////////////////////////////////////////////////////////////////////////////
 	////////////////////////ステートシェンジ関数///////////////////////////////////
 	void PlayerManager::StateChangeDoingInterpose() {
-		//挟まれた対象からフラグをもらう
 		auto PtrShotEnemyChild = GetStage()->GetSharedGameObject<ShotEnemyChild>(L"ShotEnemyChild", false);
-		if (PtrShotEnemyChild->GetShotEnemyChildSandFlg()) {
-			GetStateMachine_Manager()->ChangeState(DoingInterposeState_Manager::Instance());
-
+		if (PtrShotEnemyChild) {
+			if (PtrShotEnemyChild->GetShotEnemyChildSandFlg()) {
+				GetStateMachine_Manager()->ChangeState(DoingInterposeState_Manager::Instance());
+			}
 		}
 	}
 	void PlayerManager::StateChangeDie() {
@@ -500,7 +595,7 @@ namespace basecross {
 		//離れている時の移動　
 		if (CntlVec[0].fThumbLX || CntlVec[0].fThumbLY) {
 			InputStick();
-			Speed_F - 0.0f;
+			Speed_F = 0.0f;
 		}
 		else if (CntlVec[0].wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER || CntlVec[0].wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
 			InitializationVelocity();
@@ -508,16 +603,17 @@ namespace basecross {
 			PlayerAngle();
 		}
 		else {
+			//離れるの上限
+			if (Distance.x * Distance.x + Distance.z * Distance.z > 100) {
+				Speed_F = 0.0f;
+			}
+			else {
+				Speed_F += Rig->GetMaxSpeed() / 30;
+			}
 			PlayerL_Ptr->GetComponent<Rigidbody>()->SetVelocity(Vector3(PlayerL_Direction_Vec3.x, 0, PlayerL_Direction_Vec3.z)* Speed_F * ElapsedTime_F);
 			PlayerR_Ptr->GetComponent<Rigidbody>()->SetVelocity(Vector3(PlayerR_Direction_Vec3.x, 0, PlayerR_Direction_Vec3.z)* Speed_F * ElapsedTime_F);
 		}
-		//離れるの上限
-		if (Distance.x * Distance.x + Distance.z * Distance.z > 100) {
-			Speed_F = 0.0f;
-		}
-		else {
-			Speed_F += Rig->GetMaxSpeed() / 30;
-		}
+	
 
 		//Aが話されたら攻撃ステートに移動
 		if (!(CntlVec[0].wButtons& XINPUT_GAMEPAD_A)) {
@@ -545,14 +641,14 @@ namespace basecross {
 		//New_Vec = 進む方向　Speed_F = 移動スピード
 		PlayerL_Ptr->GetComponent<Rigidbody>()->SetVelocity(Vector3(PlayerL_Direction_Vec3.x, 0, PlayerL_Direction_Vec3.z)* Speed_F * ElapsedTime_F);
 		PlayerR_Ptr->GetComponent<Rigidbody>()->SetVelocity(Vector3(PlayerR_Direction_Vec3.x, 0, PlayerR_Direction_Vec3.z)* Speed_F * ElapsedTime_F);
-
+		//ステート遷移
 		StateChangeDoingInterpose();
 		if (1.5 > abs(Distance_Vec3.x) && 1.5 > abs(Distance_Vec3.z)) {
 
 			//SE
 			auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
 			pMultiSoundEffect->Start(L"Collision_01_SE", 0, 0.4f);
-
+			//ステート遷移
 			GetStateMachine_Manager()->ChangeState(ReturnState_Manager::Instance());
 		}
 		//死んだとき
@@ -621,10 +717,12 @@ namespace basecross {
 		InitializationVelocity();
 	}
 	void PlayerManager::ExitDoingInterpose() {
-		auto PtrShotEnemyChild = GetStage()->GetSharedGameObject<ShotEnemyChild>(L"ShotEnemyChild", false);
-		PtrShotEnemyChild->SetShotEnemyChildSandFlg(false);
-		InitializationVelocity();
-		SetActiveCollision(false);
+			auto PtrShotEnemyChild = GetStage()->GetSharedGameObject<ShotEnemyChild>(L"ShotEnemyChild", false);
+			if (PtrShotEnemyChild) {
+				PtrShotEnemyChild->SetShotEnemyChildSandFlg(false);
+				InitializationVelocity();
+				SetActiveCollision(false);
+			}
 	}
 	void PlayerManager::ExitDieBehavior() {
 		InitializationVelocity();
@@ -833,6 +931,11 @@ namespace basecross {
 			SetInvincible(true);
 
 			if (GetDamage_int() > 0) {
+				auto PlayerL_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false);
+				auto PlayerR_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_R", false);
+				PlayerL_Ptr->SetChangeAnima(3);
+				PlayerR_Ptr->SetChangeAnima(3);
+
 				SetDamage_int(0);
 			}
 		}
