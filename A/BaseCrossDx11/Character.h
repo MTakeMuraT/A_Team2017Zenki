@@ -233,6 +233,25 @@ namespace basecross{
 	};
 	//Abe20170412
 
+	//Abe20170519
+	//--------------------------------------------------------------------------------------
+	//	class PauseMenu : public GameObject;
+	//	用途: ポーズ
+	//--------------------------------------------------------------------------------------
+	class PauseMenu : public GameObject
+	{
+	private:
+		//ポーズ背景(暗幕)
+		shared_ptr<GameObject> m_PauseBackBlack;
+		//ポーズ背景(残存勢力)
+		shared_ptr<GameObject> m_PauseBackEnemyS;
+		//選択項目
+
+	public:
+
+	};
+	//Abe20170519
+
 	//Abe20170418
 	//--------------------------------------------------------------------------------------
 	//	class NumberSprite : public GameObject;
@@ -549,7 +568,8 @@ namespace basecross{
 		}
 	};
 
-
+	//Abe20170519MukkuMargeNumberSpriteと同じ処理だったのでそっちで代用
+	/*
 	//--------------------------------------------------------------------------------------
 	//	class EnemyCountSprite : public GameObject;
 	//	用途: 残敵数のスプライト表示
@@ -586,16 +606,15 @@ namespace basecross{
 		//大きさ調整
 		void SetScaleVec2(Vector2 scale);
 		*/
-
+	/*
 		//数字設定
 		void SetNum(int num);
 
 		void SetNumDraw(bool flg);
 
-
-
-
 	};
+	*/
+	//Abe20170519MukkuMargeNumberSpriteと同じ処理だったのでそっちで代用
 
 	////////////////////////
 
@@ -608,31 +627,24 @@ namespace basecross{
 		Vector2 m_InitScale;
 		//レイヤー
 		int m_LayerNum;
-		//制限時間
-		int m_InitTime;
-		//現在時間
-		float m_Time;
-		//時間止めるフラグ
-		bool m_TimeStopFlg = false;
-		//終わったか
-		bool m_FinishFlg = false;
 		//数字
-		shared_ptr<EnemyCountSprite> m_Numbers;
+		shared_ptr<NumberSprite> m_Numbers;
+		//最大数
+		shared_ptr<NumberSprite> m_MaxNumber;
 
 		int m_EnemyCunt = 0;
+		int m_EnemyMaxCount = 0;
 	public:
-		//初期時間、座標、大きさ、レイヤー
-		EnemyCountA(const shared_ptr<Stage>& StagePtr, int Time, Vector2 pos, Vector2 scale, int layer);
+		//座標、大きさ、レイヤー
+		EnemyCountA(const shared_ptr<Stage>& StagePtr, Vector2 pos, Vector2 scale, int layer);
 
 		void OnCreate()override;
 		void OnUpdate()override;
 
-		//void SetTimer(bool flg);
-
-		bool GetTimerFlg() { return m_FinishFlg; }
 	};
 
-
+	//Abe20170519MukkuMarge一つでまとめられるのでEnemyCountAのほうにまとめ
+	/*
 	class EnemyCountB : public GameObject
 	{
 	private:
@@ -642,23 +654,19 @@ namespace basecross{
 		Vector2 m_InitScale;
 		//レイヤー
 		int m_LayerNum;
-		//制限時間
-		int m_InitTime;
-		//現在時間
-		float m_Time;
 		//時間止めるフラグ
 		bool m_TimeStopFlg = false;
 		//終わったか
 		bool m_FinishFlg = false;
 		//数字
-		shared_ptr<EnemyCountSprite> m_Numbers;
+		shared_ptr<NumberSprite> m_Numbers;
 
 		int m_EnemyCunt = 0;
 
 		int m_MaxCount = 0;
 	public:
 		//初期時間、座標、大きさ、レイヤー
-		EnemyCountB(const shared_ptr<Stage>& StagePtr, int Time, Vector2 pos, Vector2 scale, int layer);
+		EnemyCountB(const shared_ptr<Stage>& StagePtr, Vector2 pos, Vector2 scale, int layer);
 
 		void OnCreate()override;
 		void OnUpdate()override;
@@ -668,6 +676,6 @@ namespace basecross{
 		bool GetTimerFlg() { return m_FinishFlg; }
 	};
 
-
+	*/
 }
 //end basecross

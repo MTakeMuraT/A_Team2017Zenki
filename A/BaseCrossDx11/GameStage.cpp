@@ -106,7 +106,7 @@ namespace basecross
 			wstring(L"Background_TX")
 			);
 
-		AddGameObject<Enemycount>();
+		//AddGameObject<Enemycount>();
 		/*AddGameObject<FixdBox>(
 			Vector3(1, 1, 1),
 			Vector3(0, 0, 0),
@@ -139,7 +139,14 @@ namespace basecross
 		SetSharedGameObject(L"CollisionSand", ColSandPtr);
 	}
 	//アタリ判定作成--------------------------------------------
-	
+
+	//エネミーカウント作成--------------------------------------------
+	void GameStage::CreateEnemyCounts()
+	{
+		AddGameObject<EnemyCountA>(Vector2(550, -280), Vector2(100, 100), 3);
+	}
+	//エネミーカウント作成--------------------------------------------
+
 	
 	void GameStage::OnCreate()
 	{
@@ -162,6 +169,11 @@ namespace basecross
 			//背景の作成
 			CreateBackGround();
 			CreateTestLin();
+
+			//Abe20170519MukkuMarge
+			//エネミーの数作成
+			CreateEnemyCounts();
+			//Abe20170519MukkuMarge
 
 			//アタリ判定作成
 			CreateCollision();

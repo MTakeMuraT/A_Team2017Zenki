@@ -1376,7 +1376,7 @@ namespace basecross {
 
 	/////////////////////////////////////////////
 
-
+	/*
 	EnemyCountSprite::EnemyCountSprite(const shared_ptr<Stage>& StagePtr, int num, Vector2 pos, Vector2 scale, int layer) :
 		GameObject(StagePtr),
 		m_num(num),
@@ -1581,15 +1581,14 @@ namespace basecross {
 			v->SetDrawActive(flg);
 		}
 
-	}
+	}*/
 
 
 
 	////////////////////////////////////////////////////
 
-	EnemyCountA::EnemyCountA(const shared_ptr<Stage>& StagePtr, int Time, Vector2 pos, Vector2 scale, int layer) :
+	EnemyCountA::EnemyCountA(const shared_ptr<Stage>& StagePtr, Vector2 pos, Vector2 scale, int layer) :
 		GameObject(StagePtr),
-		m_InitTime(Time),
 		m_InitPos(pos),
 		m_InitScale(scale),
 		m_LayerNum(layer)
@@ -1598,11 +1597,20 @@ namespace basecross {
 	void EnemyCountA::OnCreate()
 	{
 		//”Žšì¬
-		m_Numbers = GetStage()->AddGameObject<EnemyCountSprite>(m_InitTime, m_InitPos, m_InitScale, m_LayerNum);
-		//‰ŠúŽžŠÔ“ü‚ê‚é
-		m_Time = m_InitTime;
+		//Abe20170519‚¿‚å‚Á‚ÆC³
+		Vector2 pos = m_InitPos;
+		//¶ã‚É‚¸‚ç‚·
+		pos.x += -m_InitScale.x * 1;
+		pos.y += +m_InitScale.y * 1;
+		m_Numbers = GetStage()->AddGameObject<NumberSprite>(0,pos, m_InitScale, m_LayerNum);
+		//‰E‰º‚É
+		pos.x += +m_InitScale.x * 1;
+		pos.y += -m_InitScale.y * 1;
+
+		m_MaxNumber = GetStage()->AddGameObject<NumberSprite>(0, pos, m_InitScale, m_LayerNum);
 
 		m_EnemyCunt = 0;
+		m_EnemyMaxCount = 0;
 	}
 
 	void EnemyCountA::OnUpdate()
@@ -1655,16 +1663,23 @@ namespace basecross {
 				}
 			}
 		}
+		if (m_EnemyMaxCount == 0)
+		{
+			m_EnemyMaxCount = m_EnemyCunt;
+			m_MaxNumber->SetNum((int)m_EnemyMaxCount);
+		}
+
 		m_Numbers->SetNum((int)m_EnemyCunt);
 	}
 
 
 
 	////////////////////////////////////////////////////
+	//Abe20170519MukkuMargeˆê‚Â‚Å‚Ü‚Æ‚ß‚ç‚ê‚é‚Ì‚ÅEnemyCountA‚Ì‚Ù‚¤‚É‚Ü‚Æ‚ß
+	/*
 
-	EnemyCountB::EnemyCountB(const shared_ptr<Stage>& StagePtr, int Time, Vector2 pos, Vector2 scale, int layer) :
+	EnemyCountB::EnemyCountB(const shared_ptr<Stage>& StagePtr, Vector2 pos, Vector2 scale, int layer) :
 		GameObject(StagePtr),
-		m_InitTime(Time),
 		m_InitPos(pos),
 		m_InitScale(scale),
 		m_LayerNum(layer)
@@ -1673,9 +1688,7 @@ namespace basecross {
 	void EnemyCountB::OnCreate()
 	{
 		//”Žšì¬
-		m_Numbers = GetStage()->AddGameObject<EnemyCountSprite>(m_InitTime, m_InitPos, m_InitScale, m_LayerNum);
-		//‰ŠúŽžŠÔ“ü‚ê‚é
-		m_Time = m_InitTime;
+		m_Numbers = GetStage()->AddGameObject<NumberSprite>(0,m_InitPos, m_InitScale, m_LayerNum);
 
 		m_EnemyCunt = 0;
 
@@ -1742,7 +1755,6 @@ namespace basecross {
 			m_MaxCount = m_EnemyCunt;
 			m_Numbers->SetNum((int)m_MaxCount);
 		}
-	}
-	}
-
+	}*/
+}
 	//end basecross
