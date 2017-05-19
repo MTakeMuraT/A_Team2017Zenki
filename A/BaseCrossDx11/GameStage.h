@@ -44,6 +44,11 @@ namespace basecross
 		Vector2 m_StageSize;
 		//Abe20170515
 
+		//Abe20170519MukkuMarge
+		void CreateEnemyCounts();
+		//Abe20170519MukkuMarge
+
+
 	public:
 		//\’z‚Æ”jŠü
 		GameStage() :Stage() {}
