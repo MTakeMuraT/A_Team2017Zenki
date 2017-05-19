@@ -583,6 +583,12 @@ namespace basecross
 		void StageEndCheck();
 		//Abe20170515
 
+
+		//Abe20170519
+		//‘«Œ³‚Ì‰e
+		shared_ptr<GameObject> m_Shadow;
+		//Abe20170519
+
 		//ˆÈ‰ºƒpƒ‰ƒ[ƒ^
 		//UŒ‚—Í
 		int m_power = 0;

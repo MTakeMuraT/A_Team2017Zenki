@@ -1210,7 +1210,7 @@ namespace basecross {
 		m_Velocity.y += -9.8f * App::GetApp()->GetElapsedTime();
 
 		//è∞Ç…ãﬂÇ≠Ç»Ç¡ÇΩÇÁè¡Ç∑
-		if (GetComponent<Transform>()->GetPosition().y <= 0.5f)
+		if (GetComponent<Transform>()->GetPosition().y <= 1.0f)
 		{
 			m_ShotFlg = true;
 		}

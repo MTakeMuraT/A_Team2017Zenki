@@ -67,12 +67,12 @@ namespace basecross
 				dist2 = dist2 * dist2;
 
 				//一体目があたる
-				if (half > dist1.x + dist1.z)
+				if (half > dist1.x + dist1.z && (dist1.y < 0.5f && dist1.y > -0.5f))
 				{
 					CollisionAfter(ptr, 1);
 				}
 				//二体目があたる
-				if (half > dist2.x + dist2.z)
+				if (half > dist2.x + dist2.z && (dist2.y < 0.5f && dist2.y > -0.5f))
 				{
 					CollisionAfter(ptr, 2);
 				}
@@ -282,8 +282,8 @@ namespace basecross
 			Vector3 topos = ppos - obpos;
 
 			//XとZを割合に変換
-			//まずマイナス反転
-			//XZnormはXPlusZを計算するためだけに使う
+				//まずマイナス反転
+				//XZnormはXPlusZを計算するためだけに使う
 			Vector3 XZnorm = topos;
 			if (topos.x < 0)
 			{
@@ -296,13 +296,20 @@ namespace basecross
 			//XとZの合計でXとZを割って割合を取る
 			float XPlusZ = XZnorm.x + XZnorm.z;
 
-			topos /= XPlusZ;
+			if (XPlusZ != 0)
+			{
+				topos /= XPlusZ;
+			}
 
 			//当たったオブジェクトを中心にして、あたったオブジェクトとプレイヤーの半径をかけて押し出す
 			//この時ちょっとだけ大きめ(Player側依存)に半径を取る
-			topos = obpos + topos * (obj->GetComponent<Transform>()->GetScale().x / 2 + m_Player1->GetComponent<Transform>()->GetScale().x);
+			topos = obpos + topos * (obj->GetComponent<Transform>()->GetScale().x / 1.5f + m_Player1->GetComponent<Transform>()->GetScale().x);
+
+			//Y座標戻す
+			topos.y = ppos.y;
 
 			m_Player1->GetComponent<Transform>()->SetPosition(topos);
+
 
 			//==============================================
 			//if (dynamic_pointer_cast<Enemy01>(obj))
@@ -324,8 +331,8 @@ namespace basecross
 			Vector3 topos = ppos - obpos;
 
 			//XとZを割合に変換
-			//まずマイナス反転
-			//XZnormはXPlusZを計算するためだけに使う
+				//まずマイナス反転
+				//XZnormはXPlusZを計算するためだけに使う
 			Vector3 XZnorm = topos;
 			if (topos.x < 0)
 			{
@@ -338,10 +345,15 @@ namespace basecross
 			//XとZの合計でXとZを割って割合を取る
 			float XPlusZ = XZnorm.x + XZnorm.z;
 
-			topos /= XPlusZ;
-
+			if (XPlusZ != 0)
+			{
+				topos /= XPlusZ;
+			}
 			//当たったオブジェクトを中心にして、あたったオブジェクトとプレイヤーの半径をかけて押し出す
 			topos = obpos + topos * (obj->GetComponent<Transform>()->GetScale().x / 2 + m_Player2->GetComponent<Transform>()->GetScale().x);
+
+			//Y座標戻す
+			topos.y = ppos.y;
 
 			m_Player2->GetComponent<Transform>()->SetPosition(topos);
 

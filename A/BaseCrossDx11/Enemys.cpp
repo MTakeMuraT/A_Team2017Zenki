@@ -56,7 +56,7 @@ namespace basecross
 		auto TransCi = circle->AddComponent<Transform>();
 		Vector3 posci = m_InitPos;
 		//足元へ移動
-		posci.y += -m_ParScale / 2;
+		posci.y = 1;
 		TransCi->SetPosition(posci);
 		TransCi->SetScale(Vector3(m_SearchDistance, m_SearchDistance, m_SearchDistance));
 		TransCi->SetRotation(90 * 3.14159265 / 180, 0, 0);
@@ -303,7 +303,7 @@ namespace basecross
 	{
 		Vector3 pos = GetComponent<Transform>()->GetPosition();
 		//足元へ移動
-		pos.y += -m_ParScale / 2;
+		pos.y = 1;
 		m_SearchCircle->GetComponent<Transform>()->SetPosition(pos);
 		m_SearchCircle->SetDrawActive(true);
 	}
@@ -481,7 +481,7 @@ namespace basecross
 		auto TransCi = circle->AddComponent<Transform>();
 		Vector3 posci = m_InitPos;
 		//足元へ移動
-		posci.y += -m_ParScale / 2;
+		posci.y = 1;
 		TransCi->SetPosition(posci);
 		TransCi->SetScale(Vector3(m_SearchDistance, m_SearchDistance, m_SearchDistance));
 		TransCi->SetRotation(90 * 3.14159265 / 180, 0, 0);
@@ -660,6 +660,22 @@ namespace basecross
 				//死んでたら再利用
 				if (ptr)
 				{
+					Vector3 PPOS = GetComponent<Transform>()->GetPosition();
+					PPOS.y += GetComponent<Transform>()->GetScale().y / 2;
+					int Tangle = (int)angle % 360;
+					//とりあえず10～20、-10～-20度の範囲で飛ばす
+					if (rand() % 2 == 0)
+					{
+						Tangle += rand() % 11 + 10;
+					}
+					else
+					{
+						Tangle += rand() % 11 - 20;
+					}
+
+					float angle2 = Tangle * 3.14159265f / 180;
+					ptr->SetVelocity(Vector3(cos(angle2) * (float)(rand() % 3 + 1) * m_ParScale/2, rand() % 5 + 5, sin(angle2) * (float)(rand() % 3 + 1))* m_ParScale / 2);
+
 					flgg = true;
 					break;
 				}
@@ -682,7 +698,7 @@ namespace basecross
 				}
 
 				float angle2 = Tangle * 3.14159265f / 180;
-				pptr->SetVelocity(Vector3(cos(angle2) * (float)(rand()%3+1), rand() % 5 + 5, sin(angle2) * (float)(rand() % 3 + 1)));
+				pptr->SetVelocity(Vector3(cos(angle2) * (float)(rand() % 3 + 1) * m_ParScale / 2, rand() % 5 + 5, sin(angle2) * (float)(rand() % 3 + 1))* m_ParScale / 2);
 				m_ChildS.push_back(pptr);
 			}
 
@@ -823,7 +839,7 @@ namespace basecross
 		auto TransCi = circle->AddComponent<Transform>();
 		Vector3 posci = m_InitPos;
 		//足元へ移動
-		posci.y += -m_ParScale / 2;
+		posci.y = 1;
 		TransCi->SetPosition(posci);
 		TransCi->SetScale(Vector3(m_SearchDistance, m_SearchDistance, m_SearchDistance));
 		TransCi->SetRotation(90 * 3.14159265 / 180, 0, 0);
@@ -1079,7 +1095,7 @@ namespace basecross
 	{
 		Vector3 pos = GetComponent<Transform>()->GetPosition();
 		//足元へ移動
-		pos.y += -m_ParScale / 2;
+		pos.y = 1;
 		m_SearchCircle->GetComponent<Transform>()->SetPosition(pos);
 		m_SearchCircle->SetDrawActive(true);
 	}
@@ -1221,7 +1237,7 @@ namespace basecross
 		auto TransCi = circle->AddComponent<Transform>();
 		Vector3 posci = m_InitPos;
 		//足元へ移動
-		posci.y += -m_ParScale / 2;
+		posci.y = 1;
 		TransCi->SetPosition(posci);
 		TransCi->SetScale(Vector3(m_SearchDistance, m_SearchDistance, m_SearchDistance));
 		TransCi->SetRotation(90 * 3.14159265 / 180, 0, 0);
@@ -1385,7 +1401,7 @@ namespace basecross
 	{
 		Vector3 pos = GetComponent<Transform>()->GetPosition();
 		//足元へ移動
-		pos.y += -m_ParScale / 2;
+		pos.y = 1;
 		m_SearchCircle->GetComponent<Transform>()->SetPosition(pos);
 		m_SearchCircle->SetDrawActive(true);
 	}
@@ -1742,7 +1758,7 @@ namespace basecross
 		//索敵範囲作成
 		auto circle = GetStage()->AddGameObject<GameObject>();
 		auto TransCi = circle->AddComponent<Transform>();
-		TransCi->SetPosition(0,0,0);
+		TransCi->SetPosition(0,1,0);
 		TransCi->SetScale(Vector3(m_SearchDistance, m_SearchDistance, m_SearchDistance));
 		TransCi->SetRotation(90 * 3.14159265 / 180, 0, 0);
 
@@ -1992,6 +2008,25 @@ namespace basecross
 		m_Effect = GetStage()->AddGameObject<BombEffect>();
 		//Abe20170517
 
+		//Abe20170519
+		//影作成
+		auto circle = GetStage()->AddGameObject<GameObject>();
+		auto TransCi = circle->AddComponent<Transform>();
+		TransCi->SetPosition(0, 1, 0);
+		TransCi->SetScale(Vector3(0.5f, 0.5f, 0.5f));
+		TransCi->SetRotation(90 * 3.14159265 / 180, 0, 0);
+
+		auto DrawCi = circle->AddComponent<PNTStaticDraw>();
+		DrawCi->SetTextureResource(L"SHOADOW_TX");
+		DrawCi->SetMeshResource(L"DEFAULT_SQUARE");
+
+		circle->SetAlphaActive(true);
+		circle->SetDrawActive(false);
+		//レイヤー設定
+		circle->SetDrawLayer(2);
+
+		m_Shadow = circle;
+		//Abe20170519
 	}
 
 	void Missile::OnUpdate()
@@ -2002,7 +2037,10 @@ namespace basecross
 			Vector3 pos = GetComponent<Transform>()->GetPosition();
 			pos += m_Velocity * App::GetApp()->GetElapsedTime();
 			GetComponent<Transform>()->SetPosition(pos);
-
+			
+			//影移動
+			pos.y = 1;
+			m_Shadow->GetComponent<Transform>()->SetPosition(pos);
 			if (m_FallFlg)
 			{
 				//ちょっと遅めに落とす
@@ -2053,6 +2091,8 @@ namespace basecross
 
 		//描画
 		SetDrawActive(true);
+		//影も
+		m_Shadow->SetDrawActive(true);
 
 		//落ちるフラグ設定
 		m_FallFlg = falltype;
@@ -2073,6 +2113,9 @@ namespace basecross
 
 			//描画消す
 			SetDrawActive(false);
+
+			//影も
+			m_Shadow->SetDrawActive(false);
 		}
 	}
 	//Abe20170515
@@ -2080,18 +2123,18 @@ namespace basecross
 	//Abe20170517
 	void Missile::ToDamagePleyer()
 	{
-		//落ちる設定にされてるときはy座標を測る
-		if (m_FallFlg)
-		{
-			float PlayerY = GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_L")->GetComponent<Transform>()->GetPosition().y;
-			//ちょっと上に
-			PlayerY += GetComponent<Transform>()->GetScale().y / 2;
-			//プレイヤーより結構上のほうにいたら判定しない
-			if (GetComponent<Transform>()->GetPosition().y > PlayerY)
-			{
-				return;
-			}
-		}
+		////落ちる設定にされてるときはy座標を測る
+		//if (m_FallFlg)
+		//{
+		//	float PlayerY = GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_L")->GetComponent<Transform>()->GetPosition().y;
+		//	//ちょっと上に
+		//	PlayerY += GetComponent<Transform>()->GetScale().y / 2;
+		//	//プレイヤーより結構上のほうにいたら判定しない
+		//	if (GetComponent<Transform>()->GetPosition().y > PlayerY)
+		//	{
+		//		return;
+		//	}
+		//}
 
 		//HPを減らす
 		auto PtrPlayerHP = GetStage()->GetSharedGameObject<PlayerHP>(L"PlayerHP", false);

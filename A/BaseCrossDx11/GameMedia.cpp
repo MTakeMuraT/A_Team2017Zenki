@@ -109,6 +109,11 @@ namespace basecross {
 		strTexture = DataDir + L"Enemy\\Missile.png";
 		App::GetApp()->RegisterTexture(L"MISSILE_TX", strTexture);
 		//Abe20170517
+		//Abe20170519
+		strTexture = DataDir + L"Enemy\\Bomb.png";
+		App::GetApp()->RegisterTexture(L"SHOADOW_TX", strTexture);
+		//Abe20170519
+
 
 	
 		////モデル（ボーンあり
@@ -133,8 +138,6 @@ namespace basecross {
 		//自爆エネミー
 		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Enemy\\EnemyModel\\Bomb\\Bomb.bmf");
 		App::GetApp()->RegisterResource(L"BOMB_MODEL", MadelMesh);
-
-		
 		//Abe20170519
 
 
