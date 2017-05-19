@@ -23,7 +23,7 @@ namespace basecross {
 		//m_Collision_Sphere = GetStage()->AddGameObject<Collision_Sphere>();
 		//初期位置などの設定
 		auto Ptr = AddComponent<Transform>();
-		Ptr->SetScale(1.0f, 1.0f, 1.0f);	//直径25センチの球体
+		Ptr->SetScale(1.0f, 1.0f, 1.0f);	
 		Ptr->SetRotation(0.0f, 0.0f, 0.0f);
 		Ptr->SetPosition(m_StartPos);
 		Vector3 Rot;
@@ -280,9 +280,10 @@ namespace basecross {
 		m_Debugtxt->SetColor(Vector3(0, 0, 0));
 		//大きさ変更
 		m_Debugtxt->SetScaleTxt(40);
-
-
-
+		
+		//ステージの大きさ
+		auto ScenePtr = App::GetApp()->GetScene<Scene>();
+		m_StageSize = ScenePtr->GetStageSize() / 2;
 	}
 	void PlayerManager::OnUpdate() {
 		m_StateManagerMachine->Update();
@@ -326,10 +327,11 @@ namespace basecross {
 		else {
 			Move_Speed = Rig->GetMaxSpeed() / 7.0f;
 		}
+		
 		Vec_Vec3 = Vector3(CntlVec[0].fThumbLX, 0, CntlVec[0].fThumbLY);
 		PlayerL_Rig->SetVelocity(Vec_Vec3 * Move_Speed);
 		PlayerR_Rig->SetVelocity(Vec_Vec3 * Move_Speed);
-
+		
 
 	}
 	//回転
@@ -392,6 +394,7 @@ namespace basecross {
 			PosR = Vector3(sin(RotY), 0, cos(RotY));
 			}*/
 		}
+		StintArea();
 		PosL += PlayerCenterPos;
 		PosR += PlayerCenterPos;
 		PlayerL_Trans->SetScale(1.0, 1.0, 1.0);
@@ -458,6 +461,90 @@ namespace basecross {
 			);
 		}
 	}
+	//エリア制限関数
+	void PlayerManager::StintArea() {
+		auto PlayerL_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false);
+		auto PlayerR_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_R", false);
+		Vector3 PlayerL_Pos = PlayerL_Ptr->GetComponent<Transform>()->GetPosition();
+		Vector3 PlayerR_Pos = PlayerR_Ptr->GetComponent<Transform>()->GetPosition();
+		Vector3 PlayerL_Scale = PlayerL_Ptr->GetComponent<Transform>()->GetScale();
+		Vector3 PlayerR_Scale = PlayerR_Ptr->GetComponent<Transform>()->GetScale();
+		auto Elap = App::GetApp()->GetElapsedTime();
+		//右　PLayerR
+		if (m_StageSize.x < PlayerR_Pos.x) {
+			auto n2 = m_StageSize.x - PlayerR_Pos.x;
+			PlayerR_Pos.x +=  n2 ;
+			PlayerL_Pos.x += n2;
+
+			PlayerL_Ptr->GetComponent<Transform>()->SetPosition(PlayerL_Pos.x,1,PlayerL_Pos.z);
+			PlayerR_Ptr->GetComponent<Transform>()->SetPosition(PlayerR_Pos.x , 1,PlayerR_Pos.z);
+		}
+		//PLayerL
+		 if (m_StageSize.x < PlayerL_Pos.x) {
+			auto n2 = m_StageSize.x - PlayerL_Pos.x;
+			PlayerR_Pos.x += n2;
+			PlayerL_Pos.x += n2;
+
+			PlayerL_Ptr->GetComponent<Transform>()->SetPosition(PlayerL_Pos.x, 1, PlayerL_Pos.z);
+			PlayerR_Ptr->GetComponent<Transform>()->SetPosition(PlayerR_Pos.x, 1, PlayerR_Pos.z);
+		}
+		 //左　PLayerL
+		if (-m_StageSize.x > PlayerL_Pos.x)
+		{
+			auto n = -m_StageSize.x + (-PlayerL_Pos.x);
+			PlayerL_Pos.x += n;
+			PlayerR_Pos.x += n;
+
+			PlayerL_Ptr->GetComponent<Transform>()->SetPosition(PlayerL_Pos.x, 1, PlayerL_Pos.z);
+			PlayerR_Ptr->GetComponent<Transform>()->SetPosition(PlayerR_Pos.x, 1, PlayerR_Pos.z);
+		}
+		//PlayerR
+		if (-m_StageSize.x > PlayerR_Pos.x) {
+			auto n = -m_StageSize.x + (-PlayerR_Pos.x);
+			PlayerL_Pos.x += n;
+			PlayerR_Pos.x += n;
+
+			PlayerL_Ptr->GetComponent<Transform>()->SetPosition(PlayerL_Pos.x, 1, PlayerL_Pos.z);
+			PlayerR_Ptr->GetComponent<Transform>()->SetPosition(PlayerR_Pos.x, 1, PlayerR_Pos.z);
+		}
+		//上　PlayerL
+		if (m_StageSize.y -1.5 < PlayerL_Pos.z) {
+			auto n3 = (m_StageSize.y -1.5) - PlayerL_Pos.z;
+			PlayerR_Pos.z += n3;
+			PlayerL_Pos.z += n3;
+
+			PlayerL_Ptr->GetComponent<Transform>()->SetPosition(PlayerL_Pos.x, 1, PlayerL_Pos.z);
+			PlayerR_Ptr->GetComponent<Transform>()->SetPosition(PlayerR_Pos.x, 1, PlayerR_Pos.z);
+		}
+		//PLayerR
+		if (m_StageSize.y -1.5< PlayerR_Pos.z) {
+			auto n3 = (m_StageSize.y - 1.5) - PlayerR_Pos.z;
+			PlayerR_Pos.z += n3;
+			PlayerL_Pos.z += n3;
+
+			PlayerL_Ptr->GetComponent<Transform>()->SetPosition(PlayerL_Pos.x, 1, PlayerL_Pos.z);
+			PlayerR_Ptr->GetComponent<Transform>()->SetPosition(PlayerR_Pos.x, 1, PlayerR_Pos.z);
+		}
+		//下　PlayerL
+		if (-m_StageSize.y > PlayerL_Pos.z ) {
+			auto n3 = -m_StageSize.y +(-PlayerL_Pos.z);
+			PlayerR_Pos.z += n3;
+			PlayerL_Pos.z += n3;
+
+			PlayerL_Ptr->GetComponent<Transform>()->SetPosition(PlayerL_Pos.x, 1, PlayerL_Pos.z);
+			PlayerR_Ptr->GetComponent<Transform>()->SetPosition(PlayerR_Pos.x, 1, PlayerR_Pos.z);
+		}
+		//PLayerR
+		if (-m_StageSize.y > PlayerR_Pos.z) {
+			auto n3 = -m_StageSize.y + (-PlayerR_Pos.z);
+			PlayerR_Pos.z += n3;
+			PlayerL_Pos.z += n3;
+
+			PlayerL_Ptr->GetComponent<Transform>()->SetPosition(PlayerL_Pos.x, 1, PlayerL_Pos.z);
+			PlayerR_Ptr->GetComponent<Transform>()->SetPosition(PlayerR_Pos.x, 1, PlayerR_Pos.z);
+		}
+	
+	}
 	/////////////////////////////////////////////////////////////////////////////////
 	////////////////////////ステートシェンジ関数///////////////////////////////////
 	void PlayerManager::StateChangeDoingInterpose() {
@@ -508,6 +595,7 @@ namespace basecross {
 		PlayerL_Direction_Vec3 = Move_Velo(PtrPlayerL_Pos, PtrPlayerR_Pos);
 		PlayerR_Direction_Vec3 = Move_Velo(PtrPlayerR_Pos, PtrPlayerL_Pos);
 		Speed_F = 0.0f;
+		
 
 	}
 	//最初の位置に戻る
@@ -565,6 +653,7 @@ namespace basecross {
 		InputStick();
 		InputRotation();
 		PlayerAngle();
+		StintArea();
 
 		if (CntlVec[0].wButtons &XINPUT_GAMEPAD_A) {
 			//ステート移動
@@ -606,14 +695,21 @@ namespace basecross {
 			//離れるの上限
 			if (Distance.x * Distance.x + Distance.z * Distance.z > 100) {
 				Speed_F = 0.0f;
+				m_LeaveRotateFlg = true;
+			}
+			else if(m_LeaveRotateFlg == false){
+				Speed_F += Rig->GetMaxSpeed() / 30;
+
+			}
+			if (m_LeaveRotateFlg  == false) {
+				PlayerL_Ptr->GetComponent<Rigidbody>()->SetVelocity(Vector3(PlayerL_Direction_Vec3.x, 0, PlayerL_Direction_Vec3.z)* Speed_F * ElapsedTime_F);
+				PlayerR_Ptr->GetComponent<Rigidbody>()->SetVelocity(Vector3(PlayerR_Direction_Vec3.x, 0, PlayerR_Direction_Vec3.z)* Speed_F * ElapsedTime_F);
 			}
 			else {
-				Speed_F += Rig->GetMaxSpeed() / 30;
+				InitializationVelocity();
 			}
-			PlayerL_Ptr->GetComponent<Rigidbody>()->SetVelocity(Vector3(PlayerL_Direction_Vec3.x, 0, PlayerL_Direction_Vec3.z)* Speed_F * ElapsedTime_F);
-			PlayerR_Ptr->GetComponent<Rigidbody>()->SetVelocity(Vector3(PlayerR_Direction_Vec3.x, 0, PlayerR_Direction_Vec3.z)* Speed_F * ElapsedTime_F);
 		}
-	
+		StintArea();
 
 		//Aが話されたら攻撃ステートに移動
 		if (!(CntlVec[0].wButtons& XINPUT_GAMEPAD_A)) {
@@ -707,6 +803,7 @@ namespace basecross {
 	void PlayerManager::ExitLeaveBehavior() {
 		InitializationVelocity();
 		Speed_F = 0.0f;
+		m_LeaveRotateFlg = false;
 		//処理なし
 	}
 	void PlayerManager::ExitToAttractBehavior() {
