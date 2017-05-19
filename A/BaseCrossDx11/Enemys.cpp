@@ -27,12 +27,23 @@ namespace basecross
 		Trans->SetScale(Vector3(m_ParScale, m_ParScale, m_ParScale));
 		Trans->SetRotation(0, 0, 0);
 
-		//見た目
-		auto Draw = AddComponent<PNTStaticDraw>();
-		//メッシュ設定
-		Draw->SetMeshResource(L"DEFAULT_CUBE");
-		Draw->SetTextureResource(L"SKY_TX");
+		//モデルとトランスフォームの間の差分
+		Matrix4X4 Mat;
+		Mat.DefTransformation(
+			Vector3(1.0, 1.0f, 1.0f),
+			Vector3(0.0f, -90 * 3.14159265f / 180, 0.0f),
+			Vector3(0.0f, 0.0f, 0.0f)
+			);
 
+		//見た目
+		auto Draw = AddComponent<PNTStaticModelDraw>();
+		//メッシュ設定
+		Draw->SetMeshResource(L"TACKLE_MODEL");
+		//モデル大きさ調整
+		Draw->SetMeshToTransformMatrix(Mat);
+
+		//透明処理
+		SetAlphaActive(true);
 		//ステート初期化
 		m_State = SearchS;
 
@@ -441,12 +452,23 @@ namespace basecross
 		Trans->SetScale(Vector3(m_ParScale, m_ParScale, m_ParScale));
 		Trans->SetRotation(0, 0, 0);
 
-		//見た目
-		auto Draw = AddComponent<PNTStaticDraw>();
-		//メッシュ設定
-		Draw->SetMeshResource(L"DEFAULT_CUBE");
-		Draw->SetTextureResource(L"SKY_TX");
+		//モデルとトランスフォームの間の差分
+		Matrix4X4 Mat;
+		Mat.DefTransformation(
+			Vector3(1.0, 1.0f, 1.0f),
+			Vector3(0.0f, -90 * 3.14159265f / 180, 0.0f),
+			Vector3(0.0f, 0.0f, 0.0f)
+			);
 
+		//見た目
+		auto Draw = AddComponent<PNTStaticModelDraw>();
+		//メッシュ設定
+		Draw->SetMeshResource(L"MISSILE_MODEL");
+		//モデル大きさ調整
+		Draw->SetMeshToTransformMatrix(Mat);
+
+		//透明処理
+		SetAlphaActive(true);	
 		//ステート初期化
 		m_State = SearchS;
 
@@ -774,11 +796,23 @@ namespace basecross
 		Trans->SetScale(Vector3(m_ParScale, m_ParScale, m_ParScale));
 		Trans->SetRotation(0, 0, 0);
 
+		//モデルとトランスフォームの間の差分
+		Matrix4X4 Mat;
+		Mat.DefTransformation(
+			Vector3(1.0, 1.0f, 1.0f),
+			Vector3(0.0f, -90 * 3.14159265f / 180, 0.0f),
+			Vector3(0.0f, 0.0f, 0.0f)
+			);
+
 		//見た目
-		auto Draw = AddComponent<PNTStaticDraw>();
+		auto Draw = AddComponent<PNTStaticModelDraw>();
 		//メッシュ設定
-		Draw->SetMeshResource(L"DEFAULT_CUBE");
-		Draw->SetTextureResource(L"SKY_TX");
+		Draw->SetMeshResource(L"TELEPORT_MODEL");
+		//モデル大きさ調整
+		Draw->SetMeshToTransformMatrix(Mat);
+
+		//透明処理
+		SetAlphaActive(true);
 
 		//プレイヤーのアクセサー的なのをはじめにもってきておく
 		m_Player1 = GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_L");
@@ -1157,11 +1191,23 @@ namespace basecross
 		Trans->SetScale(Vector3(m_ParScale, m_ParScale, m_ParScale));
 		Trans->SetRotation(0, 0, 0);
 
+		//モデルとトランスフォームの間の差分
+		Matrix4X4 Mat;
+		Mat.DefTransformation(
+			Vector3(1.0, 1.0f, 1.0f),
+			Vector3(0.0f, -90 * 3.14159265f / 180, 0.0f),
+			Vector3(0.0f, 0.0f, 0.0f)
+			);
+
 		//見た目
-		auto Draw = AddComponent<PNTStaticDraw>();
+		auto Draw = AddComponent<PNTStaticModelDraw>();
 		//メッシュ設定
-		Draw->SetMeshResource(L"DEFAULT_CUBE");
-		Draw->SetTextureResource(L"SKY_TX");
+		Draw->SetMeshResource(L"BOMBENEMY_MODEL");
+		//モデル大きさ調整
+		Draw->SetMeshToTransformMatrix(Mat);
+
+		//透明処理
+		SetAlphaActive(true);
 
 		//ステート初期化
 		m_State = SearchS;
@@ -1443,7 +1489,7 @@ namespace basecross
 		auto Draw = AddComponent<PNTStaticDraw>();
 		Draw->SetMeshResource(L"DEFAULT_SQUARE");
 		Draw->SetTextureResource(L"BOMBEFFECT_TX");
-
+		//透明処理
 		SetAlphaActive(true);
 		SetDrawActive(false);
 	}
@@ -1539,11 +1585,21 @@ namespace basecross
 		Trans->SetScale(m_Scale);
 		Trans->SetRotation(0, 0, 0);
 
-		auto Draw = AddComponent<PNTStaticDraw>();
-		Draw->SetTextureResource(L"BOMB_TX");
-		Draw->SetMeshResource(L"DEFAULT_SPHERE");
+		//モデルとトランスフォームの間の差分
+		Matrix4X4 Mat;
+		Mat.DefTransformation(
+			Vector3(1.0, 1.0f, 1.0f),
+			Vector3(0.0f, -90 * 3.14159265f / 180, 0.0f),
+			Vector3(0.0f, 0.0f, 0.0f)
+			);
 
-		//透明度有効
+		//見た目
+		auto Draw = AddComponent<PNTStaticModelDraw>();
+		//メッシュ設定
+		Draw->SetMeshResource(L"BOMB_MODEL");
+		//モデル大きさ調整
+		Draw->SetMeshToTransformMatrix(Mat);
+		//透明処理
 		SetAlphaActive(true);
 
 		m_time = 0;
@@ -1657,13 +1713,26 @@ namespace basecross
 		//座標、大きさ、回転
 		auto Trans = AddComponent<Transform>();
 		Trans->SetPosition(0,0,0);
-		Trans->SetScale(0.25f, 0.25f, 0.25f);
+		Trans->SetScale(0.5f, 0.5f, 0.5f);
 		Trans->SetRotation(0, 0, 0);
 
-		auto Draw = AddComponent<PNTStaticDraw>();
-		Draw->SetTextureResource(L"TEREPORTPOINT_TX");
-		Draw->SetMeshResource(L"DEFAULT_SPHERE");
 
+		//モデルとトランスフォームの間の差分
+		Matrix4X4 Mat;
+		Mat.DefTransformation(
+			Vector3(1.0, 1.0f, 1.0f),
+			Vector3(0.0f, -90 * 3.14159265f / 180, 0.0f),
+			Vector3(0.0f, 0.0f, 0.0f)
+			);
+
+		//見た目
+		auto Draw = AddComponent<PNTStaticModelDraw>();
+		//メッシュ設定
+		Draw->SetMeshResource(L"SEARCHDRAWN_MODEL");
+		//モデル大きさ調整
+		Draw->SetMeshToTransformMatrix(Mat);
+
+		//透明処理
 		SetAlphaActive(true);
 
 		//プレイヤーのアクセサー的なのをはじめにもってきておく
@@ -1894,10 +1963,22 @@ namespace basecross
 		Trans->SetScale(0, 0, 0);
 		Trans->SetRotation(0, 0, 0);
 
-		auto Draw = AddComponent<PNTStaticDraw>();
-		Draw->SetTextureResource(L"MISSILE_TX");
-		Draw->SetMeshResource(L"DEFAULT_SPHERE");
+		//モデルとトランスフォームの間の差分
+		Matrix4X4 Mat;
+		Mat.DefTransformation(
+			Vector3(1.0, 1.0f, 1.0f),
+			Vector3(0.0f, -90 * 3.14159265f / 180, 0.0f),
+			Vector3(0.0f, 0.0f, 0.0f)
+			);
 
+		//見た目
+		auto Draw = AddComponent<PNTStaticModelDraw>();
+		//メッシュ設定
+		Draw->SetMeshResource(L"MISSILE_MODEL");
+		//モデル大きさ調整
+		Draw->SetMeshToTransformMatrix(Mat);
+
+		//透明処理
 		SetAlphaActive(true);
 		SetDrawActive(false);
 

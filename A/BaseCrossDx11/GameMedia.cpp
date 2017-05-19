@@ -114,6 +114,29 @@ namespace basecross {
 		////モデル（ボーンあり
 		auto MadelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Player\\PlayerModel\\Player_animation.bmf");
 		App::GetApp()->RegisterResource(L"Player_Model", MadelMesh);
+		//Abe20170519
+		//突撃エネミー
+		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Enemy\\EnemyModel\\Assault\\Assault.bmf");
+		App::GetApp()->RegisterResource(L"TACKLE_MODEL", MadelMesh);
+		//テレポートエネミー
+		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Enemy\\EnemyModel\\Teleport\\Teleport.bmf");
+		App::GetApp()->RegisterResource(L"TELEPORT_MODEL", MadelMesh);
+		//ミサイルエネミー
+		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Enemy\\EnemyModel\\Missile_Enemy\\Missile_Enemy.bmf");
+		App::GetApp()->RegisterResource(L"MISSILE_MODEL", MadelMesh);
+		//ドローン
+		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Enemy\\EnemyModel\\Dorawn\\Dorawn.bmf");
+		App::GetApp()->RegisterResource(L"SEARCHDRAWN_MODEL", MadelMesh);
+		//自爆エネミー
+		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Enemy\\EnemyModel\\BombEnemy\\Suicide_bomd.bmf");
+		App::GetApp()->RegisterResource(L"BOMBENEMY_MODEL", MadelMesh);
+		//自爆エネミー
+		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Enemy\\EnemyModel\\Bomb\\Bomb.bmf");
+		App::GetApp()->RegisterResource(L"BOMB_MODEL", MadelMesh);
+
+		
+		//Abe20170519
+
 
 		//検証するのに重いので一時的に消します Abe20170505
 		//BGM

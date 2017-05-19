@@ -578,6 +578,26 @@ namespace basecross {
 	}
 	//Abe20170413
 
+	//Abe20170519
+	//--------------------------------------------------------------------------------------
+	//	class PauseMenu : public GameObject;
+	//	用途: ポーズ
+	//--------------------------------------------------------------------------------------
+	PauseMenu::PauseMenu(const shared_ptr<Stage>& StagePtr):
+		GameObject(StagePtr)
+	{}
+
+	void PauseMenu::OnCreate()
+	{
+
+	}
+
+	void PauseMenu::OnUpdate()
+	{
+
+	}
+	//Abe20170519
+
 
 	//Abe20170418
 	//--------------------------------------------------------------------------------------

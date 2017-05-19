@@ -246,9 +246,19 @@ namespace basecross{
 		//ポーズ背景(残存勢力)
 		shared_ptr<GameObject> m_PauseBackEnemyS;
 		//選択項目
-
+		//ゲームに戻る
+		shared_ptr<GameObject> m_BackGameSprite;
+		//リトライ
+		shared_ptr<GameObject> m_RetrySprite;
+		//ステージセレクト
+		shared_ptr<GameObject> m_StageSelectSprite;
+		//タイトル
+		shared_ptr<GameObject> m_TitleSprite;
 	public:
+		PauseMenu(const shared_ptr<Stage>& StagePtr);
 
+		void OnCreate() override;
+		void OnUpdate() override;
 	};
 	//Abe20170519
 
