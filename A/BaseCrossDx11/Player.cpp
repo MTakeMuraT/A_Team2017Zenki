@@ -685,6 +685,10 @@ namespace basecross {
 		if (CntlVec[0].fThumbLX || CntlVec[0].fThumbLY) {
 			InputStick();
 			Speed_F = 0.0f;
+			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER || CntlVec[0].wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
+				InputRotation();
+				PlayerAngle();
+			}
 		}
 		else if (CntlVec[0].wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER || CntlVec[0].wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
 			InitializationVelocity();
