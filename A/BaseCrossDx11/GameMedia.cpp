@@ -115,6 +115,12 @@ namespace basecross {
 		//Abe20170519
 
 
+		//Abe20170519
+		//エネミーカウントのスラッシュ
+		strTexture = DataDir + L"Enemy\\EnemyCountSlash.png";
+		App::GetApp()->RegisterTexture(L"ENEMYCOUNTSLASH_TX", strTexture);
+		//Abe20170519
+
 	
 		////モデル（ボーンあり
 		auto MadelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Player\\PlayerModel\\Player_animation.bmf");

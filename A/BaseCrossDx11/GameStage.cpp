@@ -143,7 +143,7 @@ namespace basecross
 	//エネミーカウント作成--------------------------------------------
 	void GameStage::CreateEnemyCounts()
 	{
-		AddGameObject<EnemyCountA>(Vector2(550, -280), Vector2(100, 100), 3);
+		AddGameObject<EnemyCountA>(Vector2(520, -250), Vector2(100, 100), 3);
 	}
 	//エネミーカウント作成--------------------------------------------
 

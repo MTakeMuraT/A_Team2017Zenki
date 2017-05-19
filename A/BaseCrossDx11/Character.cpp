@@ -1620,8 +1620,8 @@ namespace basecross {
 		//Abe20170519‚¿‚å‚Á‚ÆC³
 		Vector2 pos = m_InitPos;
 		//¶ã‚É‚¸‚ç‚·
-		pos.x += -m_InitScale.x * 1;
-		pos.y += +m_InitScale.y * 1;
+		pos.x += -m_InitScale.x * 0.5f;
+		pos.y += +m_InitScale.y * 0.5f;
 		m_Numbers = GetStage()->AddGameObject<NumberSprite>(0,pos, m_InitScale, m_LayerNum);
 		//‰E‰º‚É
 		pos.x += +m_InitScale.x * 1;
@@ -1631,6 +1631,18 @@ namespace basecross {
 
 		m_EnemyCunt = 0;
 		m_EnemyMaxCount = 0;
+
+		auto ptr = GetStage()->AddGameObject<GameObject>();
+
+		auto Trans = ptr->AddComponent<Transform>();
+		Trans->SetPosition(m_InitPos.x, m_InitPos.y, 0);
+		Trans->SetRotation(0, 0, 0);
+		Trans->SetScale(m_InitScale.x,m_InitScale.y,1);
+
+		auto Draw = ptr->AddComponent<PCTSpriteDraw>();
+		Draw->SetTextureResource(L"ENEMYCOUNTSLASH_TX");
+		ptr->SetAlphaActive(true);
+		ptr->SetDrawLayer(3);
 	}
 
 	void EnemyCountA::OnUpdate()

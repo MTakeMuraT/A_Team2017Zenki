@@ -111,6 +111,7 @@ namespace basecross
 				//攻撃
 			case AttackS:
 				Attack();
+				Rot();
 				StageEndCheck();
 				break;
 				//クールタイム
@@ -118,8 +119,34 @@ namespace basecross
 				CoolTime();
 				break;
 			}
+
+			//回転
+			Rot();
 		}
 	}
+	//Abe20170519
+	void TackleEnemy::Rot()
+	{
+		//持ってる速度から角度算出
+		Vector3 vel = m_Velocity;
+		//マイナス反転(absは重いので使いません)
+		if (vel.x < 0)
+		{
+			vel.x *= -1;
+		}
+		if (vel.z < 0)
+		{
+			vel.z *= -1;
+		}
+		//xとz足した値が0.2よりあれば
+		if (vel.x + vel.z > 0.2f)
+		{
+			float angle = atan2(m_Velocity.z, m_Velocity.x);
+			angle += 90 * 3.14159265f / 180;
+			GetComponent<Transform>()->SetRotation(0, angle, 0);
+		}
+	}
+	//Abe20170519
 
 	//Abe20170515
 	//ステージの端にいったか判定して向き反転するやつ
@@ -1276,10 +1303,40 @@ namespace basecross
 				Attack();
 				break;
 			}
+
+			//Abe20170519
+			//回転
+			Rot();
+			//Abe20170519
+
 		}
 
 
 	}
+
+	//Abe20170519
+	void BombEnemy::Rot()
+	{
+		//持ってる速度から角度算出
+		Vector3 vel = m_Velocity;
+		//マイナス反転(absは重いので使いません)
+		if (vel.x < 0)
+		{
+			vel.x *= -1;
+		}
+		if (vel.z < 0)
+		{
+			vel.z *= -1;
+		}
+		//xとz足した値が0.2よりあれば
+		if (vel.x + vel.z > 0.2f)
+		{
+			float angle = atan2(m_Velocity.z, m_Velocity.x);
+			angle += 90 * 3.14159265f / 180;
+			GetComponent<Transform>()->SetRotation(0, angle, 0);
+		}
+	}
+	//Abe20170519
 
 	void BombEnemy::Search()
 	{

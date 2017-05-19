@@ -72,6 +72,11 @@ namespace basecross
 		void StageEndCheck();
 		//Abe20170515
 
+		//Abe20170519
+		//‰ñ“]
+		void Rot();
+		//Abe20170519
+
 		//ˆÈ‰ºƒpƒ‰ƒ[ƒ^
 		//‘å‚«‚³
 		float m_ParScale;
@@ -351,6 +356,11 @@ namespace basecross
 		int m_TargetNum = 0;
 		//“ËŒ‚‚µ‚Ä‚éŠÔ
 		float m_TackleTime = 3.0f;
+
+		//Abe20170519
+		//‰ñ“]
+		void Rot();
+		//Abe20170519
 
 
 
