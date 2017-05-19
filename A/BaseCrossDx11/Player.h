@@ -101,6 +101,10 @@ namespace basecross {
 		Vector3 Distance = Vector3(0, 0, 0);
 		//回転フラグ
 		bool m_RotateFlg = false;
+		//ローテーション可能フラグ(離れている時
+		bool m_LeaveRotateFlg = false;
+		//ステージのスケール
+		Vector2 m_StageSize;
 
 
 	public:
@@ -153,6 +157,9 @@ namespace basecross {
 		void ExitReturnBehavior();//戻る
 		void ExitDoingInterpose();//挟んでいるとき
 		void ExitDieBehavior();
+
+		//エリア外への進行を防ぐ関数
+		void StintArea();
 
 		bool GetRotateFlg() {
 			return m_RotateFlg;
