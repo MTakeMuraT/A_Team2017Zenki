@@ -34,7 +34,7 @@ namespace basecross {
 			);
 		AddGameObject<PressSprite>(
 			Vector2(512, 512),
-			Vector2(0, -180)
+			Vector2(0, -155)
 			);
 		
 		//AddGameObject<InputCSV>();
