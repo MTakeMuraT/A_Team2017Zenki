@@ -1374,50 +1374,375 @@ namespace basecross {
 
 	}
 
-	Enemycount::Enemycount(const shared_ptr<Stage>& StagePtr):
-	GameObject(StagePtr)
+	/////////////////////////////////////////////
+
+
+	EnemyCountSprite::EnemyCountSprite(const shared_ptr<Stage>& StagePtr, int num, Vector2 pos, Vector2 scale, int layer) :
+		GameObject(StagePtr),
+		m_num(num),
+		m_pos(pos),
+		m_scale(scale),
+		m_layer(layer)
 	{
 	}
-	void Enemycount::OnCreate() {
-		//デバッグ文字生成
-	    m_Debugtxt = GetStage()->AddGameObject<DebugTxt>();
-		m_Debugtxt->SetLayer(10);
-		//色黒に変更
-		m_Debugtxt->SetColor(Vector3(0, 0, 0));
-		//大きさ変更
-		m_Debugtxt->SetScaleTxt(50);
-		EnemyCunt = 0;
-	}
+	void EnemyCountSprite::OnCreate() {
 
-	void Enemycount::OnUpdate() {
-		wstring CountStr(L"Enemyの数::\t");
-		CountStr += Util::IntToWStr(EnemyCunt);
+		//桁数える-------------------------------------
+		int count = m_num;
+		do
+		{
+			count /= 10;
+			m_digit++;
+		} while (count > 0);
+		//桁数える-------------------------------------
 
-		auto Group = GetStage()->GetSharedObjectGroup(L"EnemyGroup");
-	//	auto ShellVec = Group->GetGroupVector();
-		if (m_TestFlg == false) {
-			for (auto i = 0; i < Group->size(); i++) {
-				auto Obj = Group->at(i);
-				if (Obj && Obj->IsUpdateActive()) {
-					EnemyCunt++;
-				}
+		//数字の画像作成-------------------------
+		for (int i = 0; i < 10; i++)
+		{
+			//頂点配列
+			vector<VertexPositionNormalTexture> vertices;
+			//インデックスを作成するための配列
+			vector<uint16_t> indices;
+			//Squareの作成(ヘルパー関数を利用)
+			MeshUtill::CreateSquare(1.0f, vertices, indices);
+			//UV値の変更
+			float from = i / 10.0f;
+			float to = from + (1.0f / 10.0f);
+			//左上頂点
+			vertices[0].textureCoordinate = Vector2(from, 0);
+			//右上頂点
+			vertices[1].textureCoordinate = Vector2(to, 0);
+			//左下頂点
+			vertices[2].textureCoordinate = Vector2(from, 1.0f);
+			//右下頂点
+			vertices[3].textureCoordinate = Vector2(to, 1.0f);
+			//頂点の型を変えた新しい頂点を作成
+			vector<VertexPositionColorTexture> new_vertices;
+			for (auto& v : vertices) {
+				VertexPositionColorTexture nv;
+				nv.position = v.position;
+				nv.color = Color4(1.0f, 1.0f, 1.0f, 1.0f);
+				nv.textureCoordinate = v.textureCoordinate;
+				new_vertices.push_back(nv);
 			}
-			//for (auto Ptr : ShellVec) {
-			//	auto shptr = Ptr.lock();
-			//	if (shptr && shptr->IsUpdateActive()) {
-			//		EnemyCunt++;
-			//	}
-			//}
-			m_TestFlg = true;
+			//メッシュ作成
+			m_Mesh.push_back(MeshResource::CreateMeshResource<VertexPositionColorTexture>(new_vertices, indices, true));
+		}
+		//数字の画像作成-------------------------
+
+		//数字スプライト作成---------------------
+		//処理用に数字取っておく
+		int masternum = m_num;
+
+		//計算結果入れておく用の箱
+		vector<int> OutNums;
+
+		//桁分ループ、数字作成
+		for (int j = 0; j < m_digit; j++)
+		{
+			//生成した桁数加算
+			m_Constdigit++;
+
+			//上位の桁から数字入れてく
+			int num = masternum / pow(10, (m_digit - 1) - j);
+			OutNums.push_back(num);
+			//計算用の桁の最上位の桁を排除
+			masternum = masternum % (int)(pow(10, (m_digit - 1) - j));
 		}
 
+		//一個右との差
+		float distance = m_scale.x / IntervalNums;
+
+		wstring txt;
+		//桁分逆からループ！(0から上位の桁入れてるので)
+		//動けばいいよね、バグ起きそうとか言わない
+		for (int j = 0; j < m_digit; j++) {
 
 
-		wstring  str = CountStr;
-		m_Debugtxt->SetText(str);
+			//生成オブジェ
+			auto NumP = GetStage()->AddGameObject<GameObject>();
+
+			//座標設定
+			auto TranP = NumP->AddComponent<Transform>();
+			TranP->SetPosition(m_pos.x - (distance*count), m_pos.y, 5);
+			TranP->SetScale(m_scale.x, m_scale.y, 3);
+			TranP->SetRotation(0, 0, 0);
+
+			//大きさ設定
+			auto DrawP = NumP->AddComponent<PCTSpriteDraw>();
+			DrawP->SetTextureResource(L"NUMBER_TX");
+			DrawP->SetMeshResource(m_Mesh[OutNums[(m_digit - 1) - j]]);
+			NumP->SetAlphaActive(true);
+
+			//レイヤー設定
+			NumP->SetDrawLayer(m_layer);
+			//メンバ変数の管理するやつに追加
+			m_Numbers.push_back(NumP);
+
+			//カウントアップ
+			count++;
+
+		}
+		//数字スプライト作成---------------------
+	}
+
+
+	void EnemyCountSprite::SetNum(int num)
+	{
+		//マイナス弾く
+		if (m_num >= 0)
+		{
+			m_num = num;
+			//入力された桁持ってくる
+			int digit = 0;
+			int innum = num;
+			do
+			{
+				innum /= 10;
+				digit++;
+			} while (innum > 0);
+
+			//処理用に数字取っておく
+			int masternum = m_num;
+			//計算結果入れておく用の箱
+			vector<int> OutNums;
+
+			//桁分ループ、数字作成
+			for (int j = 0; j < digit; j++)
+			{
+				//上位の桁から数字入れてく
+				int num = masternum / pow(10, (digit - 1) - j);
+				OutNums.push_back(num);
+				//計算用の桁の最上位の桁を排除
+				masternum = masternum % (int)(pow(10, (digit - 1) - j));
+			}
+
+
+			//入力されたほうが大きかったら
+			if (digit > m_digit)
+			{
+				//追加する分だけループ
+				for (int j = 0; j < (digit - m_Constdigit); j++)
+				{
+					//左側に桁追加だけ、数字は後で入れる
+					m_Constdigit++;
+
+					auto NumP = GetStage()->AddGameObject<GameObject>();
+
+					float distance = m_scale.x / 1.8f;
+
+					auto TranP = NumP->AddComponent<Transform>();
+					TranP->SetPosition(m_pos.x - (distance*(m_digit + j)), m_pos.y, 0);
+					TranP->SetScale(m_scale.x, m_scale.y, 1);
+					TranP->SetRotation(0, 0, 0);
+
+					auto DrawP = NumP->AddComponent<PCTSpriteDraw>();
+					DrawP->SetTextureResource(L"NUMBER_TX");
+					DrawP->SetMeshResource(m_Mesh[0]);
+					NumP->SetAlphaActive(true);
+
+					NumP->SetDrawLayer(m_layer);
+					m_Numbers.push_back(NumP);
+				}
+
+				for (int i = 0; i < m_Constdigit; i++)
+				{
+					m_Numbers[i]->SetDrawActive(true);
+				}
+
+			}
+			//入力されたほうが小さい
+			else if (digit < m_digit)
+			{
+				//添え字ように-1ずらす
+				for (int i = m_digit - 1; i > digit - 1; i--)
+				{
+					m_Numbers[i]->SetDrawActive(false);
+				}
+			}
+
+			//桁更新
+			m_digit = digit;
+
+			//数字入れ替え
+			masternum = m_num;
+			for (int i = 0; i < m_digit; i++)
+			{
+				m_Numbers[i]->GetComponent<PCTSpriteDraw>()->SetMeshResource(m_Mesh[OutNums[(m_digit - 1) - i]]);
+			}
+
+		}
+	}
+
+	void EnemyCountSprite::SetNumDraw(bool flg)
+	{
+		for (auto v : m_Numbers)
+		{
+			v->SetDrawActive(flg);
+		}
+
+	}
+
+
+
+	////////////////////////////////////////////////////
+
+	EnemyCountA::EnemyCountA(const shared_ptr<Stage>& StagePtr, int Time, Vector2 pos, Vector2 scale, int layer) :
+		GameObject(StagePtr),
+		m_InitTime(Time),
+		m_InitPos(pos),
+		m_InitScale(scale),
+		m_LayerNum(layer)
+	{}
+
+	void EnemyCountA::OnCreate()
+	{
+		//数字作成
+		m_Numbers = GetStage()->AddGameObject<EnemyCountSprite>(m_InitTime, m_InitPos, m_InitScale, m_LayerNum);
+		//初期時間入れる
+		m_Time = m_InitTime;
+
+		m_EnemyCunt = 0;
+	}
+
+	void EnemyCountA::OnUpdate()
+	{
+		m_EnemyCunt = 0;
+
+		auto Group = GetStage()->GetSharedObjectGroup(L"EnemyGroup")->GetGroupVector();
+		//	auto ShellVec = Group->GetGroupVector();
+
+		for (auto obj : Group) {
+			//キャスト
+			//auto ptr = dynamic_pointer_cast<TackleEnemy>(obj.lock());
+			auto ptr1 = dynamic_pointer_cast<TackleEnemy>(obj.lock());
+			if (ptr1)
+			{
+				if (ptr1->GetDrawActive())
+				{
+					m_EnemyCunt++;
+					//m_Numbers->SetNum((int)m_EnemyCunt);
+				}
+			}
+
+			auto ptr2 = dynamic_pointer_cast<BombEnemy>(obj.lock());
+			if (ptr2)
+			{
+				if (ptr2->GetDrawActive())
+				{
+					m_EnemyCunt++;
+					//m_Numbers->SetNum((int)m_EnemyCunt);
+				}
+			}
+
+			auto ptr3 = dynamic_pointer_cast<TeleportEnemy>(obj.lock());
+			if (ptr3)
+			{
+				if (ptr3->GetDrawActive())
+				{
+					m_EnemyCunt++;
+					//m_Numbers->SetNum((int)m_EnemyCunt);
+				}
+			}
+
+			auto ptr4 = dynamic_pointer_cast<ShotEnemy>(obj.lock());
+			if (ptr4)
+			{
+				if (ptr4->GetDrawActive())
+				{
+					m_EnemyCunt++;
+					//m_Numbers->SetNum((int)m_EnemyCunt);
+				}
+			}
+		}
+		m_Numbers->SetNum((int)m_EnemyCunt);
+	}
+
+
+
+	////////////////////////////////////////////////////
+
+	EnemyCountB::EnemyCountB(const shared_ptr<Stage>& StagePtr, int Time, Vector2 pos, Vector2 scale, int layer) :
+		GameObject(StagePtr),
+		m_InitTime(Time),
+		m_InitPos(pos),
+		m_InitScale(scale),
+		m_LayerNum(layer)
+	{}
+
+	void EnemyCountB::OnCreate()
+	{
+		//数字作成
+		m_Numbers = GetStage()->AddGameObject<EnemyCountSprite>(m_InitTime, m_InitPos, m_InitScale, m_LayerNum);
+		//初期時間入れる
+		m_Time = m_InitTime;
+
+		m_EnemyCunt = 0;
+
+
+	}
+
+	void EnemyCountB::OnUpdate()
+	{
+		m_EnemyCunt = 0;
+
+		auto Group = GetStage()->GetSharedObjectGroup(L"EnemyGroup")->GetGroupVector();
+		//auto ShellVec = Group->GetGroupVector();
+
+		for (auto obj : Group) {
+			//キャスト
+			//auto ptr = dynamic_pointer_cast<TackleEnemy>(obj.lock());
+			auto ptr1 = dynamic_pointer_cast<TackleEnemy>(obj.lock());
+			if (ptr1)
+			{
+				if (ptr1->GetDrawActive())
+				{
+					m_EnemyCunt++;
+					//m_Numbers->SetNum((int)m_EnemyCunt);
+
+				}
+			}
+
+			auto ptr2 = dynamic_pointer_cast<BombEnemy>(obj.lock());
+			if (ptr2)
+			{
+				if (ptr2->GetDrawActive())
+				{
+					m_EnemyCunt++;
+					//m_Numbers->SetNum((int)m_EnemyCunt);
+
+				}
+			}
+
+			auto ptr3 = dynamic_pointer_cast<TeleportEnemy>(obj.lock());
+			if (ptr3)
+			{
+				if (ptr3->GetDrawActive())
+				{
+					m_EnemyCunt++;
+					//m_Numbers->SetNum((int)m_EnemyCunt);
+
+				}
+			}
+
+			auto ptr4 = dynamic_pointer_cast<ShotEnemy>(obj.lock());
+			if (ptr4)
+			{
+				if (ptr4->GetDrawActive())
+				{
+					m_EnemyCunt++;
+					//m_Numbers->SetNum((int)m_EnemyCunt);
+
+				}
+			}
+
+		}
+		if (m_MaxCount == 0)
+		{
+			m_MaxCount = m_EnemyCunt;
+			m_Numbers->SetNum((int)m_MaxCount);
+		}
 	}
 	}
-	
-	
-	
-//end basecross
+
+	//end basecross
