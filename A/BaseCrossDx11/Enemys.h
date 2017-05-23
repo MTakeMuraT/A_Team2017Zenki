@@ -95,6 +95,8 @@ namespace basecross
 
 		//デバッグ文字表示オブジェ
 		shared_ptr<DebugTxt> m_Debugtxt;
+		
+
 
 	public :
 		//引数 位置(pos)、大きさ(parscale)、HP(hp)、索敵距離(serchdistance)、クールタイム(cooltime)、速度(speed)、攻撃力(power)、突撃回数(tacklecount)
@@ -136,6 +138,7 @@ namespace basecross
 		void DamagePlayer();
 		//ミサイルとか爆弾とかプレイヤー以外
 		void Damage(int num);
+		int GetPower() { return m_Power; }
 	};
 
 	//************************************
@@ -357,6 +360,9 @@ namespace basecross
 		//突撃してる時間
 		float m_TackleTime = 3.0f;
 
+		void StageEndCheck();
+		Vector2 m_StageSize;
+
 		//Abe20170519
 		//回転
 		void Rot();
@@ -408,6 +414,9 @@ namespace basecross
 		//自分がダメージ受けたときの関数
 		//プレイヤーから
 		void DamagePlayer();
+
+		void TurnVecolity(bool, bool);
+		int GetPower() { return m_Power; }
 
 	};
 

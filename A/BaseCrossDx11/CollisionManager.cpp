@@ -171,19 +171,19 @@ namespace basecross
 		//================================================
 		//					１体目
 		//================================================
-		if (dynamic_pointer_cast<TackleEnemy>(obj))
-		{
-			//横が当たってる
-			if ((angle > 135.0f && angle < 225.0f) || (angle > 315.0f && angle < 45.0f))
-			{
-				dynamic_pointer_cast<TackleEnemy>(obj)->TurnVecolity(true, false);
-			}
-			//縦の判定[!横]でいけるんじゃね？
-			else
-			{
-				dynamic_pointer_cast<TackleEnemy>(obj)->TurnVecolity(false, true);
-			}
-		}
+		//if (dynamic_pointer_cast<TackleEnemy>(obj))
+		//{
+		//	//横が当たってる
+		//	if ((angle > 135.0f && angle < 225.0f) || (angle > 315.0f && angle < 45.0f))
+		//	{
+		//		dynamic_pointer_cast<TackleEnemy>(obj)->TurnVecolity(true, false);
+		//	}
+		//	//縦の判定[!横]でいけるんじゃね？
+		//	else
+		//	{
+		//		dynamic_pointer_cast<TackleEnemy>(obj)->TurnVecolity(false, true);
+		//	}
+		//}
 		if (dynamic_pointer_cast<ShotEnemyChildMissile>(obj))
 		{
 			//それぞれのエネミーにダメージを与える
@@ -195,8 +195,9 @@ namespace basecross
 			{
 				dynamic_pointer_cast<TeleportEnemy>(obj2)->Damage((int)dynamic_pointer_cast<ShotEnemyChildMissile>(obj)->GetChildMissileAttackDamage());
 			}
+			
 		}
-
+		
 		//ミサイルがあたった
 		if (dynamic_pointer_cast<Missile>(obj))
 		{
@@ -213,7 +214,45 @@ namespace basecross
 			{
 				dynamic_pointer_cast<ShotEnemy>(obj2)->Damage((int)dynamic_pointer_cast<Missile>(obj)->GetPower());
 			}
+			if (dynamic_pointer_cast<BombEnemy>(obj2))
+			{
+				dynamic_pointer_cast<BombEnemy>(obj2)->DamagePlayer();
+			}
+		}
+		//突撃エネミー
+		if (dynamic_pointer_cast<TackleEnemy>(obj))
+		{
+		
+			//それぞれのエネミーにダメージを与える
+			if (dynamic_pointer_cast<ShotEnemy>(obj2))
+			{
+				dynamic_pointer_cast<ShotEnemy>(obj2)->Damage((int)dynamic_pointer_cast<TackleEnemy>(obj)->GetPower());
+			}
+			if (dynamic_pointer_cast<TeleportEnemy>(obj2))
+			{
+				dynamic_pointer_cast<TeleportEnemy>(obj2)->Damage((int)dynamic_pointer_cast<TackleEnemy>(obj)->GetPower());
+			}
+			if (dynamic_pointer_cast<BombEnemy>(obj2))
+			{
+				dynamic_pointer_cast<BombEnemy>(obj2)->DamagePlayer();
+			}
+		}
+		//自爆エネミー
+		if (dynamic_pointer_cast<BombEnemy>(obj))
+		{
+			if (dynamic_pointer_cast<TackleEnemy>(obj2))
+			{
+				dynamic_pointer_cast<TackleEnemy>(obj2)->Damage((int)dynamic_pointer_cast<BombEnemy>(obj)->GetPower());
+			}
 
+			if (dynamic_pointer_cast<TeleportEnemy>(obj2))
+			{
+				dynamic_pointer_cast<TeleportEnemy>(obj2)->Damage((int)dynamic_pointer_cast<BombEnemy>(obj)->GetPower());
+			}
+			if (dynamic_pointer_cast<ShotEnemy>(obj2))
+			{
+				dynamic_pointer_cast<ShotEnemy>(obj2)->Damage((int)dynamic_pointer_cast<BombEnemy>(obj)->GetPower());
+			}
 		}
 
 		//上と同じもの
@@ -264,6 +303,41 @@ namespace basecross
 				dynamic_pointer_cast<ShotEnemy>(obj)->Damage((int)dynamic_pointer_cast<Missile>(obj2)->GetPower());
 			}
 
+		}
+		//突撃エネミー
+		if (dynamic_pointer_cast<TackleEnemy>(obj2))
+		{
+		
+			//それぞれのエネミーにダメージを与える
+			if (dynamic_pointer_cast<ShotEnemy>(obj))
+			{
+				dynamic_pointer_cast<ShotEnemy>(obj)->Damage((int)dynamic_pointer_cast<TackleEnemy>(obj2)->GetPower());
+			}
+			if (dynamic_pointer_cast<TeleportEnemy>(obj))
+			{
+				dynamic_pointer_cast<TeleportEnemy>(obj)->Damage((int)dynamic_pointer_cast<TackleEnemy>(obj2)->GetPower());
+			}
+			if (dynamic_pointer_cast<BombEnemy>(obj))
+			{
+				dynamic_pointer_cast<BombEnemy>(obj)->DamagePlayer();
+			}
+		}
+	
+		//自爆エネミー
+		if (dynamic_pointer_cast<BombEnemy>(obj2))
+		{
+			if (dynamic_pointer_cast<TackleEnemy>(obj))
+			{
+				dynamic_pointer_cast<TackleEnemy>(obj)->Damage((int)dynamic_pointer_cast<BombEnemy>(obj2)->GetPower());
+			}
+			if (dynamic_pointer_cast<TeleportEnemy>(obj))
+			{
+				dynamic_pointer_cast<TeleportEnemy>(obj)->Damage((int)dynamic_pointer_cast<BombEnemy>(obj2)->GetPower());
+			}
+			if (dynamic_pointer_cast<ShotEnemy>(obj))
+			{
+				dynamic_pointer_cast<ShotEnemy>(obj)->Damage((int)dynamic_pointer_cast<BombEnemy>(obj2)->GetPower());
+			}
 		}
 
 	}
