@@ -727,6 +727,11 @@ namespace basecross
 				float angle2 = Tangle * 3.14159265f / 180;
 				pptr->SetVelocity(Vector3(cos(angle2) * (float)(rand() % 3 + 1) * m_ParScale / 2, rand() % 5 + 5, sin(angle2) * (float)(rand() % 3 + 1))* m_ParScale / 2);
 				m_ChildS.push_back(pptr);
+
+				//グループに入れる
+				GetStage()->GetSharedObjectGroup(L"CollisionGroup")->IntoGroup(pptr);
+				GetStage()->GetSharedObjectGroup(L"EnemyGroup")->IntoGroup(pptr);
+
 			}
 
 		}
@@ -2203,5 +2208,22 @@ namespace basecross
 	}
 	//Abe20170517
 
-
+	//索敵サークル
+	SearchCircle::SearchCircle(const shared_ptr<Stage>& StagePtr) :
+		SS5ssae(StagePtr, App::GetApp()->m_wstrDataPath + L"EF\\", L"NewAnimation.ssae", L"anime_1",true)
+	{
+	}
+	void SearchCircle::OnCreate() {
+		auto Trans = AddComponent<Transform>();
+		Trans->SetPosition(0, 2, 0);
+		Trans->SetScale(5,1, 5);
+		Trans->SetRotation(0, 0, 0);
+		SS5ssae::OnCreate();
+		SetAlphaActive(true);
+		SetDrawActive(true);
+		SetDrawLayer(10);
+	}
+	void SearchCircle::OnUpdate() {
+		SetLooped(true);
+	}
 }

@@ -78,11 +78,13 @@ namespace basecross {
 		Vector3 m_DebugR = Vector3(0, 0, 0);
 		//別のスピード
 		float Speed_F = 0.0f;
+		float AddSpeed = 0.0f;//加速時に使用
 		shared_ptr<StateMachine<PlayerManager>> m_StateManagerMachine;
 		//InputStick関数内の使用変数/////
 		//移動スピード
 		float Move_Speed = 0.0f;
 		Vector3 Vec_Vec3 = Vector3(0.0f, 0.0f, 0.0f);
+		Vector3 StickVec = Vector3(0.0f, 0.0f, 0.0f);
 		/////////////////////////////////
 		//Direction関数内の使用変数/////
 		Vector3 Direction_Vec3 = Vector3(0, 0, 0);

@@ -620,5 +620,17 @@ namespace basecross
 		int GetPower() { return m_power; }
 	};
 	//Abe20170515
+	//サーチサークル
+	class SearchCircle : public SS5ssae {
+		//中略
+
+	public:
+		//構築と破棄
+		SearchCircle(const shared_ptr<Stage>& StagePtr);
+		virtual ~SearchCircle() {}
+		//初期化
+		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
+	};
 
 }

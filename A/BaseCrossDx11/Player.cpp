@@ -66,11 +66,13 @@ namespace basecross {
 		//透明処理
 		SetAlphaActive(true);
 		PtrDraw->SetMeshToTransformMatrix(PlayerMat);
-		//オーディオリソース登録
-		auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
-		pMultiSoundEffect->AddAudioResource(L"PlayerDie_SE");
+	
 		m_Effect = GetStage()->AddGameObject<BombEffect>();
 		
+		//オーディオリソース登録
+		auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
+		pMultiSoundEffect->AddAudioResource(L"PrayerDie_SE");
+
 		//アニメーション
 		PtrDraw->AddAnimation(L"AllAnima", 0, 150, 30.0f);
 		PtrDraw->AddAnimation(L"Wait", 0, 30, true, 30.0f);
@@ -100,8 +102,8 @@ namespace basecross {
 				else {
 					m_Effect->SetPosActive(GetComponent<Transform>()->GetPosition());
 				}
-				/*auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
-				pMultiSoundEffect->Start(L"PlayerDie_SE", 0, 1.0f);*/
+				auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+				//pMultiSoundEffect->Start(L"PrayerDie_SE", 0, 1.0f);
 				PtrDraw->SetDrawActive(false);
 				SetUpdateActive(false);
 			}
@@ -327,11 +329,24 @@ namespace basecross {
 		else {
 			Move_Speed = Rig->GetMaxSpeed() / 7.0f;
 		}
+		if (CntlVec[0].fThumbLX || CntlVec[0].fThumbLY) {
+			if (Move_Speed > AddSpeed) {
+				AddSpeed += 0.5f;
+			}
+		}
+		else {
+			if (AddSpeed > 0.0f) {
+				AddSpeed -= 0.5f;
+			}
+		}
 		
+
 		Vec_Vec3 = Vector3(CntlVec[0].fThumbLX, 0, CntlVec[0].fThumbLY);
-		PlayerL_Rig->SetVelocity(Vec_Vec3 * Move_Speed);
-		PlayerR_Rig->SetVelocity(Vec_Vec3 * Move_Speed);
-		
+		if (CntlVec[0].fThumbLX || CntlVec[0].fThumbLY) {
+			StickVec = Vec_Vec3;
+		}
+		PlayerL_Rig->SetVelocity(StickVec * AddSpeed);
+		PlayerR_Rig->SetVelocity(StickVec * AddSpeed);
 
 	}
 	//回転
@@ -373,12 +388,7 @@ namespace basecross {
 			RotY -= XM_PIDIV2;
 			PosL = Vector3(sin(RotY) * testLD, 0, cos(RotY) * testLD);
 			m_DebugL = PosL;
-			/*if (m_StateManagerMachine->GetCurrentState() == LeaveState_Manager::Instance()) {
-			PosL = Vector3((sin(RotY)* testLD.x), 0, (cos(RotY)* testLD.z));
-			}
-			else {
-			PosL = Vector3(sin(RotY), 0, cos(RotY));
-			}*/
+			
 		}
 		//初期化//
 		RotY = RotY_Initialization;
@@ -387,12 +397,7 @@ namespace basecross {
 			RotY += XM_PIDIV2;
 			PosR = Vector3(sin(RotY)*testRD, 0, cos(RotY)*testRD);
 			m_DebugR = PosR;
-			/*	if (m_StateManagerMachine->GetCurrentState() == LeaveState_Manager::Instance()) {
-			PosR = Vector3((sin(RotY)*testRL.x), 0, (cos(RotY)*testRL.z));
-			}
-			else {
-			PosR = Vector3(sin(RotY), 0, cos(RotY));
-			}*/
+			
 		}
 		StintArea();
 		PosL += PlayerCenterPos;
