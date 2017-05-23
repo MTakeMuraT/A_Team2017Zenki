@@ -620,9 +620,14 @@ namespace basecross
 		int GetPower() { return m_power; }
 	};
 	//Abe20170515
-	//サーチサークル
+
+	//Abe20170523IzumiHikitugi
+	//************************************
+	//	索敵サークル(SS版)
+	//	スプライトスタジオで再生
+	//************************************
 	class SearchCircle : public SS5ssae {
-		//中略
+	private :
 
 	public:
 		//構築と破棄
@@ -632,5 +637,6 @@ namespace basecross
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 	};
+	//Abe20170523IzumiHikitugi
 
 }

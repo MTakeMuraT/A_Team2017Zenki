@@ -71,7 +71,7 @@ namespace basecross {
 		
 		//オーディオリソース登録
 		auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
-		pMultiSoundEffect->AddAudioResource(L"PrayerDie_SE");
+		pMultiSoundEffect->AddAudioResource(L"PlayerDie_SE");
 
 		//アニメーション
 		PtrDraw->AddAnimation(L"AllAnima", 0, 150, 30.0f);

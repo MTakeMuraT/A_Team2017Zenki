@@ -186,6 +186,10 @@ namespace basecross
 			AddGameObject<InputCSV>();
 			/////////////////////////
 
+			//テスト(索敵サークル)
+			//Abe20170523IzumiHikitugi
+			//AddGameObject<SearchCircle>();
+			//Abe20170523IzumiHikitugi
 
 		}
 		catch (...) {
@@ -293,7 +297,7 @@ namespace basecross
 		WorldMat.DefTransformation(
 			Vector3(100.0f, 100.0f, 1.0f),
 			Qt,
-			Vector3(0.0f, 0.0f, 0.0f)
+			Vector3(0.0f, -1.0f, 0.0f)
 		);
 
 		PtrTrans->SetScale(m_Scale);

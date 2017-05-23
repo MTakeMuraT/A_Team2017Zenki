@@ -50,10 +50,12 @@ namespace basecross
 		//プレイヤーのアクセサー的なのをはじめにもってきておく
 		m_Player1 = GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_L");
 		m_Player2 = GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_R");
-
+		
+		//Abe20170523
 		//索敵範囲作成
-		auto circle = GetStage()->AddGameObject<GameObject>();
-		auto TransCi = circle->AddComponent<Transform>();
+		//auto circle = GetStage()->AddGameObject<GameObject>();
+		auto circle = GetStage()->AddGameObject<SearchCircle>();
+		auto TransCi = circle->GetComponent<Transform>();
 		Vector3 posci = m_InitPos;
 		//足元へ移動
 		posci.y = 1;
@@ -61,6 +63,7 @@ namespace basecross
 		TransCi->SetScale(Vector3(m_SearchDistance, m_SearchDistance, m_SearchDistance));
 		TransCi->SetRotation(90 * 3.14159265 / 180, 0, 0);
 
+		/*
 		auto DrawCi = circle->AddComponent<PNTStaticDraw>();
 		DrawCi->SetTextureResource(L"SEARCHCIRCLE_TX");
 		DrawCi->SetMeshResource(L"DEFAULT_SQUARE");
@@ -68,8 +71,9 @@ namespace basecross
 		circle->SetAlphaActive(true);
 		//レイヤー設定
 		circle->SetDrawLayer(2);
-
+		*/
 		m_SearchCircle = circle;
+		//Abe20170523
 
 
 
@@ -503,9 +507,30 @@ namespace basecross
 		m_Player1 = GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_L");
 		m_Player2 = GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_R");
 
+		////索敵範囲作成
+		//auto circle = GetStage()->AddGameObject<GameObject>();
+		//auto TransCi = circle->AddComponent<Transform>();
+		//Vector3 posci = m_InitPos;
+		////足元へ移動
+		//posci.y = 1;
+		//TransCi->SetPosition(posci);
+		//TransCi->SetScale(Vector3(m_SearchDistance, m_SearchDistance, m_SearchDistance));
+		//TransCi->SetRotation(90 * 3.14159265 / 180, 0, 0);
+
+		//auto DrawCi = circle->AddComponent<PNTStaticDraw>();
+		//DrawCi->SetTextureResource(L"SEARCHCIRCLE_TX");
+		//DrawCi->SetMeshResource(L"DEFAULT_SQUARE");
+
+		//circle->SetAlphaActive(true);
+		////レイヤー設定
+		//circle->SetDrawLayer(2);
+
+		//m_SearchCircle = circle;
+
+		//Abe20170523
 		//索敵範囲作成
-		auto circle = GetStage()->AddGameObject<GameObject>();
-		auto TransCi = circle->AddComponent<Transform>();
+		auto circle = GetStage()->AddGameObject<SearchCircle>();
+		auto TransCi = circle->GetComponent<Transform>();
 		Vector3 posci = m_InitPos;
 		//足元へ移動
 		posci.y = 1;
@@ -513,15 +538,9 @@ namespace basecross
 		TransCi->SetScale(Vector3(m_SearchDistance, m_SearchDistance, m_SearchDistance));
 		TransCi->SetRotation(90 * 3.14159265 / 180, 0, 0);
 
-		auto DrawCi = circle->AddComponent<PNTStaticDraw>();
-		DrawCi->SetTextureResource(L"SEARCHCIRCLE_TX");
-		DrawCi->SetMeshResource(L"DEFAULT_SQUARE");
-
-		circle->SetAlphaActive(true);
-		//レイヤー設定
-		circle->SetDrawLayer(2);
-
 		m_SearchCircle = circle;
+		//Abe20170523
+
 	}
 
 	void ShotEnemy::OnUpdate()
@@ -867,8 +886,29 @@ namespace basecross
 		m_Player2 = GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_R");
 
 		//索敵範囲作成
-		auto circle = GetStage()->AddGameObject<GameObject>();
-		auto TransCi = circle->AddComponent<Transform>();
+		//auto circle = GetStage()->AddGameObject<GameObject>();
+		//auto TransCi = circle->AddComponent<Transform>();
+		//Vector3 posci = m_InitPos;
+		////足元へ移動
+		//posci.y = 1;
+		//TransCi->SetPosition(posci);
+		//TransCi->SetScale(Vector3(m_SearchDistance, m_SearchDistance, m_SearchDistance));
+		//TransCi->SetRotation(90 * 3.14159265 / 180, 0, 0);
+
+		//auto DrawCi = circle->AddComponent<PNTStaticDraw>();
+		//DrawCi->SetTextureResource(L"SEARCHCIRCLE_TX");
+		//DrawCi->SetMeshResource(L"DEFAULT_SQUARE");
+
+		//circle->SetAlphaActive(true);
+		////レイヤー設定
+		//circle->SetDrawLayer(2);
+
+		//m_SearchCircle = circle;
+
+		//Abe20170523
+		//索敵範囲作成
+		auto circle = GetStage()->AddGameObject<SearchCircle>();
+		auto TransCi = circle->GetComponent<Transform>();
 		Vector3 posci = m_InitPos;
 		//足元へ移動
 		posci.y = 1;
@@ -876,15 +916,8 @@ namespace basecross
 		TransCi->SetScale(Vector3(m_SearchDistance, m_SearchDistance, m_SearchDistance));
 		TransCi->SetRotation(90 * 3.14159265 / 180, 0, 0);
 
-		auto DrawCi = circle->AddComponent<PNTStaticDraw>();
-		DrawCi->SetTextureResource(L"SEARCHCIRCLE_TX");
-		DrawCi->SetMeshResource(L"DEFAULT_SQUARE");
-
-		circle->SetAlphaActive(true);
-		//レイヤー設定
-		circle->SetDrawLayer(2);
-
 		m_SearchCircle = circle;
+		//Abe20170523
 
 		//ステート初期化
 		ToSearch();
@@ -1265,8 +1298,29 @@ namespace basecross
 		m_Player2 = GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_R");
 
 		//索敵範囲作成
-		auto circle = GetStage()->AddGameObject<GameObject>();
-		auto TransCi = circle->AddComponent<Transform>();
+		//auto circle = GetStage()->AddGameObject<GameObject>();
+		//auto TransCi = circle->AddComponent<Transform>();
+		//Vector3 posci = m_InitPos;
+		////足元へ移動
+		//posci.y = 1;
+		//TransCi->SetPosition(posci);
+		//TransCi->SetScale(Vector3(m_SearchDistance, m_SearchDistance, m_SearchDistance));
+		//TransCi->SetRotation(90 * 3.14159265 / 180, 0, 0);
+
+		//auto DrawCi = circle->AddComponent<PNTStaticDraw>();
+		//DrawCi->SetTextureResource(L"SEARCHCIRCLE_TX");
+		//DrawCi->SetMeshResource(L"DEFAULT_SQUARE");
+
+		//circle->SetAlphaActive(true);
+		////レイヤー設定
+		//circle->SetDrawLayer(2);
+
+		//m_SearchCircle = circle;
+
+		//Abe20170523
+		//索敵範囲作成
+		auto circle = GetStage()->AddGameObject<SearchCircle>();
+		auto TransCi = circle->GetComponent<Transform>();
 		Vector3 posci = m_InitPos;
 		//足元へ移動
 		posci.y = 1;
@@ -1274,15 +1328,8 @@ namespace basecross
 		TransCi->SetScale(Vector3(m_SearchDistance, m_SearchDistance, m_SearchDistance));
 		TransCi->SetRotation(90 * 3.14159265 / 180, 0, 0);
 
-		auto DrawCi = circle->AddComponent<PNTStaticDraw>();
-		DrawCi->SetTextureResource(L"SEARCHCIRCLE_TX");
-		DrawCi->SetMeshResource(L"DEFAULT_SQUARE");
-
-		circle->SetAlphaActive(true);
-		//レイヤー設定
-		circle->SetDrawLayer(2);
-
 		m_SearchCircle = circle;
+		//Abe20170523
 
 	}
 
@@ -1818,23 +1865,33 @@ namespace basecross
 		m_Player2 = GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_R");
 
 		//索敵範囲作成
-		auto circle = GetStage()->AddGameObject<GameObject>();
-		auto TransCi = circle->AddComponent<Transform>();
-		TransCi->SetPosition(0,1,0);
+		//auto circle = GetStage()->AddGameObject<GameObject>();
+		//auto TransCi = circle->AddComponent<Transform>();
+		//TransCi->SetPosition(0,1,0);
+		//TransCi->SetScale(Vector3(m_SearchDistance, m_SearchDistance, m_SearchDistance));
+		//TransCi->SetRotation(90 * 3.14159265 / 180, 0, 0);
+
+		//auto DrawCi = circle->AddComponent<PNTStaticDraw>();
+		//DrawCi->SetTextureResource(L"SEARCHCIRCLE_TX");
+		//DrawCi->SetMeshResource(L"DEFAULT_SQUARE");
+
+		//circle->SetAlphaActive(true);
+		//circle->SetDrawActive(false);
+		////レイヤー設定
+		//circle->SetDrawLayer(2);
+
+		//m_SearchCircle = circle;
+		
+		//Abe20170523
+		//索敵範囲作成
+		auto circle = GetStage()->AddGameObject<SearchCircle>();
+		auto TransCi = circle->GetComponent<Transform>();
+		TransCi->SetPosition(0, 0, 0);
 		TransCi->SetScale(Vector3(m_SearchDistance, m_SearchDistance, m_SearchDistance));
 		TransCi->SetRotation(90 * 3.14159265 / 180, 0, 0);
 
-		auto DrawCi = circle->AddComponent<PNTStaticDraw>();
-		DrawCi->SetTextureResource(L"SEARCHCIRCLE_TX");
-		DrawCi->SetMeshResource(L"DEFAULT_SQUARE");
-
-		circle->SetAlphaActive(true);
-		circle->SetDrawActive(false);
-		//レイヤー設定
-		circle->SetDrawLayer(2);
-
 		m_SearchCircle = circle;
-
+		//Abe20170523
 		//Abe20170515
 		//ステージの大きさ取得
 		auto ScenePtr = App::GetApp()->GetScene<Scene>();
@@ -2208,22 +2265,49 @@ namespace basecross
 	}
 	//Abe20170517
 
-	//索敵サークル
+	//Abe20170523IzumiHikitugi
+	//************************************
+	//	索敵サークル(SS版)
+	//	スプライトスタジオで再生
+	//************************************
 	SearchCircle::SearchCircle(const shared_ptr<Stage>& StagePtr) :
-		SS5ssae(StagePtr, App::GetApp()->m_wstrDataPath + L"EF\\", L"NewAnimation.ssae", L"anime_1",true)
+		SS5ssae(StagePtr, App::GetApp()->m_wstrDataPath + L"EF\\", L"NewAnimation.ssae", L"anime_1")
 	{
 	}
 	void SearchCircle::OnCreate() {
 		auto Trans = AddComponent<Transform>();
-		Trans->SetPosition(0, 2, 0);
-		Trans->SetScale(5,1, 5);
+		Trans->SetPosition(0, 1, 0);
+		Trans->SetScale(5, 5, 5);
 		Trans->SetRotation(0, 0, 0);
+
+		//アニメーション関連
+		Matrix4X4 mat;
+		mat.DefTransformation(
+			Vector3(0.07f, 0.07f, 0.07f),
+			Vector3(0, 0, 0),
+			Vector3(0.0f, 0.0f, 0.0f)
+			);
+		SetToAnimeMatrix(mat);
+
+		//親クラスのCreate
 		SS5ssae::OnCreate();
+		//秒あたりのフレーム数
+		SetFps(60.0f);
+		//ループ有効
+		SetLooped(true);
+
+
+		//透明度有効化
 		SetAlphaActive(true);
+		//描画
 		SetDrawActive(true);
-		SetDrawLayer(10);
+		//表示レイヤー
+		SetDrawLayer(2);
 	}
 	void SearchCircle::OnUpdate() {
-		SetLooped(true);
+		//アニメ―ション更新
+		UpdateAnimeTime(App::GetApp()->GetElapsedTime()/2);
 	}
+	//Abe20170523IzumiHikitugi
+
 }
