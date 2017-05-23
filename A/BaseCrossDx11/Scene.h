@@ -53,7 +53,8 @@ namespace basecross{
 		void SetStageNumAndStageSize(int stagenum, Vector2 stagesize);
 		//ステージサイズアクセサー
 		Vector2 GetStageSize() { return m_StageSize; }
-
+		//ステージ番号アクセサー
+		int GetStageNum() { return m_StageNum; }
 		//Abe20170515
 
 	};

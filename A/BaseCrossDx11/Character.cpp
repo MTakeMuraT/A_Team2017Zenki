@@ -119,6 +119,59 @@ namespace basecross {
 		//PtrString->SetText(str);
 	}
 
+	//--------------------------------------------------------------------------------------
+	//	シーン遷移のスプライトスタジオ
+	//--------------------------------------------------------------------------------------
+	SceneChangeSS::SceneChangeSS(const shared_ptr<Stage>& StagePtr) :
+		SS5ssae(StagePtr, App::GetApp()->m_wstrDataPath + L"SS\\", L"scene_shange.ssae", L"anime_1",true)
+	{
+	}
+
+	void SceneChangeSS::OnCreate()
+	{
+		auto Trans = AddComponent<Transform>();
+		Trans->SetPosition(0, 0, 0);
+		Trans->SetScale(5, 5, 5);
+		Trans->SetRotation(0, 0, 0);
+
+		//アニメーション関連
+		Matrix4X4 mat;
+		mat.DefTransformation(
+			Vector3(1.0f, 1.0f, 1.0f),
+			Vector3(0, 0, 0),
+			Vector3(0.0f, 0.0f, 0.0f)
+			);
+		SetToAnimeMatrix(mat);
+
+		//親クラスのCreate
+		SS5ssae::OnCreate();
+		//秒あたりのフレーム数
+		SetFps(60.0f);
+		//ループ無効
+		SetLooped(false);
+
+
+		//透明度有効化
+		SetAlphaActive(true);
+		//描画
+		SetDrawActive(true);
+		//表示レイヤー
+		SetDrawLayer(2);
+
+	}
+
+	void SceneChangeSS::OnUpdate()
+	{
+		//アニメ―ション更新
+		UpdateAnimeTime(App::GetApp()->GetElapsedTime() / 2);
+
+	}
+
+	void SceneChangeSS::OnAnim()
+	{
+		m_ActiveFlg = true;
+		ChangeAnimation(L"anime_1");
+	}
 	//ゆーすけくん
 	//--------------------------------------------------------------------------------------
 	//	class StageSelectSprite : public GameObject;

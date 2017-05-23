@@ -128,6 +128,11 @@ namespace basecross
 		//選択してる番号 0でNo、1でYes
 		int m_selectnum = 0;
 
+		//Abe20170523
+		//ステージ
+		int m_stageNum = 0;
+		//Abe20170523
+
 		//表示されてるか
 		bool m_Dispflg = false;
 	public :
@@ -141,8 +146,14 @@ namespace basecross
 
 		//スプライトとか消す
 		void CloseCheck();
+
+		//Abe20170523
+		//ステージ番号設定
+		void SetStageNumber(int num) { m_stageNum = num; };
+		//Abe20170523
 	};
 	//Abe20170421
+
 	//Abe20170427
 
 	//--------------------------------------------------------------------------------------

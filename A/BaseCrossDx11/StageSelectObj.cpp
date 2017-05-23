@@ -364,6 +364,8 @@ namespace basecross
 
 		//Šm”FƒEƒBƒ“ƒhƒE‹N“®
 		GetStage()->GetSharedGameObject<GoStageCheck>(L"GoStageCheck", false)->OpenCheck();
+		GetStage()->GetSharedGameObject<GoStageCheck>(L"GoStageCheck", false)->SetStageNumber(m_stagenumber);
+
 	}
 
 	//--------------------------------------------------------------------------------------
@@ -536,7 +538,28 @@ namespace basecross
 						break;
 						//Yes
 					case 1:
+						//ƒXƒe[ƒW”Ô†‚ðScene.cpp‚É“n‚·
+						//====================================================
+						//	‚P`‚S(25,25)@‚T`‚P‚Q(50,50)@‚P‚R`‚P‚U(75,75)
+						//====================================================
+						Vector2 StageSize;
+						StageSize = Vector2(25, 25);
+						if (m_stageNum >= 1 && m_stageNum <= 4)
+						{
+							StageSize = Vector2(25, 25);
+						}
+						else if (m_stageNum >= 5 && m_stageNum <= 12)
+						{
+							StageSize = Vector2(50, 50);
+						}
+						else if (m_stageNum >= 13 && m_stageNum <= 16)
+						{
+							StageSize = Vector2(75, 75);
+						}
+
 						auto ScenePtr = App::GetApp()->GetScene<Scene>();
+						//ƒXƒe[ƒW”Ô†‚Æ”Ô†‚É‚ ‚Á‚½ƒXƒe[ƒW‚Ì‘å‚«‚³‚ð“n‚·
+						ScenePtr->SetStageNumAndStageSize(m_stageNum, StageSize);
 						PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToGameStage");
 						break;
 					}

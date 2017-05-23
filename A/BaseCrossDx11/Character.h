@@ -80,6 +80,27 @@ namespace basecross{
 
 	};
 
+	//Abe20170523
+	//--------------------------------------------------------------------------------------
+	//	シーン遷移のスプライトスタジオ
+	//--------------------------------------------------------------------------------------
+	class SceneChangeSS : public SS5ssae
+	{
+	private :
+		//動くか
+		bool m_ActiveFlg = false;
+	public :
+		//構築と破棄
+		SceneChangeSS(const shared_ptr<Stage>& StagePtr);
+		virtual ~SceneChangeSS() {}
+		//初期化
+		void OnCreate() override;
+		void OnUpdate() override;
+
+		void OnAnim();
+	};
+	//Abe20170523
+
 
 	//ゆーすけくん
 	//--------------------------------------------------------------------------------------

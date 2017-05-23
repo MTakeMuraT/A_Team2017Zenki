@@ -52,9 +52,9 @@ namespace basecross {
 			CreateViewLight();
 			//îwåiÇÃçÏê¨
 			CreateBackGround();	
-			AddGameObject<DimSprite>(true,
-				Vector2(1280, 720),
-				Vector2(0, 0));
+			//AddGameObject<DimSprite>(true,
+			//	Vector2(1280, 720),
+			//	Vector2(0, 0));
 		}
 		
 		catch (...) {
@@ -67,9 +67,17 @@ namespace basecross {
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 
 		if (KeylVec.m_bPressedKeyTbl['A'] || CntlVec[0].wPressedButtons &XINPUT_GAMEPAD_A) {
+			auto ptr = GetSharedGameObject<SceneChangeSS>(L"SceneChangeSS",false);
+			if (!ptr)
+			{
+				auto ptr2 = AddGameObject<SceneChangeSS>();
+				ptr2->OnAnim();
+				SetSharedGameObject(L"SceneChangeSS",ptr2);
+			}
 			auto ScenePtr = App::GetApp()->GetScene<Scene>();
+			//ÇQïbë“Ç¬
+			PostEvent(2.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToStageSelectScene");
 
-			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToStageSelectScene");
 		}
 	}
 	//îjä¸
