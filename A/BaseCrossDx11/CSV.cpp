@@ -7,6 +7,8 @@ namespace basecross {
 	{}
 	InputCSV::~InputCSV(){}
 	void InputCSV::OnCreate() {
+		auto ScenePtr = App::GetApp()->GetScene<Scene>();
+		
 		auto PtrEnemyGroup = GetStage()->GetSharedObjectGroup(L"EnemyGroup");
 		auto PtrCollisionGroup = GetStage()->GetSharedObjectGroup(L"CollisionGroup");
 		auto PtrTereportGroup = GetStage()->GetSharedObjectGroup(L"TereportPointGroup");
@@ -14,7 +16,9 @@ namespace basecross {
 		// CSVフォルダの指定
 		wstring CsvMediaPath = App::GetApp()->m_wstrRelativeDataPath + L"CSV\\";
 		wstring CsvFileName = CsvMediaPath + L"Stage1.csv";
+		//wstring CsvFileName2 = CsvMediaPath + L"Stage2.csv";
 		CsvFile GameStageCsv(CsvFileName);
+		//CsvFile GameStageCsv(CsvFileName2);
 		// ファイルの確認
 		if (!GameStageCsv.ReadCsv())
 		{
@@ -27,8 +31,10 @@ namespace basecross {
 		}
 		//最初の名前分数を入れる
 		vector<wstring> LineVec;
+		//消す
 		//for (auto& v : LineVec) {
 			//各エネミー読み込LineVec
+		if (ScenePtr->GetStageNum() == 0) {
 #pragma region TackleEnemyCSV
 			GameStageCsv.GetSelect(LineVec, 0, L"TackleEnemy");
 			for (auto& v : LineVec) {
@@ -37,11 +43,11 @@ namespace basecross {
 				//複数の値の時に使用
 				vector<wstring> Tokens2;
 				//トークン（カラム）単位で文字列を抽出(L','をデリミタとして区分け)
-				Util::WStrToTokenVector(Tokens, v, L',');		
+				Util::WStrToTokenVector(Tokens, v, L',');
 				//各値がそろったのでオブジェクト作成
 				auto PtrTackleEnemy = GetStage()->AddGameObject<TackleEnemy>(
-					SinglePos(Tokens), MultiScale(Tokens,Tokens2), MultiHP(Tokens,Tokens2),
-					MultiSearch(Tokens,Tokens2), MultiCoolTime(Tokens, Tokens2), MultiSpeed(Tokens, Tokens2), 
+					SinglePos(Tokens), MultiScale(Tokens, Tokens2), MultiHP(Tokens, Tokens2),
+					MultiSearch(Tokens, Tokens2), MultiCoolTime(Tokens, Tokens2), MultiSpeed(Tokens, Tokens2),
 					MultiAttackPower(Tokens, Tokens2), MultiAttackTimes(Tokens, Tokens2));
 				//グループに入れる
 				PtrEnemyGroup->IntoGroup(PtrTackleEnemy);
@@ -61,9 +67,9 @@ namespace basecross {
 				Util::WStrToTokenVector(Tokens, v, L',');
 				//スケール
 				vector<wstring> Tokens2;
-			
+
 				//各値がそろったのでオブジェクト作成       位置、大きさ、HP、索敵距離、クールタイム、攻撃力、子機発射間隔、発射数
-				auto PtrShotEnemy = GetStage()->AddGameObject<ShotEnemy>(SinglePos(Tokens), MultiScale(Tokens,Tokens2), 
+				auto PtrShotEnemy = GetStage()->AddGameObject<ShotEnemy>(SinglePos(Tokens), MultiScale(Tokens, Tokens2),
 					MultiHP(Tokens, Tokens2), MultiSearch(Tokens, Tokens2), MultiShotCoolTime(Tokens, Tokens2),
 					MultiAttackPower(Tokens, Tokens2), SingleChildDrop(Tokens), SingleShotBullet(Tokens));
 				PtrEnemyGroup->IntoGroup(PtrShotEnemy);
@@ -88,8 +94,8 @@ namespace basecross {
 				//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 				PtrTereportGroup->IntoGroup(A);       // 位置、大きさ、HP、索敵距離、クールタイムM、索敵型子機発射S
 				auto PtrTeleportEnemy = GetStage()->AddGameObject<TeleportEnemy>(
-					SinglePos(Tokens), SingleScale(Tokens),SingleHP(Tokens), 
-					MultiSearch(Tokens,Tokens2), MultiCoolTime(Tokens,Tokens2),SingleChildSearch(Tokens)
+					SinglePos(Tokens), SingleScale(Tokens), SingleHP(Tokens),
+					MultiSearch(Tokens, Tokens2), MultiCoolTime(Tokens, Tokens2), SingleChildSearch(Tokens)
 					);
 				PtrEnemyGroup->IntoGroup(PtrTeleportEnemy);
 				PtrCollisionGroup->IntoGroup(PtrTeleportEnemy);
@@ -110,13 +116,55 @@ namespace basecross {
 				//各値がそろったのでオブジェクト作成　位置s　大きさs　HPs　索敵m　スピードm　攻撃力m
 				auto PtrBombEnemy = GetStage()->AddGameObject<BombEnemy>(
 					SinglePos(Tokens), SingleScale(Tokens), SingleHP(Tokens),
-					MultiSearch(Tokens,Tokens2), MultiSpeed(Tokens,Tokens2), MultiAttackPower(Tokens,Tokens2));
+					MultiSearch(Tokens, Tokens2), MultiSpeed(Tokens, Tokens2), MultiAttackPower(Tokens, Tokens2));
 				PtrEnemyGroup->IntoGroup(PtrBombEnemy);
 				PtrCollisionGroup->IntoGroup(PtrBombEnemy);
 				m_Pos = Vector3(0, 0, 0); m_Scale = 0; m_HP = 0; m_Search = 0; m_Speed = 0; m_AttackPower = 0;
 			}
 #pragma endregion
-
+		}
+		//else if (ScenePtr->GetStageNum() == 1) {
+		//	//1
+		//}
+		//else if (ScenePtr->GetStageNum() == 2) {
+		//	//2
+		//}
+		//else if (ScenePtr->GetStageNum() == 3) {
+		//	//3
+		//}
+		//else if (ScenePtr->GetStageNum() == 4) {
+		//	//4
+		//}
+		//else if (ScenePtr->GetStageNum() == 5) {
+		//	//5
+		//}
+		//else if (ScenePtr->GetStageNum() == 6) {
+		//	//6
+		//}
+		//else if (ScenePtr->GetStageNum() == 7) {
+		//	//7
+		//}
+		//else if (ScenePtr->GetStageNum() == 8) {
+		//	//8
+		//}
+		//else if (ScenePtr->GetStageNum() == 9) {
+		//	//9
+		//}
+		//else if (ScenePtr->GetStageNum() == 10) {
+		//	//10
+		//}
+		//else if (ScenePtr->GetStageNum() == 11) {
+		//	//11
+		//}
+		//else if (ScenePtr->GetStageNum() == 12) {
+		//	//12
+		//}
+		//else if (ScenePtr->GetStageNum() == 13) {
+		//	//13
+		//}
+		//else if (ScenePtr->GetStageNum() == 14) {
+		//	//14
+		//}
 		//}
 	}
 	//位置
