@@ -1331,6 +1331,11 @@ namespace basecross
 		m_SearchCircle = circle;
 		//Abe20170523
 
+		//ステージの大きさ取得
+		auto ScenePtr = App::GetApp()->GetScene<Scene>();
+		m_StageSize = ScenePtr->GetStageSize() / 2;
+
+
 	}
 
 	void BombEnemy::OnUpdate()
@@ -1349,10 +1354,13 @@ namespace basecross
 				//探索
 			case MoveS:
 				Move();
+				StageEndCheck();
 				break;
 				//攻撃
 			case AttackS:
 				Attack();
+				Rot();
+				StageEndCheck();
 				break;
 			}
 
@@ -1389,6 +1397,53 @@ namespace basecross
 		}
 	}
 	//Abe20170519
+
+	void BombEnemy::StageEndCheck()
+	{
+		//位置[右]、[上]、[左]、[下]
+		Vector3 pos = GetComponent<Transform>()->GetPosition();
+		Vector3 scale = GetComponent<Transform>()->GetScale();
+		Vector4 PositionPXYMXY = Vector4(pos.x + scale.x, pos.z + scale.z, pos.x - scale.x, pos.z - scale.z);
+		//ステージの端に当たってるか判定
+		//右
+		if (m_StageSize.x < PositionPXYMXY.x)
+		{
+			pos.x = m_StageSize.x - scale.x;
+			m_Velocity.x *= -1;
+		}
+		//上
+		if (m_StageSize.y < PositionPXYMXY.y)
+		{
+			pos.z = m_StageSize.y - scale.z;
+			m_Velocity.z *= -1;
+		}
+		//左
+		if (-m_StageSize.x > PositionPXYMXY.z)
+		{
+			pos.x = -m_StageSize.x + scale.x;
+			m_Velocity.x *= -1;
+		}
+		//下
+		if (-m_StageSize.y > PositionPXYMXY.w)
+		{
+			pos.z = -m_StageSize.y + scale.z;
+			m_Velocity.z *= -1;
+		}
+
+	}
+
+	//なんかにぶつかったら速度反転、横と縦どっちがあたったかだけほしぃ
+	void BombEnemy::TurnVecolity(bool flgx, bool flgz)
+	{
+		if (flgx)
+		{
+			m_Velocity.x *= -1;
+		}
+		if (flgz)
+		{
+			m_Velocity.z *= -1;
+		}
+	}
 
 	void BombEnemy::Search()
 	{

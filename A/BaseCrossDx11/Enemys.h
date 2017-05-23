@@ -357,6 +357,9 @@ namespace basecross
 		//突撃してる時間
 		float m_TackleTime = 3.0f;
 
+		void StageEndCheck();
+		Vector2 m_StageSize;
+
 		//Abe20170519
 		//回転
 		void Rot();
@@ -408,6 +411,8 @@ namespace basecross
 		//自分がダメージ受けたときの関数
 		//プレイヤーから
 		void DamagePlayer();
+
+		void TurnVecolity(bool, bool);
 
 	};
 
