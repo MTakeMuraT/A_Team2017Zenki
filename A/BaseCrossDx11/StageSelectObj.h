@@ -60,6 +60,15 @@ namespace basecross
 
 		//キャンセルしたときにくっつかないように
 		bool m_CancelFlg = false;
+
+		//Abe20170524
+		//ステージの幅
+		//左制限、右制限、上制限、下制限の順
+		Vector4 MoveLimit = Vector4(-20, 66, 10, -36);
+		//デバッグ文字表示オブジェ
+		shared_ptr<GameObject> m_Debugtxt;
+		//Abe20170524
+
 	public :
 		SelectPlayer(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, float speed);
 
@@ -73,6 +82,14 @@ namespace basecross
 		void SandFlgOn() { m_SandFlg = true; }
 		//元の位置に戻るフラグオン
 		void SandFinishFlgOn() { m_SandFinishFlg = true; }
+
+
+		//座標移動関数
+		void SetPos(Vector3);
+		//座標とれる
+		Vector3 GetPos();
+		//動けるようにする関数
+		void ActiveMove();
 	};
 
 	//--------------------------------------------------------------------------------------
@@ -169,7 +186,6 @@ namespace basecross
 
 		void OnCreate() override;
 		void OnUpdate() override;
-
 	};
 	//Abe20170427
 

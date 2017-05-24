@@ -72,6 +72,18 @@ namespace basecross
 			
 			//プレイヤーのアクセサ?
 			m_Player.push_back(PlayerPtr);
+
+			//デバッグ文字生成
+			auto debtxt = GetStage()->AddGameObject<DebugTxt>();
+			debtxt->SetLayer(10);
+			//色赤に変更
+			debtxt->SetColor(Vector3(1, 0, 0));
+			//大きさ変更
+			debtxt->SetScaleTxt(40);
+
+			m_Debugtxt = debtxt;
+			//Abe20170524
+
 		}
 
 	}
@@ -80,10 +92,81 @@ namespace basecross
 	{
 		//コントローラ取得
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+
+#pragma region //*******デバッグ用*******//
+		//*******デバッグ用*******//
+		//auto KeylVec = App::GetApp()->GetInputDevice().GetKeyState();
+
+		////移動
+		//Vector2 InputXY = Vector2((KeylVec.m_bPushKeyTbl[VK_RIGHT] + -KeylVec.m_bPushKeyTbl[VK_LEFT]), (KeylVec.m_bPushKeyTbl[VK_UP] + -KeylVec.m_bPushKeyTbl[VK_DOWN])) * m_Speed;
+		////もしステージ幅制限を越えるなら動かさない
+		////１体目の座標
+		//Vector3 ppos1 = m_Player[0]->GetComponent<Transform>()->GetPosition();
+		////２体目の座標
+		//Vector3 ppos2 = m_Player[1]->GetComponent<Transform>()->GetPosition();
+		//ppos1.x += InputXY.x * App::GetApp()->GetElapsedTime();
+		//ppos1.z += InputXY.y * App::GetApp()->GetElapsedTime();
+		//ppos2.x += InputXY.x * App::GetApp()->GetElapsedTime();
+		//ppos2.z += InputXY.y * App::GetApp()->GetElapsedTime();
+		////制限(左-20右+66上+10下-36)
+		//if ((ppos1.x < MoveLimit.x || ppos2.x < MoveLimit.x) || (ppos1.x > MoveLimit.y || ppos2.x > MoveLimit.y))
+		//{
+		//	InputXY.x = 0;
+		//}
+		//if ((ppos1.z < MoveLimit.w || ppos2.z < MoveLimit.w) || (ppos1.z > MoveLimit.z || ppos2.z > MoveLimit.z))
+		//{
+		//	InputXY.y = 0;
+		//}
+		////wstring txt;
+		////txt += L"1X:" + Util::FloatToWStr(ppos1.x) + L"1Z:" + Util::FloatToWStr(ppos1.z) +
+		////	L"\n2X:" + Util::FloatToWStr(ppos2.x) + L"1Z:" + Util::FloatToWStr(ppos2.z);
+		////dynamic_pointer_cast<DebugTxt>(m_Debugtxt)->SetText(txt);
+		//Vector3 ppos31 = (ppos1 + ppos2) / 2;
+
+		//dynamic_pointer_cast<DebugTxt>(m_Debugtxt)->SetText(L"X:" + Util::FloatToWStr(ppos31.x) + L"Z:" + Util::FloatToWStr(ppos31.z));
+
+		////*******デバッグ用*******//
+
+		////移動
+		//for (auto obj : m_Player)
+		//{
+		//	//挟んでる間は別のVelocityが入れられるのでここ更新しても動かない
+		//	obj->GetComponent<Rigidbody>()->SetVelocity(InputXY.x, 0, InputXY.y);
+		//}
+
+#pragma endregion
+
 		if (CntlVec[0].bConnected)
 		{
+			Vector3 ppos11 = m_Player[0]->GetComponent<Transform>()->GetPosition();
+			Vector3 ppos21 = m_Player[1]->GetComponent<Transform>()->GetPosition();
+
+			Vector3 ppos31 = (ppos11 + ppos21) / 2;
+
 			//移動
 			Vector2 InputXY = Vector2(CntlVec[0].fThumbLX, CntlVec[0].fThumbLY) * m_Speed;
+
+			//もしステージ幅制限を越えるなら動かさない
+			//制限(左-20右+66上+10下-36)
+			//１体目の座標
+			Vector3 ppos1 = m_Player[0]->GetComponent<Transform>()->GetPosition();
+			//２体目の座標
+			Vector3 ppos2 = m_Player[1]->GetComponent<Transform>()->GetPosition();
+			ppos1.x += InputXY.x * App::GetApp()->GetElapsedTime();
+			ppos1.z += InputXY.y * App::GetApp()->GetElapsedTime();
+			ppos2.x += InputXY.x * App::GetApp()->GetElapsedTime();
+			ppos2.z += InputXY.y * App::GetApp()->GetElapsedTime();
+			//制限(左-20右+66上+10下-36)
+			if ((ppos1.x < MoveLimit.x || ppos2.x < MoveLimit.x) || (ppos1.x > MoveLimit.y || ppos2.x > MoveLimit.y))
+			{
+				InputXY.x = 0;
+			}
+			if ((ppos1.z < MoveLimit.w || ppos2.z < MoveLimit.w) || (ppos1.z > MoveLimit.z || ppos2.z > MoveLimit.z))
+			{
+				InputXY.y = 0;
+			}
+
+			//移動
 			for (auto obj : m_Player)
 			{
 				//挟んでる間は別のVelocityが入れられるのでここ更新しても動かない
@@ -166,17 +249,75 @@ namespace basecross
 				//角度から求めて中心からの距離をかける
 				Vector3 vel = Vector3(cos(an1*3.14159265f / 180), 0, sin(an1*3.14159265f / 180)) * m_DifLength;
 				pos1 = centerpos + vel;
-				m_Player[0]->GetComponent<Transform>()->SetPosition(pos1);
 
 				//２体目
-				dif = pos2 - centerpos;
-				float angle2 = atan2(dif.z, dif.x) * 180 / 3.14159265f;
+				Vector3 dif2 = pos2 - centerpos;
+				float angle2 = atan2(dif2.z, dif2.x) * 180 / 3.14159265f;
 				angle2 += 360;
 				int an2 = (int)angle2 % 360;
 				an2 += (int)(m_RotSpeedPerSec * App::GetApp()->GetElapsedTime());
 				//角度から求めて中心からの距離をかける
-				vel = Vector3(cos(an2*3.14159265f / 180), 0, sin(an2*3.14159265f / 180)) * m_DifLength;
-				pos2 = centerpos + vel;
+				Vector3 vel2 = Vector3(cos(an2*3.14159265f / 180), 0, sin(an2*3.14159265f / 180)) * m_DifLength;
+				pos2 = centerpos + vel2;
+
+#pragma region 押し出し処理
+				//押し出し処理
+				//左押し出し
+				if (pos1.x < MoveLimit.x)
+				{
+					float disX = MoveLimit.x - pos1.x;
+					pos1.x += disX;
+					pos2.x += disX;
+				}
+				if (pos2.x < MoveLimit.x)
+				{
+					float disX = MoveLimit.x - pos2.x;
+					pos1.x += disX;
+					pos2.x += disX;
+				}
+				//右押し出し
+				if (pos1.x > MoveLimit.y)
+				{
+					float disX = MoveLimit.y - pos1.x;
+					pos1.x += disX;
+					pos2.x += disX;
+				}
+				if (pos2.x > MoveLimit.y)
+				{
+					float disX = MoveLimit.y - pos2.x;
+					pos1.x += disX;
+					pos2.x += disX;
+				}
+				//上押し出し
+				if (pos1.z > MoveLimit.z)
+				{
+					float disZ = MoveLimit.z - pos1.z;
+					pos1.z += disZ;
+					pos2.z += disZ;
+				}
+				if (pos2.z > MoveLimit.z)
+				{
+					float disZ = MoveLimit.z - pos2.z;
+					pos1.z += disZ;
+					pos2.z += disZ;
+				}
+				//下押し出し
+				if (pos1.z < MoveLimit.w)
+				{
+					float disZ = MoveLimit.z - pos1.z;
+					pos1.z += disZ;
+					pos2.z += disZ;
+				}
+				if (pos2.z < MoveLimit.w)
+				{
+					float disZ = MoveLimit.z - pos2.z;
+					pos1.z += disZ;
+					pos2.z += disZ;
+				}
+#pragma endregion
+
+				//移動
+				m_Player[0]->GetComponent<Transform>()->SetPosition(pos1);
 				m_Player[1]->GetComponent<Transform>()->SetPosition(pos2);
 
 			}
@@ -197,17 +338,75 @@ namespace basecross
 				//角度から求めて中心からの距離をかける
 				Vector3 vel = Vector3(cos(an1*3.14159265f / 180), 0, sin(an1*3.14159265f / 180)) * m_DifLength;
 				pos1 = centerpos + vel;
-				m_Player[0]->GetComponent<Transform>()->SetPosition(pos1);
 
 				//２体目
-				dif = pos2 - centerpos;
-				float angle2 = atan2(dif.z, dif.x) * 180 / 3.14159265f;
+				Vector3 dif2 = pos2 - centerpos;
+				float angle2 = atan2(dif2.z, dif2.x) * 180 / 3.14159265f;
 				angle2 += 360;
 				int an2 = (int)angle2 % 360;
 				an2 += -(int)(m_RotSpeedPerSec * App::GetApp()->GetElapsedTime());
 				//角度から求めて中心からの距離をかける
-				vel = Vector3(cos(an2*3.14159265f / 180), 0, sin(an2*3.14159265f / 180)) * m_DifLength;
-				pos2 = centerpos + vel;
+				Vector3 vel2 = Vector3(cos(an2*3.14159265f / 180), 0, sin(an2*3.14159265f / 180)) * m_DifLength;
+				pos2 = centerpos + vel2;
+
+#pragma region 押し出し処理
+				//押し出し処理
+				//左押し出し
+				if (pos1.x < MoveLimit.x)
+				{
+					float disX = MoveLimit.x - pos1.x;
+					pos1.x += disX;
+					pos2.x += disX;
+				}
+				if (pos2.x < MoveLimit.x)
+				{
+					float disX = MoveLimit.x - pos2.x;
+					pos1.x += disX;
+					pos2.x += disX;
+				}
+				//右押し出し
+				if (pos1.x > MoveLimit.y)
+				{
+					float disX = MoveLimit.y - pos1.x;
+					pos1.x += disX;
+					pos2.x += disX;
+				}
+				if (pos2.x > MoveLimit.y)
+				{
+					float disX = MoveLimit.y - pos2.x;
+					pos1.x += disX;
+					pos2.x += disX;
+				}
+				//上押し出し
+				if (pos1.z > MoveLimit.z)
+				{
+					float disZ = MoveLimit.z - pos1.z;
+					pos1.z += disZ;
+					pos2.z += disZ;
+				}
+				if (pos2.z > MoveLimit.z)
+				{
+					float disZ = MoveLimit.z - pos2.z;
+					pos1.z += disZ;
+					pos2.z += disZ;
+				}
+				//下押し出し
+				if (pos1.z < MoveLimit.w)
+				{
+					float disZ = MoveLimit.z - pos1.z;
+					pos1.z += disZ;
+					pos2.z += disZ;
+				}
+				if (pos2.z < MoveLimit.w)
+				{
+					float disZ = MoveLimit.z - pos2.z;
+					pos1.z += disZ;
+					pos2.z += disZ;
+				}
+#pragma endregion
+
+				//移動
+				m_Player[0]->GetComponent<Transform>()->SetPosition(pos1);
 				m_Player[1]->GetComponent<Transform>()->SetPosition(pos2);
 
 			}
@@ -287,6 +486,36 @@ namespace basecross
 		}
 	}
 
+	//座標移動
+	void SelectPlayer::SetPos(Vector3 pos)
+	{
+		int count = 0;
+		for (auto obj : m_Player)
+		{
+			obj->GetComponent<CollisionSphere>()->SetUpdateActive(false);
+			Vector3 pos1 = pos;
+			pos1.x += -m_DifLength + (count * m_DifLength * 2);
+			obj->GetComponent<Transform>()->SetPosition(pos1);
+			count++;
+		}
+	}
+
+	//座標取得
+	Vector3 SelectPlayer::GetPos()
+	{
+		Vector3 ppos1 = m_Player[0]->GetComponent<Transform>()->GetPosition();
+		Vector3 ppos2 = m_Player[1]->GetComponent<Transform>()->GetPosition();
+
+		return (ppos1 + ppos2) / 2;
+	}
+
+	void SelectPlayer::ActiveMove()
+	{	
+		for (auto obj : m_Player)
+		{
+			obj->GetComponent<CollisionSphere>()->SetUpdateActive(true);
+		}
+	}
 	//--------------------------------------------------------------------------------------
 	//	ステージの箱
 	//--------------------------------------------------------------------------------------
@@ -307,8 +536,9 @@ namespace basecross
 
 		//描画設定
 		auto PtrDraw = AddComponent<PNTStaticDraw>();
-		PtrDraw->SetMeshResource(L"DEFAULT_SPHERE");
-		PtrDraw->SetTextureResource(L"SKY_TX");
+		PtrDraw->SetMeshResource(L"DEFAULT_CUBE");
+		wstring stageString = L"STAGEBOX_" + Util::IntToWStr(m_stagenumber) + L"_TX";
+		PtrDraw->SetTextureResource(stageString);
 
 		//Rigidbodyをつける
 		auto PtrRedid = AddComponent<Rigidbody>();
@@ -613,13 +843,16 @@ namespace basecross
 
 	void SelectGroud::OnCreate()
 	{
+		//必要最低限------
 		auto TranP = AddComponent<Transform>();
 		TranP->SetPosition(m_Pos);
 		TranP->SetScale(m_Scale);
 		TranP->SetRotation(0, 0, 0);
 
 		auto Draw = AddComponent<PNTStaticDraw>();
+		Draw->SetMeshResource(L"DEFAULT_CUBE");
 		Draw->SetTextureResource(L"SELECT_SIRO_TX");
+		//必要最低限------
 
 		
 	}

@@ -23,6 +23,8 @@ namespace basecross{
 
 			//最初のアクティブステージの設定
 			ResetActiveStage<TitleScene>();
+			//ResetActiveStage<StageSelectScene>();
+
 		}
 		catch (...) {
 			throw;

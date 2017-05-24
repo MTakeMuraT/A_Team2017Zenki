@@ -30,6 +30,11 @@ namespace basecross {
 		void CreateGoCheck();
 		//Abe20170421
 
+		//Abe20170524
+		//ステージの床作成
+		void CreateStageUnder();
+		//Abe20170524
+
 		//Abe20170427
 		//カメラ移動フラグ
 		bool m_moveCameraFlg = false;
@@ -39,11 +44,18 @@ namespace basecross {
 		Vector3 m_CameraPos;
 		//注視点
 		Vector3 m_CameraAt;
-		//移動番号
-		int m_CameraMoveNum = 0;
 		//カメラ移動関数
 		void CameraMove();
 		//Abe20170427
+
+		//Abe20170524
+		//デバッグ文字表示オブジェ
+		shared_ptr<GameObject> m_Debugtxt;
+		//カメラ移動時のプレイヤー移動先
+		Vector3 m_CameraMovePlayerTargetPos;
+		//今のカメラの位置
+		int m_CameraNum = 5;
+		//Abe20170524
 
 	public:
 		//構築と破棄

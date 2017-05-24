@@ -17,7 +17,7 @@ namespace basecross {
 		auto PtrView = CreateView<SingleView>();
 		//ビューのカメラの設定(カメラ固定)
 		auto PtrCamera = PtrView->GetCamera();
-		PtrCamera->SetEye(Vector3(0.0f, 30.0f, -5.0f));
+		PtrCamera->SetEye(Vector3(0.0f, 30.0f, -0.1f));
 		PtrCamera->SetAt(Vector3(0.0f, 0.0f, 0.0f));
 
 		//シングルライトの作成
@@ -52,8 +52,47 @@ namespace basecross {
 	//ステージボックス作成
 	void StageSelectScene::CreateStageBox()
 	{
-		AddGameObject<StageBox>(Vector3(0,0,0),Vector3(1,1,1),1);
+		//計算めんどいので直打ち
+		//１～４
+		AddGameObject<StageBox>(Vector3(-8, 0, 5), Vector3(1, 1, 1), 1);
+		AddGameObject<StageBox>(Vector3(8, 0, 5), Vector3(1, 1, 1), 2);
+		AddGameObject<StageBox>(Vector3(-8, 0, -5), Vector3(1, 1, 1), 3);
+		AddGameObject<StageBox>(Vector3(8, 0, -5), Vector3(1, 1, 1), 4);
+		
+		//５～８
+		AddGameObject<StageBox>(Vector3(-8, 0, -22), Vector3(1, 1, 1), 5);
+		AddGameObject<StageBox>(Vector3(8, 0, -22), Vector3(1, 1, 1), 6);
+		AddGameObject<StageBox>(Vector3(-8, 0, -32), Vector3(1, 1, 1), 7);
+		AddGameObject<StageBox>(Vector3(8, 0, -32), Vector3(1, 1, 1), 8);
+		
+		//９～１２
+		AddGameObject<StageBox>(Vector3(36, 0, -22), Vector3(1, 1, 1), 9);
+		AddGameObject<StageBox>(Vector3(56, 0, -22), Vector3(1, 1, 1), 10);
+		AddGameObject<StageBox>(Vector3(36, 0, -32), Vector3(1, 1, 1), 11);
+		AddGameObject<StageBox>(Vector3(56, 0, -32), Vector3(1, 1, 1), 12);
+		
+		//１３～１６
+		AddGameObject<StageBox>(Vector3(36, 0, 5), Vector3(1, 1, 1), 13);
+		AddGameObject<StageBox>(Vector3(56, 0, 5), Vector3(1, 1, 1), 14);
+		AddGameObject<StageBox>(Vector3(36, 0, -5), Vector3(1, 1, 1), 15);
+		AddGameObject<StageBox>(Vector3(56, 0, -5), Vector3(1, 1, 1), 16);
+		
 	}
+
+	//ステージの床作成
+	void StageSelectScene::CreateStageUnder()
+	{
+		//地面作成
+		//左上
+		AddGameObject<SelectGroud>(Vector3(0, -0.5, 0), Vector3(45, 1, 25));
+		//左下
+		AddGameObject<SelectGroud>(Vector3(0, -0.5, -26), Vector3(45, 1, 25));
+		//右下
+		AddGameObject<SelectGroud>(Vector3(46, -0.5, -26), Vector3(45, 1, 25));
+		//右上
+		AddGameObject<SelectGroud>(Vector3(46, -0.5, 0), Vector3(45, 1, 25));
+	}
+
 
 	//ステージ行くかチェックするスプライト
 	void StageSelectScene::CreateGoCheck()
@@ -83,9 +122,21 @@ namespace basecross {
 			CreateGoCheck();
 			//Abe20170421
 
+			//Abe20170524
+			//ステージの床作成
+			CreateStageUnder();
 
-			//デバッグ用の文字
-			SetSharedGameObject(L"DebugTxt", AddGameObject<DebugTxt>());
+			//デバッグ文字生成
+			auto debtxt = AddGameObject<DebugTxt>();
+			debtxt->SetLayer(10);
+			//色赤に変更
+			debtxt->SetColor(Vector3(1, 0, 0));
+			//大きさ変更
+			debtxt->SetScaleTxt(40);
+
+			m_Debugtxt = debtxt;
+			//Abe20170524
+
 		}
 		catch (...) {
 
@@ -102,34 +153,90 @@ namespace basecross {
 			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToGameStage");
 		}
 
+
+		/*
+		if (KeylVec.m_bPressedKeyTbl[VK_DOWN] && m_CameraNum != 1)
+		{
+			MoveCamera(1);
+		}
+		if (KeylVec.m_bPressedKeyTbl[VK_UP] && m_CameraNum != 0)
+		{
+			MoveCamera(0);
+		}
+		if (KeylVec.m_bPressedKeyTbl[VK_RIGHT] && m_CameraNum != 2)
+		{
+			MoveCamera(2);
+		}
+		if (KeylVec.m_bPressedKeyTbl[VK_LEFT] && m_CameraNum != 3)
+		{
+			MoveCamera(3);
+		}
+		*/
 		//Abe20170427
 		//カメラ移動
 		if (m_moveCameraFlg)
 		{
-			//CameraMove();
+			CameraMove();
+		}
+		else
+		{
+			//プレイヤー座標取得
+			auto pptr = GetSharedGameObject<SelectPlayer>(L"SelectPlayer", false);
+			Vector3 ppos = pptr->GetPos();
+
+			//左上に移動
+			//範囲(X[-26~26]Y[16~-16])
+			if ((ppos.x > -26 && ppos.x < 26) && (ppos.z > -16 && ppos.z < 16) && m_CameraNum != 0)
+			{
+				MoveCamera(0);
+				m_CameraNum = 0;
+			}
+			//左下に移動
+			//範囲(X[-26~26]Y[-10~-33])
+			else if ((ppos.x > -26 && ppos.x < 26) && (ppos.z > -33 && ppos.z < -10) && m_CameraNum != 1)
+			{
+				MoveCamera(1);
+				m_CameraNum = 1;
+			}
+
+			//右上に移動
+			//範囲(X[18~63]Y[16~-16])
+			else if ((ppos.x > 18 && ppos.x < 63) && (ppos.z > -16 && ppos.z < 16) && m_CameraNum != 2)
+			{
+				MoveCamera(2);
+				m_CameraNum = 2;
+			}
+
+			//右下に移動
+			//範囲(X[18~63]Y[-10~-33])
+			else if ((ppos.x > 18 && ppos.x < 63) && (ppos.z > -33 && ppos.z < -10) && m_CameraNum != 3)
+			{
+				MoveCamera(3);
+				m_CameraNum = 3;
+			}
+
 		}
 
+		//Abe20170524
+		/*カメラ座標確認用*/
+		//wstring txt;
+		//txt += Util::FloatToWStr(KeylVec.m_bPushKeyTbl[VK_UP]) + L"," + Util::FloatToWStr(KeylVec.m_bPushKeyTbl[VK_RIGHT]) + L"," + Util::FloatToWStr(KeylVec.m_bPushKeyTbl[VK_DOWN]) + L"," + Util::FloatToWStr(KeylVec.m_bPushKeyTbl[VK_LEFT]);
+		//dynamic_pointer_cast<DebugTxt>(m_Debugtxt)->SetText(txt);
+		//Vector2 InputXY = Vector2((KeylVec.m_bPushKeyTbl[VK_RIGHT] + -KeylVec.m_bPushKeyTbl[VK_LEFT]), (KeylVec.m_bPushKeyTbl[VK_UP] + -KeylVec.m_bPushKeyTbl[VK_DOWN]));
+		//auto View = GetView();
+		//auto CameraP = View->GetTargetCamera();
+		//m_CameraPos = CameraP->GetEye();
+		//m_CameraAt = CameraP->GetAt();
+		//m_CameraPos += Vector3(InputXY.x, 0, InputXY.y);
+		//m_CameraAt += Vector3(InputXY.x, 0, InputXY.y);
+		//CameraP->SetEye(m_CameraPos);
+		//CameraP->SetAt(m_CameraAt);
+		//Abe20170524
 		
-		///*カメラ座標確認用*/
-		//auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
-		//if (CntlVec[0].bConnected)
-		//{
-		//	Vector2 InputXY = Vector2(CntlVec[0].fThumbLX, CntlVec[0].fThumbLY);
-		//	auto View = GetView();
-		//	auto CameraP = View->GetTargetCamera();
-		//	m_CameraPos = CameraP->GetEye();
-		//	m_CameraAt = CameraP->GetAt();
-		//	m_CameraPos += Vector3(InputXY.x,0,InputXY.y);
-		//	m_CameraAt += Vector3(InputXY.x, 0, InputXY.y);
-		//	CameraP->SetEye(m_CameraPos);
-		//	CameraP->SetAt(m_CameraAt);
-		//	
-		//	/*
-		//	wstring txt;
-		//	txt += L"X:" + Util::FloatToWStr(m_CameraPos.x) + L"Z:" + Util::FloatToWStr(m_CameraPos.z);
-		//	GetSharedGameObject<DebugTxt>(L"DebugTxt",false)->SetText(txt);
-		//	*/
-		//}
+		//wstring txt;
+		//txt += L"X:" + Util::FloatToWStr(m_CameraPos.x) + L"Z:" + Util::FloatToWStr(m_CameraPos.z);
+		//dynamic_pointer_cast<DebugTxt>(m_Debugtxt)->SetText(txt);
+		
 		//Abe20170427
 	}
 
@@ -137,28 +244,92 @@ namespace basecross {
 	//カメラ移動関数
 	void StageSelectScene::CameraMove()
 	{
-		
+		//Abe20170524	
+		auto View = GetView();
+		auto CameraP = View->GetTargetCamera();
+		m_CameraPos = CameraP->GetEye();
+		m_CameraAt = CameraP->GetAt();
+
+		//目標地点との距離を測って近くなければ近づけてく
+		Vector3 dis = m_CameraMoveTarget - m_CameraPos;
+		if (abs(dis.x) + abs(dis.z) > 1.0f)
+		{
+			dynamic_pointer_cast<DebugTxt>(m_Debugtxt)->SetText(Util::FloatToWStr(abs(dis.x) + abs(dis.z)));
+
+			dis /= 15;
+			m_CameraPos += dis;
+			m_CameraAt += dis;
+			CameraP->SetEye(m_CameraPos);
+			CameraP->SetAt(m_CameraAt);
+		}
+		else
+		{
+			dynamic_pointer_cast<DebugTxt>(m_Debugtxt)->SetText(L"end");
+
+			//移動停止
+			m_moveCameraFlg = false;
+			//座標固定
+			m_CameraPos = m_CameraMoveTarget;
+
+			//プレイヤー動けるように(ていうかアタリ判定戻す)
+			auto pptr = GetSharedGameObject<SelectPlayer>(L"SelectPlayer", false);
+			pptr->ActiveMove();
+			return;
+		}
+
+		//プレイヤー移動
+		auto pptr = GetSharedGameObject<SelectPlayer>(L"SelectPlayer", false);
+		Vector3 ppos = pptr->GetPos();
+		//移動
+		Vector3 dis2 = m_CameraMovePlayerTargetPos - ppos;
+		if (abs(dis2.x) + abs(dis2.z) > 1.0f)
+		{
+			dis2 /= 5;
+			ppos += dis2;
+			pptr->SetPos(ppos);
+		}
+		else
+		{
+			ppos = m_CameraMovePlayerTargetPos;
+			pptr->SetPos(ppos);
+		}
+
+		//Abe20170524
 	}
 
 	void StageSelectScene::MoveCamera(int num)
 	{
+		//Z:26 X:46
+
 		auto View = GetView();
 		auto CameraP = View->GetTargetCamera();
 		//ターゲット設定
 		m_CameraPos = CameraP->GetEye();
 		m_CameraAt = CameraP->GetAt();
-		//カメラ移動0：上に　1：右に　2：下に　3：左に
+		//Abe20170524
+		//カメラ移動0：左上に　1：左下に　2：右上に　3：右下に
 		switch (num)
 		{
 		case 0:
+			m_CameraMoveTarget = Vector3(0, 30, -0.1f);
+			m_CameraMovePlayerTargetPos = Vector3(0, 0, 0);
 			break;
 		case 1:
+			m_CameraMoveTarget = Vector3(0, 30, -27.1f);
+			m_CameraMovePlayerTargetPos = Vector3(0, 0, -27);
 			break;
 		case 2:
+			m_CameraMoveTarget = Vector3(46, 30, -0.1f);
+			m_CameraMovePlayerTargetPos = Vector3(46, 0, 0);
 			break;
-		case 3:
+		case 3:		
+			m_CameraMoveTarget = Vector3(46, 30, -27.1f);
+			m_CameraMovePlayerTargetPos = Vector3(46, 0, -27);
 			break;
 		}
+		//移動フラグを立てる
+		m_moveCameraFlg = true;
+		//Abe20170524
 	}
 	//Abe20170427
 

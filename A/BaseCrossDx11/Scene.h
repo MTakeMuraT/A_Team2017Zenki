@@ -19,7 +19,7 @@ namespace basecross{
 
 		//Abe20170515
 		//ステージ番号
-		int m_StageNum = 0;
+		int m_StageNum = 1;
 		//ステージの幅
 		Vector2 m_StageSize = Vector2(50,50);
 		//Abe20170515
