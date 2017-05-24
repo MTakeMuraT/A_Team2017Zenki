@@ -119,7 +119,7 @@ namespace basecross
 	//タイマー作成------------------------------------------
 	void GameStage::CreateTimer()
 	{
-		auto Ti = AddGameObject<Timer>(60, Vector2(50, 300), Vector2(100, 100), 5);
+		auto Ti = AddGameObject<Timer>(0, Vector2(50, 300), Vector2(100, 100), 5);
 		SetSharedGameObject(L"Timer", Ti);
 	}
 	//タイマー作成------------------------------------------
@@ -287,6 +287,7 @@ namespace basecross
 		}
 		else if(m_TX_Name == L"Glass_TX"){
 			PtrDraw->SetTextureResource(m_TX_Name);
+			SetDrawLayer(2);
 		}
 
 		
