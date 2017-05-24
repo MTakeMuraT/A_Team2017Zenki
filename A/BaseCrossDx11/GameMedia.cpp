@@ -121,7 +121,16 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"ENEMYCOUNTSLASH_TX", strTexture);
 		//Abe20170519
 
-	
+		//Abe20170524
+		for (int i = 1; i <= 16; i++)
+		{
+			wstring txt1 = L"StageSelect\\" + Util::IntToWStr(i) + L".png";
+			strTexture = DataDir + txt1;
+			wstring txt2 = L"STAGEBOX_" + Util::IntToWStr(i) + L"_TX";
+			App::GetApp()->RegisterTexture(txt2, strTexture);
+		}
+		//Abe20170524
+
 		////モデル（ボーンあり
 		auto MadelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Player\\PlayerModel\\Player_animation.bmf");
 		App::GetApp()->RegisterResource(L"Player_Model", MadelMesh);
