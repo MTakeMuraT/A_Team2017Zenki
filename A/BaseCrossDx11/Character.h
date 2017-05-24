@@ -708,5 +708,22 @@ namespace basecross{
 	};
 
 	*/
+
+ //”wŒiƒ‚ƒfƒ‹
+	class BackgroundModel : public GameObject {
+	private:
+		Vector3 m_Pos = Vector3(0, 0, 0);
+		Vector3 m_Scale = Vector3(0, 0, 0);
+		int m_LayerNum = 0;
+		float Rot = 1.0f;
+		
+	public:
+		//\’z‚Æ”jŠü
+		BackgroundModel(const shared_ptr<Stage>& StagePtr, const Vector3& Pos,const Vector3& Scale,const int& LayerNum);
+		virtual ~BackgroundModel() {}
+		//‰Šú‰»
+		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
+	};
 }
 //end basecross

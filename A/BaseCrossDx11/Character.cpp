@@ -923,7 +923,7 @@ namespace basecross {
 		if (!m_TimeStopFlg)
 		{
 			//ŠÔŒ¸‚ç‚·
-			m_Time += -App::GetApp()->GetElapsedTime();
+			m_Time += App::GetApp()->GetElapsedTime();
 			//‚O•bˆÈ‰º‚È‚ç
 			if (m_Time <= 0)
 			{
@@ -1841,5 +1841,48 @@ namespace basecross {
 			m_Numbers->SetNum((int)m_MaxCount);
 		}
 	}*/
+
+	//”wŒiƒ‚ƒfƒ‹
+	BackgroundModel::BackgroundModel(const shared_ptr<Stage>& StagePtr, const Vector3& Pos, const Vector3& Scale,const int& LayerNum):
+		GameObject(StagePtr),
+		m_Pos(Pos),
+		m_Scale(Scale),
+		m_LayerNum(LayerNum)
+	{}
+	void BackgroundModel::OnCreate() {
+		auto Trans = AddComponent<Transform>();
+		Trans->SetScale(m_Scale);
+
+		//•`‰æƒRƒ“ƒ|[ƒlƒ“ƒg‚Ìİ’è
+		auto PtrDraw = AddComponent<PNTStaticModelDraw>();
+		//•`‰æ‚·‚éƒƒbƒVƒ…‚ğİ’è
+		PtrDraw->SetMeshResource(L"Background_Model");
+		
+		if (m_LayerNum == 1) {
+			Trans->SetPosition(m_Pos);
+			Trans->SetRotation(0, 50, 0);
+			SetDrawLayer(1);
+			SetAlphaActive(true);
+		}
+		else {
+			Trans->SetPosition(m_Pos);
+			Trans->SetRotation(0, 0, 0);
+			SetDrawLayer(0);
+			SetAlphaActive(true);
+		}
+	}
+	void BackgroundModel::OnUpdate() {
+		if (m_LayerNum == 1) {
+			Rot += 0.01f;
+			auto Trans = GetComponent<Transform>();
+			Trans->SetRotation(0, Rot, 0);
+		}
+		else {
+			Rot += -0.01f;
+			auto Trans = GetComponent<Transform>();
+			Trans->SetRotation(0, Rot, 0);
+		}
+		
+	}
 }
 	//end basecross

@@ -127,7 +127,7 @@ namespace basecross {
 		App::GetApp()->RegisterResource(L"Player_Model", MadelMesh);
 		//Abe20170519
 		//突撃エネミー
-		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Enemy\\EnemyModel\\Assault\\Assault.bmf");
+		MadelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Enemy\\EnemyModel\\Assault\\Assault.bmf");
 		App::GetApp()->RegisterResource(L"TACKLE_MODEL", MadelMesh);
 		//テレポートエネミー
 		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Enemy\\EnemyModel\\Teleport\\Teleport.bmf");
@@ -145,11 +145,18 @@ namespace basecross {
 		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Enemy\\EnemyModel\\Bomb\\Bomb.bmf");
 		App::GetApp()->RegisterResource(L"BOMB_MODEL", MadelMesh);
 		//Abe20170519
-
+		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Enemy\\Missile_Enemy_Child\\Missile_Enemy_Child.bmf");
+		App::GetApp()->RegisterResource(L"MissileEnemyChildModl", MadelMesh); 
+		//ミサイル
+		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Enemy\\Missile\\Missile.bmf");
+		App::GetApp()->RegisterResource(L"Missile_Model", MadelMesh); 
+		//背景MOD
+		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"GameStage\\Background\\Shild_big_1.bmf");
+		App::GetApp()->RegisterResource(L"Background_Model", MadelMesh);
 
 		//検証するのに重いので一時的に消します Abe20170505
 		//BGM
-	/*	wstring strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Title\\Title_01.wav";
+		/*wstring strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Title\\Title_01.wav";
 		App::GetApp()->RegisterWav(L"Title_01_BGM", strMusic);
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\StageSelect\\StageSelect_01.wav";
 		App::GetApp()->RegisterWav(L"StageSelect_01_BGM", strMusic);
@@ -157,7 +164,7 @@ namespace basecross {
 		App::GetApp()->RegisterWav(L"GameStage_01_BGM", strMusic);*/
 	
 		//SE
-		wstring strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Decision_01.wav";
+		wstring  strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Decision_01.wav";
 		App::GetApp()->RegisterWav(L"Decision_01_SE", strMusic);
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Collision_01.wav";
 		App::GetApp()->RegisterWav(L"Collision_01_SE", strMusic);
@@ -167,7 +174,10 @@ namespace basecross {
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\PlayerDie.wav";
 		App::GetApp()->RegisterWav(L"PlayerDie_SE", strMusic);
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\CursorMove.wav";
-		App::GetApp()->RegisterWav(L"CursorMove_SE", strMusic);
+		App::GetApp()->RegisterWav(L"CursorMove_SE", strMusic); 
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\PrayerExposure.wav";
+		App::GetApp()->RegisterWav(L"PrayerDie_SE", strMusic); 
+
 
 
 	}

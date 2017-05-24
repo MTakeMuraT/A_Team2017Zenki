@@ -34,7 +34,7 @@ namespace basecross {
 		//消す
 		//for (auto& v : LineVec) {
 			//各エネミー読み込LineVec
-		if (ScenePtr->GetStageNum() == 0) {
+		if (ScenePtr->GetStageNum() == 1) {
 #pragma region TackleEnemyCSV
 			GameStageCsv.GetSelect(LineVec, 0, L"TackleEnemy");
 			for (auto& v : LineVec) {
@@ -122,6 +122,9 @@ namespace basecross {
 				m_Pos = Vector3(0, 0, 0); m_Scale = 0; m_HP = 0; m_Search = 0; m_Speed = 0; m_AttackPower = 0;
 			}
 #pragma endregion
+			GetStage()->AddGameObject<BackgroundModel>(Vector3(0, 0, 0), Vector3(5, 5, 5), 1);
+			GetStage()->AddGameObject<BackgroundModel>(Vector3(0, 0, 0), Vector3(7, 7, 7), 2);
+
 		}
 		//else if (ScenePtr->GetStageNum() == 1) {
 		//	//1
