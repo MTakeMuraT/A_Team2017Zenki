@@ -27,6 +27,26 @@ namespace basecross
 		void OnCreate() override;
 	};
 
+	//Abe20170525
+	//--------------------------------------------------------------------------------------
+	//	ロゴ
+	//--------------------------------------------------------------------------------------
+	class SelectLogo : public GameObject
+	{
+	private:
+		//座標（引数でVec2入れるけどSetPositionでVec3入れるし）
+		Vector3 m_InitPos;
+		//大きさ
+		Vector3 m_InitScale;
+		//レイヤー
+		int m_layer;
+	public:
+		SelectLogo(const shared_ptr<Stage>& StagePtr, Vector2 pos, Vector2 scale, int layer);
+
+		void OnCreate() override;
+	};
+	//Abe20170525
+
 	//--------------------------------------------------------------------------------------
 	//	プレイヤーの中心
 	//--------------------------------------------------------------------------------------
@@ -133,12 +153,8 @@ namespace basecross
 
 		//背景
 		shared_ptr<GameObject> m_CheckBack;
-		//Yes文字
-		shared_ptr<GameObject> m_CheckYes;
-		//No文字
-		shared_ptr<GameObject> m_CheckNo;
-		//確認文字
-		shared_ptr<GameObject> m_CheckLogo;
+		//中身
+		shared_ptr<GameObject> m_CheckBoxIn;
 		//カーソル
 		shared_ptr<GameObject> m_Cursor;
 
@@ -152,6 +168,18 @@ namespace basecross
 
 		//表示されてるか
 		bool m_Dispflg = false;
+
+		//Abe20170525
+		//それぞれの数
+		//突撃
+		shared_ptr<NumberSprite> m_TackleNumSpr;
+		//玉撃つ
+		shared_ptr<NumberSprite> m_ShotNumSpr;
+		//テレポート
+		shared_ptr<NumberSprite> m_TerepoNumSpr;
+		//自爆
+		shared_ptr<NumberSprite> m_BombNumSpr;
+		//Abe20170525
 	public :
 		GoStageCheck(const shared_ptr<Stage>& StagePtr, Vector2 scale);
 
@@ -168,6 +196,12 @@ namespace basecross
 		//ステージ番号設定
 		void SetStageNumber(int num) { m_stageNum = num; };
 		//Abe20170523
+
+		//Abe20170525
+		//エネミーの数入れる
+		void SetEnemyNum(int tackle, int shot, int terepo, int bomb);
+		//Abe20170525
+
 	};
 	//Abe20170421
 

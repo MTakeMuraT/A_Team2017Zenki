@@ -54,28 +54,28 @@ namespace basecross {
 	{
 		//åvéZÇﬂÇÒÇ«Ç¢ÇÃÇ≈íºë≈Çø
 		//ÇPÅ`ÇS
-		AddGameObject<StageBox>(Vector3(-8, 0, 5), Vector3(1, 1, 1), 1);
-		AddGameObject<StageBox>(Vector3(8, 0, 5), Vector3(1, 1, 1), 2);
-		AddGameObject<StageBox>(Vector3(-8, 0, -5), Vector3(1, 1, 1), 3);
-		AddGameObject<StageBox>(Vector3(8, 0, -5), Vector3(1, 1, 1), 4);
+		AddGameObject<StageBox>(Vector3(-8, 0, 5), Vector3(2, 2, 2), 1);
+		AddGameObject<StageBox>(Vector3(8, 0, 5), Vector3(2, 2, 2), 2);
+		AddGameObject<StageBox>(Vector3(-8, 0, -5), Vector3(2, 2, 2), 3);
+		AddGameObject<StageBox>(Vector3(8, 0, -5), Vector3(2, 2, 2), 4);
 		
 		//ÇTÅ`ÇW
-		AddGameObject<StageBox>(Vector3(-8, 0, -22), Vector3(1, 1, 1), 5);
-		AddGameObject<StageBox>(Vector3(8, 0, -22), Vector3(1, 1, 1), 6);
-		AddGameObject<StageBox>(Vector3(-8, 0, -32), Vector3(1, 1, 1), 7);
-		AddGameObject<StageBox>(Vector3(8, 0, -32), Vector3(1, 1, 1), 8);
+		AddGameObject<StageBox>(Vector3(-8, 0, -22), Vector3(2, 2, 2), 5);
+		AddGameObject<StageBox>(Vector3(8, 0, -22), Vector3(2, 2, 2), 6);
+		AddGameObject<StageBox>(Vector3(-8, 0, -32), Vector3(2, 2, 2), 7);
+		AddGameObject<StageBox>(Vector3(8, 0, -32), Vector3(2, 2, 2), 8);
 		
 		//ÇXÅ`ÇPÇQ
-		AddGameObject<StageBox>(Vector3(36, 0, -22), Vector3(1, 1, 1), 9);
-		AddGameObject<StageBox>(Vector3(56, 0, -22), Vector3(1, 1, 1), 10);
-		AddGameObject<StageBox>(Vector3(36, 0, -32), Vector3(1, 1, 1), 11);
-		AddGameObject<StageBox>(Vector3(56, 0, -32), Vector3(1, 1, 1), 12);
+		AddGameObject<StageBox>(Vector3(36, 0, -22), Vector3(2, 2, 2), 9);
+		AddGameObject<StageBox>(Vector3(56, 0, -22), Vector3(2, 2, 2), 10);
+		AddGameObject<StageBox>(Vector3(36, 0, -32), Vector3(2, 2, 2), 11);
+		AddGameObject<StageBox>(Vector3(56, 0, -32), Vector3(2, 2, 2), 12);
 		
 		//ÇPÇRÅ`ÇPÇU
-		AddGameObject<StageBox>(Vector3(36, 0, 5), Vector3(1, 1, 1), 13);
-		AddGameObject<StageBox>(Vector3(56, 0, 5), Vector3(1, 1, 1), 14);
-		AddGameObject<StageBox>(Vector3(36, 0, -5), Vector3(1, 1, 1), 15);
-		AddGameObject<StageBox>(Vector3(56, 0, -5), Vector3(1, 1, 1), 16);
+		AddGameObject<StageBox>(Vector3(36, 0, 5), Vector3(2, 2, 2), 13);
+		AddGameObject<StageBox>(Vector3(56, 0, 5), Vector3(2, 2, 2), 14);
+		AddGameObject<StageBox>(Vector3(36, 0, -5), Vector3(2, 2, 2), 15);
+		AddGameObject<StageBox>(Vector3(56, 0, -5), Vector3(2, 2, 2), 16);
 		
 	}
 
@@ -101,6 +101,14 @@ namespace basecross {
 	}
 	//Abe20170421
 
+	//Abe20170525
+	//ÉXÉeÅ[ÉWÉçÉSçÏê¨
+	void StageSelectScene::CreateStageLogo()
+	{
+		AddGameObject<SelectLogo>(Vector2(0,300),Vector2(800,120),3);
+	}
+	//Abe20170525
+
 	void StageSelectScene::OnCreate()
 	{
 		try {
@@ -122,6 +130,11 @@ namespace basecross {
 			CreateGoCheck();
 			//Abe20170421
 
+			//Abe20170525
+			//ÉXÉeÅ[ÉWÉçÉSçÏê¨
+			CreateStageLogo();
+			//Abe20170525
+
 			//Abe20170524
 			//ÉXÉeÅ[ÉWÇÃè∞çÏê¨
 			CreateStageUnder();
@@ -136,6 +149,10 @@ namespace basecross {
 
 			m_Debugtxt = debtxt;
 			//Abe20170524
+
+			//Abe20170525ämîFóp
+			//AddGameObject<SpritePosScaleChecker>(Vector2(0,0),Vector2(100,100),5,L"TRACE_TX");
+			//Abe20170525ämîFóp
 
 		}
 		catch (...) {
@@ -254,7 +271,7 @@ namespace basecross {
 		Vector3 dis = m_CameraMoveTarget - m_CameraPos;
 		if (abs(dis.x) + abs(dis.z) > 1.0f)
 		{
-			dynamic_pointer_cast<DebugTxt>(m_Debugtxt)->SetText(Util::FloatToWStr(abs(dis.x) + abs(dis.z)));
+			//dynamic_pointer_cast<DebugTxt>(m_Debugtxt)->SetText(Util::FloatToWStr(abs(dis.x) + abs(dis.z)));
 
 			dis /= 15;
 			m_CameraPos += dis;
@@ -264,7 +281,7 @@ namespace basecross {
 		}
 		else
 		{
-			dynamic_pointer_cast<DebugTxt>(m_Debugtxt)->SetText(L"end");
+			//dynamic_pointer_cast<DebugTxt>(m_Debugtxt)->SetText(L"end");
 
 			//à⁄ìÆí‚é~
 			m_moveCameraFlg = false;

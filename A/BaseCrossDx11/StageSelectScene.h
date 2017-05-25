@@ -29,6 +29,11 @@ namespace basecross {
 		//ステージ行くか確認するスプライト
 		void CreateGoCheck();
 		//Abe20170421
+		
+		//Abe20170525
+		//ステージロゴ作成
+		void CreateStageLogo();
+		//Abe20170525
 
 		//Abe20170524
 		//ステージの床作成

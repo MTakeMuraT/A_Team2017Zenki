@@ -32,6 +32,36 @@ namespace basecross
 		SetDrawLayer(m_layer);
 	}
 
+	//Abe20170525
+	//--------------------------------------------------------------------------------------
+	//	ロゴ
+	//--------------------------------------------------------------------------------------
+	SelectLogo::SelectLogo(const shared_ptr<Stage>& StagePtr, Vector2 pos, Vector2 scale, int layer) :
+		GameObject(StagePtr),
+		m_InitPos(pos),
+		m_InitScale(scale),
+		m_layer(layer)
+	{}
+
+	void SelectLogo::OnCreate()
+	{
+		//座標設定
+		auto Trans = AddComponent<Transform>();
+		Trans->SetPosition(m_InitPos);
+		Trans->SetScale(m_InitScale);
+		Trans->SetRotation(0, 0, 0);
+
+		//描画設定
+		auto Draw = AddComponent<PCTSpriteDraw>();
+		Draw->SetTextureResource(L"SELECT_LOGO_TX");
+
+		//透明度設定
+		SetAlphaActive(true);
+		//レイヤー設定
+		SetDrawLayer(m_layer);
+	}
+	//Abe20170525
+
 	//--------------------------------------------------------------------------------------
 	//	プレイヤー
 	//--------------------------------------------------------------------------------------
@@ -615,12 +645,12 @@ namespace basecross
 		//座標
 		auto Trans = CheckBack->AddComponent<Transform>();
 		Trans->SetPosition(0, -30, 0);
-		Trans->SetScale(Vector3(660,600,1));
+		Trans->SetScale(Vector3(660,720,1));
 		Trans->SetRotation(0, 0, 0);
 
 		//描画
 		auto Draw = CheckBack->AddComponent<PCTSpriteDraw>();
-		Draw->SetTextureResource(L"SELECT_SIRO_TX");
+		Draw->SetTextureResource(L"SELECTCHECK_FLAME_TX");
 		
 		//レイヤー設定
 		CheckBack->SetDrawLayer(2);
@@ -632,84 +662,37 @@ namespace basecross
 
 		m_CheckBack = CheckBack;
 		
-		
-		//YES文字作成---------------------------------
-		auto YesSprite = GetStage()->AddGameObject<GameObject>();
+		//中身作成----------------------------------------
+		auto CheckBackIn = GetStage()->AddGameObject<GameObject>();
 
 		//座標
-		auto YTrans = YesSprite->AddComponent<Transform>();
-		YTrans->SetPosition(-150, -260, 0);
-		YTrans->SetScale(240, 120, 1);
-		YTrans->SetRotation(0, 0, 0);
+		auto CITrans = CheckBackIn->AddComponent<Transform>();
+		CITrans->SetPosition(0, -30, 0);
+		CITrans->SetScale(Vector3(660, 580, 1));
+		CITrans->SetRotation(0, 0, 0);
 
 		//描画
-		auto YDraw = YesSprite->AddComponent<PCTSpriteDraw>();
-		YDraw->SetTextureResource(L"SELECT_YES_TX");
+		auto CIDraw = CheckBackIn->AddComponent<PCTSpriteDraw>();
+		CIDraw->SetTextureResource(L"SELECT_WINDOWIN_TX");
+
+		//レイヤー設定
+		CheckBackIn->SetDrawLayer(3);
+		//透明度有効化
+		CheckBackIn->SetAlphaActive(true);
+
+		//消しとく
+		CheckBackIn->SetDrawActive(false);
+
+		m_CheckBoxIn = CheckBackIn;
+
+
 		
-		//レイヤー設定
-		YesSprite->SetDrawLayer(4);
-
-		//透明度有効化
-		YesSprite->SetAlphaActive(true);
-
-		//消しとく
-		YesSprite->SetDrawActive(false);
-
-		m_CheckYes = YesSprite;
-		
-		//No文字作成------------------------------------
-		auto NoSprite = GetStage()->AddGameObject<GameObject>();
-
-		//座標
-		auto NTrans = NoSprite->AddComponent<Transform>();
-		NTrans->SetPosition(150, -260, 0);
-		NTrans->SetScale(240, 120, 1);
-		NTrans->SetRotation(0, 0, 0);
-
-		//描画
-		auto NDraw = NoSprite->AddComponent<PCTSpriteDraw>();
-		NDraw->SetTextureResource(L"SELECT_NO_TX");
-
-		//レイヤー設定
-		NoSprite->SetDrawLayer(4);
-
-		//透明度有効化
-		NoSprite->SetAlphaActive(true);
-
-		//消しとく
-		NoSprite->SetDrawActive(false);
-
-		m_CheckNo = NoSprite;
-
-		//確認文字作成------------------------------------
-		auto CheckLogo = GetStage()->AddGameObject<GameObject>();
-		//座標
-		auto CLTrans = CheckLogo->AddComponent<Transform>();
-		CLTrans->SetPosition(0, 220, 0);
-		CLTrans->SetScale(550, 120, 1);
-		CLTrans->SetRotation(0, 0, 0);
-
-		//描画
-		auto CLDraw = CheckLogo->AddComponent<PCTSpriteDraw>();
-		CLDraw->SetTextureResource(L"SELECT_YES_TX");
-
-		//レイヤー設定
-		CheckLogo->SetDrawLayer(4);
-
-		//透明度有効化
-		CheckLogo->SetAlphaActive(true);
-
-		//消しとく
-		CheckLogo->SetDrawActive(false);
-
-		m_CheckLogo = CheckLogo;
-
 		//カーソル作成------------------------------------
 		auto CursorSprite = GetStage()->AddGameObject<GameObject>();
 		//座標
 		auto CTrans = CursorSprite->AddComponent<Transform>();
-		CTrans->SetPosition(150, -270, 0);
-		CTrans->SetScale(500, 100, 1);
+		CTrans->SetPosition(135, -310, 0);
+		CTrans->SetScale(200, 100, 1);
 		CTrans->SetRotation(0, 0, 0);
 
 		//描画
@@ -728,6 +711,25 @@ namespace basecross
 		m_Cursor = CursorSprite;
 
 
+		//Abe20170525
+		//それぞれの数字作成
+		//突撃
+		auto tacklenum = GetStage()->AddGameObject<NumberSprite>(0,Vector2(-25,140),Vector2(100,100),4);
+		tacklenum->SetNumDraw(false);
+		m_TackleNumSpr = tacklenum;
+		//玉
+		auto shotnum = GetStage()->AddGameObject<NumberSprite>(0, Vector2(260, 140), Vector2(100, 100), 4);
+		shotnum->SetNumDraw(false);
+		m_ShotNumSpr = shotnum;
+		//てれ
+		auto terenum = GetStage()->AddGameObject<NumberSprite>(0, Vector2(-25, -115), Vector2(100, 100), 4);
+		terenum->SetNumDraw(false);
+		m_TerepoNumSpr = terenum;
+		//爆
+		auto bombnum = GetStage()->AddGameObject<NumberSprite>(0, Vector2(260, -115), Vector2(100, 100), 4);
+		bombnum->SetNumDraw(false);
+		m_BombNumSpr = bombnum;
+		//Abe20170525
 
 		//文字列
 		auto PtrString = AddComponent<StringSprite>();
@@ -748,13 +750,15 @@ namespace basecross
 				{
 					//選択項目Yes
 					m_selectnum = 1;
-					m_Cursor->GetComponent<Transform>()->SetPosition(Vector3(-150, -270, 0));
+					m_Cursor->GetComponent<Transform>()->SetPosition(Vector3(-180, -310, 0));
+					m_Cursor->GetComponent<Transform>()->SetScale(Vector3(100, 100, 1));
 				}
 				//右
 				else if (CntlVec[0].fThumbLX > 0.5f)
 				{
 					m_selectnum = 0;
-					m_Cursor->GetComponent<Transform>()->SetPosition(Vector3(150, -270, 0));
+					m_Cursor->GetComponent<Transform>()->SetPosition(Vector3(135, -310, 0));
+					m_Cursor->GetComponent<Transform>()->SetScale(Vector3(200, 100, 1));
 				}
 
 				//AかBボタン押されたら
@@ -803,10 +807,13 @@ namespace basecross
 	{
 		m_Dispflg = true;
 		m_CheckBack->SetDrawActive(true);
-		m_CheckYes->SetDrawActive(true);
-		m_CheckNo->SetDrawActive(true);
-		m_CheckLogo->SetDrawActive(true);
+		m_CheckBoxIn->SetDrawActive(true);
 		m_Cursor->SetDrawActive(true);
+		m_TackleNumSpr->SetNumDraw(true);
+		m_ShotNumSpr->SetNumDraw(true);
+		m_TerepoNumSpr->SetNumDraw(true);
+		m_BombNumSpr->SetNumDraw(true);
+
 	}
 
 	//終了
@@ -814,14 +821,18 @@ namespace basecross
 	{
 		m_Dispflg = false;
 		m_CheckBack->SetDrawActive(false);
-		m_CheckYes->SetDrawActive(false);
-		m_CheckNo->SetDrawActive(false);
-		m_CheckLogo->SetDrawActive(false);
+		m_CheckBoxIn->SetDrawActive(false);
 		m_Cursor->SetDrawActive(false);
+		m_TackleNumSpr->SetNumDraw(false);
+		m_ShotNumSpr->SetNumDraw(false);
+		m_TerepoNumSpr->SetNumDraw(false);
+		m_BombNumSpr->SetNumDraw(false);
+
+
 
 		//次起動するとき用に初期化
 		//Noに初期化
-		m_Cursor->GetComponent<Transform>()->SetPosition(Vector3(150, -270, 0));
+		m_Cursor->GetComponent<Transform>()->SetPosition(Vector3(150, -300, 0));
 		m_selectnum = 0;
 
 		//プレイヤーのアップデート再開
@@ -831,6 +842,15 @@ namespace basecross
 	}
 	//Abe20170421
 
+	//Abe20170525
+	void GoStageCheck::SetEnemyNum(int tackle, int shot, int terepo, int bomb)
+	{
+		//数字のスプライト変更
+		m_TackleNumSpr->SetNum(tackle);
+		m_ShotNumSpr->SetNum(shot);
+		m_TerepoNumSpr->SetNum(terepo);
+		m_BombNumSpr->SetNum(bomb);
+	}
 	//Abe20170427
 	//--------------------------------------------------------------------------------------
 	//	地面
@@ -851,7 +871,7 @@ namespace basecross
 
 		auto Draw = AddComponent<PNTStaticDraw>();
 		Draw->SetMeshResource(L"DEFAULT_CUBE");
-		Draw->SetTextureResource(L"SELECT_SIRO_TX");
+		Draw->SetTextureResource(L"STAGESELECTGROUND_TX");
 		//必要最低限------
 
 		
