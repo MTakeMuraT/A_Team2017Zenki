@@ -195,6 +195,7 @@ namespace basecross
 		//Abe20170523
 		//ステージ番号設定
 		void SetStageNumber(int num) { m_stageNum = num; };
+		int GetStageNumber() { return m_stageNum; };
 		//Abe20170523
 
 		//Abe20170525
