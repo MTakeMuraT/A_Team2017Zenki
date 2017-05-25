@@ -625,7 +625,7 @@ namespace basecross
 		//確認ウィンドウ起動
 		GetStage()->GetSharedGameObject<GoStageCheck>(L"GoStageCheck", false)->OpenCheck();
 		GetStage()->GetSharedGameObject<GoStageCheck>(L"GoStageCheck", false)->SetStageNumber(m_stagenumber);
-
+		GetStage()->GetSharedGameObject<EnemyCount>(L"Count", false)->Count();
 	}
 
 	//--------------------------------------------------------------------------------------

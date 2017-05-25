@@ -153,6 +153,8 @@ namespace basecross {
 			//Abe20170525確認用
 			//AddGameObject<SpritePosScaleChecker>(Vector2(0,0),Vector2(100,100),5,L"TRACE_TX");
 			//Abe20170525確認用
+			auto PtrEnemyCount = AddGameObject<EnemyCount>();
+			SetSharedGameObject(L"Count", PtrEnemyCount);
 
 		}
 		catch (...) {

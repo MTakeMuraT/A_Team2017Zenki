@@ -12,6 +12,7 @@
 #include "Behavior.h"
 
 #include "ProjectShader.h"
+#include "EnemyCount.h"
 //ÉVÅ[Éì
 #include "Scene.h"
 #include "TitleScene.h"

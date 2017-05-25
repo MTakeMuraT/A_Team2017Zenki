@@ -27,6 +27,7 @@
     <ClInclude Include="Common\SpriteStudio5.h" />
     <ClInclude Include="Common\StringComponents.h" />
     <ClInclude Include="CSV.h" />
+    <ClInclude Include="EnemyCount.h" />
     <ClInclude Include="Enemys.h" />
     <ClInclude Include="GameMedia.h" />
     <ClInclude Include="GameStage.h" />
@@ -57,6 +58,7 @@
     <ClCompile Include="Common\SpriteStudio5.cpp" />
     <ClCompile Include="Common\StringComponents.cpp" />
     <ClCompile Include="CSV.cpp" />
+    <ClCompile Include="EnemyCount.cpp" />
     <ClCompile Include="Enemys.cpp" />
     <ClCompile Include="GameMedia.cpp" />
     <ClCompile Include="GameStage.cpp" />

@@ -111,6 +111,9 @@
     <ClInclude Include="Enemys.h">
       <Filter>SourceCode\Header</Filter>
     </ClInclude>
+    <ClInclude Include="EnemyCount.h">
+      <Filter>SourceCode\Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\StringComponents.cpp">
@@ -186,6 +189,9 @@
       <Filter>SourceCode\cpp</Filter>
     </ClCompile>
     <ClCompile Include="Enemys.cpp">
+      <Filter>SourceCode\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyCount.cpp">
       <Filter>SourceCode\cpp</Filter>
     </ClCompile>
   </ItemGroup>
