@@ -23,9 +23,6 @@ namespace basecross {
 		strTexture = DataDir + L"TestTexture\\sky.jpg";
 		App::GetApp()->RegisterTexture(L"SKY_TX", strTexture);
 
-		strTexture = DataDir + L"TestTexture\\spark.png";
-		App::GetApp()->RegisterTexture(L"SPARK_TX", strTexture);
-
 		//数字のスプライト
 		strTexture = DataDir + L"number.png";
 		App::GetApp()->RegisterTexture(L"NUMBER_TX", strTexture);
@@ -64,26 +61,27 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"KURO_TX", strTexture);
 
 		//Abe20170421
-		//仮ステセレ
-		//セレクトのフレーム
-		strTexture = DataDir + L"TestTexture\\Select_flameTEST.png";
+		//ステセレ
+		//セレクトのフレーム大枠
+		strTexture = DataDir + L"StageSelect\\Select_Flame.png";
 		App::GetApp()->RegisterTexture(L"SELECT_FLAME_TX", strTexture);		
 		//Abe20170512
-		//本番
-		//セレクトのステージ行くか確認するときのYES
-		strTexture = DataDir + L"StageSelect\\Go.png";
-		App::GetApp()->RegisterTexture(L"SELECT_YES_TX", strTexture);
-		//セレクトのステージ行くか確認するときのNO
-		strTexture = DataDir + L"StageSelect\\Back.png";
-		App::GetApp()->RegisterTexture(L"SELECT_NO_TX", strTexture);
-		//本番
+		//セレクトのウィンドウのフレーム
+		strTexture = DataDir + L"StageSelect\\Flame.png";
+		App::GetApp()->RegisterTexture(L"SELECTCHECK_FLAME_TX", strTexture);
 		//Abe20170512
+		//Abe20170525
+		//中身
+		strTexture = DataDir + L"StageSelect\\StageSelect_WindowBack.png";
+		App::GetApp()->RegisterTexture(L"SELECT_WINDOWIN_TX", strTexture);
+		//ロゴ
+		//カーソル
+		strTexture = DataDir + L"StageSelect\\StageSelect_Logo.png";
+		App::GetApp()->RegisterTexture(L"SELECT_LOGO_TX", strTexture);
 
-		//仮のシロ
-		strTexture = DataDir + L"TestTexture\\siro.png";
-		App::GetApp()->RegisterTexture(L"SELECT_SIRO_TX", strTexture);
-		//仮のカーソル
-		strTexture = DataDir + L"TestTexture\\spark.png";
+		//Abe20170525
+		//カーソル
+		strTexture = DataDir + L"StageSelect\\StageSelect_Cursor.png";
 		App::GetApp()->RegisterTexture(L"SELECT_CURSOR_TX", strTexture);
 
 		//Abe20170421
@@ -122,6 +120,7 @@ namespace basecross {
 		//Abe20170519
 
 		//Abe20170524
+		//ステージの番号
 		for (int i = 1; i <= 16; i++)
 		{
 			wstring txt1 = L"StageSelect\\" + Util::IntToWStr(i) + L".png";
@@ -129,6 +128,9 @@ namespace basecross {
 			wstring txt2 = L"STAGEBOX_" + Util::IntToWStr(i) + L"_TX";
 			App::GetApp()->RegisterTexture(txt2, strTexture);
 		}
+		//ステセレの背景
+		strTexture = DataDir + L"SELECT_Background.png";
+		App::GetApp()->RegisterTexture(L"STAGESELECTGROUND_TX", strTexture);
 		//Abe20170524
 
 		////モデル（ボーンあり
@@ -173,20 +175,22 @@ namespace basecross {
 		App::GetApp()->RegisterWav(L"GameStage_01_BGM", strMusic);*/
 	
 		//SE
+		
 		wstring  strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Decision_01.wav";
 		App::GetApp()->RegisterWav(L"Decision_01_SE", strMusic);
+		
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Collision_01.wav";
 		App::GetApp()->RegisterWav(L"Collision_01_SE", strMusic);
 		//テストSE
-		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Decision_02.wav";
-		App::GetApp()->RegisterWav(L"Decision_02_SE", strMusic);
+		//strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Decision_02.wav";
+		//App::GetApp()->RegisterWav(L"Decision_02_SE", strMusic);
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\PlayerDie.wav";
 		App::GetApp()->RegisterWav(L"PlayerDie_SE", strMusic);
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\CursorMove.wav";
-		App::GetApp()->RegisterWav(L"CursorMove_SE", strMusic); 
-		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\PrayerExposure.wav";
-		App::GetApp()->RegisterWav(L"PrayerDie_SE", strMusic); 
-
+		//App::GetApp()->RegisterWav(L"CursorMove_SE", strMusic); 
+		//strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\PrayerExposure.wav";
+		//App::GetApp()->RegisterWav(L"PrayerDie_SE", strMusic); 
+		
 
 
 	}

@@ -645,7 +645,7 @@ namespace basecross
 		//À•W
 		auto Trans = CheckBack->AddComponent<Transform>();
 		Trans->SetPosition(0, -30, 0);
-		Trans->SetScale(Vector3(660,720,1));
+		Trans->SetScale(Vector3(840,740,1));
 		Trans->SetRotation(0, 0, 0);
 
 		//•`‰æ
@@ -667,7 +667,7 @@ namespace basecross
 
 		//À•W
 		auto CITrans = CheckBackIn->AddComponent<Transform>();
-		CITrans->SetPosition(0, -30, 0);
+		CITrans->SetPosition(0, -32, 0);
 		CITrans->SetScale(Vector3(660, 580, 1));
 		CITrans->SetRotation(0, 0, 0);
 
