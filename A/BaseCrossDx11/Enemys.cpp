@@ -96,6 +96,14 @@ namespace basecross
 
 	void TackleEnemy::OnUpdate()
 	{
+		//Vector3 rot = GetComponent<Transform>()->GetRotation();
+		//rot.x = 0;
+		//rot.y += 0.01f;
+		//rot.z = 0;
+		//GetComponent<Transform>()->SetRotation(rot);
+
+		//m_Debugtxt->SetText(L"X:" + Util::FloatToWStr(rot.x) + L"\nY:" + Util::FloatToWStr(rot.y) + L"\nZ:" + Util::FloatToWStr(rot.z));
+		
 		//生きてれば
 		if (m_ActiveFlg)
 		{
@@ -146,7 +154,7 @@ namespace basecross
 		if (vel.x + vel.z > 0.2f)
 		{
 			float angle = atan2(m_Velocity.z, m_Velocity.x);
-			angle += 90 * 3.14159265f / 180;
+			angle *= -1;
 			GetComponent<Transform>()->SetRotation(0, angle, 0);
 		}
 	}
@@ -332,6 +340,7 @@ namespace basecross
 
 	void TackleEnemy::CircleMove()
 	{
+
 		Vector3 pos = GetComponent<Transform>()->GetPosition();
 		//足元へ移動
 		pos.y = 1;
@@ -601,12 +610,14 @@ namespace basecross
 		{
 			Vector3 dif = m_Player1->GetComponent<Transform>()->GetPosition() - GetComponent<Transform>()->GetPosition();
 			angle = atan2(dif.z, dif.x);
+			angle *= -1;
 			GetComponent<Transform>()->SetRotation(0, angle, 0);
 		}
 		else
 		{
 			Vector3 dif = m_Player2->GetComponent<Transform>()->GetPosition() - GetComponent<Transform>()->GetPosition();
 			angle = atan2(dif.z, dif.x);
+			angle *= -1;
 			GetComponent<Transform>()->SetRotation(0, angle, 0);
 		}
 
@@ -861,7 +872,7 @@ namespace basecross
 		auto Trans = AddComponent<Transform>();
 		Trans->SetPosition(m_InitPos);
 		Trans->SetScale(Vector3(m_ParScale, m_ParScale, m_ParScale));
-		Trans->SetRotation(0, 0, 0);
+		Trans->SetRotation(0, -90 * 3.14159265f / 180, 0);
 
 		//モデルとトランスフォームの間の差分
 		Matrix4X4 Mat;
@@ -1392,7 +1403,7 @@ namespace basecross
 		if (vel.x + vel.z > 0.2f)
 		{
 			float angle = atan2(m_Velocity.z, m_Velocity.x);
-			angle += 90 * 3.14159265f / 180;
+			angle *= -1;
 			GetComponent<Transform>()->SetRotation(0, angle, 0);
 		}
 	}
