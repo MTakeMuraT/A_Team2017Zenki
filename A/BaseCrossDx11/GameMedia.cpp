@@ -142,7 +142,7 @@ namespace basecross {
 		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Enemy\\EnemyModel\\Teleport\\Teleport.bmf");
 		App::GetApp()->RegisterResource(L"TELEPORT_MODEL", MadelMesh);
 		//ミサイルエネミー
-		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Enemy\\EnemyModel\\Missile_Enemy\\Missile_Enemy.bmf");
+		MadelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Enemy\\EnemyModel\\Missile_Enemy\\Missile_Enemy.bmf");
 		App::GetApp()->RegisterResource(L"MISSILE_MODEL", MadelMesh);
 		//ドローン
 		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Enemy\\EnemyModel\\Dorawn\\Dorawn.bmf");

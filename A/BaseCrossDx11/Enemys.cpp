@@ -36,7 +36,7 @@ namespace basecross
 			);
 
 		//見た目
-		auto Draw = AddComponent<PNTStaticModelDraw>();
+		auto Draw = AddComponent<PNTBoneModelDraw>();
 		//メッシュ設定
 		Draw->SetMeshResource(L"TACKLE_MODEL");
 		//モデル大きさ調整
@@ -492,7 +492,7 @@ namespace basecross
 			);
 
 		//見た目
-		auto Draw = AddComponent<PNTStaticModelDraw>();
+		auto Draw = AddComponent<PNTBoneModelDraw>();
 		//メッシュ設定
 		Draw->SetMeshResource(L"MISSILE_MODEL");
 		//モデル大きさ調整
