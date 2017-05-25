@@ -56,9 +56,15 @@ namespace basecross
 	}
 	//地面
 	void GameStage::CreateGround() {
+		//Abe20170525
+		//ステージの大きさ取得
+		auto ScenePtr = App::GetApp()->GetScene<Scene>();
+		m_StageSize = ScenePtr->GetStageSize();
+		//Abe20170525
+
 		//Vector3:S・P  wstring:TX_Name
 		AddGameObject<Ground_GameStage>(
-			Vector3(50, 50, 50),
+			Vector3(m_StageSize.x, m_StageSize.y, 1),
 			Vector3(0, 0, 0),
 			wstring(L"Glass_TX")
 			);
