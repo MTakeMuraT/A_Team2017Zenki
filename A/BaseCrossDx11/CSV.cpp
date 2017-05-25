@@ -15,7 +15,9 @@ namespace basecross {
 		auto PtrBomGroup = GetStage()->GetSharedObjectGroup(L"BombGroup");
 		// CSVフォルダの指定
 		wstring CsvMediaPath = App::GetApp()->m_wstrRelativeDataPath + L"CSV\\";
-		wstring CsvFileName = CsvMediaPath + L"Stage1.csv";
+		wstring CsvFileName = CsvMediaPath + L"Stage";
+		CsvFileName += App::GetApp()->GetScene<Scene>()->GetCsvStageNum();
+		CsvFileName += L".csv";
 		//wstring CsvFileName2 = CsvMediaPath + L"Stage2.csv";
 		CsvFile GameStageCsv(CsvFileName);
 		//CsvFile GameStageCsv(CsvFileName2);
@@ -34,7 +36,7 @@ namespace basecross {
 		//消す
 		//for (auto& v : LineVec) {
 			//各エネミー読み込LineVec
-		if (ScenePtr->GetStageNum() == 1) {
+	
 #pragma region TackleEnemyCSV
 			GameStageCsv.GetSelect(LineVec, 0, L"TackleEnemy");
 			for (auto& v : LineVec) {
@@ -124,51 +126,6 @@ namespace basecross {
 #pragma endregion
 			GetStage()->AddGameObject<BackgroundModel>(Vector3(0, 0, 0), Vector3(5, 5, 5), 1);
 			GetStage()->AddGameObject<BackgroundModel>(Vector3(0, 0, 0), Vector3(7, 7, 7), 2);
-
-		}
-		//else if (ScenePtr->GetStageNum() == 1) {
-		//	//1
-		//}
-		//else if (ScenePtr->GetStageNum() == 2) {
-		//	//2
-		//}
-		//else if (ScenePtr->GetStageNum() == 3) {
-		//	//3
-		//}
-		//else if (ScenePtr->GetStageNum() == 4) {
-		//	//4
-		//}
-		//else if (ScenePtr->GetStageNum() == 5) {
-		//	//5
-		//}
-		//else if (ScenePtr->GetStageNum() == 6) {
-		//	//6
-		//}
-		//else if (ScenePtr->GetStageNum() == 7) {
-		//	//7
-		//}
-		//else if (ScenePtr->GetStageNum() == 8) {
-		//	//8
-		//}
-		//else if (ScenePtr->GetStageNum() == 9) {
-		//	//9
-		//}
-		//else if (ScenePtr->GetStageNum() == 10) {
-		//	//10
-		//}
-		//else if (ScenePtr->GetStageNum() == 11) {
-		//	//11
-		//}
-		//else if (ScenePtr->GetStageNum() == 12) {
-		//	//12
-		//}
-		//else if (ScenePtr->GetStageNum() == 13) {
-		//	//13
-		//}
-		//else if (ScenePtr->GetStageNum() == 14) {
-		//	//14
-		//}
-		//}
 	}
 	//位置
 	Vector3 InputCSV::SinglePos(vector<wstring> Tokens) {

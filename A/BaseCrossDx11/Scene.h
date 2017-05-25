@@ -23,6 +23,8 @@ namespace basecross{
 		//ステージの幅
 		Vector2 m_StageSize = Vector2(50,50);
 		//Abe20170515
+		//ステージCSV番号
+		wstring m_CsvStageNum;
 
 	public:
 
@@ -56,7 +58,9 @@ namespace basecross{
 		//ステージ番号アクセサー
 		int GetStageNum() { return m_StageNum; }
 		//Abe20170515
-
+		//CSVのステージナンバーアクセサ
+		void SetCsvStageNum(wstring StageNumCSV) { m_CsvStageNum = StageNumCSV; }
+		wstring GetCsvStageNum() { return m_CsvStageNum; }
 	};
 
 }

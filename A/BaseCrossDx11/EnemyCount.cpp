@@ -15,6 +15,7 @@ namespace basecross {
 			wstring CsvMediaPath = App::GetApp()->m_wstrRelativeDataPath + L"CSV\\";
 			wstring CsvFileName = CsvMediaPath + L"Stage";
 			CsvFileName += Util::IntToWStr(GetStage()->GetSharedGameObject<GoStageCheck>(L"GoStageCheck", false)->GetStageNumber());
+			wstring CSVNum = Util::IntToWStr(GetStage()->GetSharedGameObject<GoStageCheck>(L"GoStageCheck", false)->GetStageNumber());
 			CsvFileName += L".csv";
 			//	wstring CsvFileName2 = CsvMediaPath + L"Stage2.csv";
 
@@ -53,6 +54,7 @@ namespace basecross {
 			}
 			GetStage()->GetSharedGameObject<GoStageCheck>(L"GoStageCheck", false)->SetEnemyNum(m_TackeEnemyCount, m_ShotEnemyCount, m_TeleportEnemyCount, m_BombEnemyCount);
 			ResetCount();
+			App::GetApp()->GetScene<Scene>()->SetCsvStageNum(CSVNum);
 		}
 	}
 	void EnemyCount::ResetCount() {
