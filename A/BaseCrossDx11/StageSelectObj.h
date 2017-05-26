@@ -220,8 +220,27 @@ namespace basecross
 		SelectGroud(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale);
 
 		void OnCreate() override;
-		void OnUpdate() override;
 	};
 	//Abe20170427
+
+
+	//Abe20170526
+	//--------------------------------------------------------------------------------------
+	//	’n–Ê‚É“\‚é‚â‚Â
+	//--------------------------------------------------------------------------------------
+	class SelectGroundSquare : public GameObject
+	{
+	private:
+		Vector3 m_Pos;
+		Vector3 m_Scale;
+		wstring m_Text;
+		float m_rot;
+	public:
+		SelectGroundSquare(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale,wstring txt,float rot);
+
+		void OnCreate() override;
+	};
+
+	//Abe20170526
 
 }

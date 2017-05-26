@@ -80,10 +80,23 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"SELECT_LOGO_TX", strTexture);
 
 		//Abe20170525
+		//Abe20170526
+		//–îˆó
+		strTexture = DataDir + L"StageSelect\\Yazirushi.png";
+		App::GetApp()->RegisterTexture(L"YAZIRUSHI_TX", strTexture);
+		//easy
+		strTexture = DataDir + L"StageSelect\\Easy.png";
+		App::GetApp()->RegisterTexture(L"EASY_TX", strTexture);
+		//normal
+		strTexture = DataDir + L"StageSelect\\Normal.png";
+		App::GetApp()->RegisterTexture(L"NORMAL_TX", strTexture);
+		//hard
+		strTexture = DataDir + L"StageSelect\\Hard.png";
+		App::GetApp()->RegisterTexture(L"HARD_TX", strTexture);
+		//Abe20170526
 		//ƒJ[ƒ\ƒ‹
 		strTexture = DataDir + L"StageSelect\\StageSelect_Cursor.png";
 		App::GetApp()->RegisterTexture(L"SELECT_CURSOR_TX", strTexture);
-
 		//Abe20170421
 
 		//Abe20170505

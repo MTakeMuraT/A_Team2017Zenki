@@ -46,7 +46,7 @@ namespace basecross {
 	//ÉvÉåÉCÉÑÅ[çÏê¨
 	void StageSelectScene::CreatePlayer()
 	{
-		SetSharedGameObject(L"SelectPlayer", AddGameObject<SelectPlayer>(Vector3(0, 0, 0), Vector3(1, 1, 1),20.0f));
+		SetSharedGameObject(L"SelectPlayer", AddGameObject<SelectPlayer>(Vector3(0, 0.6f, 0), Vector3(1, 1, 1),20.0f));
 	}
 
 	//ÉXÉeÅ[ÉWÉ{ÉbÉNÉXçÏê¨
@@ -54,28 +54,28 @@ namespace basecross {
 	{
 		//åvéZÇﬂÇÒÇ«Ç¢ÇÃÇ≈íºë≈Çø
 		//ÇPÅ`ÇS
-		AddGameObject<StageBox>(Vector3(-8, 0, 5), Vector3(2, 2, 2), 1);
-		AddGameObject<StageBox>(Vector3(8, 0, 5), Vector3(2, 2, 2), 2);
-		AddGameObject<StageBox>(Vector3(-8, 0, -5), Vector3(2, 2, 2), 3);
-		AddGameObject<StageBox>(Vector3(8, 0, -5), Vector3(2, 2, 2), 4);
+		AddGameObject<StageBox>(Vector3(-8, 0.5f, 5), Vector3(2, 2, 2), 1);
+		AddGameObject<StageBox>(Vector3(8, 0.5f, 5), Vector3(2, 2, 2), 2);
+		AddGameObject<StageBox>(Vector3(-8, 0.5f, -5), Vector3(2, 2, 2), 3);
+		AddGameObject<StageBox>(Vector3(8, 0.5f, -5), Vector3(2, 2, 2), 4);
 		
 		//ÇTÅ`ÇW
-		AddGameObject<StageBox>(Vector3(-8, 0, -22), Vector3(2, 2, 2), 5);
-		AddGameObject<StageBox>(Vector3(8, 0, -22), Vector3(2, 2, 2), 6);
-		AddGameObject<StageBox>(Vector3(-8, 0, -32), Vector3(2, 2, 2), 7);
-		AddGameObject<StageBox>(Vector3(8, 0, -32), Vector3(2, 2, 2), 8);
+		AddGameObject<StageBox>(Vector3(-8, 0.5f, -22), Vector3(2, 2, 2), 5);
+		AddGameObject<StageBox>(Vector3(8, 0.5f, -22), Vector3(2, 2, 2), 6);
+		AddGameObject<StageBox>(Vector3(-8, 0.5f, -32), Vector3(2, 2, 2), 7);
+		AddGameObject<StageBox>(Vector3(8, 0.5f, -32), Vector3(2, 2, 2), 8);
 		
 		//ÇXÅ`ÇPÇQ
-		AddGameObject<StageBox>(Vector3(36, 0, -22), Vector3(2, 2, 2), 9);
-		AddGameObject<StageBox>(Vector3(56, 0, -22), Vector3(2, 2, 2), 10);
-		AddGameObject<StageBox>(Vector3(36, 0, -32), Vector3(2, 2, 2), 11);
-		AddGameObject<StageBox>(Vector3(56, 0, -32), Vector3(2, 2, 2), 12);
+		AddGameObject<StageBox>(Vector3(36, 0.5f, -22), Vector3(2, 2, 2), 9);
+		AddGameObject<StageBox>(Vector3(56, 0.5f, -22), Vector3(2, 2, 2), 10);
+		AddGameObject<StageBox>(Vector3(36, 0.5f, -32), Vector3(2, 2, 2), 11);
+		AddGameObject<StageBox>(Vector3(56, 0.5f, -32), Vector3(2, 2, 2), 12);
 		
 		//ÇPÇRÅ`ÇPÇU
-		AddGameObject<StageBox>(Vector3(36, 0, 5), Vector3(2, 2, 2), 13);
-		AddGameObject<StageBox>(Vector3(56, 0, 5), Vector3(2, 2, 2), 14);
-		AddGameObject<StageBox>(Vector3(36, 0, -5), Vector3(2, 2, 2), 15);
-		AddGameObject<StageBox>(Vector3(56, 0, -5), Vector3(2, 2, 2), 16);
+		AddGameObject<StageBox>(Vector3(36, 0.5f, 5), Vector3(2, 2, 2), 13);
+		AddGameObject<StageBox>(Vector3(56, 0.5f, 5), Vector3(2, 2, 2), 14);
+		AddGameObject<StageBox>(Vector3(36, 0.5f, -5), Vector3(2, 2, 2), 15);
+		AddGameObject<StageBox>(Vector3(56, 0.5f, -5), Vector3(2, 2, 2), 16);
 		
 	}
 
@@ -108,6 +108,35 @@ namespace basecross {
 		AddGameObject<SelectLogo>(Vector2(0,300),Vector2(800,120),3);
 	}
 	//Abe20170525
+
+	//Abe20170526
+	void StageSelectScene::CreateGroundSquareS()
+	{
+		//ñÓàÛ
+		//ç∂è„
+		AddGameObject<SelectGroundSquare>(Vector3(0, 0.5f, -10), Vector3(3, 3, 3), L"YAZIRUSHI_TX", 270);
+		AddGameObject<SelectGroundSquare>(Vector3(18, 0.5f, 0), Vector3(3, 3, 3), L"YAZIRUSHI_TX", 0);
+		//ç∂â∫
+		AddGameObject<SelectGroundSquare>(Vector3(0, 0.5f, -18), Vector3(3, 3, 3), L"YAZIRUSHI_TX", 90);
+		AddGameObject<SelectGroundSquare>(Vector3(18, 0.5f, -27), Vector3(3, 3, 3), L"YAZIRUSHI_TX", 0);
+		//âEâ∫
+		AddGameObject<SelectGroundSquare>(Vector3(46, 0.5f, -18), Vector3(3, 3, 3), L"YAZIRUSHI_TX", 90);
+		AddGameObject<SelectGroundSquare>(Vector3(28, 0.5f, -27), Vector3(3, 3, 3), L"YAZIRUSHI_TX", 180);
+		//âEè„
+		AddGameObject<SelectGroundSquare>(Vector3(46, 0.5f, -10), Vector3(3, 3, 3), L"YAZIRUSHI_TX", 270);
+		AddGameObject<SelectGroundSquare>(Vector3(28, 0.5f, 0), Vector3(3, 3, 3), L"YAZIRUSHI_TX", 180);
+
+		//Easy
+		AddGameObject<SelectGroundSquare>(Vector3(0, 0.5f, 0), Vector3(10, 10, 11), L"EASY_TX", 0);
+		//Normal
+		AddGameObject<SelectGroundSquare>(Vector3(0, 0.5, -26), Vector3(10, 10, 11), L"NORMAL_TX", 0);
+		AddGameObject<SelectGroundSquare>(Vector3(46, 0.5f, -26), Vector3(10, 10, 11), L"NORMAL_TX", 0);
+		//Hard
+		AddGameObject<SelectGroundSquare>(Vector3(46, 0.5f, 0), Vector3(10, 10, 11), L"HARD_TX", 0);
+
+	}
+	//Abe20170526
+
 
 	void StageSelectScene::OnCreate()
 	{
@@ -149,6 +178,11 @@ namespace basecross {
 
 			m_Debugtxt = debtxt;
 			//Abe20170524
+
+			//Abe20170526
+			//ÉXÉeÅ[ÉWÇÃè∞Ç…ì\ÇÈÇ‚Ç¬çÏê¨
+			CreateGroundSquareS();
+			//Abe20170526
 
 			//Abe20170525ämîFóp
 			//AddGameObject<SpritePosScaleChecker>(Vector2(0,0),Vector2(100,100),5,L"TRACE_TX");

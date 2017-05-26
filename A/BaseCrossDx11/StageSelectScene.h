@@ -53,6 +53,11 @@ namespace basecross {
 		void CameraMove();
 		//Abe20170427
 
+		//Abe20170526
+		//地面に張り付けるやつ作成
+		void CreateGroundSquareS();
+		//Abe20170526
+
 		//Abe20170524
 		//デバッグ文字表示オブジェ
 		shared_ptr<GameObject> m_Debugtxt;

@@ -100,21 +100,23 @@ namespace basecross
 			//衝突判定をつける
 			auto PtrCol = PlayerPtr->AddComponent<CollisionSphere>();
 			
+			PlayerPtr->SetDrawLayer(0);
+
 			//プレイヤーのアクセサ?
 			m_Player.push_back(PlayerPtr);
 
-			//デバッグ文字生成
-			auto debtxt = GetStage()->AddGameObject<DebugTxt>();
-			debtxt->SetLayer(10);
-			//色赤に変更
-			debtxt->SetColor(Vector3(1, 0, 0));
-			//大きさ変更
-			debtxt->SetScaleTxt(40);
-
-			m_Debugtxt = debtxt;
-			//Abe20170524
 
 		}
+		//デバッグ文字生成
+		auto debtxt = GetStage()->AddGameObject<DebugTxt>();
+		debtxt->SetLayer(10);
+		//色赤に変更
+		debtxt->SetColor(Vector3(1, 0, 0));
+		//大きさ変更
+		debtxt->SetScaleTxt(40);
+
+		m_Debugtxt = debtxt;
+		//Abe20170524
 
 	}
 
@@ -876,11 +878,36 @@ namespace basecross
 
 		
 	}
-
-	void SelectGroud::OnUpdate()
-	{
-
-	}
 	//Abe20170427
+
+	//Abe20170526
+	//--------------------------------------------------------------------------------------
+	//	地面に貼るやつ
+	//--------------------------------------------------------------------------------------
+	SelectGroundSquare::SelectGroundSquare(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale,wstring txt,float rot) :
+		GameObject(StagePtr),
+		m_Pos(pos),
+		m_Scale(scale),
+		m_Text(txt),
+		m_rot(rot)
+	{}
+
+	void SelectGroundSquare::OnCreate()
+	{
+		//必要最低限------
+		auto TranP = AddComponent<Transform>();
+		TranP->SetPosition(m_Pos);
+		TranP->SetScale(m_Scale);
+		TranP->SetRotation(90 * 3.14159265f / 180, -m_rot*3.14159265f / 180, 0);
+
+		auto Draw = AddComponent<PNTStaticDraw>();
+		Draw->SetMeshResource(L"DEFAULT_SQUARE");
+		Draw->SetTextureResource(m_Text);
+		//必要最低限------
+
+		SetDrawLayer(1);
+		SetAlphaActive(true);
+	}
+	//Abe20170526
 
 }
