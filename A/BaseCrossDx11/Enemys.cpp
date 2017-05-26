@@ -50,7 +50,7 @@ namespace basecross
 		Draw->AddAnimation(L"AttackNow", 90, 20, true, 30);
 		Draw->AddAnimation(L"Damage", 120, 30, false, 30);
 
-		Draw->GetCurrentAnimation() == L"Wait";
+		Draw->ChangeCurrentAnimation(L"Wait");
 		//Abe20170526
 
 		//透明処理
@@ -610,6 +610,15 @@ namespace basecross
 		//モデル大きさ調整
 		Draw->SetMeshToTransformMatrix(Mat);
 
+		//Abe20170526
+		//アニメーション追加
+		Draw->AddAnimation(L"Wait", 0, 30, true, 30);
+		Draw->AddAnimation(L"Attack", 40, 30, false, 30);
+		Draw->AddAnimation(L"Damage", 80, 30, false, 30);
+		Draw->AddAnimation(L"ChildSpawn", 120, 30, false, 30);
+		//Abe20170526
+
+		Draw->ChangeCurrentAnimation(L"Wait");
 		//透明処理
 		SetAlphaActive(true);	
 		//ステート初期化
@@ -670,8 +679,47 @@ namespace basecross
 				Attack();
 				break;
 			}
+
+			//アニメーション更新
+			float ElapsedTime = App::GetApp()->GetElapsedTime();
+			GetComponent<PNTBoneModelDraw>()->UpdateAnimation(ElapsedTime);
+
 		}
 	}
+
+	//Abe20170526
+	//アニメーション変更
+	void ShotEnemy::ChangeAnimation(string txt)
+	{
+		if (txt == "Wait")
+		{
+			GetComponent<PNTBoneModelDraw>()->ChangeCurrentAnimation(L"Wait");
+		}
+		if (txt == "Attack")
+		{
+			GetComponent<PNTBoneModelDraw>()->ChangeCurrentAnimation(L"Attack");
+		}
+		if (txt == "Damage")
+		{
+			GetComponent<PNTBoneModelDraw>()->ChangeCurrentAnimation(L"Damage");
+		}
+		if (txt == "ChildSpawn")
+		{
+			GetComponent<PNTBoneModelDraw>()->ChangeCurrentAnimation(L"ChildSpawn");
+		}
+
+		/*
+		Draw->AddAnimation(L"Wait", 0, 30, true, 30);
+		Draw->AddAnimation(L"AttackWait", 40, 10, false, 30);
+		Draw->AddAnimation(L"AttackNow", 50, 20, true, 30);
+		Draw->AddAnimation(L"Damage", 80, 30, false, 30);
+		Draw->AddAnimation(L"ChildSpawnOpen", 120, 10, false, 30);
+		Draw->AddAnimation(L"ChildSpawnClose", 130, 20, false, 30);
+		*/
+	}
+	//Abe20170526
+
+
 
 	//状態群----------------------------------------------------------
 	void ShotEnemy::Search()
@@ -715,6 +763,8 @@ namespace basecross
 			angle = atan2(dif.z, dif.x);
 			angle *= -1;
 			GetComponent<Transform>()->SetRotation(0, angle, 0);
+			//実際の回転は逆なんで逆にする
+			angle *= -1;
 		}
 		else
 		{
@@ -722,12 +772,17 @@ namespace basecross
 			angle = atan2(dif.z, dif.x);
 			angle *= -1;
 			GetComponent<Transform>()->SetRotation(0, angle, 0);
+			angle *= -1;
 		}
 
 		//ミサイル打つ処理
 		m_time += App::GetApp()->GetElapsedTime();
 		if (m_time > m_CoolTime)
 		{
+
+			//アニメーション変更
+			ChangeAnimation("Attack");
+
 			//アングル変換
 			angle *= 180 / 3.14159265f;
 			angle += 360;
@@ -808,6 +863,9 @@ namespace basecross
 		m_Childtime += App::GetApp()->GetElapsedTime();
 		if(m_Childtime > m_ShotChildInterval)
 		{ 
+			//アニメーション変更
+			ChangeAnimation("ChildSpawn");
+
 			//計算用時間初期化
 			m_Childtime = 0;
 			//子機はいたフラグオン
@@ -820,24 +878,27 @@ namespace basecross
 				//死んでたら再利用
 				if (ptr)
 				{
-					Vector3 PPOS = GetComponent<Transform>()->GetPosition();
-					PPOS.y += GetComponent<Transform>()->GetScale().y / 2;
-					int Tangle = (int)angle % 360;
-					//とりあえず10～20、-10～-20度の範囲で飛ばす
-					if (rand() % 2 == 0)
+					if (!ptr->GetDrawActive())
 					{
-						Tangle += rand() % 11 + 10;
-					}
-					else
-					{
-						Tangle += rand() % 11 - 20;
-					}
+						Vector3 PPOS = GetComponent<Transform>()->GetPosition();
+						PPOS.y += GetComponent<Transform>()->GetScale().y / 2;
+						int Tangle = (int)angle % 360;
+						//とりあえず10～20、-10～-20度の範囲で飛ばす
+						if (rand() % 2 == 0)
+						{
+							Tangle += rand() % 11 + 10;
+						}
+						else
+						{
+							Tangle += rand() % 11 - 20;
+						}
 
-					float angle2 = Tangle * 3.14159265f / 180;
-					ptr->SetVelocity(Vector3(cos(angle2) * (float)(rand() % 3 + 1) * m_ParScale/2, rand() % 5 + 5, sin(angle2) * (float)(rand() % 3 + 1))* m_ParScale / 2);
+						float angle2 = Tangle * 3.14159265f / 180;
+						ptr->SetVelocity(Vector3(cos(angle2) * (float)(rand() % 3 + 1) * m_ParScale / 2, rand() % 5 + 5, sin(angle2) * (float)(rand() % 3 + 1))* m_ParScale / 2);
 
-					flgg = true;
-					break;
+						flgg = true;
+						break;
+					}
 				}
 			}
 			//いなかったら作る
@@ -901,6 +962,8 @@ namespace basecross
 		//サークル描画
 		m_SearchCircle->SetDrawActive(true);
 
+		//アニメーション変更
+		ChangeAnimation("Wait");
 	}
 
 	void ShotEnemy::ToAttack()
@@ -916,6 +979,9 @@ namespace basecross
 
 		//狙うプレイヤーを決める
 		m_TargetPlayer = rand() % 2+1;
+
+		//アニメーション変更
+		ChangeAnimation("Wait");
 	}
 
 	//Abe20170517
@@ -938,6 +1004,8 @@ namespace basecross
 			m_Hp--;
 		}
 
+		//アニメーション変更
+		ChangeAnimation("Damage");
 	}
 
 	void ShotEnemy::Damage(int num)
@@ -948,6 +1016,9 @@ namespace basecross
 		{
 			m_Hp = 1;
 		}
+
+		//アニメーション変更
+		ChangeAnimation("Damage");
 
 	}
 	//Abe20170517

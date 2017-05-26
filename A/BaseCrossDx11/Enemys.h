@@ -191,6 +191,12 @@ namespace basecross
 		float m_ShotPower = 3.0f;
 		//Abe20170517
 
+		//Abe20170526
+		//アニメーション変更
+		void ChangeAnimation(string);
+		//Abe20170526
+
+
 		//以下パラメータ
 		//大きさ
 		float m_ParScale;
