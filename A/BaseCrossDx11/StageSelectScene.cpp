@@ -156,6 +156,8 @@ namespace basecross {
 			auto PtrEnemyCount = AddGameObject<EnemyCount>();
 			SetSharedGameObject(L"Count", PtrEnemyCount);
 
+			//遷移アニメーション
+			AddGameObject<SceneChangeSSOut>()->OnAnim();
 		}
 		catch (...) {
 
@@ -171,6 +173,8 @@ namespace basecross {
 
 			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToGameStage");
 		}
+
+
 
 
 		/*

@@ -123,7 +123,7 @@ namespace basecross {
 	//	シーン遷移のスプライトスタジオ
 	//--------------------------------------------------------------------------------------
 	SceneChangeSS::SceneChangeSS(const shared_ptr<Stage>& StagePtr) :
-		SS5ssae(StagePtr, App::GetApp()->m_wstrDataPath + L"SS\\", L"scene_shange.ssae", L"anime_1",true)
+		SS5ssae(StagePtr, App::GetApp()->m_wstrDataPath + L"SS\\FadeIn\\", L"scene_shange.ssae", L"anime_1",true)
 	{
 	}
 
@@ -163,7 +163,7 @@ namespace basecross {
 	void SceneChangeSS::OnUpdate()
 	{
 		//アニメ―ション更新
-		UpdateAnimeTime(App::GetApp()->GetElapsedTime() / 2);
+		UpdateAnimeTime(App::GetApp()->GetElapsedTime() / 4);
 
 	}
 
@@ -172,6 +172,63 @@ namespace basecross {
 		m_ActiveFlg = true;
 		ChangeAnimation(L"anime_1");
 	}
+
+	//Abe20170526
+	//--------------------------------------------------------------------------------------
+	//	シーン遷移のスプライトスタジオ
+	//--------------------------------------------------------------------------------------
+	SceneChangeSSOut::SceneChangeSSOut(const shared_ptr<Stage>& StagePtr) :
+		SS5ssae(StagePtr, App::GetApp()->m_wstrDataPath + L"SS\\FadeOut\\", L"scene_shange.ssae", L"anime_1", true)
+	{
+	}
+
+	void SceneChangeSSOut::OnCreate()
+	{
+		auto Trans = AddComponent<Transform>();
+		Trans->SetPosition(0, 0, 0);
+		Trans->SetScale(5, 5, 5);
+		Trans->SetRotation(0, 0, 0);
+
+		//アニメーション関連
+		Matrix4X4 mat;
+		mat.DefTransformation(
+			Vector3(6.5f, 6.5f, 6.5f),
+			Vector3(0, 0, 0),
+			Vector3(0, 10, 0)
+			);
+		SetToAnimeMatrix(mat);
+
+		//親クラスのCreate
+		SS5ssae::OnCreate();
+		//秒あたりのフレーム数
+		SetFps(60.0f);
+		//ループ無効
+		SetLooped(false);
+
+
+		//透明度有効化
+		SetAlphaActive(true);
+		//描画
+		SetDrawActive(true);
+		//表示レイヤー
+		SetDrawLayer(2);
+
+	}
+
+	void SceneChangeSSOut::OnUpdate()
+	{
+		//アニメ―ション更新
+		UpdateAnimeTime(App::GetApp()->GetElapsedTime() / 2);
+
+	}
+
+	void SceneChangeSSOut::OnAnim()
+	{
+		m_ActiveFlg = true;
+		ChangeAnimation(L"anime_1");
+	}
+	//Abe20170526
+
 	//ゆーすけくん
 	//--------------------------------------------------------------------------------------
 	//	class StageSelectSprite : public GameObject;
