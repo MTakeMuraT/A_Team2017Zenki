@@ -14,7 +14,8 @@ enum EnemyState
 	SearchS,
 	MoveS,
 	AttackS,
-	CoolTimeS
+	CoolTimeS,
+	MutekiS
 };
 
 namespace basecross
@@ -72,6 +73,16 @@ namespace basecross
 		void StageEndCheck();
 		//Abe20170515
 
+
+		//Abe20170526
+		//無敵フラグ
+		bool m_MutekiFlg = false;
+		//無敵時間
+		float m_MutekiTime = 3.0f;
+		//点滅用
+		float m_MutekiTenmetuTime = 0;
+		//Abe20170526
+
 		//Abe20170519
 		//回転
 		void Rot();
@@ -117,6 +128,10 @@ namespace basecross
 		void Attack();
 		//クールタイム
 		void CoolTime();
+		//Abe20170526
+		//無敵時間
+		void Muteki();
+		//Abe20170526
 
 		//サークル移動
 		void CircleMove();
@@ -133,6 +148,9 @@ namespace basecross
 		void ToMove();
 		void ToAttack(int);		//攻撃する対象(1なら１体目2なら２体目)
 		void ToCoolTime();
+		//Abe20170526
+		void ToMuteki();
+		//Abe20170526
 
 		//プレイヤーへの攻撃判定
 		void ToDamagePlayer();
@@ -194,8 +212,14 @@ namespace basecross
 		//Abe20170526
 		//アニメーション変更
 		void ChangeAnimation(string);
-		//Abe20170526
 
+		//無敵フラグ
+		bool m_MutekiFlg = false;
+		//無敵時間
+		float m_MutekiTime = 3.0f;
+		//点滅用
+		float m_MutekiTenmetuTime = 0;
+		//Abe20170526
 
 		//以下パラメータ
 		//大きさ
@@ -223,9 +247,18 @@ namespace basecross
 		void Search();
 		//攻撃
 		void Attack();
+		//Abe20170526
+		//無敵時間
+		void Muteki();
+		//Abe20170526
+
 		//状態変更
 		void ToSearch();
-		void ToAttack();
+		void ToAttack();		
+		//Abe20170526
+		void ToMuteki();
+		//Abe20170526
+
 
 		//自分がダメージ受けたときの関数
 		//プレイヤーから

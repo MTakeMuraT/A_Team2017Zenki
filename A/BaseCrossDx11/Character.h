@@ -91,7 +91,7 @@ namespace basecross{
 		bool m_ActiveFlg = false;
 
 		//§ŒÀŠÔ
-		float m_LimitTime = 3.0f;
+		float m_LimitTime = 2.0f;
 		float m_time = 0;
 	public :
 		//\’z‚Æ”jŠü
@@ -113,7 +113,7 @@ namespace basecross{
 		//“®‚­‚©
 		bool m_ActiveFlg = false;
 		//§ŒÀŠÔ
-		float m_LimitTime = 3.0f;
+		float m_LimitTime = 1.5f;
 		float m_time = 0;
 	public:
 		//\’z‚Æ”jŠü

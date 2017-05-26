@@ -141,6 +141,10 @@ namespace basecross
 			case CoolTimeS:
 				CoolTime();
 				break;
+				//無敵
+			case MutekiS:
+				Muteki();
+				break;
 			}
 
 			//回転
@@ -421,6 +425,38 @@ namespace basecross
 		}
 	}
 
+	void TackleEnemy::Muteki()
+	{
+		m_time += App::GetApp()->GetElapsedTime();
+		if (m_time > m_MutekiTime)
+		{
+			Vector3 sca = Vector3(m_ParScale, m_ParScale, m_ParScale);
+			GetComponent<Transform>()->SetScale(sca);
+
+			m_MutekiFlg = false;
+			ToSearch();
+		}
+		else
+		{
+			m_MutekiTenmetuTime += App::GetApp()->GetElapsedTime();
+			if (m_MutekiTenmetuTime > 0.05f)
+			{
+				m_MutekiTenmetuTime = 0;
+				Vector3 sca = GetComponent<Transform>()->GetScale();
+				if (sca.x < m_ParScale)
+				{
+					sca = Vector3(m_ParScale, m_ParScale, m_ParScale);
+				}
+				else
+				{
+					sca = Vector3(m_ParScale / 2, m_ParScale / 2, m_ParScale / 2);
+				}
+				//大きさ変更
+				GetComponent<Transform>()->SetScale(sca);
+			}
+		}
+	}
+
 	void TackleEnemy::CircleMove()
 	{
 
@@ -518,6 +554,27 @@ namespace basecross
 
 	}
 
+	void TackleEnemy::ToMuteki()
+	{
+		//状態変更
+		m_State = MutekiS;
+
+		//フラグオン
+		m_MutekiFlg = true;
+
+		//攻撃フラグ解除
+		m_TackleFlg = false;
+		//攻撃回数リセット
+		m_AttackCount = 0;
+
+		//時間初期化
+		m_time = 0;
+
+		//アニメーション変更
+		ChangeAnimation("Damage");
+
+	}
+
 	//プレイヤーへの攻撃判定
 	void TackleEnemy::ToDamagePlayer()
 	{
@@ -526,7 +583,7 @@ namespace basecross
 		{
 			//HPを減らす
 			auto PtrPlayerHP = GetStage()->GetSharedGameObject<PlayerHP>(L"PlayerHP", false);
-			PtrPlayerHP->SetDamage_int(1);
+			PtrPlayerHP->SetDamage_int(m_Power);
 			PtrPlayerHP->SetHit(true);
 			ToCoolTime();
 		}
@@ -535,39 +592,42 @@ namespace basecross
 	//攻撃受けたとき
 	void TackleEnemy::DamagePlayer()
 	{
-		//もしHPが1以下なら
-		if (m_Hp <= 1)
+		if (!m_MutekiFlg)
 		{
-			//タヒぬ
-			SetDrawActive(false);
-			m_Hp = 0;
-			m_ActiveFlg = false;
+			//もしHPが1以下なら
+			if (m_Hp <= 1)
+			{
+				//タヒぬ
+				SetDrawActive(false);
+				m_Hp = 0;
+				m_ActiveFlg = false;
 
-			//サークル除去
-			m_SearchCircle->SetDrawActive(false);
+				//サークル除去
+				m_SearchCircle->SetDrawActive(false);
 
+			}
+			else
+			{
+				m_Hp--;
+			}
+
+			ToMuteki();
 		}
-		else
-		{
-			m_Hp--;
-		}
-
-		//アニメーション変更
-		ChangeAnimation("Damage");
 	}
 
 	void TackleEnemy::Damage(int num)
 	{
-		//HP減らしてなくなってれば1残す
-		m_Hp += -num;
-		if (m_Hp < 0)
+		if (!m_MutekiFlg)
 		{
-			m_Hp = 1;
+			//HP減らしてなくなってれば1残す
+			m_Hp += -num;
+			if (m_Hp < 0)
+			{
+				m_Hp = 1;
+			}
+
+			ToMuteki();
 		}
-
-		//アニメーション変更
-		ChangeAnimation("Damage");
-
 	}
 
 	//************************************************************************
@@ -613,7 +673,7 @@ namespace basecross
 		//Abe20170526
 		//アニメーション追加
 		Draw->AddAnimation(L"Wait", 0, 30, true, 30);
-		Draw->AddAnimation(L"Attack", 40, 30, false, 30);
+		Draw->AddAnimation(L"Attack", 30, 50, false, 30);
 		Draw->AddAnimation(L"Damage", 80, 30, false, 30);
 		Draw->AddAnimation(L"ChildSpawn", 120, 30, false, 30);
 		//Abe20170526
@@ -678,6 +738,10 @@ namespace basecross
 			case AttackS:
 				Attack();
 				break;
+				//無敵
+			case MutekiS:
+				Muteki();
+				break;
 			}
 
 			//アニメーション更新
@@ -691,6 +755,7 @@ namespace basecross
 	//アニメーション変更
 	void ShotEnemy::ChangeAnimation(string txt)
 	{
+		
 		if (txt == "Wait")
 		{
 			GetComponent<PNTBoneModelDraw>()->ChangeCurrentAnimation(L"Wait");
@@ -707,7 +772,7 @@ namespace basecross
 		{
 			GetComponent<PNTBoneModelDraw>()->ChangeCurrentAnimation(L"ChildSpawn");
 		}
-
+		
 		/*
 		Draw->AddAnimation(L"Wait", 0, 30, true, 30);
 		Draw->AddAnimation(L"AttackWait", 40, 10, false, 30);
@@ -815,11 +880,30 @@ namespace basecross
 
 						//飛ばす向きを決める yは2～6
 						Vector3 tovelo = Vector3(cos(angle2) * m_ShotPower, rand() % 5 + 2, sin(angle2) * m_ShotPower);
-						//頭の上から発射
+						////頭の上から発射
+						//Vector3 topos = GetComponent<Transform>()->GetPosition();
+						//topos.y += GetComponent<Transform>()->GetScale().y / 2;
+						//dynamic_pointer_cast<Missile>(obj)->SetMissileActive(topos, m_MissileScale, tovelo, true, 1);
+
+						//Abe20170526
+						//体の横から発射
 						Vector3 topos = GetComponent<Transform>()->GetPosition();
-						topos.y += GetComponent<Transform>()->GetScale().y / 2;
+						float toanglem = angle;
+						//ループが偶数の時
+						if (i % 2 == 0)
+						{
+							toanglem += 90;
+						}
+						else
+						{
+							toanglem += -90;
+						}
+						toanglem *= 3.14159265f / 180;
+						float ShEnHalf = GetComponent<Transform>()->GetScale().x / 2;
+						topos += Vector3(cos(toanglem)*ShEnHalf, ShEnHalf, sin(toanglem)*ShEnHalf);
 						dynamic_pointer_cast<Missile>(obj)->SetMissileActive(topos, m_MissileScale, tovelo, true, 1);
 
+						//Abe20170526
 						//撃ったフラグオン
 						sflg = true;
 
@@ -852,9 +936,30 @@ namespace basecross
 					//飛ばす向きを決める yは2～6
 					Vector3 tovelo = Vector3(cos(angle2) * m_ShotPower, rand() % 5 + 2, sin(angle2) * m_ShotPower);
 					//頭の上から発射
+					//Vector3 topos = GetComponent<Transform>()->GetPosition();
+					//topos.y += GetComponent<Transform>()->GetScale().y / 2;
+					//objm->SetMissileActive(topos, m_MissileScale, tovelo, true, 1);
+
+					//Abe20170526
+					//体の横から発射
 					Vector3 topos = GetComponent<Transform>()->GetPosition();
-					topos.y += GetComponent<Transform>()->GetScale().y / 2;
+					float toanglem = angle;
+					//ループが偶数の時
+					if (i % 2 == 0)
+					{
+						toanglem += 90;
+					}
+					else
+					{
+						toanglem += -90;
+					}
+					toanglem *= 3.14159265f / 180;
+					float ShEnHalf = GetComponent<Transform>()->GetScale().x / 2;
+					topos += Vector3(cos(toanglem)*ShEnHalf, ShEnHalf, sin(toanglem)*ShEnHalf);
 					objm->SetMissileActive(topos, m_MissileScale, tovelo, true, 1);
+					m_MissileS.push_back(objm);
+					//Abe20170526
+
 				}
 			}
 		}
@@ -864,7 +969,7 @@ namespace basecross
 		if(m_Childtime > m_ShotChildInterval)
 		{ 
 			//アニメーション変更
-			ChangeAnimation("ChildSpawn");
+			//ChangeAnimation("ChildSpawn");
 
 			//計算用時間初期化
 			m_Childtime = 0;
@@ -881,7 +986,7 @@ namespace basecross
 					if (!ptr->GetDrawActive())
 					{
 						Vector3 PPOS = GetComponent<Transform>()->GetPosition();
-						PPOS.y += GetComponent<Transform>()->GetScale().y / 2;
+						PPOS.y += GetComponent<Transform>()->GetScale().y;
 						int Tangle = (int)angle % 360;
 						//とりあえず10～20、-10～-20度の範囲で飛ばす
 						if (rand() % 2 == 0)
@@ -905,7 +1010,7 @@ namespace basecross
 			if (!flgg)
 			{
 				Vector3 PPOS = GetComponent<Transform>()->GetPosition();
-				PPOS.y += GetComponent<Transform>()->GetScale().y/2;
+				PPOS.y += GetComponent<Transform>()->GetScale().y;
 				auto pptr = GetStage()->AddGameObject<ShotEnemyChild>(PPOS, Vector3(1, 1, 1), 2);
 				int Tangle = (int)angle % 360;
 				//とりあえず10～20、-10～-20度の範囲で飛ばす
@@ -947,6 +1052,38 @@ namespace basecross
 
 	}
 
+	void ShotEnemy::Muteki()
+	{
+		m_time += App::GetApp()->GetElapsedTime();
+		if (m_time > m_MutekiTime)
+		{
+			Vector3 sca = Vector3(m_ParScale, m_ParScale, m_ParScale);
+			GetComponent<Transform>()->SetScale(sca);
+
+			m_MutekiFlg = false;
+			ToSearch();
+		}
+		else
+		{
+			m_MutekiTenmetuTime += App::GetApp()->GetElapsedTime();
+			if (m_MutekiTenmetuTime > 0.05f)
+			{
+				m_MutekiTenmetuTime = 0;
+				Vector3 sca = GetComponent<Transform>()->GetScale();
+				if (sca.x < m_ParScale)
+				{
+					sca = Vector3(m_ParScale, m_ParScale, m_ParScale);
+				}
+				else
+				{
+					sca = Vector3(m_ParScale / 2, m_ParScale / 2, m_ParScale / 2);
+				}
+				//大きさ変更
+				GetComponent<Transform>()->SetScale(sca);
+			}
+		}
+	}
+
 	//状態変更群----------------------------------------------------------
 	void ShotEnemy::ToSearch()
 	{
@@ -984,44 +1121,66 @@ namespace basecross
 		ChangeAnimation("Wait");
 	}
 
-	//Abe20170517
-	void ShotEnemy::DamagePlayer()
+	//Abe20170526
+	void ShotEnemy::ToMuteki()
 	{
-		//もしHPが1以下なら
-		if (m_Hp <= 1)
-		{
-			//タヒぬ
-			SetDrawActive(false);
-			m_Hp = 0;
-			m_ActiveFlg = false;
+		//状態変更
+		m_State = MutekiS;
 
-			//サークル除去
-			m_SearchCircle->SetDrawActive(false);
+		//フラグオン
+		m_MutekiFlg = true;
 
-		}
-		else
-		{
-			m_Hp--;
-		}
+		//時間初期化
+		m_time = 0;
 
 		//アニメーション変更
 		ChangeAnimation("Damage");
+
+	}
+
+	//Abe20170526
+	//Abe20170517
+	void ShotEnemy::DamagePlayer()
+	{
+		if (!m_MutekiFlg)
+		{
+			//もしHPが1以下なら
+			if (m_Hp <= 1)
+			{
+				//タヒぬ
+				SetDrawActive(false);
+				m_Hp = 0;
+				m_ActiveFlg = false;
+
+				//サークル除去
+				m_SearchCircle->SetDrawActive(false);
+
+			}
+			else
+			{
+				m_Hp--;
+			}
+
+			ToMuteki();
+		}
 	}
 
 	void ShotEnemy::Damage(int num)
 	{
-		//HP減らしてなくなってれば1残す
-		m_Hp += -num;
-		if (m_Hp < 0)
+		if (!m_MutekiFlg)
 		{
-			m_Hp = 1;
+			//HP減らしてなくなってれば1残す
+			m_Hp += -num;
+			if (m_Hp < 0)
+			{
+				m_Hp = 1;
+			}
+
+			ToMuteki();
 		}
-
-		//アニメーション変更
-		ChangeAnimation("Damage");
-
 	}
 	//Abe20170517
+
 
 
 	//Abe20170508
@@ -1814,7 +1973,7 @@ namespace basecross
 		{
 			//HPを減らす
 			auto PtrPlayerHP = GetStage()->GetSharedGameObject<PlayerHP>(L"PlayerHP", false);
-			PtrPlayerHP->SetDamage_int(3);
+			PtrPlayerHP->SetDamage_int(m_Power);
 			PtrPlayerHP->SetHit(true);
 
 			//自爆の為消滅
