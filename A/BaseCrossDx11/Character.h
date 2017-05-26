@@ -375,6 +375,7 @@ namespace basecross{
 	private:
 	
 		bool m_DieFlg = true;
+		bool dmg = false;
 
 		//現在地
 		int m_Life = 10;
@@ -389,7 +390,8 @@ namespace basecross{
 		//ライフスプライト
 		vector<shared_ptr<GameObject>> m_LifeSprite;
 		//フレーム・・・は増やすってなったら追加するか
-
+		//全部
+		vector<shared_ptr<GameObject>> m_AllSpriteS;
 		//調整用
 		//間隔
 		float m_IntervalLife = 0.45f;
@@ -397,6 +399,7 @@ namespace basecross{
 		Player_Life(const shared_ptr<Stage>& StagePtr, int LifeNum, Vector2 pos, Vector2 scale, int layer);
 
 		void OnCreate() override;
+		void OnUpdate() override;
 
 		//入力した値分ライフから引く
 		void LifeDown(int num);

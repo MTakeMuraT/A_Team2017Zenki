@@ -978,6 +978,12 @@ namespace basecross {
 
 			//フレーム作成
 			auto HP_Flame = GetStage()->AddGameObject<GameObject>();
+
+			//Vector3 HP_Flame2 = HP_Flame->GetComponent<Transform>()->GetPosition();
+
+
+			//m_LifeSprite.push_back(HP_Flame);
+
 			//座標設定
 			auto TranP2 = HP_Flame->AddComponent<Transform>();
 			TranP2->SetPosition(m_InitPos.x + (m_IntervalLife * i * m_InitScale.x), m_InitPos.y, 0);
@@ -992,12 +998,63 @@ namespace basecross {
 			//レイヤー設定
 			HP_Flame->SetDrawLayer(m_layer);
 
+			m_AllSpriteS.push_back(HP);
+			m_AllSpriteS.push_back(HP_Flame);
 		}
 		m_DieFlg = true;
 	}
 
+
+	void Player_Life::OnUpdate()
+	{
+
+		for (int i = m_LifeMax - 1; i > m_Life - 1; i--)
+		{
+
+			if (dmg == true)
+			{
+				for (auto obj : m_AllSpriteS)
+				{
+					Vector3 pos = obj->GetComponent<Transform>()->GetPosition();
+					/////////////
+					if (pos.y >= 250) {
+						pos.y += -30;
+						/////////////
+						obj->GetComponent<Transform>()->SetPosition(pos);
+					}
+					dmg = false;
+				}
+			}
+
+			if (dmg == false)
+			{
+				for (auto obj : m_AllSpriteS)
+				{
+					Vector3 pos = obj->GetComponent<Transform>()->GetPosition();
+
+					////////
+					if (pos.y < 300) {
+						pos.y += +1;
+						/////////////
+						obj->GetComponent<Transform>()->SetPosition(pos);
+					}
+					//pos.y = 300;
+					///////
+					obj->GetComponent<Transform>()->SetPosition(pos);
+
+				}
+			}
+
+		}
+
+	}
+
+
 	void Player_Life::LifeDown(int num)
 	{
+		dmg = true;
+
+
 
 		m_Life += -num;
 		if (m_Life <= 0)
@@ -1015,6 +1072,7 @@ namespace basecross {
 	}
 	//Abe20170418
 	//Abe20170421
+
 	//--------------------------------------------------------------------------------------
 	//	スプライトの大きさ、位置を確認するオブジェクト
 	//--------------------------------------------------------------------------------------
