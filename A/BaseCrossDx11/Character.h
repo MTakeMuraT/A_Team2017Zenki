@@ -89,6 +89,10 @@ namespace basecross{
 	private :
 		//“®‚­‚©
 		bool m_ActiveFlg = false;
+
+		//§ŒÀŠÔ
+		float m_LimitTime = 3.0f;
+		float m_time = 0;
 	public :
 		//\’z‚Æ”jŠü
 		SceneChangeSS(const shared_ptr<Stage>& StagePtr);
@@ -108,6 +112,9 @@ namespace basecross{
 	private:
 		//“®‚­‚©
 		bool m_ActiveFlg = false;
+		//§ŒÀŠÔ
+		float m_LimitTime = 3.0f;
+		float m_time = 0;
 	public:
 		//\’z‚Æ”jŠü
 		SceneChangeSSOut(const shared_ptr<Stage>& StagePtr);

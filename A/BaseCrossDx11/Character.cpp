@@ -162,9 +162,12 @@ namespace basecross {
 
 	void SceneChangeSS::OnUpdate()
 	{
-		//アニメ―ション更新
-		UpdateAnimeTime(App::GetApp()->GetElapsedTime() / 4);
-
+		if (m_time < m_LimitTime)
+		{
+			m_time += App::GetApp()->GetElapsedTime();
+			//アニメ―ション更新
+			UpdateAnimeTime(App::GetApp()->GetElapsedTime() / 2);
+		}
 	}
 
 	void SceneChangeSS::OnAnim()
@@ -217,9 +220,12 @@ namespace basecross {
 
 	void SceneChangeSSOut::OnUpdate()
 	{
-		//アニメ―ション更新
-		UpdateAnimeTime(App::GetApp()->GetElapsedTime() / 2);
-
+		if (m_time < m_LimitTime)
+		{
+			m_time += App::GetApp()->GetElapsedTime();
+			//アニメ―ション更新
+			UpdateAnimeTime(App::GetApp()->GetElapsedTime() / 2);
+		}
 	}
 
 	void SceneChangeSSOut::OnAnim()

@@ -97,6 +97,10 @@ namespace basecross
 		shared_ptr<DebugTxt> m_Debugtxt;
 		
 
+		//Abe20170526
+		//アニメーション変更
+		void ChangeAnimation(string);
+		//Abe20170526
 
 	public :
 		//引数 位置(pos)、大きさ(parscale)、HP(hp)、索敵距離(serchdistance)、クールタイム(cooltime)、速度(speed)、攻撃力(power)、突撃回数(tacklecount)

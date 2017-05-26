@@ -42,6 +42,17 @@ namespace basecross
 		//モデル大きさ調整
 		Draw->SetMeshToTransformMatrix(Mat);
 
+		//Abe20170526
+		//アニメーション追加
+		Draw->AddAnimation(L"Walk", 0, 30, true, 30);
+		Draw->AddAnimation(L"Wait", 40, 30, true, 30);
+		Draw->AddAnimation(L"AttackWait", 80, 10, false, 30);
+		Draw->AddAnimation(L"AttackNow", 90, 20, true, 30);
+		Draw->AddAnimation(L"Damage", 120, 30, false, 30);
+
+		Draw->GetCurrentAnimation() == L"Wait";
+		//Abe20170526
+
 		//透明処理
 		SetAlphaActive(true);
 		//ステート初期化
@@ -134,8 +145,50 @@ namespace basecross
 
 			//回転
 			Rot();
+
+			//アニメーション更新
+			float ElapsedTime = App::GetApp()->GetElapsedTime();
+			GetComponent<PNTBoneModelDraw>()->UpdateAnimation(ElapsedTime);
+
 		}
 	}
+
+	//Abe20170526
+	//アニメーション変更
+	void TackleEnemy::ChangeAnimation(string txt)
+	{
+		if (txt == "Walk")
+		{
+			GetComponent<PNTBoneModelDraw>()->ChangeCurrentAnimation(L"Walk");
+		}
+		if (txt == "Wait")
+		{
+			GetComponent<PNTBoneModelDraw>()->ChangeCurrentAnimation(L"Wait");
+		}
+		if (txt == "AttackWait")
+		{
+			GetComponent<PNTBoneModelDraw>()->ChangeCurrentAnimation(L"AttackWait");
+		}
+		if (txt == "AttackNow")
+		{
+			GetComponent<PNTBoneModelDraw>()->ChangeCurrentAnimation(L"AttackNow");
+		}
+		if (txt == "Damage")
+		{
+			GetComponent<PNTBoneModelDraw>()->ChangeCurrentAnimation(L"Damage");
+		}
+			/*
+			Draw->AddAnimation(L"Walk", 0, 30, true, 30);
+		Draw->AddAnimation(L"Wait", 40, 70, true, 30);
+		Draw->AddAnimation(L"AttackWait", 80, 90, false, 30);
+		Draw->AddAnimation(L"AttackNow", 90, 110, true, 30);
+		Draw->AddAnimation(L"Damage", 120, 150, false, 30);
+		*/
+	}
+
+	//Abe20170526
+
+
 	//Abe20170519
 	void TackleEnemy::Rot()
 	{
@@ -156,6 +209,32 @@ namespace basecross
 			float angle = atan2(m_Velocity.z, m_Velocity.x);
 			angle *= -1;
 			GetComponent<Transform>()->SetRotation(0, angle, 0);
+		}
+
+		if (!m_TackleFlg && m_State == AttackS)
+		{
+			//回転
+			//１体目に突撃
+			if (m_TargetNum == 1)
+			{
+				Vector3 dis = m_Player1->GetComponent<Transform>()->GetPosition() - GetComponent<Transform>()->GetPosition();
+				//角度算出
+				float angle = atan2(dis.z, dis.x);
+				//回転
+				angle *= -1;
+				GetComponent<Transform>()->SetRotation(0, angle, 0);
+			}
+			//２体目に突撃
+			else if (m_TargetNum == 2)
+			{
+				Vector3 dis = m_Player2->GetComponent<Transform>()->GetPosition() - GetComponent<Transform>()->GetPosition();
+				//角度算出
+				float angle = atan2(dis.z, dis.x);
+				//回転
+				angle *= -1;
+				GetComponent<Transform>()->SetRotation(0, angle, 0);
+			}
+
 		}
 	}
 	//Abe20170519
@@ -270,9 +349,13 @@ namespace basecross
 			//	}
 			//}
 			*/
+
 			//攻撃までのチャージが終了
 			if (m_time > m_AttackTime)
 			{
+				//アニメーション変更
+				ChangeAnimation("AttackNow");
+
 				m_time = 0;
 				m_TackleFlg = true;
 				//攻撃した回数加算
@@ -373,6 +456,8 @@ namespace basecross
 		//サークル移動
 		CircleMove();
 
+		//アニメーション変更
+		ChangeAnimation("Wait");
 	}
 
 	void TackleEnemy::ToMove()
@@ -392,6 +477,9 @@ namespace basecross
 		//状態変更
 		m_State = MoveS;
 
+		//アニメーション変更
+		ChangeAnimation("Walk");
+
 	}
 
 	void TackleEnemy::ToAttack(int num)
@@ -406,6 +494,10 @@ namespace basecross
 
 		//状態変更
 		m_State = AttackS;
+
+		//アニメーション変更
+		ChangeAnimation("AttackWait");
+
 	}
 
 	void TackleEnemy::ToCoolTime()
@@ -420,6 +512,10 @@ namespace basecross
 
 		//状態変更
 		m_State = CoolTimeS;
+
+		//アニメーション変更
+		ChangeAnimation("Wait");
+
 	}
 
 	//プレイヤーへの攻撃判定
@@ -455,6 +551,9 @@ namespace basecross
 		{
 			m_Hp--;
 		}
+
+		//アニメーション変更
+		ChangeAnimation("Damage");
 	}
 
 	void TackleEnemy::Damage(int num)
@@ -465,6 +564,10 @@ namespace basecross
 		{
 			m_Hp = 1;
 		}
+
+		//アニメーション変更
+		ChangeAnimation("Damage");
+
 	}
 
 	//************************************************************************
