@@ -1,0 +1,60 @@
+/*	strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Cancel.wav";
+		App::GetApp()->RegisterWav(L"Cancel_SE", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Clear.wav";
+		App::GetApp()->RegisterWav(L"Clear_SE", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Decide.wav";
+		App::GetApp()->RegisterWav(L"Decide_SE", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Menu.wav";
+		App::GetApp()->RegisterWav(L"Menu_SE", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Move.wav";
+		App::GetApp()->RegisterWav(L"Move_SE", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\CursorMove.wav";
+		App::GetApp()->RegisterWav(L"CursorMove_SE", strMusic); */
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\PrayerExposure.wav";
+		App::GetApp()->RegisterWav(L"PrayerExposure_SE", strMusic); 
+		/*strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Boost.wav";
+		App::GetApp()->RegisterWav(L"Boost_SE", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Shield Break.wav";
+		App::GetApp()->RegisterWav(L"Shield Break_SE", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Computer Launch.wav";
+		App::GetApp()->RegisterWav(L"Computer Launch_SE", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Countdown.wav";
+		App::GetApp()->RegisterWav(L"Countdown_SE", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Enemy ArmorBreak.wav";
+		App::GetApp()->RegisterWav(L"Enemy ArmorBreak_SE", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\SelfDestruction.wav";
+		App::GetApp()->RegisterWav(L"SelfDestruction_SE", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Conflict.wav";
+		App::GetApp()->RegisterWav(L"Conflict_SE", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Bass-Fall.wav";
+		App::GetApp()->RegisterWav(L"Bass-Fall_SE", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\ChildAppearance.wav";
+		App::GetApp()->RegisterWav(L"ChildAppearance_SE", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Impact.wav";
+		App::GetApp()->RegisterWav(L"Impact_SE", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Missile.wav";
+		App::GetApp()->RegisterWav(L"Missile_SE", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Enemy Exposure.wav";
+		App::GetApp()->RegisterWav(L"Enemy Exposure_SE", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\siren.wav";
+		App::GetApp()->RegisterWav(L"siren_SE", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\ShortSelfDestruction.wav";
+		App::GetApp()->RegisterWav(L"ShortSelfDestruction_SE", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Teleport.wav";
+		App::GetApp()->RegisterWav(L"Teleport_SE", strMusic);*/
+
+
+
+		wstring strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Title\\Title.wav";
+		App::GetApp()->RegisterWav(L"Title_BGM", strMusic);
+
+	/*	strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\StageSelect\\GameOver_01.wav";
+		App::GetApp()->RegisterWav(L"GameOver_01_BGM", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\StageSelect\\GameOver_02.wav";
+		App::GetApp()->RegisterWav(L"GameOver_02_BGM", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\GameStage\\UnderWorld.wav";
+		App::GetApp()->RegisterWav(L"UnderWorld_BGM", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Cyber30\\UnderWorld.wav";
+		App::GetApp()->RegisterWav(L"Cyber30_BGM", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\airport\\UnderWorld.wav";
+		App::GetApp()->RegisterWav(L"airport_BGM", strMusic);*/
