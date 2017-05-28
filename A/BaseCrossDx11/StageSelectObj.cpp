@@ -88,9 +88,10 @@ namespace basecross
 			Trans->SetRotation(0, 0, 0);
 
 			//描画設定
-			auto PtrDraw = PlayerPtr->AddComponent<PNTStaticDraw>();
-			PtrDraw->SetMeshResource(L"DEFAULT_SPHERE");
-			PtrDraw->SetTextureResource(L"TRACE_TX");
+			auto PtrDraw = PlayerPtr->AddComponent<PNTBoneModelDraw>();
+			
+			PtrDraw->SetMeshResource(L"Player_Model");
+		//	PtrDraw->SetTextureResource(L"TRACE_TX");
 
 			//透明処理
 			SetAlphaActive(true);
@@ -104,7 +105,9 @@ namespace basecross
 
 			//プレイヤーのアクセサ?
 			m_Player.push_back(PlayerPtr);
-
+			PtrDraw->AddAnimation(L"Wait", 0, 30, true, 30.0f);
+			PtrDraw->AddAnimation(L"LeftRot", 80, 15, false, 30.0f);
+			PtrDraw->AddAnimation(L"RightRot", 120, 15, false, 30.0f);
 
 		}
 		//デバッグ文字生成
@@ -117,11 +120,15 @@ namespace basecross
 
 		m_Debugtxt = debtxt;
 		//Abe20170524
+	
+		
 
 	}
 
 	void SelectPlayer::OnUpdate()
 	{
+		AnimationWait();
+		Model();
 		//コントローラ取得
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 
@@ -261,12 +268,16 @@ namespace basecross
 	//回転処理
 	void SelectPlayer::Rot()
 	{
+		
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		if (CntlVec[0].bConnected)
 		{
+			
 			//左肩
 			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
 			{
+				m_WaitFlg = false;
+				AnimationRotL();
 				//座標取得
 				Vector3 pos1 = m_Player[0]->GetComponent<Transform>()->GetPosition();
 				Vector3 pos2 = m_Player[1]->GetComponent<Transform>()->GetPosition();
@@ -346,6 +357,7 @@ namespace basecross
 					pos1.z += disZ;
 					pos2.z += disZ;
 				}
+				
 #pragma endregion
 
 				//移動
@@ -353,9 +365,14 @@ namespace basecross
 				m_Player[1]->GetComponent<Transform>()->SetPosition(pos2);
 
 			}
+			else {
+				m_WaitFlg = true;
+			}
 			//右肩
 			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
 			{
+				m_WaitFlg = false;
+				AnimationRotR();
 				//座標取得
 				Vector3 pos1 = m_Player[0]->GetComponent<Transform>()->GetPosition();
 				Vector3 pos2 = m_Player[1]->GetComponent<Transform>()->GetPosition();
@@ -441,6 +458,9 @@ namespace basecross
 				m_Player[0]->GetComponent<Transform>()->SetPosition(pos1);
 				m_Player[1]->GetComponent<Transform>()->SetPosition(pos2);
 
+			}
+			else {
+				m_WaitFlg = true;
 			}
 		}
 	}
@@ -548,6 +568,66 @@ namespace basecross
 			obj->GetComponent<CollisionSphere>()->SetUpdateActive(true);
 		}
 	}
+	//モデルの向き
+	void SelectPlayer::Model() {
+		if (m_Model_flg) {
+			auto Player1 = m_Player[0];
+			auto Player2 = m_Player[1];
+			Player1->GetComponent<Transform>()->SetRotation(0, -XM_PI / 2, 0);
+			Player2->GetComponent<Transform>()->SetRotation(0, XM_PI / 2, 0);
+
+			m_Model_flg = false;
+		}
+	}
+	//待機アニメーション
+	void SelectPlayer::AnimationWait() {
+		auto PtrDraw = m_Player[0]->GetComponent<PNTBoneModelDraw>();
+		auto PtrDraw2 = m_Player[1]->GetComponent<PNTBoneModelDraw>();
+		if (!(PtrDraw->GetCurrentAnimation() == L"Wait") && m_WaitFlg) {
+			PtrDraw->ChangeCurrentAnimation(L"Wait");
+			PtrDraw2->ChangeCurrentAnimation(L"Wait");
+		}
+		UpdateAnyAnimation();
+		UpdateAnyAnimation2();
+	}
+	//回転アニメション関数 左
+	void SelectPlayer::AnimationRotL() {
+		auto PtrDraw = m_Player[0]->GetComponent<PNTBoneModelDraw>();
+		auto PtrDraw2 = m_Player[1]->GetComponent<PNTBoneModelDraw>();
+
+
+		if (PtrDraw->GetCurrentAnimation() != L"LeftRot"){
+			PtrDraw->ChangeCurrentAnimation(L"LeftRot");
+			PtrDraw2->ChangeCurrentAnimation(L"LeftRot");
+		}
+		UpdateAnyAnimation();
+		UpdateAnyAnimation2();
+	}
+	//右
+	void SelectPlayer::AnimationRotR() {
+		auto PtrDraw = m_Player[0]->GetComponent<PNTBoneModelDraw>();
+		auto PtrDraw2 = m_Player[1]->GetComponent<PNTBoneModelDraw>();
+
+		if (!(PtrDraw->GetCurrentAnimation() == L"RightRot")) {
+			PtrDraw->ChangeCurrentAnimation(L"RightRot");
+			PtrDraw2->ChangeCurrentAnimation(L"RightRot");
+
+		}
+		UpdateAnyAnimation();
+		UpdateAnyAnimation2();
+	}
+	//アニメーション更新関数
+	bool SelectPlayer::UpdateAnyAnimation() {
+		auto PtrDraw = m_Player[0]->GetComponent<PNTBoneModelDraw>();
+		float ElapsedTime = App::GetApp()->GetElapsedTime();
+		return PtrDraw->UpdateAnimation(ElapsedTime);
+	}
+	bool SelectPlayer::UpdateAnyAnimation2() {
+		auto PtrDraw = m_Player[1]->GetComponent<PNTBoneModelDraw>();
+		float ElapsedTime = App::GetApp()->GetElapsedTime();
+		return PtrDraw->UpdateAnimation(ElapsedTime);
+	}
+
 	//--------------------------------------------------------------------------------------
 	//	ステージの箱
 	//--------------------------------------------------------------------------------------
