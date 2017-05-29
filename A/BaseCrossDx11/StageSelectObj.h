@@ -247,11 +247,29 @@ namespace basecross
 		wstring m_Text;
 		float m_rot;
 	public:
-		SelectGroundSquare(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale,wstring txt,float rot);
-
+		SelectGroundSquare(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, wstring txt, float rot);
+		
 		void OnCreate() override;
 	};
 
 	//Abe20170526
+
+	//Abe20170529
+	//--------------------------------------------------------------------------------------
+	//	’n–Ê‚É“\‚é‚â‚Â(SS”Å)
+	//--------------------------------------------------------------------------------------
+	class SelectGroundSquareSS : public SS5ssae
+	{
+	private:
+		Vector3 m_Pos;
+		Vector3 m_Scale;
+		float m_rot;
+	public:
+		SelectGroundSquareSS(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, wstring txtdire, wstring txtname, float rot);
+
+		void OnCreate() override;
+		void OnUpdate() override;
+	};
+	//Abe20170529
 
 }

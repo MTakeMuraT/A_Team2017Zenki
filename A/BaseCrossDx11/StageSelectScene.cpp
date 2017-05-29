@@ -127,7 +127,12 @@ namespace basecross {
 		AddGameObject<SelectGroundSquare>(Vector3(28, 0.5f, 0), Vector3(5, 5, 5), L"YAZIRUSHI_TX", 180);
 
 		//Easy
-		AddGameObject<SelectGroundSquare>(Vector3(0, 0.5f, 0), Vector3(15, 10, 11), L"EASY_TX", 0);
+		//AddGameObject<SelectGroundSquare>(Vector3(0, 0.5f, 0), Vector3(15, 10, 11), L"EASY_TX", 0);
+		//Abe20170529
+		//SS”Å
+		AddGameObject<SelectGroundSquareSS>(Vector3(0, 0.5f, 0), Vector3(3, 3,3), L"SS\\EASY_animation\\", L"EASY.ssae", 0);
+		//Abe20170529
+
 		//Normal
 		AddGameObject<SelectGroundSquare>(Vector3(0, 0.5, -26), Vector3(15, 10, 11), L"NORMAL_TX", 0);
 		AddGameObject<SelectGroundSquare>(Vector3(46, 0.5f, -26), Vector3(15, 10, 11), L"NORMAL_TX", 0);

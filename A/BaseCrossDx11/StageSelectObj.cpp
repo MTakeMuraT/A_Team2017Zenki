@@ -1011,4 +1011,72 @@ namespace basecross
 	}
 	//Abe20170526
 
+	//Abe20170529
+	//--------------------------------------------------------------------------------------
+	//	地面に貼るやつ(SS版)
+	//--------------------------------------------------------------------------------------
+	SelectGroundSquareSS::SelectGroundSquareSS(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, wstring txtdire, wstring txtname, float rot) :
+		SS5ssae(StagePtr, App::GetApp()->m_wstrDataPath + txtdire, txtname, L"anime_1"),
+		m_Pos(pos),
+		m_Scale(scale),
+		m_rot(rot)
+	{}
+
+	void SelectGroundSquareSS::OnCreate()
+	{
+		/*
+		//必要最低限------
+		auto TranP = AddComponent<Transform>();
+		TranP->SetPosition(m_Pos);
+		TranP->SetScale(m_Scale);
+		TranP->SetRotation(90 * 3.14159265f / 180, -m_rot*3.14159265f / 180, 0);
+
+		auto Draw = AddComponent<PNTStaticDraw>();
+		Draw->SetMeshResource(L"DEFAULT_SQUARE");
+		Draw->SetTextureResource(m_Text);
+		//必要最低限------
+
+		SetDrawLayer(1);
+		SetAlphaActive(true);
+		*/
+		auto Trans = AddComponent<Transform>();
+		Trans->SetPosition(m_Pos);
+		Trans->SetScale(m_Scale);
+		Trans->SetRotation(90 * 3.14159265f / 180, -m_rot*3.14159265f / 180, 0);
+
+		//アニメーション関連
+		Matrix4X4 mat;
+		mat.DefTransformation(
+			Vector3(1.0f, 1.0f, 1.0f),
+			Vector3(0, 0, 0),
+			Vector3(0, 0, 0)
+			);
+		SetToAnimeMatrix(mat);
+
+		//親クラスのCreate
+		SS5ssae::OnCreate();
+		//秒あたりのフレーム数
+		SetFps(60.0f);
+		//ループ無効
+		SetLooped(true);
+
+
+		//透明度有効化
+		SetAlphaActive(true);
+		//描画
+		SetDrawActive(true);
+		//表示レイヤー
+		SetDrawLayer(2);
+
+	}
+
+
+	void SelectGroundSquareSS::OnUpdate()
+	{
+		//アニメ―ション更新
+		UpdateAnimeTime(App::GetApp()->GetElapsedTime() / 4);
+
+	}
+	//Abe20170529
+
 }
