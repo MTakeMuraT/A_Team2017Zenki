@@ -107,7 +107,9 @@ namespace basecross {
 		bool m_LeaveRotateFlg = false;
 		//ステージのスケール
 		Vector2 m_StageSize;
-
+		//ダメージ用
+		bool m_DamePower = false;
+		float m_LimitTime = 0;
 
 	public:
 
@@ -138,6 +140,7 @@ namespace basecross {
 		void EnterMoveBehavior();//移動ステート 
 		void EnterLeaveBehavior();//離れるステート
 		void EnterToAttractBehavior();//引き付けるステート
+		void EnterToAttractFailureBehavior();//攻撃失敗
 		void EnterReturnBehavior();//戻る
 		void EneterDoingInterpose();//挟んでいるとき
 		void EneterDieBehavior();
@@ -147,6 +150,7 @@ namespace basecross {
 		void ExecuteMoveBehavior();
 		void ExecuteLeaveBehavior();//離れる
 		void ExecuteToAttractBehavior();//引き付ける
+		void ExecuteToAttractFailureBehavior();//攻撃失敗
 		void ExecuteReturnBehavior();//戻る
 		void ExecuteDoingInterpose();//挟んでいるとき
 		void ExecuteDieBehavior();
@@ -156,6 +160,7 @@ namespace basecross {
 		void ExitMoveBehabior();
 		void ExitLeaveBehavior();//離れる
 		void ExitToAttractBehavior();//引き付ける
+		void ExitToAttractFailureBehavior();//攻撃失敗
 		void ExitReturnBehavior();//戻る
 		void ExitDoingInterpose();//挟んでいるとき
 		void ExitDieBehavior();
@@ -217,6 +222,23 @@ namespace basecross {
 	public:
 		//ステートのインスタンス取得
 		static shared_ptr<ToAttractState_Manager> Instance();
+		//ステートに入ったときに呼ばれる関数
+		virtual void Enter(const shared_ptr<PlayerManager>& Obj)override;
+		//ステート実行中に毎ターン呼ばれる関数
+		virtual void Execute(const shared_ptr<PlayerManager>& Obj)override;
+		//ステートにから抜けるときに呼ばれる関数
+		virtual void Exit(const shared_ptr<PlayerManager>& Obj)override;
+	};
+	//--------------------------------------------------------------------------------------
+	//	class ToAttractAttract_F_Manager : public ObjState<PlayerManager>;
+	//	用途:　攻撃失敗
+	//--------------------------------------------------------------------------------------
+	class ToAttractAttract_F_Manager : public ObjState<PlayerManager>
+	{
+		ToAttractAttract_F_Manager() {}
+	public:
+		//ステートのインスタンス取得
+		static shared_ptr<ToAttractAttract_F_Manager> Instance();
 		//ステートに入ったときに呼ばれる関数
 		virtual void Enter(const shared_ptr<PlayerManager>& Obj)override;
 		//ステート実行中に毎ターン呼ばれる関数
@@ -311,6 +333,8 @@ namespace basecross {
 		virtual void OnCreate() override;
 		//操作
 	};
+
+	
 
 	//--------------------------------------------------------------------------------------
 	//	class PlayerHP : public GameObject;
