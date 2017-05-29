@@ -265,9 +265,25 @@ namespace basecross
 		}
 
 		//‚‚³İ’è
-		Vector3 pppos = GetComponent<Transform>()->GetPosition();
-		pppos.y = 0.6f;
-		GetComponent<Transform>()->SetPosition(pppos);
+		for (auto obj : m_Player)
+		{
+			Vector3 pppos = obj->GetComponent<Transform>()->GetPosition();
+			pppos.y = 0.6f;
+			obj->GetComponent<Transform>()->SetPosition(pppos);
+		}
+		//‚à‚¤•Ğ•û‚ÉŒü‚­
+		Vector3 ppos2 = m_Player[0]->GetComponent<Transform>()->GetPosition();
+		Vector3 ppos3 = m_Player[1]->GetComponent<Transform>()->GetPosition();
+		Vector3 dif = ppos3 - ppos2;
+		float angle = atan2(dif.z, dif.x) * -1;
+		angle += 90 * 3.14159265f / 180;
+		Vector3 dif2 = ppos2 - ppos3;
+		float angle2 = atan2(dif2.z, dif2.x) * -1;
+		angle2 += 90 * 3.14159265f / 180;
+
+
+		m_Player[0]->GetComponent<Transform>()->SetRotation(0, angle2, 0);
+		m_Player[1]->GetComponent<Transform>()->SetRotation(0, angle, 0);
 	}
 
 	//‰ñ“]ˆ—

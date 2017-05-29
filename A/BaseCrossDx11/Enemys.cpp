@@ -125,25 +125,47 @@ namespace basecross
 				//索敵
 			case SearchS:
 				Search();
+				if (!m_SearchCircle->GetDrawActive())
+				{
+					m_SearchCircle->SetDrawActive(true);
+				}
+				CircleMove();
 				break;
 				//探索
 			case MoveS:
 				Move();
 				StageEndCheck();
+				if (!m_SearchCircle->GetDrawActive())
+				{
+					m_SearchCircle->SetDrawActive(true);
+				}
+				CircleMove();
 				break;
 				//攻撃
 			case AttackS:
 				Attack();
 				Rot();
 				StageEndCheck();
+				if (m_SearchCircle->GetDrawActive())
+				{
+					m_SearchCircle->SetDrawActive(false);
+				}
 				break;
 				//クールタイム
 			case CoolTimeS:
 				CoolTime();
+				if (m_SearchCircle->GetDrawActive())
+				{
+					m_SearchCircle->SetDrawActive(false);
+				}
 				break;
 				//無敵
 			case MutekiS:
 				Muteki();
+				if (m_SearchCircle->GetDrawActive())
+				{
+					m_SearchCircle->SetDrawActive(false);
+				}
 				break;
 			}
 
@@ -327,6 +349,34 @@ namespace basecross
 			pos += m_Velocity * App::GetApp()->GetElapsedTime();
 			//なんかオブジェクトに当たった時はVelocityを反転するけどそれは別のとこでやるわ
 			GetComponent<Transform>()->SetPosition(pos);
+
+
+			//索敵--------------------------------
+			//位置情報取得
+			Vector3 mypos = GetComponent<Transform>()->GetPosition();
+			Vector3 pos1 = m_Player1->GetComponent<Transform>()->GetPosition();
+			Vector3 pos2 = m_Player2->GetComponent<Transform>()->GetPosition();
+			float distance = m_Player1->GetComponent<Transform>()->GetScale().x / 2 + m_SearchDistance / 2;
+
+			//距離を測る
+			//１体目
+			Vector3 dis = pos1 - mypos;
+			if ((dis.x*dis.x) + (dis.z*dis.z) < distance*distance)
+			{
+				ToAttack(1);
+				/*1A
+				//チャージ中のぶれぶれ中心座標を記録
+				//m_BurePos = GetComponent<Transform>()->GetPosition();
+				*/
+			}
+			//２体目
+			dis = pos2 - mypos;
+			if ((dis.x*dis.x) + (dis.z*dis.z) < distance*distance)
+			{
+				ToAttack(2);
+			}
+			//索敵--------------------------------
+
 		}
 		else
 		{
@@ -464,7 +514,6 @@ namespace basecross
 		//足元へ移動
 		pos.y = 1;
 		m_SearchCircle->GetComponent<Transform>()->SetPosition(pos);
-		m_SearchCircle->SetDrawActive(true);
 	}
 
 	//なんかにぶつかったら速度反転、横と縦どっちがあたったかだけほしぃ
@@ -501,9 +550,6 @@ namespace basecross
 		//計算時間初期化
 		m_time = 0;
 
-		//サークル除去
-		m_SearchCircle->SetDrawActive(false);
-
 		//移動ベクトル(?)計算
 		//0.5～-0.5までランダムで出してスピードかける
 		m_Velocity = Vector3(rand() % 100 - 50, 0, rand() % 100 - 50);
@@ -524,9 +570,6 @@ namespace basecross
 		m_time = 0;
 		//攻撃する対象を設定
 		m_TargetNum = num;
-
-		//サークル除去
-		m_SearchCircle->SetDrawActive(false);
 
 		//状態変更
 		m_State = AttackS;
@@ -570,9 +613,6 @@ namespace basecross
 		//時間初期化
 		m_time = 0;
 
-		//サークル削除
-		m_SearchCircle->SetDrawActive(true);
-
 		//アニメーション変更
 		ChangeAnimation("Damage");
 
@@ -604,9 +644,6 @@ namespace basecross
 				SetDrawActive(false);
 				m_Hp = 0;
 				m_ActiveFlg = false;
-
-				//サークル除去
-				m_SearchCircle->SetDrawActive(false);
 
 			}
 			else
@@ -736,14 +773,26 @@ namespace basecross
 				//索敵
 			case SearchS:
 				Search();
+				if (!m_SearchCircle->GetDrawActive())
+				{
+					m_SearchCircle->SetDrawActive(true);
+				}
 				break;
 				//攻撃
 			case AttackS:
 				Attack();
+				if (m_SearchCircle->GetDrawActive())
+				{
+					m_SearchCircle->SetDrawActive(false);
+				}
 				break;
 				//無敵
 			case MutekiS:
 				Muteki();
+				if (m_SearchCircle->GetDrawActive())
+				{
+					m_SearchCircle->SetDrawActive(false);
+				}
 				break;
 			}
 
@@ -1099,9 +1148,6 @@ namespace basecross
 		//吐き出したフラグ解除
 		m_ShotChild = false;
 
-		//サークル描画
-		m_SearchCircle->SetDrawActive(true);
-
 		//アニメーション変更
 		ChangeAnimation("Wait");
 	}
@@ -1113,9 +1159,6 @@ namespace basecross
 		
 		//状態変更
 		m_State = AttackS;
-
-		//サークル除去
-		m_SearchCircle->SetDrawActive(false);
 
 		//狙うプレイヤーを決める
 		m_TargetPlayer = rand() % 2+1;
@@ -1136,9 +1179,6 @@ namespace basecross
 		//時間初期化
 		m_time = 0;
 
-		//サークル削除
-		m_SearchCircle->SetDrawActive(true);
-
 		//アニメーション変更
 		ChangeAnimation("Damage");
 
@@ -1157,9 +1197,6 @@ namespace basecross
 				SetDrawActive(false);
 				m_Hp = 0;
 				m_ActiveFlg = false;
-
-				//サークル除去
-				m_SearchCircle->SetDrawActive(false);
 
 			}
 			else
@@ -1311,14 +1348,26 @@ namespace basecross
 				//索敵
 			case SearchS:
 				Search();
+				if (!m_SearchCircle->GetDrawActive())
+				{
+					m_SearchCircle->SetDrawActive(true);
+				}
 				break;
 				//攻撃
 			case AttackS:
 				Attack();
+				if (m_SearchCircle->GetDrawActive())
+				{
+					m_SearchCircle->SetDrawActive(false);
+				}
 				break;
 				//クールタイム
 			case CoolTimeS:
 				CoolTime();
+				if (m_SearchCircle->GetDrawActive())
+				{
+					m_SearchCircle->SetDrawActive(false);
+				}
 				break;
 			}
 		}
@@ -1513,7 +1562,6 @@ namespace basecross
 		//足元へ移動
 		pos.y = 1;
 		m_SearchCircle->GetComponent<Transform>()->SetPosition(pos);
-		m_SearchCircle->SetDrawActive(true);
 	}
 
 	void TeleportEnemy::ToSearch()
@@ -1537,9 +1585,6 @@ namespace basecross
 		m_time = 0;
 
 		m_TargetNum = num;
-
-		//サークル除去
-		m_SearchCircle->SetDrawActive(false);
 
 		m_State = AttackS;
 
@@ -1580,8 +1625,12 @@ namespace basecross
 			m_Hp = 0;
 			m_ActiveFlg = false;
 
-			//サークル除去
-			m_SearchCircle->SetDrawActive(false);
+			//子機収納
+			for (auto obj : m_Drawns)
+			{
+				dynamic_pointer_cast<SearchDrawn>(obj)->UpDrawns();
+
+			}
 
 		}
 		else
@@ -1701,17 +1750,31 @@ namespace basecross
 				//索敵
 			case SearchS:
 				Search();
+				if (!m_SearchCircle->GetDrawActive())
+				{
+					m_SearchCircle->SetDrawActive(true);
+				}
+				CircleMove();
 				break;
 				//探索
 			case MoveS:
 				Move();
 				StageEndCheck();
+				if (!m_SearchCircle->GetDrawActive())
+				{
+					m_SearchCircle->SetDrawActive(true);
+				}
+				CircleMove();
 				break;
 				//攻撃
 			case AttackS:
 				Attack();
 				Rot();
 				StageEndCheck();
+				if (m_SearchCircle->GetDrawActive())
+				{
+					m_SearchCircle->SetDrawActive(false);
+				}
 				break;
 			}
 
@@ -1838,6 +1901,30 @@ namespace basecross
 			pos += m_Velocity * App::GetApp()->GetElapsedTime();
 			//なんかオブジェクトに当たった時はVelocityを反転するけどそれは別のとこでやるわ
 			GetComponent<Transform>()->SetPosition(pos);
+
+			//位置情報取得
+			Vector3 mypos = GetComponent<Transform>()->GetPosition();
+			Vector3 pos1 = m_Player1->GetComponent<Transform>()->GetPosition();
+			Vector3 pos2 = m_Player2->GetComponent<Transform>()->GetPosition();
+			float distance = m_Player1->GetComponent<Transform>()->GetScale().x / 2 + m_SearchDistance / 2;
+
+			//索敵------------------------------
+			//距離を測る
+			//１体目
+			Vector3 dis = pos1 - mypos;
+			if ((dis.x*dis.x) + (dis.z*dis.z) < distance*distance)
+			{
+				ToAttack(1);
+
+			}
+			//２体目
+			dis = pos2 - mypos;
+			if ((dis.x*dis.x) + (dis.z*dis.z) < distance*distance)
+			{
+				ToAttack(2);
+			}
+			//索敵------------------------------
+
 		}
 		else
 		{
@@ -1918,7 +2005,6 @@ namespace basecross
 		//足元へ移動
 		pos.y = 1;
 		m_SearchCircle->GetComponent<Transform>()->SetPosition(pos);
-		m_SearchCircle->SetDrawActive(true);
 	}
 
 
@@ -1943,9 +2029,6 @@ namespace basecross
 		//計算時間初期化
 		m_time = 0;
 
-		//サークル除去
-		m_SearchCircle->SetDrawActive(false);
-
 		//移動ベクトル(?)計算
 		//0.5～-0.5までランダムで出してスピードかける
 		m_Velocity = Vector3(rand() % 100 - 50, 0, rand() % 100 - 50);
@@ -1963,9 +2046,6 @@ namespace basecross
 		m_time = 0;
 		//攻撃する対象を設定
 		m_TargetNum = num;
-
-		//サークル除去
-		m_SearchCircle->SetDrawActive(false);
 
 		//状態変更
 		m_State = AttackS;
