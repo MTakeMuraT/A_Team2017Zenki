@@ -651,6 +651,12 @@ namespace basecross
 		shared_ptr<GameObject> m_Shadow;
 		//Abe20170519
 
+		//Abe20170529
+		//属性 0でshotエネミーには当たらない、1で当たる
+		int m_Zokusei = 0;
+		//Abe20170529
+
+
 		//以下パラメータ
 		//攻撃力
 		int m_power = 0;

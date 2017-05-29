@@ -2617,6 +2617,15 @@ namespace basecross
 
 		//UŒ‚—Íİ’è
 		m_power = power;
+
+		if (!falltype)
+		{
+			m_Zokusei = 1;
+		}
+		else
+		{
+			m_Zokusei = 0;
+		}
 	}
 
 	void Missile::DeleteMissile()
