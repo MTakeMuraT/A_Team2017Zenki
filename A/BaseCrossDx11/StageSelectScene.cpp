@@ -114,17 +114,17 @@ namespace basecross {
 	{
 		//ñÓàÛ
 		//ç∂è„
-		AddGameObject<SelectGroundSquare>(Vector3(0, 0.5f, -10), Vector3(3, 3, 3), L"YAZIRUSHI_TX", 270);
-		AddGameObject<SelectGroundSquare>(Vector3(18, 0.5f, 0), Vector3(3, 3, 3), L"YAZIRUSHI_TX", 0);
+		AddGameObject<SelectGroundSquare>(Vector3(0, 0.5f, -10), Vector3(5, 5, 5), L"YAZIRUSHI_TX", 270);
+		AddGameObject<SelectGroundSquare>(Vector3(18, 0.5f, 0), Vector3(5, 5, 5), L"YAZIRUSHI_TX", 0);
 		//ç∂â∫
-		AddGameObject<SelectGroundSquare>(Vector3(0, 0.5f, -18), Vector3(3, 3, 3), L"YAZIRUSHI_TX", 90);
-		AddGameObject<SelectGroundSquare>(Vector3(18, 0.5f, -27), Vector3(3, 3, 3), L"YAZIRUSHI_TX", 0);
+		AddGameObject<SelectGroundSquare>(Vector3(0, 0.5f, -18), Vector3(5, 5, 5), L"YAZIRUSHI_TX", 90);
+		AddGameObject<SelectGroundSquare>(Vector3(18, 0.5f, -27), Vector3(5, 5, 5), L"YAZIRUSHI_TX", 0);
 		//âEâ∫
-		AddGameObject<SelectGroundSquare>(Vector3(46, 0.5f, -18), Vector3(3, 3, 3), L"YAZIRUSHI_TX", 90);
-		AddGameObject<SelectGroundSquare>(Vector3(28, 0.5f, -27), Vector3(3, 3, 3), L"YAZIRUSHI_TX", 180);
+		AddGameObject<SelectGroundSquare>(Vector3(46, 0.5f, -18), Vector3(5, 5, 5), L"YAZIRUSHI_TX", 90);
+		AddGameObject<SelectGroundSquare>(Vector3(28, 0.5f, -27), Vector3(5, 5, 5), L"YAZIRUSHI_TX", 180);
 		//âEè„
-		AddGameObject<SelectGroundSquare>(Vector3(46, 0.5f, -10), Vector3(3, 3, 3), L"YAZIRUSHI_TX", 270);
-		AddGameObject<SelectGroundSquare>(Vector3(28, 0.5f, 0), Vector3(3, 3, 3), L"YAZIRUSHI_TX", 180);
+		AddGameObject<SelectGroundSquare>(Vector3(46, 0.5f, -10), Vector3(5, 5, 5), L"YAZIRUSHI_TX", 270);
+		AddGameObject<SelectGroundSquare>(Vector3(28, 0.5f, 0), Vector3(5, 5, 5), L"YAZIRUSHI_TX", 180);
 
 		//Easy
 		AddGameObject<SelectGroundSquare>(Vector3(0, 0.5f, 0), Vector3(15, 10, 11), L"EASY_TX", 0);
