@@ -1342,7 +1342,7 @@ namespace basecross {
 		auto Draw = AddComponent<PNTStaticDraw>();
 		//メッシュ設定
 		Draw->SetMeshResource(L"DEFAULT_CUBE");
-		Draw->SetTextureResource(L"TRACE_TX");
+		Draw->SetTextureResource(L"Glass_TX");
 		//SetDrawActive(false);
 		//文字列をつける
 		auto PtrString = AddComponent<StringSprite>();
@@ -1353,7 +1353,7 @@ namespace basecross {
 		m_ReferencePoint_Vec3 = Vector3(m_Position.x - (m_Scale.x / 2) / 2, m_Position.y, m_Position.z - m_Scale.z / 2);//右
 		m_ReferencePoint2_Vec3 = Vector3(m_Position.x + (m_Scale.x / 2) / 2, m_Position.y, m_Position.z - m_Scale.z / 2);//左
 		m_CenterPoint_Vec3 = Vector3(m_Position.x, m_Position.y, m_Position.z - m_Scale.z / 2);
-
+		SetDrawLayer(-20);
 
 	}
 	void ShotEnemyChild::OnUpdate() {
@@ -1540,7 +1540,7 @@ namespace basecross {
 		auto Draw = AddComponent<PNTStaticDraw>();
 		//メッシュ設定
 		Draw->SetMeshResource(L"DEFAULT_SPHERE");
-		Draw->SetTextureResource(L"TRACE_TX");
+		Draw->SetTextureResource(L"Glass_TX");
 		//撃つ
 		m_ShotActive = true;
 	}

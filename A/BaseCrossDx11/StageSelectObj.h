@@ -89,6 +89,10 @@ namespace basecross
 		shared_ptr<GameObject> m_Debugtxt;
 		//Abe20170524
 
+		bool m_Model_flg = true;
+		bool m_Animeflg = true;
+		bool m_WaitFlg = true;
+
 	public :
 		SelectPlayer(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, float speed);
 
@@ -110,6 +114,13 @@ namespace basecross
 		Vector3 GetPos();
 		//“®‚¯‚é‚æ‚¤‚É‚·‚éŠÖ”
 		void ActiveMove();
+		//ƒ‚ƒfƒ‹‚ÌÅ‰‚ÌŒü‚«
+		void Model();
+		void AnimationWait();
+		void AnimationRotL();
+		void AnimationRotR();
+		bool UpdateAnyAnimation();
+		bool UpdateAnyAnimation2();
 	};
 
 	//--------------------------------------------------------------------------------------

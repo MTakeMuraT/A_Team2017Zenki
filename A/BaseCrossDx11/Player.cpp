@@ -285,7 +285,7 @@ namespace basecross {
 		
 		//ステージの大きさ
 		auto ScenePtr = App::GetApp()->GetScene<Scene>();
-		m_StageSize = ScenePtr->GetStageSize() / 2;
+		m_StageSize = ScenePtr->GetStageSize()/2;
 	}
 	void PlayerManager::OnUpdate() {
 		m_StateManagerMachine->Update();
