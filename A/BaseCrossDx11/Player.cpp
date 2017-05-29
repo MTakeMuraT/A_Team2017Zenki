@@ -603,6 +603,10 @@ namespace basecross {
 		
 
 	}
+	//攻撃失敗
+	void PlayerManager::EnterToAttractFailureBehavior() {
+		
+	}
 	//最初の位置に戻る
 	void PlayerManager::EnterReturnBehavior() {
 		SetActiveCollision(false);
@@ -612,6 +616,8 @@ namespace basecross {
 		auto PlaeyrR_Pos = PlayerR_Ptr->GetComponent<Transform>()->GetPosition();
 		PlayerL_Velocity_Vec3 = Move_Velo(PlayerL_Pos, PlayerL_SavePos_Vec3);
 		PlayerR_Velocity_Vec3 = Move_Velo(PlayerL_Pos, PlayerR_SavePos_Vec3);
+	
+		
 
 	}
 	//挟んでいるとき
@@ -705,6 +711,7 @@ namespace basecross {
 			if (Distance.x * Distance.x + Distance.z * Distance.z > 100) {
 				Speed_F = 0.0f;
 				m_LeaveRotateFlg = true;
+				m_DamePower = true;
 			}
 			else if(m_LeaveRotateFlg == false){
 				Speed_F += Rig->GetMaxSpeed() / 30;
@@ -722,8 +729,12 @@ namespace basecross {
 
 		//Aが話されたら攻撃ステートに移動
 		if (!(CntlVec[0].wButtons& XINPUT_GAMEPAD_A)) {
-		
-			GetStateMachine_Manager()->ChangeState(ToAttractState_Manager::Instance());
+			if (m_DamePower) {
+				GetStateMachine_Manager()->ChangeState(ToAttractState_Manager::Instance());
+			}
+			else {
+				GetStateMachine_Manager()->ChangeState(ToAttractAttract_F_Manager::Instance());
+			}
 		}
 		//死んだとき
 		StateChangeDie();
@@ -748,16 +759,28 @@ namespace basecross {
 		PlayerR_Ptr->GetComponent<Rigidbody>()->SetVelocity(Vector3(PlayerR_Direction_Vec3.x, 0, PlayerR_Direction_Vec3.z)* Speed_F * ElapsedTime_F);
 		//ステート遷移
 		StateChangeDoingInterpose();
+		m_LimitTime += App::GetApp()->GetElapsedTime();
+
+
 		if (1.5 > abs(Distance_Vec3.x) && 1.5 > abs(Distance_Vec3.z)) {
 
 			//SE
 			auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
 			pMultiSoundEffect->Start(L"Collision_01_SE", 0, 0.4f);
-			//ステート遷移
-			GetStateMachine_Manager()->ChangeState(ReturnState_Manager::Instance());
+				//ステート遷移
+				GetStateMachine_Manager()->ChangeState(ReturnState_Manager::Instance());
 		}
+		 if(m_LimitTime > 2){
+			GetStateMachine_Manager()->ChangeState(MoveState_Manager::Instance());
+
+		}
+	
 		//死んだとき
 		StateChangeDie();
+	}
+	//攻撃失敗
+	void PlayerManager::ExecuteToAttractFailureBehavior() {
+		GetStateMachine_Manager()->ChangeState(ReturnState_Manager::Instance());
 	}
 	//最初の位置に戻る
 	void PlayerManager::ExecuteReturnBehavior() {
@@ -813,11 +836,17 @@ namespace basecross {
 		InitializationVelocity();
 		Speed_F = 0.0f;
 		m_LeaveRotateFlg = false;
+		m_DamePower = false;
 		//処理なし
 	}
 	void PlayerManager::ExitToAttractBehavior() {
 		InitializationVelocity();
 		Speed_F = 0.0f;
+		m_LimitTime = 0;
+	}
+	//攻撃失敗
+	void PlayerManager::ExitToAttractFailureBehavior() {
+
 	}
 	void PlayerManager::ExitReturnBehavior() {
 		InitializationVelocity();
@@ -934,6 +963,30 @@ namespace basecross {
 	//ステート実行中に毎ターン呼ばれる関数
 	void ToAttractState_Manager::Exit(const shared_ptr<PlayerManager>& Obj) {
 		Obj->ExitToAttractBehavior();
+	}
+	//--------------------------------------------------------------------------------------
+	//	class ToAttractAttract_F_Manager : public ObjState<MoveState_Manager>;
+	//	用途:攻撃失敗　
+	//--------------------------------------------------------------------------------------
+	//ステートのインスタンス取得
+	shared_ptr<ToAttractAttract_F_Manager> ToAttractAttract_F_Manager::Instance() {
+		static shared_ptr<ToAttractAttract_F_Manager> instance;
+		if (!instance) {
+			instance = shared_ptr<ToAttractAttract_F_Manager>(new ToAttractAttract_F_Manager);
+		}
+		return instance;
+	}
+	//ステートに入ったときに呼ばれる関数
+	void ToAttractAttract_F_Manager::Enter(const shared_ptr<PlayerManager>& Obj) {
+		Obj->EnterToAttractFailureBehavior();
+	}
+	//ステート実行中に毎ターン呼ばれる関数
+	void ToAttractAttract_F_Manager::Execute(const shared_ptr<PlayerManager>& Obj) {
+		Obj->ExecuteToAttractFailureBehavior();
+	}
+	//ステート実行中に毎ターン呼ばれる関数
+	void ToAttractAttract_F_Manager::Exit(const shared_ptr<PlayerManager>& Obj) {
+		Obj->ExitToAttractFailureBehavior();
 	}
 	//--------------------------------------------------------------------------------------
 	//	class ReturnState_Manager : public ObjState<MoveState_Manager>;
@@ -1055,6 +1108,8 @@ namespace basecross {
 			}
 		}
 	}
+
+
 	
 	//--------------------------------------------------------------------------------------
 	//	class SkySphere : public GameObject;

@@ -985,14 +985,15 @@ namespace basecross {
 		//止めるフラグあったら動かさない
 		if (!m_TimeStopFlg)
 		{
-			//時間減らす
+			//時間加算する
 			m_Time += App::GetApp()->GetElapsedTime();
 			//０秒以下なら
-			if (m_Time <= 0)
+			if (m_Time >= 999)
 			{
 				m_FinishFlg = true;
-				m_Time = 0;
+				m_Time = 999;
 			}
+			
 
 			m_Numbers->SetNum((int)m_Time);
 		}
@@ -1333,16 +1334,27 @@ namespace basecross {
 	{}
 	void ShotEnemyChild::OnCreate() {
 		SetDrawLayer(10);
+
+
+		//モデルとトランスフォームの間の差分
+		Matrix4X4 ShotEnemyChildMat;
+		ShotEnemyChildMat.DefTransformation(
+			Vector3(1.0, 1.0f, 1.0f),
+			Vector3(0,140,0),
+			Vector3(0.0f, -0.61f, 0.0f)
+		);
+
+
 		auto Trans = GetComponent<Transform>();
 		Trans->SetPosition(m_Position);
 		Trans->SetScale(m_Scale);
-		Trans->SetRotation(0, 0, 0);
+		Trans->SetRotation(0,0 ,0);
 		AddComponent<Rigidbody>();
 		//描画設定
 		auto Draw = AddComponent<PNTStaticDraw>();
 		//メッシュ設定
-		Draw->SetMeshResource(L"DEFAULT_CUBE");
-		Draw->SetTextureResource(L"Glass_TX");
+		Draw->SetMeshResource(L"MissileEnemyChildModl");
+	//	Draw->SetTextureResource(L"Glass_TX");
 		//SetDrawActive(false);
 		//文字列をつける
 		auto PtrString = AddComponent<StringSprite>();
@@ -1354,6 +1366,9 @@ namespace basecross {
 		m_ReferencePoint2_Vec3 = Vector3(m_Position.x + (m_Scale.x / 2) / 2, m_Position.y, m_Position.z - m_Scale.z / 2);//左
 		m_CenterPoint_Vec3 = Vector3(m_Position.x, m_Position.y, m_Position.z - m_Scale.z / 2);
 		SetDrawLayer(-20);
+		auto PtrDraw = GetComponent<PNTStaticDraw>();
+		PtrDraw->SetMeshToTransformMatrix(ShotEnemyChildMat);
+
 
 	}
 	void ShotEnemyChild::OnUpdate() {
