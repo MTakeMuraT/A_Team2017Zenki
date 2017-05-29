@@ -239,6 +239,14 @@ namespace basecross
 				{
 					dynamic_pointer_cast<TeleportEnemy>(obj2)->Damage((int)dynamic_pointer_cast<TackleEnemy>(obj)->GetPower());
 				}
+				if (dynamic_pointer_cast<TackleEnemy>(obj2))
+				{
+					dynamic_pointer_cast<TackleEnemy>(obj2)->Damage((int)dynamic_pointer_cast<TackleEnemy>(obj)->GetPower());
+				}
+				if (dynamic_pointer_cast<BombEnemy>(obj2))
+				{
+					dynamic_pointer_cast<BombEnemy>(obj2)->DamagePlayer();
+				}
 			}
 		}
 		//自爆エネミー
@@ -326,6 +334,10 @@ namespace basecross
 				if (dynamic_pointer_cast<TeleportEnemy>(obj))
 				{
 					dynamic_pointer_cast<TeleportEnemy>(obj)->Damage((int)dynamic_pointer_cast<TackleEnemy>(obj2)->GetPower());
+				}
+				if (dynamic_pointer_cast<TackleEnemy>(obj))
+				{
+					dynamic_pointer_cast<TackleEnemy>(obj)->Damage((int)dynamic_pointer_cast<TackleEnemy>(obj2)->GetPower());
 				}
 				if (dynamic_pointer_cast<BombEnemy>(obj))
 				{
