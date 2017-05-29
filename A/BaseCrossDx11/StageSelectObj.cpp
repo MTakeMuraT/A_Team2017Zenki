@@ -256,6 +256,11 @@ namespace basecross
 		{
 			SandMove();
 		}
+
+		//‚‚³İ’è
+		Vector3 pppos = GetComponent<Transform>()->GetPosition();
+		pppos.y = 0.6f;
+		GetComponent<Transform>()->SetPosition(pppos);
 	}
 
 	//‰ñ“]ˆ—
