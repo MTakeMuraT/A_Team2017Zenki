@@ -676,6 +676,9 @@ namespace basecross
 		void ToDamagePleyer();
 
 		int GetPower() { return m_power; }
+
+		//属性アクセサー
+		int GetZokusei() { return m_Zokusei; }
 	};
 	//Abe20170515
 

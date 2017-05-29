@@ -212,7 +212,11 @@ namespace basecross
 			}
 			if (dynamic_pointer_cast<ShotEnemy>(obj2))
 			{
-				dynamic_pointer_cast<ShotEnemy>(obj2)->Damage((int)dynamic_pointer_cast<Missile>(obj)->GetPower());
+				//ショットエネミーのみ属性判定(自分のに当たるので)
+				if (dynamic_pointer_cast<Missile>(obj)->GetZokusei() == 1)
+				{
+					dynamic_pointer_cast<ShotEnemy>(obj2)->Damage((int)dynamic_pointer_cast<Missile>(obj)->GetPower());
+				}
 			}
 			if (dynamic_pointer_cast<BombEnemy>(obj2))
 			{
@@ -223,18 +227,18 @@ namespace basecross
 		if (dynamic_pointer_cast<TackleEnemy>(obj))
 		{
 		
-			//それぞれのエネミーにダメージを与える
-			if (dynamic_pointer_cast<ShotEnemy>(obj2))
+			//攻撃してるときのみ
+			if (dynamic_pointer_cast<TackleEnemy>(obj)->GetDamageFlg())
 			{
-				dynamic_pointer_cast<ShotEnemy>(obj2)->Damage((int)dynamic_pointer_cast<TackleEnemy>(obj)->GetPower());
-			}
-			if (dynamic_pointer_cast<TeleportEnemy>(obj2))
-			{
-				dynamic_pointer_cast<TeleportEnemy>(obj2)->Damage((int)dynamic_pointer_cast<TackleEnemy>(obj)->GetPower());
-			}
-			if (dynamic_pointer_cast<BombEnemy>(obj2))
-			{
-				dynamic_pointer_cast<BombEnemy>(obj2)->DamagePlayer();
+				//それぞれのエネミーにダメージを与える
+				if (dynamic_pointer_cast<ShotEnemy>(obj2))
+				{
+					dynamic_pointer_cast<ShotEnemy>(obj2)->Damage((int)dynamic_pointer_cast<TackleEnemy>(obj)->GetPower());
+				}
+				if (dynamic_pointer_cast<TeleportEnemy>(obj2))
+				{
+					dynamic_pointer_cast<TeleportEnemy>(obj2)->Damage((int)dynamic_pointer_cast<TackleEnemy>(obj)->GetPower());
+				}
 			}
 		}
 		//自爆エネミー
@@ -300,26 +304,33 @@ namespace basecross
 			}
 			if (dynamic_pointer_cast<ShotEnemy>(obj))
 			{
-				dynamic_pointer_cast<ShotEnemy>(obj)->Damage((int)dynamic_pointer_cast<Missile>(obj2)->GetPower());
+				//ショットエネミーのみ属性判定(自分のに当たるので)
+				if (dynamic_pointer_cast<Missile>(obj2)->GetZokusei() == 1)
+				{
+					dynamic_pointer_cast<ShotEnemy>(obj)->Damage((int)dynamic_pointer_cast<Missile>(obj2)->GetPower());
+				}
 			}
 
 		}
 		//突撃エネミー
 		if (dynamic_pointer_cast<TackleEnemy>(obj2))
 		{
-		
-			//それぞれのエネミーにダメージを与える
-			if (dynamic_pointer_cast<ShotEnemy>(obj))
+			//攻撃してるときのみ
+			if (dynamic_pointer_cast<TackleEnemy>(obj2)->GetDamageFlg())
 			{
-				dynamic_pointer_cast<ShotEnemy>(obj)->Damage((int)dynamic_pointer_cast<TackleEnemy>(obj2)->GetPower());
-			}
-			if (dynamic_pointer_cast<TeleportEnemy>(obj))
-			{
-				dynamic_pointer_cast<TeleportEnemy>(obj)->Damage((int)dynamic_pointer_cast<TackleEnemy>(obj2)->GetPower());
-			}
-			if (dynamic_pointer_cast<BombEnemy>(obj))
-			{
-				dynamic_pointer_cast<BombEnemy>(obj)->DamagePlayer();
+				//それぞれのエネミーにダメージを与える
+				if (dynamic_pointer_cast<ShotEnemy>(obj))
+				{
+					dynamic_pointer_cast<ShotEnemy>(obj)->Damage((int)dynamic_pointer_cast<TackleEnemy>(obj2)->GetPower());
+				}
+				if (dynamic_pointer_cast<TeleportEnemy>(obj))
+				{
+					dynamic_pointer_cast<TeleportEnemy>(obj)->Damage((int)dynamic_pointer_cast<TackleEnemy>(obj2)->GetPower());
+				}
+				if (dynamic_pointer_cast<BombEnemy>(obj))
+				{
+					dynamic_pointer_cast<BombEnemy>(obj)->DamagePlayer();
+				}
 			}
 		}
 	
