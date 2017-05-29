@@ -493,7 +493,6 @@ namespace basecross
 			dynamic_pointer_cast<Missile>(obj)->ToDamagePleyer();
 		}
 		//共通する部分---------------------------------------------------------
-
 	}
 	//Abe20170504
 
@@ -563,7 +562,7 @@ namespace basecross
 					auto eptr = dynamic_pointer_cast<GameObject>(obj.lock());
 					Vector3 epos = eptr->GetComponent<Transform>()->GetPosition();
 					//若干判定緩めるために半径タス
-					Vector3 escale = eptr->GetComponent<Transform>()->GetScale() /2;
+					Vector3 escale = eptr->GetComponent<Transform>()->GetScale() / 1.0f;
 					//2体のプレイヤーの間にいるか
 					if ((pos1.x-escale.x < epos.x && epos.x < pos2.x + escale.x) &&
 						(pos1.z-escale.z < epos.z && epos.z < pos2.z + escale.z))
