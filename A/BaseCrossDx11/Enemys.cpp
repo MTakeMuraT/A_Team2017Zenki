@@ -612,9 +612,9 @@ namespace basecross
 			else
 			{
 				m_Hp--;
+				ToMuteki();
 			}
 
-			ToMuteki();
 		}
 	}
 
@@ -1165,9 +1165,10 @@ namespace basecross
 			else
 			{
 				m_Hp--;
+				ToMuteki();
+
 			}
 
-			ToMuteki();
 		}
 	}
 
