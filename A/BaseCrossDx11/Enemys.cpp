@@ -570,6 +570,9 @@ namespace basecross
 		//時間初期化
 		m_time = 0;
 
+		//サークル削除
+		m_SearchCircle->SetDrawActive(true);
+
 		//アニメーション変更
 		ChangeAnimation("Damage");
 
@@ -1132,6 +1135,9 @@ namespace basecross
 
 		//時間初期化
 		m_time = 0;
+
+		//サークル削除
+		m_SearchCircle->SetDrawActive(true);
 
 		//アニメーション変更
 		ChangeAnimation("Damage");
