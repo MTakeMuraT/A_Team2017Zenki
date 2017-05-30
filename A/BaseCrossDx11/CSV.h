@@ -46,44 +46,61 @@ namespace basecross {
 		virtual void OnCreate() override;
 		//指定範囲内でランダム数を返す関数
 		int Random(const int Min, const int Max);
+		//シングルだったときのリターンと複数値が入ってるときのランダムリターン
 #pragma region EnemysSet
 		//エネミーへの代入用セッタ
-		//位置 Single:値が１つだけのときに使用　　Multi
+		//位置 Single:値が１つだけのときに使用　　Multi：複数の値が入ってる時のランダムリターン
 		Vector3  SinglePos(vector<wstring> Tokens);
 		//スケール
-		int SingleScale(vector<wstring> Tokens);
-		int MultiScale(vector<wstring> Tokens, vector<wstring> Tokens2);
+		int MultiScale(vector<wstring> Tokens2);
 		//HP
-		int SingleHP(vector<wstring> Tokens);
-		int MultiHP(vector<wstring> Tokens, vector<wstring> Tokens2);
+		int MultiHP( vector<wstring> Tokens2);
 		//索敵範囲
-		int SingleSearch(vector<wstring> Tokens);
-		int MultiSearch(vector<wstring> Tokens, vector<wstring> Tokens2);
+		int MultiSearch( vector<wstring> Tokens2);
         //クールタイム
-		int SingleCoolTime(vector<wstring> Tokens);
-		int MultiCoolTime(vector<wstring> Tokens, vector<wstring> Tokens2);
+		int MultiCoolTime( vector<wstring> Tokens2);
 		//ショットクールタイム（弾の撃つ間隔 使用箇所　ShotEnemy
-		int SingleShotCoolTime(vector<wstring> Tokens);
-		int MultiShotCoolTime(vector<wstring> Tokens, vector<wstring> Tokens2);
+		int MultiShotCoolTime( vector<wstring> Tokens2);
 		//スピード
-		int SingleSpeed(vector<wstring> Tokens);
-		int MultiSpeed(vector<wstring> Tokens, vector<wstring> Tokens2);
+		int MultiSpeed( vector<wstring> Tokens2);
 		//攻撃力
-		int SingleAttackPower(vector<wstring> Tokens);
-		int MultiAttackPower(vector<wstring> Tokens, vector<wstring> Tokens2);
+		int MultiAttackPower( vector<wstring> Tokens2);
 		//突撃回数（ 使用箇所 TackleEnemy
-		int SingleAttackTimes(vector<wstring> Tokens);
-		int MultiAttackTimes(vector<wstring> Tokens, vector<wstring> Tokens2);
+		int MultiAttackTimes( vector<wstring> Tokens2);
 		//子機発射間隔( 使用箇所　ShotEnemy 
-		int SingleChildDrop(vector<wstring> Tokens);
-		int MultiChildDrop(vector<wstring> Tokens, vector<wstring> Tokens2);
+		int MultiChildDrop( vector<wstring> Tokens2);
 		//索敵型子機の発射間隔（使用箇所 TeleportEnemy 
-		int SingleChildSearch(vector<wstring> Tokens);
-		int MultiChildSearch(vector<wstring> Tokens, vector<wstring> Tokens2);
+		int MultiChildSearch( vector<wstring> Tokens2);
 		//発射数（一回で発射される弾の数  
-		int SingleShotBullet(vector<wstring> Tokens);
-		int MultiShotBullet(vector<wstring> Tokens, vector<wstring> Tokens2);
+		int MultiShotBullet(vector<wstring> Tokens2);
 #pragma endregion
+		//値が一つなのか二つなのかを見る関数
+#pragma region EnemysSetBranch
+		//スケール
+		int BranchScale(vector<wstring> Tokens,vector<wstring> Tokens2);
+		//HP
+		int BranchHP(vector<wstring> Tokens,vector<wstring> Tokens2);
+		//索敵範囲
+		int  BranchSearch(vector<wstring> Tokens,vector<wstring> Tokens2);
+		//クールタイム
+		int BranchCoolTime(vector<wstring> Tokens,vector<wstring> Tokens2);
+		//ショットクールタイム
+		int BranchShotCoolTime(vector<wstring> Tokens,vector<wstring> Tokens2);
+		//スピード
+		int BranchSpeed(vector<wstring> Tokens,vector<wstring> Tokens2);
+		//攻撃力
+		int BranchAttackPower(vector<wstring> Tokens,vector<wstring> Tokens2);
+		//突撃回数
+		int BranchAttackTimes(vector<wstring> Tokens,vector<wstring> Tokens2);
+		//子機発射間隔
+		int BranchChildDrop(vector<wstring> Tokens,vector<wstring> Tokens2);
+		//索敵型子機の発射間隔
+		int BranchChildSearch(vector<wstring> Tokens,vector<wstring> Tokens2);
+		//発射数
+		int BranchShotBullet(vector<wstring> Tokens,vector<wstring> Tokens2);
+
+#pragma endregion
+
 
 	};
 
