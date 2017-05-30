@@ -130,14 +130,19 @@ namespace basecross {
 		//AddGameObject<SelectGroundSquare>(Vector3(0, 0.5f, 0), Vector3(15, 10, 11), L"EASY_TX", 0);
 		//Abe20170529
 		//SS”Å
-		AddGameObject<SelectGroundSquareSS>(Vector3(0, 0.5f, 0), Vector3(3, 3,3), L"SS\\EASY_animation\\", L"EASY.ssae", 0);
+		AddGameObject<SelectGroundSquareSS>(Vector3(0, 0.5f, 0), Vector3(1,1,1), L"SS\\EASY_animation\\", L"EASY.ssae", 0);
+
 		//Abe20170529
 
 		//Normal
-		AddGameObject<SelectGroundSquare>(Vector3(0, 0.5, -26), Vector3(15, 10, 11), L"NORMAL_TX", 0);
-		AddGameObject<SelectGroundSquare>(Vector3(46, 0.5f, -26), Vector3(15, 10, 11), L"NORMAL_TX", 0);
+		//AddGameObject<SelectGroundSquare>(Vector3(0, 0.5, -26), Vector3(15, 10, 11), L"NORMAL_TX", 0);
+	//	AddGameObject<SelectGroundSquare>(Vector3(46, 0.5f, -26), Vector3(15, 10, 11), L"NORMAL_TX", 0);
+		AddGameObject<SelectGroundSquareSS>(Vector3(0, 0.5f, -27), Vector3(1, 1, 1), L"SS\\NORMAL_animation\\", L"NORMAL.ssae", 0);
+		AddGameObject<SelectGroundSquareSS>(Vector3(46, 0.5f, -27), Vector3(1, 1, 1), L"SS\\NORMAL_animation\\", L"NORMAL.ssae", 0);
+
 		//Hard
-		AddGameObject<SelectGroundSquare>(Vector3(46, 0.5f, 0), Vector3(15, 10, 11), L"HARD_TX", 0);
+	//	AddGameObject<SelectGroundSquare>(Vector3(46, 0.5f, 0), Vector3(15, 10, 11), L"HARD_TX", 0);
+    	AddGameObject<SelectGroundSquareSS>(Vector3(46, 0.5f, 0), Vector3(1, 1, 1), L"SS\\HARD_animation\\", L"HARD.ssae", 0);
 
 	}
 	//Abe20170526

@@ -139,7 +139,7 @@ namespace basecross {
 		mat.DefTransformation(
 			Vector3(6.5f, 6.5f, 6.5f),
 			Vector3(0, 0, 0),
-			Vector3(0, -5, 0)
+			Vector3(0, 7.5, 0)
 			);
 		SetToAnimeMatrix(mat);
 
@@ -197,7 +197,7 @@ namespace basecross {
 		mat.DefTransformation(
 			Vector3(6.5f, 6.5f, 6.5f),
 			Vector3(0, 0, 0),
-			Vector3(0, 10, 0)
+			Vector3(0, 7.5, 0)
 			);
 		SetToAnimeMatrix(mat);
 

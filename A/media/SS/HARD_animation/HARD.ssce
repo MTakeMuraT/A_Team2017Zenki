@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <SpriteStudioCellMap version="1.00.01">
-	<name>EASY</name>
+	<name>HARD</name>
 	<exportPath></exportPath>
 	<generator>SpriteStudio</generator>
 	<packed>0</packed>
-	<imagePath>EASY.png</imagePath>
+	<imagePath>HARD.png</imagePath>
 	<pixelSize>512 512</pixelSize>
 	<overrideTexSettings>0</overrideTexSettings>
 	<wrapMode>clamp</wrapMode>
@@ -21,8 +21,8 @@
 	<cells>
 		<cell>
 			<name>NewCell</name>
-			<pos>278 47</pos>
-			<size>233 101</size>
+			<pos>0 158</pos>
+			<size>205 101</size>
 			<pivot>0 0</pivot>
 			<rotated>0</rotated>
 			<orgImageName></orgImageName>
