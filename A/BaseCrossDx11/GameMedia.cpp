@@ -125,6 +125,47 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"SHOADOW_TX", strTexture);
 		//Abe20170519
 
+		//Abe20170529
+		//ゲームオーバー---------------------------------------
+		//クロ
+		strTexture = DataDir + L"GameOver\\OverBlack.png";
+		App::GetApp()->RegisterTexture(L"OVERBLACK_TX", strTexture);
+		//シロ
+		strTexture = DataDir + L"GameOver\\OverWhite.png";
+		App::GetApp()->RegisterTexture(L"OVERWHITE_TX", strTexture);
+		//Abe20170529
+
+		//Abe20170530
+		//ノイズ
+		strTexture = DataDir + L"GameOver\\Noise1.png";
+		App::GetApp()->RegisterTexture(L"OVERNOISE_TX", strTexture);
+		//ゲームオーバーロゴ
+		strTexture = DataDir + L"GameOver\\GameOverLogo.png";
+		App::GetApp()->RegisterTexture(L"OVERLOGO_TX", strTexture);
+
+		//リトライロゴ
+		strTexture = DataDir + L"GameOver\\RetryLogo.png";
+		App::GetApp()->RegisterTexture(L"OVERRETRYLOGO_TX", strTexture);
+		//ステージセレクトロゴ
+		strTexture = DataDir + L"GameOver\\StageSelectLogo.png";
+		App::GetApp()->RegisterTexture(L"OVERSTASELELOGO_TX", strTexture);
+		//タイトルロゴ
+		strTexture = DataDir + L"GameOver\\TitleLogo.png";
+		App::GetApp()->RegisterTexture(L"OVERTITLELOGO_TX", strTexture);
+
+
+		//爆発音
+		wstring  strMOver = App::GetApp()->m_wstrRelativeDataPath + L"GameOver\\BombSE.wav";
+		App::GetApp()->RegisterWav(L"OverBombSE", strMOver);
+		//ノイズ音
+		strMOver = App::GetApp()->m_wstrRelativeDataPath + L"GameOver\\NoiseSE.wav";
+		App::GetApp()->RegisterWav(L"OverNoiseSE", strMOver);
+
+		//Abe20170530
+
+		//ゲームオーバー---------------------------------------
+		//Abe20170529
+
 
 		//Abe20170519
 		//エネミーカウントのスラッシュ
@@ -205,7 +246,14 @@ namespace basecross {
 		//App::GetApp()->RegisterWav(L"PrayerDie_SE", strMusic); 
 		
 
-
+		//Abe20170530
+		//選択音
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\CursorMove.wav";
+		App::GetApp()->RegisterWav(L"CURSORMOVE_SE", strMusic);
+		//決定音
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Decide.wav";
+		App::GetApp()->RegisterWav(L"DECIDE_SE", strMusic);
+		//Abe20170530
 	}
 	
 }
