@@ -484,6 +484,9 @@ namespace basecross
 
 		//起動、止まってれば再起動される。引数は座標
 		void SetPosActive(Vector3);
+
+		//レイヤー設定
+		void SetLayer(int num) { SetDrawLayer(num); }
 	};
 
 	//************************************

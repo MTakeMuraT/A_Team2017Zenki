@@ -1382,6 +1382,8 @@ namespace basecross
 			{
 				auto Drawn = GetStage()->AddGameObject<SearchDrawn>();
 				m_Drawns.push_back(Drawn);
+
+				GetStage()->GetSharedObjectGroup(L"SearchChildGroup")->IntoGroup(Drawn);
 			}
 		}
 

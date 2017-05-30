@@ -86,12 +86,13 @@ namespace basecross {
 	}
 	void Player::OnUpdate() {
 		ChangeAnima();
-		PlayerDieEffect();
+		//PlayerDieEffect();
 		
 	}
 
 	//プレイヤーが死ぬときのエフェクト
 	void Player::PlayerDieEffect() {
+		
 		auto PtrDraw = GetComponent<PNTBoneModelDraw>();
 		auto PlayerLifePtr = GetStage()->GetSharedGameObject<Player_Life>(L"Life", false);
 		if (PlayerLifePtr) {

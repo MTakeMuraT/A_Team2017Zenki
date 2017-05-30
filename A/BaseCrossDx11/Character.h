@@ -760,5 +760,96 @@ namespace basecross{
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 	};
+
+	//Abe20170529
+	//--------------------------------------------------------------------------------------
+	//	ゲームオーバー処理
+	//--------------------------------------------------------------------------------------
+	class GameOverS : public GameObject
+	{
+	private:
+		//状態
+		int m_State = 0;
+
+		//暗転幕
+		shared_ptr<GameObject> m_Black;
+		//透明度
+		float m_BlackAlpha = 0;
+		//上の白い版
+		shared_ptr<GameObject> m_White;
+
+		//計算用時間
+		float m_time = 0;
+
+		//プレイヤーの目的座標
+		Vector3 m_TargetPos1;
+		Vector3 m_TargetPos2;
+
+		//2
+		//落とす処理用速度
+		float m_Grav1;
+		float m_Grav2;
+		float m_BombTime = 1.0f;
+
+		//3
+		//爆発音
+		shared_ptr<MultiAudioObject> m_CreateSe;
+
+		//4
+		//ノイズ画像
+		shared_ptr<GameObject> m_Noise;
+		//ノイズの音
+		shared_ptr<MultiAudioObject> m_NoiseSe;
+		//なったか
+		bool m_NoiseSeFlg = false;
+		//クロ暗転
+		shared_ptr<GameObject> m_BlackSprite;
+
+		//6
+		//ゲームオーバーロゴ
+		shared_ptr<GameObject> m_GameOverLogo;
+
+		//7
+		//リトライロゴ
+		shared_ptr<GameObject> m_OverRetryLogo;
+		//ステセレロゴ
+		shared_ptr<GameObject> m_OverStageSelectLogo;
+		//タイトルロゴ
+		shared_ptr<GameObject> m_OverTitleLogo;
+
+		//選択肢の大きさ
+		Vector3 m_LogoSSize = Vector3(300, 100, 1);
+
+		//選択番号 0 リトライ 1 ステセレ 2 タイトル
+		int m_SelectNum = 0;
+
+		//カーソル
+		shared_ptr<GameObject> m_Cursor;
+		//動かせるか
+		bool m_MoveFlg = true;
+		
+		//選択音
+		shared_ptr<MultiAudioObject> m_SelectSe;
+
+
+		//8
+		//暗転幕
+		shared_ptr<GameObject> m_BlackLast;
+		//決定音
+		shared_ptr<MultiAudioObject> m_KetteiSe;
+
+
+		//プレイヤーのアクセサー
+		shared_ptr<GameObject> m_Player1;
+		shared_ptr<GameObject> m_Player2;
+
+	public :
+		GameOverS(const shared_ptr<Stage>& StagePtr) :GameObject(StagePtr) {};
+
+		void OnCreate() override;
+		void OnUpdate() override;
+	};
+	//Abe20170529
+
 }
 //end basecross

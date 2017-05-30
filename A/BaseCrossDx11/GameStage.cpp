@@ -82,7 +82,7 @@ namespace basecross
 			wstring(L"PlayerR")
 			);
 		auto PtrPlayerManager = AddGameObject<PlayerManager>();
-		SetSharedGameObject(L"PtrPlayerManager", false);
+		SetSharedGameObject(L"PtrPlayerManager",PtrPlayerManager);
 		SetSharedGameObject(L"GamePlayer_R", PtrPlayer_R);
 		auto PtrPlayerCenter = AddGameObject<PlayerCenter>();
 		SetSharedGameObject(L"PlayerCenter", PtrPlayerCenter);
@@ -127,6 +127,9 @@ namespace basecross
 	{
 		auto Ti = AddGameObject<Timer>(0, Vector2(50, 300), Vector2(100, 100), 5);
 		SetSharedGameObject(L"Timer", Ti);
+
+		//動くグループに追加
+		GetSharedObjectGroup(L"UgokuGroup")->IntoGroup(Ti);
 	}
 	//タイマー作成------------------------------------------
 	//ライフ作成--------------------------------------------
@@ -162,6 +165,17 @@ namespace basecross
 			//m_AudioObjectPtr->AddAudioResource(L"GameStage_01_BGM");
 			//m_AudioObjectPtr->Start(L"GameStage_01_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);
 			
+			//グループ類作成
+			auto TereportGroup = CreateSharedObjectGroup(L"TereportPointGroup");
+			auto BomGroup = CreateSharedObjectGroup(L"BombGroup");
+			auto EnemyGroup = CreateSharedObjectGroup(L"EnemyGroup");
+			auto CollisionGroup = CreateSharedObjectGroup(L"CollisionGroup");
+			//Abe20170529
+			//子機グループ
+			CreateSharedObjectGroup(L"SearchChildGroup");
+			CreateSharedObjectGroup(L"UgokuGroup");
+			//Abe20170529
+
 			//ビューとライトの作成
 			CreateViewLight();
 			CreatePlate();
@@ -183,10 +197,6 @@ namespace basecross
 
 			//アタリ判定作成
 			CreateCollision();
-			auto TereportGroup = CreateSharedObjectGroup(L"TereportPointGroup");
-			auto BomGroup = CreateSharedObjectGroup(L"BombGroup");
-			auto EnemyGroup = CreateSharedObjectGroup(L"EnemyGroup");
-			auto CollisionGroup = CreateSharedObjectGroup(L"CollisionGroup");
 
 			//2017/05/17今泉CSV//
 			AddGameObject<InputCSV>();
@@ -226,8 +236,11 @@ namespace basecross
 
 		}
 
-		//カメラ更新
-		UpdateCamera();
+		if (m_CameraMoveFlg)
+		{
+			//カメラ更新
+			UpdateCamera();
+		}
 	}
 
 	//カメラ更新
@@ -271,6 +284,49 @@ namespace basecross
 	GameStage::~GameStage() {
 		//m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
 	}
+
+	//Abe20170529
+	//ゲームオーバー処理
+	void GameStage::GameOver()
+	{
+		AddGameObject<GameOverS>();
+	}
+	//Abe20170529
+
+	//Abe20170530
+	//ゲームオーバー処理
+	bool GameStage::GameOverCamera()
+	{
+		auto View = GetView();
+		auto CameraP = View->GetTargetCamera();
+		//座標
+		Vector3 Pos = CameraP->GetEye();
+		//見る部分
+		Vector3 At = CameraP->GetAt();
+
+		//移動
+		Vector3 targetpos = Vector3(0, 15, -5);
+		Vector3 dis = targetpos - Pos;
+		dis /= 10;
+		Pos += dis;
+
+		At = Pos + Vector3(0, -5, 5);
+
+		//カメラ移動
+		CameraP->SetEye(Pos);
+		CameraP->SetAt(At);
+
+		if (abs(targetpos.x - Pos.x) + abs(targetpos.y - Pos.y) + abs(targetpos.z - Pos.z) < 0.1f)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	//Abe20170530
+
 
 	//////////////////////////////////////////////////////////////////
 	// class Ground_GameStage : public GameObject

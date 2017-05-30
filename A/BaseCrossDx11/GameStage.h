@@ -49,6 +49,10 @@ namespace basecross
 		//Abe20170519MukkuMarge
 
 
+		//Abe20170530
+		bool m_CameraMoveFlg = true;
+		//Abe20170530
+
 	public:
 		//構築と破棄
 		GameStage() :Stage() {}
@@ -60,7 +64,14 @@ namespace basecross
 		// 更新
 		virtual void OnUpdate() override;
 
+		//ゲームオーバー
+		void GameOver();
 
+		//ゲームオーバーカメラ処理
+		bool GameOverCamera();
+		
+		//カメラ移動停止
+		void CameraStop() { m_CameraMoveFlg = false; }
 	};
 
 	//地面
@@ -83,6 +94,7 @@ namespace basecross
 		virtual ~Ground_GameStage() {};
 
 		virtual void OnCreate() override;
+
 	};
 
 
