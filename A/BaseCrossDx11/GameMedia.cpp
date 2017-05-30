@@ -175,7 +175,7 @@ namespace basecross {
 		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Enemy\\Missile\\Missile.bmf");
 		App::GetApp()->RegisterResource(L"Missile_Model", MadelMesh); 
 		//”wŒiMOD
-		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"GameStage\\Background\\Shild_big_1.bmf");
+		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"GameStage\\Background\\Background_Effect.bmf");
 		App::GetApp()->RegisterResource(L"Background_Model", MadelMesh);
 
 		//ŒŸØ‚·‚é‚Ì‚Éd‚¢‚Ì‚Åˆê“I‚ÉÁ‚µ‚Ü‚· Abe20170505

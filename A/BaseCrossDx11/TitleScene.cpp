@@ -42,11 +42,11 @@ namespace basecross {
 
 	void TitleScene::OnCreate() {
 		try {
-			/*//検証するのに重いので一時的に消します Abe20170505
-			m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
-			m_AudioObjectPtr->AddAudioResource(L"Title_01_BGM");
-			m_AudioObjectPtr->Start(L"Title_01_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);
-			*/
+			////検証するのに重いので一時的に消します Abe20170505
+			//m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
+			//m_AudioObjectPtr->AddAudioResource(L"Title_01_BGM");
+			//m_AudioObjectPtr->Start(L"Title_01_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);
+			
 
 			//ビューとライトの作成
 			CreateViewLight();

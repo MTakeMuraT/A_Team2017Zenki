@@ -48,9 +48,9 @@ namespace basecross {
 				Util::WStrToTokenVector(Tokens, v, L',');
 				//各値がそろったのでオブジェクト作成
 				auto PtrTackleEnemy = GetStage()->AddGameObject<TackleEnemy>(
-					SinglePos(Tokens), MultiScale(Tokens, Tokens2), MultiHP(Tokens, Tokens2),
-					MultiSearch(Tokens, Tokens2), MultiCoolTime(Tokens, Tokens2), MultiSpeed(Tokens, Tokens2),
-					MultiAttackPower(Tokens, Tokens2), MultiAttackTimes(Tokens, Tokens2));
+					SinglePos(Tokens),BranchScale(Tokens, Tokens2), BranchHP(Tokens, Tokens2),
+					BranchSearch(Tokens, Tokens2), BranchCoolTime(Tokens, Tokens2), BranchSpeed(Tokens, Tokens2),
+					BranchAttackPower(Tokens, Tokens2), BranchAttackTimes(Tokens, Tokens2));
 				//グループに入れる
 				PtrEnemyGroup->IntoGroup(PtrTackleEnemy);
 				PtrCollisionGroup->IntoGroup(PtrTackleEnemy);
@@ -71,9 +71,9 @@ namespace basecross {
 				vector<wstring> Tokens2;
 
 				//各値がそろったのでオブジェクト作成       位置、大きさ、HP、索敵距離、クールタイム、攻撃力、子機発射間隔、発射数
-				auto PtrShotEnemy = GetStage()->AddGameObject<ShotEnemy>(SinglePos(Tokens), MultiScale(Tokens, Tokens2),
-					MultiHP(Tokens, Tokens2), MultiSearch(Tokens, Tokens2), MultiShotCoolTime(Tokens, Tokens2),
-					MultiAttackPower(Tokens, Tokens2), SingleChildDrop(Tokens), SingleShotBullet(Tokens));
+				auto PtrShotEnemy = GetStage()->AddGameObject<ShotEnemy>(SinglePos(Tokens),BranchScale(Tokens, Tokens2),
+					BranchHP(Tokens, Tokens2), BranchSearch(Tokens, Tokens2), BranchShotCoolTime(Tokens, Tokens2),
+					BranchAttackPower(Tokens, Tokens2), BranchChildDrop(Tokens,Tokens2), BranchShotBullet(Tokens,Tokens2));
 				PtrEnemyGroup->IntoGroup(PtrShotEnemy);
 				PtrCollisionGroup->IntoGroup(PtrShotEnemy);
 				m_Pos = Vector3(0, 0, 0); m_Scale = 0; m_HP = 0; m_Search = 0; m_ShotCoolTime = 0;  m_AttackPower = 0; m_ChildDrop = 0; m_ShotBullet = 0;
@@ -96,8 +96,8 @@ namespace basecross {
 				//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 				PtrTereportGroup->IntoGroup(A);       // 位置、大きさ、HP、索敵距離、クールタイムM、索敵型子機発射S
 				auto PtrTeleportEnemy = GetStage()->AddGameObject<TeleportEnemy>(
-					SinglePos(Tokens), SingleScale(Tokens), SingleHP(Tokens),
-					MultiSearch(Tokens, Tokens2), MultiCoolTime(Tokens, Tokens2), SingleChildSearch(Tokens)
+					SinglePos(Tokens), BranchScale(Tokens,Tokens2), BranchHP(Tokens,Tokens2),
+					BranchSearch(Tokens, Tokens2), BranchCoolTime(Tokens, Tokens2), MultiChildSearch(Tokens)
 					);
 				PtrEnemyGroup->IntoGroup(PtrTeleportEnemy);
 				PtrCollisionGroup->IntoGroup(PtrTeleportEnemy);
@@ -117,8 +117,8 @@ namespace basecross {
 				Util::WStrToTokenVector(Tokens, v, L',');
 				//各値がそろったのでオブジェクト作成　位置s　大きさs　HPs　索敵m　スピードm　攻撃力m
 				auto PtrBombEnemy = GetStage()->AddGameObject<BombEnemy>(
-					SinglePos(Tokens), SingleScale(Tokens), SingleHP(Tokens),
-					MultiSearch(Tokens, Tokens2), MultiSpeed(Tokens, Tokens2), MultiAttackPower(Tokens, Tokens2));
+					SinglePos(Tokens), BranchScale(Tokens,Tokens2), BranchHP(Tokens,Tokens2),
+					BranchSearch(Tokens, Tokens2), BranchSpeed(Tokens, Tokens2), BranchAttackPower(Tokens, Tokens2));
 				PtrEnemyGroup->IntoGroup(PtrBombEnemy);
 				PtrCollisionGroup->IntoGroup(PtrBombEnemy);
 				m_Pos = Vector3(0, 0, 0); m_Scale = 0; m_HP = 0; m_Search = 0; m_Speed = 0; m_AttackPower = 0;
@@ -127,6 +127,7 @@ namespace basecross {
 			GetStage()->AddGameObject<BackgroundModel>(Vector3(0, 0, 0), Vector3(5, 5, 5), 1);
 			GetStage()->AddGameObject<BackgroundModel>(Vector3(0, 0, 0), Vector3(7, 7, 7), 2);
 	}
+#pragma region EnemysSet
 	//位置
 	Vector3 InputCSV::SinglePos(vector<wstring> Tokens) {
 		//トークン（カラム）の配列
@@ -137,13 +138,7 @@ namespace basecross {
 		 return m_Pos;
 	}
 	//スケール
-	int InputCSV::SingleScale(vector<wstring> Tokens) {
-		m_Scale = (float)_wtof(Tokens[4].c_str());
-		return m_Scale;
-	}
-	int InputCSV::MultiScale(vector<wstring> Tokens, vector<wstring> Tokens2) {
-		auto TowValue_Str = Tokens[4].c_str();
-		Util::WStrToTokenVector(Tokens2, TowValue_Str, L':');
+	int InputCSV::MultiScale(vector<wstring> Tokens2) {
 		int m_Min = (float)_wtof(Tokens2[0].c_str());
 		int m_Max = (float)_wtof(Tokens2[1].c_str());
 		 m_Scale = Random((int)m_Min, (int)m_Max);
@@ -151,13 +146,8 @@ namespace basecross {
 		return m_Scale;
 	}
 	//HP
-	int InputCSV::SingleHP(vector<wstring> Tokens) {
-		m_HP = (float)_wtof(Tokens[5].c_str());
-		return m_HP;
-	}
-	int InputCSV::MultiHP(vector<wstring> Tokens, vector<wstring> Tokens2) {
-		auto TowValue_Str = Tokens[5].c_str();
-		Util::WStrToTokenVector(Tokens2, TowValue_Str, L':');
+	
+	int InputCSV::MultiHP(vector<wstring> Tokens2) {
 		int m_Min = (float)_wtof(Tokens2[0].c_str());
 		int m_Max = (float)_wtof(Tokens2[1].c_str());
 		 m_HP = Random((int)m_Min, (int)m_Max);
@@ -165,13 +155,7 @@ namespace basecross {
 		return m_HP;
 	}
 	//索敵範囲
-	int InputCSV::SingleSearch(vector<wstring> Tokens) {
-		m_Search = (float)_wtof(Tokens[6].c_str());
-		return m_Search;
-	}
-	int InputCSV::MultiSearch(vector<wstring> Tokens, vector<wstring> Tokens2) {
-		auto TowValue_Str = Tokens[6].c_str();
-		Util::WStrToTokenVector(Tokens2, TowValue_Str, L':');
+	int InputCSV::MultiSearch( vector<wstring> Tokens2) {
 		int m_Min = (float)_wtof(Tokens2[0].c_str());
 		int m_Max = (float)_wtof(Tokens2[1].c_str());
 		 m_Search = Random((int)m_Min, (int)m_Max);
@@ -179,13 +163,8 @@ namespace basecross {
 		return m_Search;
 	}
 	//クールタイム
-	int InputCSV::SingleCoolTime(vector<wstring> Tokens) {
-		m_CoolTime = (float)_wtof(Tokens[7].c_str());
-		return m_CoolTime;
-	}
-	int InputCSV::MultiCoolTime(vector<wstring> Tokens, vector<wstring> Tokens2) {
-		auto TowValue_Str = Tokens[7].c_str();
-		Util::WStrToTokenVector(Tokens2, TowValue_Str, L':');
+	
+	int InputCSV::MultiCoolTime( vector<wstring> Tokens2) {
 		int m_Min = (float)_wtof(Tokens2[0].c_str());
 		int m_Max = (float)_wtof(Tokens2[1].c_str());
 		 m_CoolTime = Random((int)m_Min, (int)m_Max);
@@ -193,27 +172,14 @@ namespace basecross {
 		return m_CoolTime;
 	}
 	//ショットクールタイム
-	int InputCSV::SingleShotCoolTime(vector<wstring> Tokens) {
-		m_ShotCoolTime = (float)_wtof(Tokens[7].c_str());
-		return m_ShotCoolTime;
-	}
-	int InputCSV::MultiShotCoolTime(vector<wstring> Tokens, vector<wstring> Tokens2) {
-		auto TowValue_Str = Tokens[7].c_str();
-		Util::WStrToTokenVector(Tokens2, TowValue_Str, L':');
+	int InputCSV::MultiShotCoolTime( vector<wstring> Tokens2) {
 		int m_Min = (float)_wtof(Tokens2[0].c_str());
 		int m_Max = (float)_wtof(Tokens2[1].c_str());
 		m_ShotCoolTime = Random((int)m_Min, (int)m_Max);
 		Tokens2.clear();
 		return m_ShotCoolTime;
 	}
-	//スピード
-	int InputCSV::SingleSpeed(vector<wstring> Tokens) {
-		m_Speed = (float)_wtof(Tokens[7].c_str());
-		return m_Speed;
-	}
-	int InputCSV::MultiSpeed(vector<wstring> Tokens, vector<wstring> Tokens2) {
-		auto TowValue_Str = Tokens[8].c_str();
-		Util::WStrToTokenVector(Tokens2, TowValue_Str, L':');
+	int InputCSV::MultiSpeed(vector<wstring> Tokens2) {
 		int m_Min = (float)_wtof(Tokens2[0].c_str());
 		int m_Max = (float)_wtof(Tokens2[1].c_str());
 		m_Speed = Random((int)m_Min, (int)m_Max);
@@ -221,13 +187,7 @@ namespace basecross {
 		return m_Speed;
 	}
 	//攻撃力
-	int InputCSV::SingleAttackPower(vector<wstring> Tokens) {
-		m_AttackPower = (float)_wtof(Tokens[9].c_str());
-		return m_AttackPower;
-	}
-	int InputCSV::MultiAttackPower(vector<wstring> Tokens, vector<wstring> Tokens2) {
-		auto TowValue_Str = Tokens[9].c_str();
-		Util::WStrToTokenVector(Tokens2, TowValue_Str, L':');
+	int InputCSV::MultiAttackPower(vector<wstring> Tokens2) {
 		int m_Min = (float)_wtof(Tokens2[0].c_str());
 		int m_Max = (float)_wtof(Tokens2[1].c_str());
 		m_AttackPower = Random((int)m_Min, (int)m_Max);
@@ -235,13 +195,7 @@ namespace basecross {
 		return m_AttackPower;
 	}
 	//突撃回数
-	int InputCSV::SingleAttackTimes(vector<wstring> Tokens) {
-		m_AttackTimes = (float)_wtof(Tokens[10].c_str());
-		return m_AttackTimes;
-	}
-	int InputCSV::MultiAttackTimes(vector<wstring> Tokens, vector<wstring> Tokens2) {
-		auto TowValue_Str = Tokens[10].c_str();
-		Util::WStrToTokenVector(Tokens2, TowValue_Str, L':');
+	int InputCSV::MultiAttackTimes(vector<wstring> Tokens2) {
 		int m_Min = (float)_wtof(Tokens2[0].c_str());
 		int m_Max = (float)_wtof(Tokens2[1].c_str());
 		m_AttackTimes = Random((int)m_Min, (int)m_Max);
@@ -249,13 +203,7 @@ namespace basecross {
 		return m_AttackTimes;
 	}
 	//子機発射間隔
-	int InputCSV::SingleChildDrop(vector<wstring> Tokens) {
-		m_ChildDrop = (float)_wtof(Tokens[11].c_str());
-		return m_ChildDrop;
-	}
-	int InputCSV::MultiChildDrop(vector<wstring> Tokens, vector<wstring> Tokens2) {
-		auto TowValue_Str = Tokens[11].c_str();
-		Util::WStrToTokenVector(Tokens2, TowValue_Str, L':');
+	int InputCSV::MultiChildDrop(vector<wstring> Tokens2) {
 		int m_Min = (float)_wtof(Tokens2[0].c_str());
 		int m_Max = (float)_wtof(Tokens2[1].c_str());
 		m_ChildDrop = Random((int)m_Min, (int)m_Max);
@@ -263,13 +211,7 @@ namespace basecross {
 		return m_ChildDrop;
 	}
 	//索敵型子機の発射間隔  TeleportEnemyのCSV列の12に「索敵型子機」を記述
-	int InputCSV::SingleChildSearch(vector<wstring> Tokens) {
-		m_ChildSearch = (float)_wtof(Tokens[12].c_str());
-		return m_ChildSearch;
-	}
-	int InputCSV::MultiChildSearch(vector<wstring> Tokens, vector<wstring> Tokens2) {
-		auto TowValue_Str = Tokens[12].c_str();
-		Util::WStrToTokenVector(Tokens2, TowValue_Str, L':');
+	int InputCSV::MultiChildSearch(vector<wstring> Tokens2) {
 		int m_Min = (float)_wtof(Tokens2[0].c_str());
 		int m_Max = (float)_wtof(Tokens2[1].c_str());
 		m_ChildSearch = Random((int)m_Min, (int)m_Max);
@@ -277,13 +219,7 @@ namespace basecross {
 		return m_ChildSearch;
 	}
 	//発射数（一回で発射される弾の数  ShotEnemyのCSV列の12に「発射数」を記述
-	int InputCSV::SingleShotBullet(vector<wstring> Tokens) {
-		m_ShotBullet = (float)_wtof(Tokens[12].c_str());
-		return m_ShotBullet;
-	}
-	int InputCSV::MultiShotBullet(vector<wstring> Tokens, vector<wstring> Tokens2) {
-		auto TowValue_Str = Tokens[12].c_str();
-		Util::WStrToTokenVector(Tokens2, TowValue_Str, L':');
+	int InputCSV::MultiShotBullet(vector<wstring> Tokens2) {
 		int m_Min = (float)_wtof(Tokens2[0].c_str());
 		int m_Max = (float)_wtof(Tokens2[1].c_str());
 		m_ShotBullet = Random((int)m_Min, (int)m_Max);
@@ -299,6 +235,131 @@ namespace basecross {
 		m_RnadNum = RandNum + Min;
 		return m_RnadNum;
 	}
+#pragma endregion
 
+#pragma region EnemysSetBranch
+	//スケール
+	int InputCSV::BranchScale(vector<wstring> Tokens,vector<wstring> Tokens2) {
+		auto TowValue_Str = Tokens[4].c_str();
+		Util::WStrToTokenVector(Tokens2, TowValue_Str, L':');
+		if (Tokens2.size() == 2) {
+		return	MultiScale(Tokens2);
+		}
+		else {
+		return (float)_wtof(TowValue_Str);
+		}
+	}
+	//HP
+	int InputCSV::BranchHP(vector<wstring> Tokens, vector<wstring> Tokens2) {
+		auto TowValue_Str = Tokens[5].c_str();
+		Util::WStrToTokenVector(Tokens2, TowValue_Str, L':');
+		if (Tokens2.size() == 2) {
+			return	MultiHP(Tokens2);
+		}
+		else {
+			return (float)_wtof(TowValue_Str);
+		}
+	}
+	//索敵範囲
+	int InputCSV::BranchSearch(vector<wstring> Tokens, vector<wstring> Tokens2) {
+		auto TowValue_Str = Tokens[6].c_str();
+		Util::WStrToTokenVector(Tokens2, TowValue_Str, L':');
+		if (Tokens2.size() == 2) {
+			return	MultiSearch(Tokens2);
+		}
+		else {
+			return (float)_wtof(TowValue_Str);
+		}
+	}
+	//クールタイム
+	int InputCSV::BranchCoolTime(vector<wstring> Tokens, vector<wstring> Tokens2) {
+		auto TowValue_Str = Tokens[7].c_str();
+		Util::WStrToTokenVector(Tokens2, TowValue_Str, L':');
+		if (Tokens2.size() == 2) {
+			return	MultiCoolTime(Tokens2);
+		}
+		else {
+			return (float)_wtof(TowValue_Str);
+		}
+	}
+	//ショットクールタイム
+	int InputCSV::BranchShotCoolTime(vector<wstring> Tokens, vector<wstring> Tokens2) {
+		auto TowValue_Str = Tokens[7].c_str();
+		Util::WStrToTokenVector(Tokens2, TowValue_Str, L':');
+		if (Tokens2.size() == 2) {
+			return	MultiShotCoolTime(Tokens2);
+		}
+		else {
+			return (float)_wtof(TowValue_Str);
+		}
+	}
+	//スピード
+	int InputCSV::BranchSpeed(vector<wstring> Tokens, vector<wstring> Tokens2) {
+		auto TowValue_Str = Tokens[8].c_str();
+		Util::WStrToTokenVector(Tokens2, TowValue_Str, L':');
+		if (Tokens2.size() == 2) {
+			return	MultiSpeed(Tokens2);
+		}
+		else {
+			return (float)_wtof(TowValue_Str);
+		}
+	}
+	//攻撃力
+	int InputCSV::BranchAttackPower(vector<wstring> Tokens, vector<wstring> Tokens2) {
+		auto TowValue_Str = Tokens[9].c_str();
+		Util::WStrToTokenVector(Tokens2, TowValue_Str, L':');
+		if (Tokens2.size() == 2) {
+			return	MultiAttackPower(Tokens2);
+		}
+		else {
+			return (float)_wtof(TowValue_Str);
+		}
+	}
+	//突撃回数
+	int InputCSV::BranchAttackTimes(vector<wstring> Tokens, vector<wstring> Tokens2) {
+		auto TowValue_Str = Tokens[10].c_str();
+		Util::WStrToTokenVector(Tokens2, TowValue_Str, L':');
+		if (Tokens2.size() == 2) {
+			return	MultiAttackTimes(Tokens2);
+		}
+		else {
+			return (float)_wtof(TowValue_Str);
+		}
+	}
+	//子機発射間隔
+	int InputCSV::BranchChildDrop(vector<wstring> Tokens, vector<wstring> Tokens2) {
+		auto TowValue_Str = Tokens[11].c_str();
+		Util::WStrToTokenVector(Tokens2, TowValue_Str, L':');
+		if (Tokens2.size() == 2) {
+			return	MultiChildDrop(Tokens2);
+		}
+		else {
+			return (float)_wtof(TowValue_Str);
+		}
+	}
+	//索敵型子機の発射間隔
+	int InputCSV::BranchChildSearch(vector<wstring> Tokens, vector<wstring> Tokens2) {
+		auto TowValue_Str = Tokens[12].c_str();
+		Util::WStrToTokenVector(Tokens2, TowValue_Str, L':');
+		if (Tokens2.size() == 2) {
+			return	MultiChildSearch(Tokens2);
+		}
+		else {
+			return (float)_wtof(TowValue_Str);
+		}
+	}
+	//発射数
+	int InputCSV::BranchShotBullet(vector<wstring> Tokens, vector<wstring> Tokens2) {
+		auto TowValue_Str = Tokens[12].c_str();
+		Util::WStrToTokenVector(Tokens2, TowValue_Str, L':');
+		if (Tokens2.size() == 2) {
+			return	MultiShotBullet(Tokens2);
+		}
+		else {
+			return (float)_wtof(TowValue_Str);
+		}
+	}
+
+#pragma endregion
 
 }
