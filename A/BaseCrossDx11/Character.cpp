@@ -1990,7 +1990,7 @@ namespace basecross {
 	{}
 	void BackgroundModel::OnCreate() {
 		auto Trans = AddComponent<Transform>();
-		Trans->SetScale(m_Scale);
+		Trans->SetScale(m_Scale * 1.5);
 
 		//描画コンポーネントの設定
 		auto PtrDraw = AddComponent<PNTStaticModelDraw>();
@@ -2000,13 +2000,13 @@ namespace basecross {
 		if (m_LayerNum == 1) {
 			Trans->SetPosition(m_Pos);
 			Trans->SetRotation(0, 50, 0);
-			SetDrawLayer(1);
+			SetDrawLayer(3);
 			SetAlphaActive(true);
 		}
 		else {
 			Trans->SetPosition(m_Pos);
 			Trans->SetRotation(0, 0, 0);
-			SetDrawLayer(0);
+			SetDrawLayer(2);
 			SetAlphaActive(true);
 		}
 	}
