@@ -1260,7 +1260,7 @@ namespace basecross
 			);
 
 		//見た目
-		auto Draw = AddComponent<PNTStaticModelDraw>();
+		auto Draw = AddComponent<PNTBoneModelDraw>();
 		//メッシュ設定
 		Draw->SetMeshResource(L"TELEPORT_MODEL");
 		//モデル大きさ調整
@@ -2207,7 +2207,7 @@ namespace basecross
 			);
 
 		//見た目
-		auto Draw = AddComponent<PNTStaticModelDraw>();
+		auto Draw = AddComponent<PNTBoneModelDraw>();
 		//メッシュ設定
 		Draw->SetMeshResource(L"BOMB_MODEL");
 		//モデル大きさ調整
