@@ -214,7 +214,10 @@ namespace basecross {
 		auto KeylVec = App::GetApp()->GetInputDevice().GetKeyState();
 		if (KeylVec.m_bPressedKeyTbl['A']) {
 			auto ScenePtr = App::GetApp()->GetScene<Scene>();
-
+			//ステージ番号を仮で１にしておく
+			ScenePtr->SetStageNumAndStageSize(1, Vector2(50, 50));
+			//なんかようわからんがバグ回避
+			ScenePtr->SetCsvStageNum(L"1");
 			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToGameStage");
 		}
 
