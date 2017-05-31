@@ -97,7 +97,7 @@ namespace basecross {
 				PtrTereportGroup->IntoGroup(A);       // 位置、大きさ、HP、索敵距離、クールタイムM、索敵型子機発射S
 				auto PtrTeleportEnemy = GetStage()->AddGameObject<TeleportEnemy>(
 					SinglePos(Tokens), BranchScale(Tokens,Tokens2), BranchHP(Tokens,Tokens2),
-					BranchSearch(Tokens, Tokens2), BranchCoolTime(Tokens, Tokens2), MultiChildSearch(Tokens)
+					BranchSearch(Tokens, Tokens2), BranchCoolTime(Tokens, Tokens2), BranchChildSearch(Tokens, Tokens2)
 					);
 				PtrEnemyGroup->IntoGroup(PtrTeleportEnemy);
 				PtrCollisionGroup->IntoGroup(PtrTeleportEnemy);
