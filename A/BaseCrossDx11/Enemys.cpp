@@ -2101,7 +2101,7 @@ namespace basecross
 	//	拡縮だけでいいかな？
 	//************************************************************************
 	BombEffect::BombEffect(const shared_ptr<Stage>& StagePtr):
-		GameObject(StagePtr)
+		SS5ssae(StagePtr, App::GetApp()->m_wstrDataPath + L"SS\\EASY_animation\\", L"EASY.ssae", L"anime_1")
 	{}
 
 	void BombEffect::OnCreate()
@@ -2109,11 +2109,29 @@ namespace basecross
 		auto Trans = AddComponent<Transform>();
 		Trans->SetPosition(0,0,0);
 		Trans->SetScale(1, 1, 1);
-		Trans->SetRotation(0, 0, 45 * 3.14159265f / 180);
+		Trans->SetRotation(45*3.14159265f/180, 0, 0);
 
+		//アニメーション関連
+		Matrix4X4 mat;
+		mat.DefTransformation(
+			Vector3(0.07f, 0.07f, 0.07f),
+			Vector3(0, 0, 0),
+			Vector3(0.0f, 0.0f, 0.0f)
+			);
+		SetToAnimeMatrix(mat);
+
+		//親クラスのCreate
+		SS5ssae::OnCreate();
+		//秒あたりのフレーム数
+		SetFps(60.0f);
+		//ループ有効
+		SetLooped(true);
+
+		/*
 		auto Draw = AddComponent<PNTStaticDraw>();
 		Draw->SetMeshResource(L"DEFAULT_SQUARE");
 		Draw->SetTextureResource(L"BOMBEFFECT_TX");
+		*/
 		//透明処理
 		SetAlphaActive(true);
 		SetDrawActive(false);
@@ -2123,6 +2141,9 @@ namespace basecross
 	{
 		if (m_ActiveFlg)
 		{
+			//アニメ―ション更新
+			UpdateAnimeTime(App::GetApp()->GetElapsedTime()*2);
+
 			switch (m_State)
 			{
 			case 0:
@@ -2173,6 +2194,9 @@ namespace basecross
 	{
 		m_ActiveFlg = true;
 		SetDrawActive(true);
+
+		//SSアニメ更新
+		ChangeAnimation(L"anime_1");
 
 		GetComponent<Transform>()->SetPosition(pos);
 	}

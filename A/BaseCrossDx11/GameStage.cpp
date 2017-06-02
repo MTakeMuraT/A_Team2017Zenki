@@ -125,7 +125,7 @@ namespace basecross
 	//タイマー作成------------------------------------------
 	void GameStage::CreateTimer()
 	{
-		auto Ti = AddGameObject<Timer>(0, Vector2(50, 300), Vector2(100, 100), 5);
+		auto Ti = AddGameObject<Timer>(0, Vector2(35, 300), Vector2(70, 70), 5);
 		SetSharedGameObject(L"Timer", Ti);
 
 		//動くグループに追加

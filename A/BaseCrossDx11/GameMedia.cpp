@@ -27,7 +27,11 @@ namespace basecross {
 		strTexture = DataDir + L"number.png";
 		App::GetApp()->RegisterTexture(L"NUMBER_TX", strTexture);
 
-		
+		//Abe20170602
+		//タイム下地
+		strTexture = DataDir + L"Time_Background.png";
+		App::GetApp()->RegisterTexture(L"TIMEBACK_TX", strTexture);
+		//Abe20170602
 
 		//ゲームステージ画面
 		strTexture = DataDir + L"GameStage\\Background.png";
@@ -134,6 +138,15 @@ namespace basecross {
 		strTexture = DataDir + L"GameOver\\OverWhite.png";
 		App::GetApp()->RegisterTexture(L"OVERWHITE_TX", strTexture);
 		//Abe20170529
+
+		//Abe20170602
+		//オーバーの最後の黒幕
+		strTexture = DataDir + L"GameOver\\OverLastBlack.png";
+		App::GetApp()->RegisterTexture(L"OVERLASTBLACK_TX", strTexture);
+		//オーバーの最後の黒幕
+		strTexture = DataDir + L"GameOver\\GameOver_Cursor.png";
+		App::GetApp()->RegisterTexture(L"OVERCURSOR_TX", strTexture);
+		//Abe20170602
 
 		//Abe20170530
 		//ノイズ

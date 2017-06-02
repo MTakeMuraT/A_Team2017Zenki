@@ -1001,6 +1001,19 @@ namespace basecross {
 		m_Numbers = GetStage()->AddGameObject<NumberSprite>(m_InitTime, m_InitPos, m_InitScale, m_LayerNum);
 		//初期時間入れる
 		m_Time = m_InitTime;
+
+		//タイムの背景
+		auto obj = GetStage()->AddGameObject<GameObject>();
+		auto Trans = obj->AddComponent<Transform>();
+		Trans->SetPosition(0, 300,0);
+		Trans->SetScale(300,150,1);
+		Trans->SetRotation(0, 0, 0);
+
+		auto Draw = obj->AddComponent<PCTSpriteDraw>();
+		Draw->SetTextureResource(L"TIMEBACK_TX");
+
+		obj->SetDrawLayer(m_LayerNum - 1);
+		obj->SetAlphaActive(true);
 	}
 
 	void Timer::OnUpdate()
@@ -2364,7 +2377,7 @@ namespace basecross {
 					Trans2->SetRotation(0, 0, 0);
 
 					auto Draw2 = obj2->AddComponent<PCTSpriteDraw>();
-					Draw2->SetTextureResource(L"OVERBLACK_TX");
+					Draw2->SetTextureResource(L"OVERLASTBLACK_TX");
 					Draw2->SetDiffuse(Color4(1, 1, 1, 0));
 
 					obj2->SetDrawLayer(11);
@@ -2419,8 +2432,8 @@ namespace basecross {
 					//ゲームオーバー文字作成
 					auto obj = GetStage()->AddGameObject<GameObject>();
 					auto Trans = obj->AddComponent<Transform>();
-					Trans->SetPosition(0, 120, 0);
-					Trans->SetScale(800, 100, 1);
+					Trans->SetPosition(0, 30, 0);
+					Trans->SetScale(800, 400, 1);
 					Trans->SetRotation(0, 0, 0);
 
 					auto Draw = obj->AddComponent<PCTSpriteDraw>();
@@ -2455,8 +2468,8 @@ namespace basecross {
 					//リトライ
 					auto obj = GetStage()->AddGameObject<GameObject>();
 					auto Trans = obj->AddComponent<Transform>();
-					Trans->SetPosition(-300, -120, 0);
-					Trans->SetScale(300, 100, 1);
+					Trans->SetPosition(-300, -200, 0);
+					Trans->SetScale(300, 150, 1);
 					Trans->SetRotation(0, 0, 0);
 
 					auto Draw = obj->AddComponent<PCTSpriteDraw>();
@@ -2470,8 +2483,8 @@ namespace basecross {
 					//ステセレ
 					obj = GetStage()->AddGameObject<GameObject>();
 					Trans = obj->AddComponent<Transform>();
-					Trans->SetPosition(0, -120, 0);
-					Trans->SetScale(300, 100, 1);
+					Trans->SetPosition(0, -200, 0);
+					Trans->SetScale(300, 150, 1);
 					Trans->SetRotation(0, 0, 0);
 
 					Draw = obj->AddComponent<PCTSpriteDraw>();
@@ -2485,8 +2498,8 @@ namespace basecross {
 					//タイトル
 					obj = GetStage()->AddGameObject<GameObject>();
 					Trans = obj->AddComponent<Transform>();
-					Trans->SetPosition(300, -120, 0);
-					Trans->SetScale(300, 100, 1);
+					Trans->SetPosition(300, -200, 0);
+					Trans->SetScale(300, 150, 1);
 					Trans->SetRotation(0, 0, 0);
 
 					Draw = obj->AddComponent<PCTSpriteDraw>();
@@ -2501,13 +2514,13 @@ namespace basecross {
 					auto CursorSprite = GetStage()->AddGameObject<GameObject>();
 					//座標
 					auto CTrans = CursorSprite->AddComponent<Transform>();
-					CTrans->SetPosition(-300, -140, 0);
-					CTrans->SetScale(120, 100, 1);
+					CTrans->SetPosition(-300, -240, 0);
+					CTrans->SetScale(180, 100, 1);
 					CTrans->SetRotation(0, 0, 0);
 
 					//描画
 					auto CDraw = CursorSprite->AddComponent<PCTSpriteDraw>();
-					CDraw->SetTextureResource(L"SELECT_CURSOR_TX");
+					CDraw->SetTextureResource(L"OVERCURSOR_TX");
 
 					//レイヤー設定
 					CursorSprite->SetDrawLayer(13);
@@ -2569,16 +2582,16 @@ namespace basecross {
 							switch (m_SelectNum)
 							{
 							case 0:
-								m_Cursor->GetComponent<Transform>()->SetPosition(-300, -140, 0);
-								m_Cursor->GetComponent<Transform>()->SetScale(140, 100, 1);
+								m_Cursor->GetComponent<Transform>()->SetPosition(-300, -240, 0);
+								m_Cursor->GetComponent<Transform>()->SetScale(180, 100, 1);
 								break;
 							case 1:
-								m_Cursor->GetComponent<Transform>()->SetPosition(0, -140, 0);
-								m_Cursor->GetComponent<Transform>()->SetScale(300, 100, 1);
+								m_Cursor->GetComponent<Transform>()->SetPosition(0, -240, 0);
+								m_Cursor->GetComponent<Transform>()->SetScale(250, 100, 1);
 								break;
 							case 2:
-								m_Cursor->GetComponent<Transform>()->SetPosition(300, -140, 0);
-								m_Cursor->GetComponent<Transform>()->SetScale(140, 100, 1);
+								m_Cursor->GetComponent<Transform>()->SetPosition(300, -240, 0);
+								m_Cursor->GetComponent<Transform>()->SetScale(180, 100, 1);
 								break;
 							default:
 								break;
