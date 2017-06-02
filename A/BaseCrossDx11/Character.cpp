@@ -1022,7 +1022,7 @@ namespace basecross {
 		if (!m_TimeStopFlg)
 		{
 			//ŽžŠÔ‰ÁŽZ‚·‚é
-			m_Time += App::GetApp()->GetElapsedTime();
+			m_Time += App::GetApp()->GetElapsedTime()*100;
 			//‚O•bˆÈ‰º‚È‚ç
 			if (m_Time >= 999)
 			{
@@ -3102,9 +3102,13 @@ namespace basecross {
 					m_TimeScoreTotal = 5000;
 				}
 				//‚ ‚Æ‚Í200•b‚Ü‚Å1•b25“_‚Å‰Á“_
-				else
+				else if(m_TimeScoreTotal <= 200)
 				{
 					m_TimeScoreTotal = (200 - m_TimeScoreTotal) * 25;
+				}
+				else
+				{
+					m_TimeScoreTotal = 0;
 				}
 
 				//ƒg[ƒ^ƒ‹ƒXƒRƒAŒvŽZ
