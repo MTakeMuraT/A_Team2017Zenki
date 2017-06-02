@@ -28,6 +28,9 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"NUMBER_TX", strTexture);
 		strTexture = DataDir + L"spark.png";
 		App::GetApp()->RegisterTexture(L"Spark_TX", strTexture);
+		App::GetApp()->RegisterTexture(L"TEST_AO_TX", strTexture);
+		strTexture = DataDir + L"red.png";
+		App::GetApp()->RegisterTexture(L"TEST_Red_TX", strTexture);
 
 		//Abe20170602
 		//ƒ^ƒCƒ€‰º’n
