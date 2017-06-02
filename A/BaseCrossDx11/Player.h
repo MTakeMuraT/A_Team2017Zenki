@@ -112,7 +112,7 @@ namespace basecross {
 		float m_LimitTime = 0;
 		//演出ブーストのflg
 		bool m_RotBoostflg = false;
-
+		bool Testflg = false;
 
 	public:
 
@@ -375,6 +375,34 @@ namespace basecross {
 	//	void CreateParticle();
 
 	//};
+	////--------------------------------------------------------------------------------------
+	////	class PlayerShield : public GameObject;
+	////	用途シールド演出
+	////--------------------------------------------------------------------------------------
+	class PlayerShield : public GameObject
+	{
+	private:
+		Vector3 m_Pos = Vector3(0, 0, 0);
+		Vector3 m_Scele = Vector3(0, 0, 0);
+		float m_Opacity = 0.0f;
+		shared_ptr<GameObject> m_Player;
+		float m_OpacityColor = 1.0f;
+		bool m_Once = true;
+		bool InitHpSaveflg = true;
+		bool m_OnShield = false;
+		//HPの保存
+		int m_HPSave = 0;
+	public:
+		PlayerShield(const shared_ptr<Stage>& StagePtr, const Vector3& Pos ,const Vector3& Scele, shared_ptr<GameObject> Player);
+		~PlayerShield() {};
+
+		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
+	};
+
+
+
+	
 	////--------------------------------------------------------------------------------------
 	////	class PlayerBoost : public GameObject;
 	////	用途:プレイヤーブースト

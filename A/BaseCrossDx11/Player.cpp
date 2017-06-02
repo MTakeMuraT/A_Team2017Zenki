@@ -556,9 +556,11 @@ namespace basecross {
 	void PlayerManager::PlayerbBooth() {
 		auto PlayerL_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false);
 		auto PlayerL_Pos = PlayerL_Ptr->GetComponent<Transform>()->GetPosition();
+		auto PlayerL_Scale = PlayerL_Ptr->GetComponent<Transform>()->GetScale();
 		auto PlayerL_Velo = PlayerL_Ptr->GetComponent<Rigidbody>()->GetVelocity();
 		auto PlayerR_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_R", false);
 		auto PlayerR_Pos = PlayerR_Ptr->GetComponent<Transform>()->GetPosition();
+		auto PlayerR_Scale = PlayerR_Ptr->GetComponent<Transform>()->GetScale();
 		auto PlayerR_Velo = PlayerR_Ptr->GetComponent<Rigidbody>()->GetVelocity();
 
 		//コントローラの取得
@@ -572,6 +574,7 @@ namespace basecross {
 				}
 				else if (PlayerR_Pos.x < PlayerL_Pos.x) {
 					GetStage()->AddGameObject<PlayerBoost>(PlayerR_Pos, Vector3(2, 2, 2), L"Spark_TX", 1.0f, 8);
+
 				}
 			}
 			else if (CntlVec[0].fThumbLX < -0.5) {
@@ -736,7 +739,12 @@ namespace basecross {
 		PlayerAngle();
 		StintArea();
 		PlayerbBooth();
-
+		
+		if (Testflg == false) {
+			GetStage()->AddGameObject<PlayerShield>(PlayerR_Pos, Vector3(2, 2, 2), PlayerL_Ptr);
+			GetStage()->AddGameObject<PlayerShield>(PlayerL_Pos, Vector3(2, 2, 2), PlayerR_Ptr);
+			Testflg = true;
+		}
 		if (CntlVec[0].wButtons &XINPUT_GAMEPAD_A &&!(CntlVec[0].wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER || CntlVec[0].wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) ) {
 			//ステート移動
 			GetStateMachine_Manager()->ChangeState(LeaveState_Manager::Instance());
@@ -1178,6 +1186,83 @@ namespace basecross {
 				InvinciblecCunt = 0.0f;
 			}
 		}
+	}
+
+	//シールド
+	PlayerShield::PlayerShield(const shared_ptr<Stage>& StagePtr, const Vector3& Pos, const Vector3& Scele , shared_ptr<GameObject> PtrPlayer) :
+		GameObject(StagePtr),
+		m_Pos(Pos),
+		m_Scele(Scele),
+		m_Player(PtrPlayer)
+	{}
+	void PlayerShield::OnCreate() {
+		auto Trans = AddComponent<Transform>();
+		Trans->SetPosition(m_Pos);
+		Trans->SetRotation(0, 0, 0);
+		Trans->SetScale(m_Scele);
+
+
+		auto PtrDraw = AddComponent<PNTStaticDraw>();
+		PtrDraw->SetMeshResource(L"DEFAULT_SPHERE");
+		PtrDraw->SetTextureResource(L"TEST_AO_TX");
+		SetAlphaActive(true);
+		PtrDraw->SetDiffuse(Color4(1, 1, 1, m_Opacity));
+		m_OpacityColor = 1.0f;
+	}
+	void PlayerShield::OnUpdate() {
+		auto PlayerLifePtr = GetStage()->GetSharedGameObject<Player_Life>(L"Life", false);
+		auto Pos = m_Player->GetComponent<Transform>()->GetPosition();
+		auto PtrDraw = GetComponent<PNTStaticDraw>();
+		GetComponent<Transform>()->SetPosition(Pos);
+		//最初のHPの保存
+		if (InitHpSaveflg) {
+			m_HPSave = PlayerLifePtr->GetLife();
+			InitHpSaveflg = false;
+			
+		}
+		//前回のHPと違う場合
+		if (PlayerLifePtr->GetLife() != m_HPSave) {
+			//保存HPの更新
+			m_HPSave = PlayerLifePtr->GetLife();
+			//演出フラグをON
+			m_OnShield = true;
+			m_Opacity = 1.0f;
+			SetDrawActive(true);
+		}
+
+		//HPが内時　シールドが赤くなり点滅する
+		if (m_OnShield && PlayerLifePtr->GetLife() != 1) {
+				//HPがあるとき
+				m_Opacity -= 0.05;
+				PtrDraw->SetDiffuse(Color4(1, 1, 1, m_Opacity));
+				if (m_Opacity < 0.0f) {
+					SetDrawActive(false);
+					m_OnShield = false;
+				}
+		}
+		else if(m_OnShield && PlayerLifePtr->GetLife() == 1){
+			if (m_Once == true) {	
+				PtrDraw->SetTextureResource(L"TEST_Red_TX");
+				m_Opacity = 0.5f;
+				SetUpdateActive(true);
+				SetDrawActive(true);
+				m_Once = false;
+			}
+			if (m_Opacity <= 0.0f) {
+				m_OpacityColor *= -1.0f;
+			}
+			else if (m_Opacity >= 0.5f) {
+				m_OpacityColor *= -1.0f;
+			}
+			m_Opacity += 0.05 * m_OpacityColor;
+			PtrDraw->SetDiffuse(Color4(1, 1, 1, m_Opacity));
+		}
+		//HPが０になったら
+		if (PlayerLifePtr->GetLife() <= 0.0f) {
+		SetUpdateActive(false);
+		SetDrawActive(false);
+		}
+		
 	}
 
 	////--------------------------------------------------------------------------------------
