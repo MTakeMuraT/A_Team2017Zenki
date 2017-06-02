@@ -795,7 +795,7 @@ namespace basecross
 		//座標
 		auto CTrans = CursorSprite->AddComponent<Transform>();
 		CTrans->SetPosition(135, -310, 0);
-		CTrans->SetScale(200, 100, 1);
+		CTrans->SetScale(200, 50, 1);
 		CTrans->SetRotation(0, 0, 0);
 
 		//描画
@@ -853,15 +853,15 @@ namespace basecross
 				{
 					//選択項目Yes
 					m_selectnum = 1;
-					m_Cursor->GetComponent<Transform>()->SetPosition(Vector3(-180, -310, 0));
-					m_Cursor->GetComponent<Transform>()->SetScale(Vector3(100, 100, 1));
+					m_Cursor->GetComponent<Transform>()->SetPosition(Vector3(-185, -310, 0));
+					m_Cursor->GetComponent<Transform>()->SetScale(Vector3(100, 50, 1));
 				}
 				//右
 				else if (CntlVec[0].fThumbLX > 0.5f)
 				{
 					m_selectnum = 0;
 					m_Cursor->GetComponent<Transform>()->SetPosition(Vector3(135, -310, 0));
-					m_Cursor->GetComponent<Transform>()->SetScale(Vector3(200, 100, 1));
+					m_Cursor->GetComponent<Transform>()->SetScale(Vector3(200, 50, 1));
 				}
 
 				//AかBボタン押されたら

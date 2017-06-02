@@ -469,13 +469,26 @@ namespace basecross
 	//	爆弾の爆発の部分(SS対応版)
 	//	拡縮だけでいいかな？
 	//************************************
-	class BombEffect : public SS5ssae
+	class BombEffect : public GameObject
 	{
 	private:
 		//状態
 		int m_State = 0;
 		//アクティブフラグ
 		bool m_ActiveFlg = false;
+
+		//分割分のvector配列
+		vector<shared_ptr<MeshResource>> m_SpriteS;
+
+		//分割数
+		int m_SpriteNum = 0;
+		//今の番号
+		int m_NowSpriteNum = 0;
+
+		//計算用時間
+		float m_time = 0;
+		//画像切り替え間隔
+		const float m_IntervalTime = 1.0f;
 	public:
 		BombEffect(const shared_ptr<Stage>& StagePtr);
 

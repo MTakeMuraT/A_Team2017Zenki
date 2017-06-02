@@ -2890,7 +2890,7 @@ namespace basecross {
 				auto obj = GetStage()->AddGameObject<GameObject>();
 				auto Trans = obj->AddComponent<Transform>();
 				Trans->SetPosition(-2000, 0, 0);
-				Trans->SetScale(1000, 300, 1);
+				Trans->SetScale(1500, 600, 1);
 				Trans->SetRotation(0, 0, 0);
 
 				auto Draw = obj->AddComponent<PCTSpriteDraw>();
@@ -2975,13 +2975,13 @@ namespace basecross {
 
 				//‘å‚«‚³Ž‚Á‚Ä‚­‚é
 				Vector3 sca = m_MissCompLogo->GetComponent<Transform>()->GetScale();
-				if (sca.x > 600)
+				if (sca.x > 1200)
 				{
 					sca.x *= 0.95f;
 					sca.y *= 0.95f;
 				}
 
-				if (pos.y > 200 && sca.x < 600)
+				if (pos.y > 200 && sca.x <= 1200)
 				{
 					//ó‘Ô•ÏX
 					m_State = 7;
@@ -3350,7 +3350,7 @@ namespace basecross {
 				auto obj = GetStage()->AddGameObject<GameObject>();
 				auto Trans = obj->AddComponent<Transform>();
 				Trans->SetPosition(-400, -120, 0);
-				Trans->SetScale(300, 100, 1);
+				Trans->SetScale(300, 150, 1);
 				Trans->SetRotation(0, 0, 0);
 
 				auto Draw = obj->AddComponent<PCTSpriteDraw>();
@@ -3363,7 +3363,7 @@ namespace basecross {
 				obj = GetStage()->AddGameObject<GameObject>();
 				Trans = obj->AddComponent<Transform>();
 				Trans->SetPosition(-150, -120, 0);
-				Trans->SetScale(300, 100, 1);
+				Trans->SetScale(300, 150, 1);
 				Trans->SetRotation(0, 0, 0);
 
 				Draw = obj->AddComponent<PCTSpriteDraw>();
@@ -3376,7 +3376,7 @@ namespace basecross {
 				obj = GetStage()->AddGameObject<GameObject>();
 				Trans = obj->AddComponent<Transform>();
 				Trans->SetPosition(150, -120, 0);
-				Trans->SetScale(300, 100, 1);
+				Trans->SetScale(300, 150, 1);
 				Trans->SetRotation(0, 0, 0);
 
 				Draw = obj->AddComponent<PCTSpriteDraw>();
@@ -3389,7 +3389,7 @@ namespace basecross {
 				obj = GetStage()->AddGameObject<GameObject>();
 				Trans = obj->AddComponent<Transform>();
 				Trans->SetPosition(450, -120, 0);
-				Trans->SetScale(300, 100, 1);
+				Trans->SetScale(300, 150, 1);
 				Trans->SetRotation(0, 0, 0);
 
 				Draw = obj->AddComponent<PCTSpriteDraw>();
@@ -3402,8 +3402,8 @@ namespace basecross {
 				auto CursorSprite = GetStage()->AddGameObject<GameObject>();
 				//À•W
 				auto CTrans = CursorSprite->AddComponent<Transform>();
-				CTrans->SetPosition(-400, -140, 0);
-				CTrans->SetScale(220, 100, 1);
+				CTrans->SetPosition(-400, -160, 0);
+				CTrans->SetScale(180, 50, 1);
 				CTrans->SetRotation(0, 0, 0);
 
 				//•`‰æ
@@ -3468,20 +3468,20 @@ namespace basecross {
 							switch (m_SelectNum)
 							{
 							case 0:
-								m_Cursor->GetComponent<Transform>()->SetPosition(-400, -140, 0);
-								m_Cursor->GetComponent<Transform>()->SetScale(220, 100, 1);
+								m_Cursor->GetComponent<Transform>()->SetPosition(-400, -160, 0);
+								m_Cursor->GetComponent<Transform>()->SetScale(180, 50, 1);
 								break;
 							case 1:
-								m_Cursor->GetComponent<Transform>()->SetPosition(-150, -140, 0);
-								m_Cursor->GetComponent<Transform>()->SetScale(140, 100, 1);
+								m_Cursor->GetComponent<Transform>()->SetPosition(-150, -160, 0);
+								m_Cursor->GetComponent<Transform>()->SetScale(180, 50, 1);
 								break;
 							case 2:
-								m_Cursor->GetComponent<Transform>()->SetPosition(150, -140, 0);
-								m_Cursor->GetComponent<Transform>()->SetScale(300, 100, 1);
+								m_Cursor->GetComponent<Transform>()->SetPosition(150, -160, 0);
+								m_Cursor->GetComponent<Transform>()->SetScale(220, 50, 1);
 								break;
 							case 3:
-								m_Cursor->GetComponent<Transform>()->SetPosition(450, -140, 0);
-								m_Cursor->GetComponent<Transform>()->SetScale(140, 100, 1);
+								m_Cursor->GetComponent<Transform>()->SetPosition(450, -160, 0);
+								m_Cursor->GetComponent<Transform>()->SetScale(180, 50, 1);
 								break;
 							default:
 								break;

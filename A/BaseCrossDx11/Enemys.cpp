@@ -2101,49 +2101,88 @@ namespace basecross
 	//	拡縮だけでいいかな？
 	//************************************************************************
 	BombEffect::BombEffect(const shared_ptr<Stage>& StagePtr):
-		SS5ssae(StagePtr, App::GetApp()->m_wstrDataPath + L"SS\\EASY_animation\\", L"EASY.ssae", L"anime_1")
+		GameObject(StagePtr)
 	{}
 
 	void BombEffect::OnCreate()
 	{
 		auto Trans = AddComponent<Transform>();
 		Trans->SetPosition(0,0,0);
-		Trans->SetScale(1, 1, 1);
+		Trans->SetScale(5, 5, 5);
 		Trans->SetRotation(45*3.14159265f/180, 0, 0);
 
-		//アニメーション関連
-		Matrix4X4 mat;
-		mat.DefTransformation(
-			Vector3(0.07f, 0.07f, 0.07f),
-			Vector3(0, 0, 0),
-			Vector3(0.0f, 0.0f, 0.0f)
-			);
-		SetToAnimeMatrix(mat);
-
-		//親クラスのCreate
-		SS5ssae::OnCreate();
-		//秒あたりのフレーム数
-		SetFps(60.0f);
-		//ループ有効
-		SetLooped(true);
-
-		/*
 		auto Draw = AddComponent<PNTStaticDraw>();
 		Draw->SetMeshResource(L"DEFAULT_SQUARE");
 		Draw->SetTextureResource(L"BOMBEFFECT_TX");
-		*/
+		
 		//透明処理
 		SetAlphaActive(true);
 		SetDrawActive(false);
+
+		//画像分割
+
+		//スプライトの数リセット
+		m_SpriteNum = -1;
+		//6x5
+		//数字の画像作成-------------------------
+		for (int i = 0; i < 30; i++)
+		{
+			m_SpriteNum++;
+			//頂点配列
+			vector<VertexPositionNormalTexture> vertices;
+			//インデックスを作成するための配列
+			vector<uint16_t> indices;
+			//Squareの作成(ヘルパー関数を利用)
+			MeshUtill::CreateSquare(1.0f, vertices, indices);
+			//UV値の変更
+			float fromx = (i % 5) / 5.0f;
+			float tox = ((i % 5) / 5.0f) + (1 / 5.0f);
+			float fromy = (i / 6)  / 6.0f;
+			float toy = ((i / 6) / 6.0f) + (1 / 6.0f);
+
+			//左上頂点
+			vertices[0].textureCoordinate = Vector2(fromx, fromy);
+			//右上頂点
+			vertices[1].textureCoordinate = Vector2(tox, toy);
+			//左下頂点
+			vertices[2].textureCoordinate = Vector2(fromx, fromy);
+			//右下頂点
+			vertices[3].textureCoordinate = Vector2(tox, toy);
+			//頂点の型を変えた新しい頂点を作成
+			vector<VertexPositionColorTexture> new_vertices;
+			for (auto& v : vertices) {
+				VertexPositionColorTexture nv;
+				nv.position = v.position;
+				nv.color = Color4(1.0f, 1.0f, 1.0f, 1.0f);
+				nv.textureCoordinate = v.textureCoordinate;
+				new_vertices.push_back(nv);
+			}
+			//メッシュ作成
+			m_SpriteS.push_back(MeshResource::CreateMeshResource<VertexPositionColorTexture>(new_vertices, indices, true));
+		}
+		//数字の画像作成-------------------------
+
 	}
 
 	void BombEffect::OnUpdate()
 	{
 		if (m_ActiveFlg)
 		{
-			//アニメ―ション更新
-			UpdateAnimeTime(App::GetApp()->GetElapsedTime()*2);
 
+			//画像遷移
+			m_time += App::GetApp()->GetElapsedTime();
+			if (m_time > m_IntervalTime)
+			{
+				m_time = 0;
+				GetComponent<PNTStaticDraw>()->SetMeshResource(m_SpriteS[m_NowSpriteNum++]);
+
+				//もし分割数より多かったら
+				if (m_NowSpriteNum > m_SpriteNum)
+				{
+					m_NowSpriteNum = 0;
+				}
+			}
+			/*
 			switch (m_State)
 			{
 			case 0:
@@ -2186,7 +2225,7 @@ namespace basecross
 				m_State = 0;
 				SetDrawActive(false);
 				break;
-			}
+			}*/
 		}
 	}
 
@@ -2194,9 +2233,6 @@ namespace basecross
 	{
 		m_ActiveFlg = true;
 		SetDrawActive(true);
-
-		//SSアニメ更新
-		ChangeAnimation(L"anime_1");
 
 		GetComponent<Transform>()->SetPosition(pos);
 	}
