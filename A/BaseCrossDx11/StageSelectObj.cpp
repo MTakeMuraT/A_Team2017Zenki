@@ -215,7 +215,7 @@ namespace basecross
 			if (!m_SandFlg)
 			{
 				//‰ñ“]ˆ—
-				Rot();
+				//Rot();
 				if (!m_CancelFlg)
 				{
 					//Aƒ{ƒ^ƒ“‰Ÿ‚µ‚Ä‚éŠÔ—£‚ê‚é
