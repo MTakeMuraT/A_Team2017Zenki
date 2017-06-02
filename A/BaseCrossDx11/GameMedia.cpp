@@ -119,7 +119,7 @@ namespace basecross {
 		//Abe20170508
 		//Abe20170512
 		//strTexture = DataDir + L"EF\\Explosion.png";
-		strTexture = DataDir + L"GameOver\\OverWhite.png";
+		strTexture = DataDir + L"EF\\Explosion.png";
 		App::GetApp()->RegisterTexture(L"BOMBEFFECT_TX", strTexture);
 		//Abe20170512
 		//Abe20170517

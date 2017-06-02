@@ -467,7 +467,7 @@ namespace basecross
 	//======================ˆÈ‰ºq‹@ŒQ=======================
 	//************************************
 	//	”š’e‚Ì”š”­‚Ì•”•ª(SS‘Î‰”Å)
-	//	Šgk‚¾‚¯‚Å‚¢‚¢‚©‚ÈH
+	//	•ªŠ„‚Í‚¢‚è‚Ü[‚·
 	//************************************
 	class BombEffect : public GameObject
 	{
@@ -488,7 +488,7 @@ namespace basecross
 		//ŒvZ—pŠÔ
 		float m_time = 0;
 		//‰æ‘œØ‚è‘Ö‚¦ŠÔŠu
-		const float m_IntervalTime = 1.0f;
+		const float m_IntervalTime = 0.05f;
 	public:
 		BombEffect(const shared_ptr<Stage>& StagePtr);
 

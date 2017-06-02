@@ -213,7 +213,7 @@ namespace basecross
 
 			//Abe20170602
 			auto ob = AddGameObject<BombEffect>();
-			ob->SetPosActive(Vector3(0, 0, 0));
+			ob->SetPosActive(Vector3(0, 5, 0));
 			ob->SetDrawLayer(10);
 			//Abe20170602
 

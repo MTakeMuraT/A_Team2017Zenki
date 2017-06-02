@@ -2098,7 +2098,7 @@ namespace basecross
 	//======================以下子機群=======================
 	//************************************************************************
 	//	爆弾の爆発の部分
-	//	拡縮だけでいいかな？
+	//	分割はいりまーす
 	//************************************************************************
 	BombEffect::BombEffect(const shared_ptr<Stage>& StagePtr):
 		GameObject(StagePtr)
@@ -2108,11 +2108,11 @@ namespace basecross
 	{
 		auto Trans = AddComponent<Transform>();
 		Trans->SetPosition(0,0,0);
-		Trans->SetScale(5, 5, 5);
+		Trans->SetScale(3, 3, 3);
 		Trans->SetRotation(45*3.14159265f/180, 0, 0);
 
-		auto Draw = AddComponent<PNTStaticDraw>();
-		Draw->SetMeshResource(L"DEFAULT_SQUARE");
+		auto Draw = AddComponent<PCTStaticDraw>();
+		//Draw->SetMeshResource(L"DEFAULT_SQUARE");
 		Draw->SetTextureResource(L"BOMBEFFECT_TX");
 		
 		//透明処理
@@ -2124,7 +2124,7 @@ namespace basecross
 		//スプライトの数リセット
 		m_SpriteNum = -1;
 		//6x5
-		//数字の画像作成-------------------------
+		//画像作成-------------------------
 		for (int i = 0; i < 30; i++)
 		{
 			m_SpriteNum++;
@@ -2135,19 +2135,18 @@ namespace basecross
 			//Squareの作成(ヘルパー関数を利用)
 			MeshUtill::CreateSquare(1.0f, vertices, indices);
 			//UV値の変更
-			float fromx = (i % 5) / 5.0f;
-			float tox = ((i % 5) / 5.0f) + (1 / 5.0f);
-			float fromy = (i / 6)  / 6.0f;
-			float toy = ((i / 6) / 6.0f) + (1 / 6.0f);
-
+			float fromX = (i % 6) / 6.0f;
+			float toX = fromX + (1.0f / 6.0f);
+			float fromY = (i / 6) / 5.0f;
+			float toY = fromY + (1.0f / 5.0f);
 			//左上頂点
-			vertices[0].textureCoordinate = Vector2(fromx, fromy);
+			vertices[0].textureCoordinate = Vector2(fromX, fromY);
 			//右上頂点
-			vertices[1].textureCoordinate = Vector2(tox, toy);
+			vertices[1].textureCoordinate = Vector2(toX, fromY);
 			//左下頂点
-			vertices[2].textureCoordinate = Vector2(fromx, fromy);
+			vertices[2].textureCoordinate = Vector2(fromX, toY);
 			//右下頂点
-			vertices[3].textureCoordinate = Vector2(tox, toy);
+			vertices[3].textureCoordinate = Vector2(toX, toY);
 			//頂点の型を変えた新しい頂点を作成
 			vector<VertexPositionColorTexture> new_vertices;
 			for (auto& v : vertices) {
@@ -2160,8 +2159,8 @@ namespace basecross
 			//メッシュ作成
 			m_SpriteS.push_back(MeshResource::CreateMeshResource<VertexPositionColorTexture>(new_vertices, indices, true));
 		}
-		//数字の画像作成-------------------------
-
+		//画像作成-------------------------
+		Draw->SetMeshResource(m_SpriteS[0]);
 	}
 
 	void BombEffect::OnUpdate()
@@ -2174,12 +2173,13 @@ namespace basecross
 			if (m_time > m_IntervalTime)
 			{
 				m_time = 0;
-				GetComponent<PNTStaticDraw>()->SetMeshResource(m_SpriteS[m_NowSpriteNum++]);
+				GetComponent<PCTStaticDraw>()->SetMeshResource(m_SpriteS[m_NowSpriteNum++]);
 
 				//もし分割数より多かったら
 				if (m_NowSpriteNum > m_SpriteNum)
 				{
 					m_NowSpriteNum = 0;
+					//m_ActiveFlg = false;
 				}
 			}
 			/*
