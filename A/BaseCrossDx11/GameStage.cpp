@@ -137,6 +137,10 @@ namespace basecross
 	{
 		auto life = AddGameObject<Player_Life>(10, Vector2(-580, 300), Vector2(100, 100), 4);
 		SetSharedGameObject(L"Life", life);
+
+		//動くグループに追加
+		GetSharedObjectGroup(L"UgokuGroup")->IntoGroup(life);
+
 	}
 	//ライフ作成--------------------------------------------
 
@@ -236,6 +240,15 @@ namespace basecross
 
 		}
 
+		//Abe20170531
+		//仮でリザルト表示**********デバッグ*********
+		if (KeylVec.m_bPressedKeyTbl['B'])
+		{
+			Result();
+		}
+		//仮でリザルト表示**********デバッグ*********
+		//Abe20170531
+
 		if (m_CameraMoveFlg)
 		{
 			//カメラ更新
@@ -289,12 +302,16 @@ namespace basecross
 	//ゲームオーバー処理
 	void GameStage::GameOver()
 	{
-		AddGameObject<GameOverS>();
+		auto ptr = GetSharedGameObject<GameObject>(L"GameOverS", false);
+		if (!ptr)
+		{
+			SetSharedGameObject(L"GameOverS",AddGameObject<GameOverS>());
+		}
 	}
 	//Abe20170529
 
 	//Abe20170530
-	//ゲームオーバー処理
+	//ゲームオーバー処理カメラ
 	bool GameStage::GameOverCamera()
 	{
 		auto View = GetView();
@@ -327,6 +344,59 @@ namespace basecross
 	}
 	//Abe20170530
 
+	//Abe20170531
+	//リザルト処理
+	void GameStage::Result()
+	{
+		auto ptr = GetSharedGameObject<GameObject>(L"ResultS", false);
+		if (!ptr)
+		{
+			SetSharedGameObject(L"ResultS", AddGameObject<ResultS>());
+		}
+	}
+	
+	//リザルトカメラ制御
+	bool GameStage::ResultCamera(Vector3 pos)
+	{
+		auto View = GetView();
+		auto CameraP = View->GetTargetCamera();
+		//座標
+		Vector3 Pos = CameraP->GetEye();
+		//見る部分
+		Vector3 At = CameraP->GetAt();
+
+		//移動
+		Vector3 targetpos = pos;
+		//ちょっと後ろ上にずらす
+		targetpos += Vector3(0, 2, -8);
+		Vector3 dis = targetpos - Pos;
+		dis /= 10;
+		Pos += dis;
+
+		//Atも移動、移動先は(プレイヤーの中心)
+		Vector3 targetAt = pos;
+		//ちょっとずらす
+		targetAt += Vector3(0, 1, 0);
+		Vector3 disAt = targetAt - At;
+		disAt /= 10;
+		At += disAt;
+
+		//目標地点に近ければtrueを返して遠ければカメラを移動してfalseを返す
+		if (abs(targetpos.x - Pos.x) + abs(targetpos.y - Pos.y) + abs(targetpos.z - Pos.z) < 0.1f)
+		{
+			return true;
+		}
+		else
+		{
+			//カメラ移動
+			CameraP->SetEye(Pos);
+			CameraP->SetAt(At);
+
+			return false;
+		}
+
+	}
+	//Abe20170531
 
 	//////////////////////////////////////////////////////////////////
 	// class Ground_GameStage : public GameObject

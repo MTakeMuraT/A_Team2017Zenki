@@ -166,6 +166,53 @@ namespace basecross {
 		//ゲームオーバー---------------------------------------
 		//Abe20170529
 
+		//Abe20170531
+		//リザルト--------------------------------------
+		//リザルト黒
+		strTexture = DataDir + L"Result\\ResultBlack.png";
+		App::GetApp()->RegisterTexture(L"RESULTBLACK_TX", strTexture);
+		//リザルト白
+		strTexture = DataDir + L"Result\\ResultWhite.png";
+		App::GetApp()->RegisterTexture(L"RESULTWHITE_TX", strTexture);
+		//ミッションコンプリート文字
+		strTexture = DataDir + L"Result\\MissionComplete.png";
+		App::GetApp()->RegisterTexture(L"MISSIONCOMPLETE_TX", strTexture);
+		//×
+		strTexture = DataDir + L"Result\\Batu.png";
+		App::GetApp()->RegisterTexture(L"BATU_TX", strTexture);
+		//TotalScoreロゴ
+		strTexture = DataDir + L"Result\\TotalScore.png";
+		App::GetApp()->RegisterTexture(L"TOTALSCORE_TX", strTexture);
+		//ランク
+		//S
+		strTexture = DataDir + L"Result\\RankS.png";
+		App::GetApp()->RegisterTexture(L"RANK_S_TX", strTexture);
+		//A
+		strTexture = DataDir + L"Result\\RankA.png";
+		App::GetApp()->RegisterTexture(L"RANK_A_TX", strTexture);
+		//B
+		strTexture = DataDir + L"Result\\RankB.png";
+		App::GetApp()->RegisterTexture(L"RANK_B_TX", strTexture);
+		//C
+		strTexture = DataDir + L"Result\\RankC.png";
+		App::GetApp()->RegisterTexture(L"RANK_C_TX", strTexture);
+
+		//次のステージへロゴ
+		strTexture = DataDir + L"Result\\NextStage.png";
+		App::GetApp()->RegisterTexture(L"RESULTNEXTSTAGELOGO_TX", strTexture);
+		//リトライロゴ
+		strTexture = DataDir + L"Result\\RetryLogo.png";
+		App::GetApp()->RegisterTexture(L"RESULTRETRYLOGO_TX", strTexture);
+		//ステージセレクトロゴ
+		strTexture = DataDir + L"Result\\StageSelectLogo.png";
+		App::GetApp()->RegisterTexture(L"RESULTSTASELELOGO_TX", strTexture);
+		//タイトルロゴ
+		strTexture = DataDir + L"Result\\TitleLogo.png";
+		App::GetApp()->RegisterTexture(L"RESULTTITLELOGO_TX", strTexture);
+
+		//リザルト--------------------------------------
+		//Abe20170531
+
 
 		//Abe20170519
 		//エネミーカウントのスラッシュ

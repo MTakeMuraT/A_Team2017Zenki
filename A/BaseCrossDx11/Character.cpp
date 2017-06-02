@@ -959,6 +959,29 @@ namespace basecross {
 
 	}
 
+	//Abe20170531
+	//移動
+	void NumberSprite::MoveNums(Vector3 inpos)
+	{
+		for (auto obj : m_Numbers)
+		{
+			Vector3 pos = obj->GetComponent<Transform>()->GetPosition();
+			pos += inpos;
+			obj->GetComponent<Transform>()->SetPosition(pos);
+		}
+	}
+
+	//レイヤー設定
+	void NumberSprite::SetLayer(int num)
+	{
+		for (auto obj : m_Numbers)
+		{
+			obj->SetDrawLayer(num);
+		}
+	}
+	//Abe20170531
+
+
 	//--------------------------------------------------------------------------------------
 	//	class Timer : public GameObject;
 	//	用途: タイマー
@@ -1003,6 +1026,20 @@ namespace basecross {
 	{
 		m_TimeStopFlg = flg;
 	}
+
+	//Abe20170531
+	//座標移動
+	void Timer::MovePos(Vector3 inpos)
+	{
+		m_Numbers->MoveNums(inpos);
+	}
+
+	//レイヤー設定
+	void Timer::SetLayer(int num)
+	{
+		m_Numbers->SetLayer(num);
+	}
+	//Abe20170531
 
 	//--------------------------------------------------------------------------------------
 	//	class Player_Life : public GameObject;
@@ -1139,6 +1176,31 @@ namespace basecross {
 	}
 	//Abe20170418
 	//Abe20170421
+
+
+	//Abe20170531
+	//ライフスプライト移動
+	void Player_Life::MoveSprtieS(Vector3 inpos)
+	{
+		//入力された分移動
+		for (auto obj : m_AllSpriteS)
+		{
+			Vector3 pos = obj->GetComponent<Transform>()->GetPosition();
+			pos += inpos;
+			obj->GetComponent<Transform>()->SetPosition(pos);
+		}
+	}
+	//レイヤー変更
+	void Player_Life::SetLayer(int num)
+	{
+		//レイヤー変更
+		for (auto obj : m_AllSpriteS)
+		{
+			obj->SetDrawLayer(num);
+		}
+
+	}
+	//Abe20170531
 
 	//--------------------------------------------------------------------------------------
 	//	スプライトの大きさ、位置を確認するオブジェクト
@@ -1894,6 +1956,11 @@ namespace basecross {
 		}
 
 		m_Numbers->SetNum((int)m_EnemyCunt);
+
+		if (m_EnemyCunt == 0)
+		{
+			dynamic_pointer_cast<GameStage>(GetStage())->Result();
+		}
 	}
 
 
@@ -2610,6 +2677,937 @@ namespace basecross {
 	}
 
 	//Abe20170529
+	//Abe20170531
+	//--------------------------------------------------------------------------------------
+	//	リザルト処理
+	//--------------------------------------------------------------------------------------
+	void ResultS::OnCreate()
+	{
+		//全部の動くオブジェクトを止める
+		auto ColGroup = GetStage()->GetSharedObjectGroup(L"CollisionGroup")->GetGroupVector();
+		auto EnemyGroup = GetStage()->GetSharedObjectGroup(L"EnemyGroup")->GetGroupVector();
+		auto SearchChildGroup = GetStage()->GetSharedObjectGroup(L"SearchChildGroup")->GetGroupVector();
+		auto UgokuGroup = GetStage()->GetSharedObjectGroup(L"UgokuGroup")->GetGroupVector();
+		//全部止める
+		for (auto obj : ColGroup)
+		{
+			auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+			if (ptr)
+			{
+				ptr->SetUpdateActive(false);
+			}
+		}
+		for (auto obj : EnemyGroup)
+		{
+			auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+			if (ptr)
+			{
+				ptr->SetUpdateActive(false);
+			}
+		}
+		for (auto obj : SearchChildGroup)
+		{
+			auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+			if (ptr)
+			{
+				ptr->SetUpdateActive(false);
+			}
+		}
+		for (auto obj : UgokuGroup)
+		{
+			auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+			if (ptr)
+			{
+				ptr->SetUpdateActive(false);
+			}
+		}
+
+		//状態を初期に
+		m_State = 0;
+
+		//プレイヤーのアクセサー的なの
+		m_Player1 = GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_L");
+		m_Player2 = GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_R");
+		//ついでにレイヤー上げとく(と表示消えるくそりぶ)
+		//m_Player1->SetDrawLayer(11);
+		//m_Player2->SetDrawLayer(11);
+
+		//プレイヤーを手前に
+		m_Player1->SetUpdateActive(false);
+		m_Player2->SetUpdateActive(false);
+
+		//プレイヤー管理してるやつ止める
+		GetStage()->GetSharedGameObject<PlayerManager>(L"PtrPlayerManager", false)->SetUpdateActive(false);
+
+		//プレイヤーの目標座標、中心座標を取得
+		m_centerPos = (m_Player1->GetComponent<Transform>()->GetPosition() + m_Player2->GetComponent<Transform>()->GetPosition()) / 2;
+		m_Player1TargetPos = m_centerPos;
+		m_Player1TargetPos.x += -2;
+		m_Player2TargetPos = m_centerPos;
+		m_Player2TargetPos.x += 2;
+
+		//Abe20170601
+		//デバッグ文字生成
+		m_Debugtxt = GetStage()->AddGameObject<DebugTxt>();
+		m_Debugtxt->SetLayer(15);
+		//色赤に変更
+		m_Debugtxt->SetColor(Vector3(1, 0, 0));
+		//大きさ変更
+		m_Debugtxt->SetScaleTxt(40);
+		//Abe20170601
+
+	}
+
+	void ResultS::OnUpdate()
+	{
+		switch (m_State)
+		{
+			//しばらく待つ
+		case 0:
+			if (true)
+			{
+				m_time += App::GetApp()->GetElapsedTime();
+				if (m_time > m_1WaitTime)
+				{
+					//状態変更
+					m_State = 1;
+
+					//時間初期化
+					m_time = 0;
+
+					//カメラ停止
+					dynamic_pointer_cast<GameStage>(GetStage())->CameraStop();
+				}
+			}
+			break;
+			//カメラを近づける＋キャラを近づける
+		case 1:
+			if (true)
+			{
+				//カメラ動いてるフラグ
+				bool flg1 = false;
+				//カメラを移動して目標地点に近いか判定
+				if (dynamic_pointer_cast<GameStage>(GetStage())->ResultCamera(m_centerPos))
+				{
+					flg1 = true;
+				}
+
+				//プレイヤーを目的地に移動
+				Vector3 ppos1 = m_Player1->GetComponent<Transform>()->GetPosition();
+				Vector3 ppos2 = m_Player2->GetComponent<Transform>()->GetPosition();
+				Vector3 pdir1 = m_Player1TargetPos - ppos1;
+				Vector3 pdir2 = m_Player2TargetPos - ppos2;
+				pdir1 /= 10;
+				pdir2 /= 10;
+				ppos1 += pdir1;
+				ppos2 += pdir2;
+
+				bool flg2 = false;
+				bool flg3 = false;
+
+				//近ければ判定用のフラグをtrueにし、遠ければ近づける
+				if (abs(m_Player1TargetPos.x - ppos1.x) + abs(m_Player1TargetPos.y - ppos1.y) + abs(m_Player1TargetPos.z - ppos1.z) < 0.1f)
+				{
+					flg2 = true;
+				}
+				else
+				{
+					m_Player1->GetComponent<Transform>()->SetPosition(ppos1);
+				}
+				if (abs(m_Player2TargetPos.x - ppos2.x) + abs(m_Player2TargetPos.y - ppos2.y) + abs(m_Player2TargetPos.z - ppos2.z) < 0.1f)
+				{
+					flg3 = true;
+				}
+				else
+				{
+					m_Player2->GetComponent<Transform>()->SetPosition(ppos2);
+				}
+
+
+				if (flg1 && flg2 && flg3)
+				{
+					//状態変更
+					m_State = 2;
+				}
+			}
+			break;
+			//キャラを手前に向かせる
+		case 2:
+			if (true)
+			{
+				//回転
+				Vector3 rot1 = m_Player1->GetComponent<Transform>()->GetRotation();
+				Vector3 rot2 = m_Player2->GetComponent<Transform>()->GetRotation();
+				rot1.y += 180 * 3.14159265f / 180 * App::GetApp()->GetElapsedTime();
+				rot2.y += -180 * 3.14159265f / 180 * App::GetApp()->GetElapsedTime();
+
+				//なんか変なとこで違う軸が回転するからそれ止める
+				rot1 = Vector3(0, rot1.y, 0);
+				rot2 = Vector3(0, rot2.y, 0);
+				//大体手前が1.6くらい
+				if (rot1.y >= 1.4f && rot1.y <= 1.8f)
+				{
+					//回転固定
+					rot1.y = 90 * 3.14159265f / 180;
+					rot2.y = -90 * 3.14159265f / 180;
+
+					//状態変更
+					m_State = 3;
+					//跳ねる力設定
+					float m_HopPower = 10;
+
+					//跳ねるフラグオン
+					m_HopFlg = true;
+
+				}
+				m_Player1->GetComponent<Transform>()->SetRotation(rot1);
+				m_Player2->GetComponent<Transform>()->SetRotation(rot2);
+
+			}
+			break;
+			//跳ねる
+		case 3:
+			if (true)
+			{
+				//状態変更
+				m_State = 4;
+
+				//ミッションコンプリート文字作成
+				//暗転幕作成
+				auto obj = GetStage()->AddGameObject<GameObject>();
+				auto Trans = obj->AddComponent<Transform>();
+				Trans->SetPosition(-2000, 0, 0);
+				Trans->SetScale(1000, 300, 1);
+				Trans->SetRotation(0, 0, 0);
+
+				auto Draw = obj->AddComponent<PCTSpriteDraw>();
+				Draw->SetTextureResource(L"MISSIONCOMPLETE_TX");
+
+				obj->SetDrawLayer(11);
+				obj->SetAlphaActive(true);
+
+				m_MissCompLogo = obj;
+
+			}
+			break;
+			//ミッションコンプリート文字左から出す
+		case 4:
+			if (true)
+			{
+				//ミッションコンプリートの座標持ってくる
+				Vector3 pos = m_MissCompLogo->GetComponent<Transform>()->GetPosition();
+				pos.x += 1000 * App::GetApp()->GetElapsedTime();
+
+				//中心まで来たら
+				if (pos.x > 0)
+				{
+					//暗転幕作成
+					auto obj = GetStage()->AddGameObject<GameObject>();
+					auto Trans = obj->AddComponent<Transform>();
+					Trans->SetPosition(0, 0, 0);
+					Trans->SetScale(1280, 720, 1);
+					Trans->SetRotation(0, 0, 0);
+
+					auto Draw = obj->AddComponent<PCTSpriteDraw>();
+					Draw->SetTextureResource(L"RESULTBLACK_TX");
+					Draw->SetDiffuse(Color4(1, 1, 1, 0));
+
+					obj->SetDrawLayer(10);
+					obj->SetAlphaActive(true);
+
+					m_Black = obj;
+
+					m_BlackAlpha = 0;
+
+					//座標固定
+					pos.x = 0;
+
+					//状態変更
+					m_State = 5;
+				}
+
+				//座標移動
+				m_MissCompLogo->GetComponent<Transform>()->SetPosition(pos);
+			}
+			break;
+			//ちょっと暗くする
+		case 5:
+			if (true)
+			{
+				if (m_BlackAlpha < 0.5f)
+				{
+					m_BlackAlpha += App::GetApp()->GetElapsedTime();
+				}
+				else
+				{
+					//透明度固定
+					m_BlackAlpha = 0.5f;
+					//状態変更
+					m_State = 6;
+				}
+				m_Black->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_BlackAlpha));
+
+			}
+			break;
+			//ミッションコンプリート小さくして上に移動
+		case 6:
+			if (true)
+			{
+				//ミッションコンプリートの座標持ってくる
+				Vector3 pos = m_MissCompLogo->GetComponent<Transform>()->GetPosition();
+				if (pos.y < 200)
+				{
+					pos.y += 600 * App::GetApp()->GetElapsedTime();
+				}
+
+				//大きさ持ってくる
+				Vector3 sca = m_MissCompLogo->GetComponent<Transform>()->GetScale();
+				if (sca.x > 600)
+				{
+					sca.x *= 0.95f;
+					sca.y *= 0.95f;
+				}
+
+				if (pos.y > 200 && sca.x < 600)
+				{
+					//状態変更
+					m_State = 7;
+
+					//タイマー持ってくる
+					auto timeptr = GetStage()->GetSharedGameObject<Timer>(L"Timer", false);
+					//HPスプライト持ってくる
+					auto hpptr = GetStage()->GetSharedGameObject<Player_Life>(L"Life", false);
+
+					//レイヤー変える
+					timeptr->SetLayer(11);
+					hpptr->SetLayer(11);
+
+					//constで宣言しても更新されないunkなので
+					//HPスプライトとTimeの目的座標を再設定
+					m_HpTargetPos = Vector3(30, -250, 0);
+					m_TimeTargetPos = Vector3(-400, -400, 0);
+				}
+
+				//座標と大きさ更新
+				m_MissCompLogo->GetComponent<Transform>()->SetPosition(pos);
+				m_MissCompLogo->GetComponent<Transform>()->SetScale(sca);
+
+			}
+			break;
+			//HPスプライトとタイム持ってくる
+		case 7:
+			if (true)
+			{
+				//タイマー持ってくる
+				auto timeptr = GetStage()->GetSharedGameObject<Timer>(L"Timer", false);
+				//HPスプライト持ってくる
+				auto hpptr = GetStage()->GetSharedGameObject<Player_Life>(L"Life", false);
+
+				m_HpPos += Vector3(0.3f, -2.5f, 0) * 3;
+				m_TimePos += Vector3(-4, -4, 0) * 3;
+
+				//判定フラグ
+				bool flg1 = false;
+				bool flg2 = false;
+
+				if (m_HpTargetPos.x < m_HpPos.x && m_HpTargetPos.y > m_HpPos.y)
+				{
+					flg1 = true;
+				}
+				else
+				{
+					hpptr->MoveSprtieS(Vector3(0.3f, -2.5f, 0) * 3);
+				}
+
+				if (m_TimeTargetPos.x > m_TimePos.x && m_TimeTargetPos.y > m_TimePos.y)
+				{
+					flg2 = true;
+				}
+				else
+				{
+					timeptr->MovePos(Vector3(-4, -4, 0) * 3);
+				}
+
+				if (flg1 && flg2)
+				{
+					//状態変更
+					m_State = 8;
+				}
+				//デバッグ-----------------------
+				//wstring txt = Util::FloatToWStr(m_TimePos.x) + L":"
+				//	+ Util::FloatToWStr(m_TimePos.y) + L":";
+				//txt += L"\n";
+				//txt += Util::FloatToWStr(m_TimeTargetPos.x) + L":"
+				//	+ Util::FloatToWStr(m_TimeTargetPos.y) + L":";
+				//m_Debugtxt->SetText(txt);
+				//デバッグ-----------------------
+
+			}
+			break;
+			//項目出す
+		case 8:
+			if (true)
+			{
+				//HPのほうの×作成
+				auto batu = GetStage()->AddGameObject<GameObject>();
+				auto Transba = batu->AddComponent<Transform>();
+				Transba->SetPosition(-5, 50, 0);
+				Transba->SetScale(100, 100, 1);
+				Transba->SetRotation(0, 0, 0);
+
+				auto Drawba = batu->AddComponent<PCTSpriteDraw>();
+				Drawba->SetTextureResource(L"BATU_TX");
+
+				batu->SetDrawLayer(11);
+				batu->SetAlphaActive(true);
+
+				//HPの倍率スコア
+				auto numhp = GetStage()->AddGameObject<NumberSprite>(500, Vector2(260, 50), Vector2(100, 100), 11);
+
+				//HPのスコア
+				auto numhpscore = GetStage()->AddGameObject<NumberSprite>(0, Vector2(560, 50), Vector2(100, 100), 11);
+				m_HpScore = numhpscore;
+
+				//TIMEのスコア
+				auto numtimescore = GetStage()->AddGameObject<NumberSprite>(0, Vector2(560, -100), Vector2(100, 100), 11);
+				m_TimeScore = numtimescore;
+
+				//状態変更
+				m_State = 9;
+
+				//数字系
+				m_HpAmount = 0;
+				m_TimeAmount = 0;
+
+				//スコア最大値設定
+				//HPの値は[値*500]
+				m_HpScoreTotal = GetStage()->GetSharedGameObject<Player_Life>(L"Life", false)->GetLife() * 500;
+				m_TimeScoreTotal = GetStage()->GetSharedGameObject<Timer>(L"Timer", false)->GetTime();
+				//Timeの値設定。30秒までは無条件で5000
+				if (m_TimeScoreTotal <= 30)
+				{
+					m_TimeScoreTotal = 5000;
+				}
+				//あとは200秒まで1秒25点で加点
+				else
+				{
+					m_TimeScoreTotal = (200 - m_TimeScoreTotal) * 25;
+				}
+
+				//トータルスコア計算
+				m_TotalAmount = 0;
+				m_TotalScore = m_HpScoreTotal + m_TimeScoreTotal;
+			}
+			break;
+			//スコア加算
+		case 9:
+			if (true)
+			{
+				//HPスコア加算
+				m_HpAmount += m_HpScoreTotal / 60;
+				//TIMEスコア加算
+				m_TimeAmount += m_TimeScoreTotal / 60;
+
+				//最大値いったかのフラグ
+				bool flg1 = false;
+				bool flg2 = false;
+				//HPのスコア越してたら
+				if (m_HpAmount >= m_HpScoreTotal)
+				{
+					m_HpAmount = m_HpScoreTotal;
+					flg1 = true;
+				}
+				//ITMEのスコア越してたら
+				if (m_TimeAmount >= m_TimeScoreTotal)
+				{
+					m_TimeAmount = m_TimeScoreTotal;
+					flg2 = true;
+				}
+				//HPスコア更新
+				dynamic_pointer_cast<NumberSprite>(m_HpScore)->SetNum(m_HpAmount);
+				//TIMEスコア更新
+				dynamic_pointer_cast<NumberSprite>(m_TimeScore)->SetNum(m_TimeAmount);
+
+
+				//HPとTIMEのスコアが設定値に届いたら
+				if (flg1 && flg2)
+				{
+					//状態更新
+					m_State = 10;
+
+					//Totalスコア
+					auto numTo = GetStage()->AddGameObject<NumberSprite>(500, Vector2(450, -250), Vector2(100, 100), 11);
+					m_TotalScoreSp = numTo;
+
+					//TotalScoreロゴ作成
+					auto obj = GetStage()->AddGameObject<GameObject>();
+					auto Trans = obj->AddComponent<Transform>();
+					Trans->SetPosition(-200, -250, 0);
+					Trans->SetScale(500, 100, 1);
+					Trans->SetRotation(0, 0, 0);
+
+					auto Draw = obj->AddComponent<PCTSpriteDraw>();
+					Draw->SetTextureResource(L"TOTALSCORE_TX");
+
+					obj->SetDrawLayer(11);
+					obj->SetAlphaActive(true);
+				}
+			}
+			break;
+			//トータルスコア加算
+		case 10:
+			if (true)
+			{
+				//Totalスコア加算
+				m_TotalAmount += m_TotalScore / 60;
+
+				if (m_TotalAmount >= m_TotalScore)
+				{
+					m_TotalAmount = m_TotalScore;
+					//状態変更
+					m_State = 11;
+
+					//ランク作成
+					auto obj = GetStage()->AddGameObject<GameObject>();
+					auto Trans = obj->AddComponent<Transform>();
+					Trans->SetPosition(0, 0, 0);
+					Trans->SetScale(1000, 1000, 1);
+					Trans->SetRotation(0, 0, 0);
+
+					auto Draw = obj->AddComponent<PCTSpriteDraw>();
+					Draw->SetDiffuse(Color4(1, 1, 1, 0));
+					if (m_TotalScore >= 7000)
+					{
+						Draw->SetTextureResource(L"RANK_S_TX");
+					}
+					else if (m_TotalScore >= 5000)
+					{
+						Draw->SetTextureResource(L"RANK_A_TX");
+					}
+					else if (m_TotalScore >= 3000)
+					{
+						Draw->SetTextureResource(L"RANK_B_TX");
+					}
+					else
+					{
+						Draw->SetTextureResource(L"RANK_C_TX");
+					}
+
+					obj->SetDrawLayer(14);
+					obj->SetAlphaActive(true);
+
+					m_RankSp = obj;
+
+					//透明度リセット
+					m_RankAlpha = 0;
+				}
+
+				//Totalスコア更新
+				dynamic_pointer_cast<NumberSprite>(m_TotalScoreSp)->SetNum(m_TotalAmount);
+
+			}
+			break;
+			//ランク表示
+		case 11:
+			if (true)
+			{
+				//実体化してく
+				m_RankAlpha += App::GetApp()->GetElapsedTime();
+
+
+				Vector3 sca = m_RankSp->GetComponent<Transform>()->GetScale();
+				sca *= 0.98f;
+				if (sca.x < 500)
+				{
+					//大きさ固定
+					sca.x = 500;
+					sca.y = 500;
+					sca.z = 1;
+					//状態変更
+					m_State = 12;
+
+					//時間リセット
+					m_time = 0;
+
+					//白い画像出す
+					auto obj2 = GetStage()->AddGameObject<GameObject>();
+					auto Trans2 = obj2->AddComponent<Transform>();
+					Trans2->SetPosition(0, 0, 0);
+					Trans2->SetScale(1280, 720, 1);
+					Trans2->SetRotation(0, 0, 0);
+
+					auto Draw2 = obj2->AddComponent<PCTSpriteDraw>();
+					Draw2->SetTextureResource(L"RESULTWHITE_TX");
+					Draw2->SetDiffuse(Color4(1, 1, 1, 1));
+
+					obj2->SetDrawLayer(13);
+					obj2->SetAlphaActive(true);
+
+					m_White12 = obj2;
+
+					m_BlackAlpha = 1;
+
+				}
+				m_RankSp->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_RankAlpha));
+
+				m_RankSp->GetComponent<Transform>()->SetScale(sca);
+			}
+			break;
+			//しばらく待つ
+		case 12:
+			if (true)
+			{
+				m_BlackAlpha += -App::GetApp()->GetElapsedTime() * 2;
+				if (m_BlackAlpha < 0)
+				{
+					m_BlackAlpha = 0;
+				}
+				m_time += App::GetApp()->GetElapsedTime();
+				if (m_time > m_Wait12Time)
+				{
+					//状態変更
+					m_State = 13;
+
+					//黒幕ランクの下に出す
+					//暗転幕作成
+					auto obj = GetStage()->AddGameObject<GameObject>();
+					auto Trans = obj->AddComponent<Transform>();
+					Trans->SetPosition(0, 0, 0);
+					Trans->SetScale(1280, 720, 1);
+					Trans->SetRotation(0, 0, 0);
+
+					auto Draw = obj->AddComponent<PCTSpriteDraw>();
+					Draw->SetTextureResource(L"RESULTBLACK_TX");
+					Draw->SetDiffuse(Color4(1, 1, 1, 0));
+
+					obj->SetDrawLayer(13);
+					obj->SetAlphaActive(true);
+
+					m_Black = obj;
+
+					m_BlackAlpha = 0;
+
+					m_Black12 = obj;
+
+					m_White12->SetDrawActive(false);
+				}
+
+				m_White12->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_BlackAlpha));
+			}
+			break;
+			//黒幕半透明にしてランクを上に移動
+		case 13:
+			if (true)
+			{
+				//暗幕
+				if (m_BlackAlpha < 0.6f)
+				{
+					m_BlackAlpha += App::GetApp()->GetElapsedTime() * 2;
+					m_Black12->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_BlackAlpha));
+				}
+				else
+				{
+					m_BlackAlpha = 0.6f;
+					m_Black12->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_BlackAlpha));
+				}
+
+				//移動
+				Vector3 pos = m_RankSp->GetComponent<Transform>()->GetPosition();
+				pos.y += 300 * App::GetApp()->GetElapsedTime();
+				if (pos.y > 200)
+				{
+					//高さ固定
+					pos.y = 200;
+
+					//状態移動
+					m_State = 14;
+				}
+				m_RankSp->GetComponent<Transform>()->SetPosition(pos);
+			}
+			break;
+			//選択肢出す
+		case 14:
+			if (true)
+			{
+				//状態変更
+				m_State = 15;
+
+				//選択肢作成
+				//次のステージへ
+				auto obj = GetStage()->AddGameObject<GameObject>();
+				auto Trans = obj->AddComponent<Transform>();
+				Trans->SetPosition(-400, -120, 0);
+				Trans->SetScale(300, 100, 1);
+				Trans->SetRotation(0, 0, 0);
+
+				auto Draw = obj->AddComponent<PCTSpriteDraw>();
+				Draw->SetTextureResource(L"RESULTNEXTSTAGELOGO_TX");
+
+				obj->SetDrawLayer(15);
+				obj->SetAlphaActive(true);
+
+				//リトライ
+				obj = GetStage()->AddGameObject<GameObject>();
+				Trans = obj->AddComponent<Transform>();
+				Trans->SetPosition(-150, -120, 0);
+				Trans->SetScale(300, 100, 1);
+				Trans->SetRotation(0, 0, 0);
+
+				Draw = obj->AddComponent<PCTSpriteDraw>();
+				Draw->SetTextureResource(L"RESULTRETRYLOGO_TX");
+
+				obj->SetDrawLayer(15);
+				obj->SetAlphaActive(true);
+
+				//ステセレ
+				obj = GetStage()->AddGameObject<GameObject>();
+				Trans = obj->AddComponent<Transform>();
+				Trans->SetPosition(150, -120, 0);
+				Trans->SetScale(300, 100, 1);
+				Trans->SetRotation(0, 0, 0);
+
+				Draw = obj->AddComponent<PCTSpriteDraw>();
+				Draw->SetTextureResource(L"RESULTSTASELELOGO_TX");
+
+				obj->SetDrawLayer(15);
+				obj->SetAlphaActive(true);
+
+				//タイトル
+				obj = GetStage()->AddGameObject<GameObject>();
+				Trans = obj->AddComponent<Transform>();
+				Trans->SetPosition(450, -120, 0);
+				Trans->SetScale(300, 100, 1);
+				Trans->SetRotation(0, 0, 0);
+
+				Draw = obj->AddComponent<PCTSpriteDraw>();
+				Draw->SetTextureResource(L"RESULTTITLELOGO_TX");
+
+				obj->SetDrawLayer(15);
+				obj->SetAlphaActive(true);
+
+				//カーソル作成------------------------------------
+				auto CursorSprite = GetStage()->AddGameObject<GameObject>();
+				//座標
+				auto CTrans = CursorSprite->AddComponent<Transform>();
+				CTrans->SetPosition(-400, -140, 0);
+				CTrans->SetScale(220, 100, 1);
+				CTrans->SetRotation(0, 0, 0);
+
+				//描画
+				auto CDraw = CursorSprite->AddComponent<PCTSpriteDraw>();
+				CDraw->SetTextureResource(L"SELECT_CURSOR_TX");
+
+				//レイヤー設定
+				CursorSprite->SetDrawLayer(16);
+
+				//透明度有効化
+				CursorSprite->SetAlphaActive(true);
+
+				m_Cursor = CursorSprite;
+
+				//音鳴らす準備
+				m_SelectSe = ObjectFactory::Create<MultiAudioObject>();
+				m_SelectSe->AddAudioResource(L"CURSORMOVE_SE");
+
+			}
+			break;
+			//選択
+		case 15:
+			if (true)
+			{
+				//コントローラ取得
+				auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+				if (CntlVec[0].bConnected)
+				{
+					//カーソル動かす処理
+					if (m_MoveFlg)
+					{
+						//右
+						if (CntlVec[0].fThumbLX > 0.5f)
+						{
+							m_SelectNum++;
+							if (m_SelectNum > 3)
+							{
+								m_SelectNum = 0;
+							}
+							//動けるフラグ止める
+							m_MoveFlg = false;
+
+						}
+						//左
+						if (CntlVec[0].fThumbLX < -0.5f)
+						{
+							m_SelectNum--;
+							if (m_SelectNum < 0)
+							{
+								m_SelectNum = 3;
+							}
+							//動けるフラグ止める
+							m_MoveFlg = false;
+						}
+
+						if (!m_MoveFlg)
+						{
+							//音鳴らす
+							m_SelectSe->Start(L"CURSORMOVE_SE", 0.5f);
+
+							//移動
+							switch (m_SelectNum)
+							{
+							case 0:
+								m_Cursor->GetComponent<Transform>()->SetPosition(-400, -140, 0);
+								m_Cursor->GetComponent<Transform>()->SetScale(220, 100, 1);
+								break;
+							case 1:
+								m_Cursor->GetComponent<Transform>()->SetPosition(-150, -140, 0);
+								m_Cursor->GetComponent<Transform>()->SetScale(140, 100, 1);
+								break;
+							case 2:
+								m_Cursor->GetComponent<Transform>()->SetPosition(150, -140, 0);
+								m_Cursor->GetComponent<Transform>()->SetScale(300, 100, 1);
+								break;
+							case 3:
+								m_Cursor->GetComponent<Transform>()->SetPosition(450, -140, 0);
+								m_Cursor->GetComponent<Transform>()->SetScale(140, 100, 1);
+								break;
+							default:
+								break;
+							}
+						}
+					}
+					//ずっと動けないように
+					else
+					{
+						if (abs(CntlVec[0].fThumbLX) < 0.5f && abs(CntlVec[0].fThumbLY) < 0.5f)
+						{
+							m_MoveFlg = true;
+						}
+					}
+
+					//Aボタン押されたら移動
+					if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B)
+					{
+						//状態変更
+						m_State = 16;
+
+						//音鳴らす
+						m_KetteiSe = ObjectFactory::Create<MultiAudioObject>();
+						m_KetteiSe->AddAudioResource(L"DECIDE_SE");
+						m_KetteiSe->Start(L"DECIDE_SE", 0.5f);
+
+						//切り替え演出
+						auto ob = GetStage()->AddGameObject<SceneChangeSS>();
+						ob->OnAnim();
+						ob->SetLayer(17);
+					}
+				}
+			}
+			break;
+			//遷移
+		case 16:
+			if (true)
+			{
+				switch (m_SelectNum)
+				{
+					//次のステージへ
+				case 0:
+					if (true)
+					{
+						auto ScenePtr = App::GetApp()->GetScene<Scene>();
+						int num = ScenePtr->GetStageNum();
+						num++;
+						//ステージ番号ごとに大きさ変える
+						if (num <= 4)
+						{
+							ScenePtr->SetStageNumAndStageSize(num, Vector2(25, 25));
+						}
+						else if (num > 4 && num <= 12)
+						{
+							ScenePtr->SetStageNumAndStageSize(num, Vector2(50, 50));
+						}
+						else if (num > 12)
+						{
+							ScenePtr->SetStageNumAndStageSize(num, Vector2(75, 75));
+						}
+						//CSVに設定
+						ScenePtr->SetCsvStageNum(Util::IntToWStr(num));
+						PostEvent(2.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToGameStage");
+					}
+					break;
+					//リトライ
+				case 1:
+					if (true)
+					{
+						auto ScenePtr = App::GetApp()->GetScene<Scene>();
+						PostEvent(2.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToGameStage");
+					}
+					break;
+					//ステセレ
+				case 2:
+					if (true)
+					{
+						auto ScenePtr = App::GetApp()->GetScene<Scene>();
+						PostEvent(2.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToStageSelectScene");
+					}
+					break;
+					//タイトル
+				case 3:
+					if (true)
+					{
+						auto ScenePtr = App::GetApp()->GetScene<Scene>();
+						PostEvent(2.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToTitleScene");
+					}
+					break;
+				}
+
+				//状態変更
+				m_State = 17;
+			}
+			break;
+			//待機
+		case 17:
+			break;
+		}
+
+		//跳ねるフラグが立ってたらぴょんぴょん
+		if (m_HopFlg)
+		{
+			if (m_HopTime > m_1WaitTime)
+			{
+				//キャラの座標持ってくる
+				Vector3 pos1 = m_Player1->GetComponent<Transform>()->GetPosition();
+				Vector3 pos2 = m_Player2->GetComponent<Transform>()->GetPosition();
+
+				//位置動かす
+				pos1.y += m_HopPower * App::GetApp()->GetElapsedTime();
+				pos2.y += m_HopPower *App::GetApp()->GetElapsedTime();
+				m_Player1->GetComponent<Transform>()->SetPosition(pos1);
+				m_Player2->GetComponent<Transform>()->SetPosition(pos2);
+
+				//跳ねる力を減衰させる
+				m_HopPower += -9.8f * App::GetApp()->GetElapsedTime() * 3;
+				//ある程度下がったらもっかい跳ねる力を加える
+				if (pos1.y < 1.0f)
+				{
+					//跳ねる力加える
+					m_HopPower = 10;
+					//計算用待機時間をリセット
+					m_HopTime = 0;
+
+					pos1.y = 1.1f;
+					pos2.y = 1.1f;
+					m_Player1->GetComponent<Transform>()->SetPosition(pos1);
+					m_Player2->GetComponent<Transform>()->SetPosition(pos2);
+
+				}
+			}
+			else
+			{
+				m_HopTime += App::GetApp()->GetElapsedTime();
+			}
+		}
+	}
+	//Abe20170531
 
 }
 	//end basecross

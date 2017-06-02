@@ -203,6 +203,7 @@ namespace basecross {
 			//遷移アニメーション
 			AddGameObject<SceneChangeSSOut>()->OnAnim();
 		}
+
 		catch (...) {
 
 			throw;

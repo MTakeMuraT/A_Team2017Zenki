@@ -101,6 +101,8 @@ namespace basecross{
 		void OnUpdate() override;
 
 		void OnAnim();
+
+		void SetLayer(int num) { SetDrawLayer(num); };
 	};
 	//Abe20170523
 	//Abe20170526
@@ -123,6 +125,9 @@ namespace basecross{
 		void OnUpdate() override;
 
 		void OnAnim();
+
+		void SetLayer(int num) { SetDrawLayer(num); };
+
 	};
 	//Abe20170526
 
@@ -352,6 +357,15 @@ namespace basecross{
 		void SetNum(int num);
 
 		void SetNumDraw(bool flg);
+
+
+		//Abe20170531
+		//移動
+		void MoveNums(Vector3);
+		//レイヤー設定
+		void SetLayer(int);
+		//Abe20170531
+
 	};
 
 	//--------------------------------------------------------------------------------------
@@ -389,6 +403,20 @@ namespace basecross{
 		void SetTimer(bool flg);
 
 		bool GetTimerFlg() { return m_FinishFlg; }
+
+		//Abe20170531
+		//座標移動
+		void MovePos(Vector3);
+		//レイヤー設定
+		void SetLayer(int);
+		//Abe20170531
+
+		//Abe20170601
+		//時間取得
+		int GetTime() { return m_Time; }
+		//Abe20170601
+
+
 	};
 
 	//--------------------------------------------------------------------------------------
@@ -434,7 +462,11 @@ namespace basecross{
 			return m_DieFlg;
 		}
 		
-		
+		//ライフスプライト移動
+		void MoveSprtieS(Vector3);
+		//レイヤー変更
+		void SetLayer(int num);
+
 	};
 	//Abe20170418
 	//Abe20170421
@@ -761,6 +793,7 @@ namespace basecross{
 		virtual void OnUpdate() override;
 	};
 
+#pragma region ***オーバー:リザルト***
 	//Abe20170529
 	//--------------------------------------------------------------------------------------
 	//	ゲームオーバー処理
@@ -851,5 +884,124 @@ namespace basecross{
 	};
 	//Abe20170529
 
+	//Abe20170530
+	//--------------------------------------------------------------------------------------
+	//	リザルト処理
+	//--------------------------------------------------------------------------------------
+	class ResultS : public GameObject
+	{
+	private :
+		//Abe20170601
+		//デバッグ文字表示オブジェ
+		shared_ptr<DebugTxt> m_Debugtxt;
+		//Abe20170601
+
+		//状態
+		int m_State = 0;
+		//プレイヤーのアクセサー
+		shared_ptr<GameObject> m_Player1;
+		shared_ptr<GameObject> m_Player2;
+
+		//計算用時間
+		float m_time = 0;
+
+		//跳ねるフラグ
+		bool m_HopFlg = false;
+
+		//跳ねる力
+		float m_HopPower = 10;
+		//跳ねる待機時間
+		const float m_HopWaitTime = 0.5f;
+		//跳ねる計算用時間
+		float m_HopTime = 0;
+		//キャラの中心
+		Vector3 m_centerPos;
+		//左側の位置
+		Vector3 m_Player1TargetPos;
+		//右側の位置
+		Vector3 m_Player2TargetPos;
+
+		//1 カメラを近づける＋キャラを近づける
+		//始めの待つ時間
+		const float m_1WaitTime = 1.0f;
+
+		//2 キャラを手前に向かせる
+
+		//3 跳ねる
+
+		//4 ミッションコンプリート文字左から出す
+		shared_ptr<GameObject> m_MissCompLogo;
+
+		//5 ちょっと暗くする
+		//黒幕
+		shared_ptr<GameObject> m_Black;
+		//透明度
+		float m_BlackAlpha = 0;
+
+		//6 ミッションコンプリート小さくして上に移動
+
+		//7 HPスプライトとタイム持ってくる
+		//HPスプライトの座標
+		Vector3 m_HpPos = Vector3(0, 0, 0);
+		//目的の座標
+		Vector3 m_HpTargetPos = Vector3(30, -250, 0);
+		//タイム座標
+		Vector3 m_TimePos = Vector3(0, 0, 0);
+		//タイム目標座標
+		Vector3 m_TimeTargetPos = Vector3(-400, -400, 0);
+
+		//8 項目を出す
+
+		//9 スコア加算
+		shared_ptr<GameObject> m_HpScore;
+		shared_ptr<GameObject> m_TimeScore;
+		//HPとTimeの値
+		int m_HpAmount;
+		int m_TimeAmount;
+		//HPとTIMEのスコア最大値
+		int m_HpScoreTotal = 0;
+		int m_TimeScoreTotal = 0;
+		//トータルスコア
+		int m_TotalScore = 0;
+		int m_TotalAmount = 0;
+
+		//10 トータルスコア加算
+		shared_ptr<GameObject> m_TotalScoreSp;
+
+		//11 ランク表示
+		shared_ptr<GameObject> m_RankSp;
+		float m_RankAlpha = 0;
+
+		//12 しばらく待つ
+		float m_Wait12Time = 3.0f;
+		shared_ptr<GameObject> m_Black12;
+		shared_ptr<GameObject> m_White12;
+
+		//13 黒幕半透明にしてランクを上に移動
+
+		//14 選択肢出す
+		//選択番号 0　次のステージ 1 リトライ 2 ステセレ 3 タイトル
+		int m_SelectNum = 0;
+
+		//カーソル
+		shared_ptr<GameObject> m_Cursor;
+		//選択音
+		shared_ptr<MultiAudioObject> m_SelectSe;
+		//決定音
+		shared_ptr<MultiAudioObject> m_KetteiSe;
+
+		//15 選択
+		//動かせるか
+		bool m_MoveFlg = true;
+
+	public :
+		ResultS(const shared_ptr<Stage>& StagePtr) :GameObject(StagePtr) {};
+
+		void OnCreate() override;
+		void OnUpdate() override;
+
+	};
+	//Abe20170530
+#pragma endregion
+
 }
-//end basecross

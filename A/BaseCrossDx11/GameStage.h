@@ -64,14 +64,27 @@ namespace basecross
 		// 更新
 		virtual void OnUpdate() override;
 
+		//Abe20170530
 		//ゲームオーバー
 		void GameOver();
 
 		//ゲームオーバーカメラ処理
 		bool GameOverCamera();
-		
+
+		//Abe20170531
+		//リザルト
+		void Result();
+
+		//リザルトカメラ処理 引数はキャラの中心
+		bool ResultCamera(Vector3 pos);
+		//Abe20170531
+
+		//Abe20170530
 		//カメラ移動停止
 		void CameraStop() { m_CameraMoveFlg = false; }
+		//Abe20170530
+
+
 	};
 
 	//地面
