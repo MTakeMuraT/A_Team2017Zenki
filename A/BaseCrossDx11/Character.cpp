@@ -1022,7 +1022,7 @@ namespace basecross {
 		if (!m_TimeStopFlg)
 		{
 			//ŽžŠÔ‰ÁŽZ‚·‚é
-			m_Time += App::GetApp()->GetElapsedTime()*100;
+			m_Time += App::GetApp()->GetElapsedTime();
 			//‚O•bˆÈ‰º‚È‚ç
 			if (m_Time >= 999)
 			{
