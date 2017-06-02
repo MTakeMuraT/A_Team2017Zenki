@@ -551,6 +551,75 @@ namespace basecross {
 		}
 	
 	}
+
+	//プレイヤーのブーストエフェクト
+	void PlayerManager::PlayerbBooth() {
+		auto PlayerL_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false);
+		auto PlayerL_Pos = PlayerL_Ptr->GetComponent<Transform>()->GetPosition();
+		auto PlayerL_Velo = PlayerL_Ptr->GetComponent<Rigidbody>()->GetVelocity();
+		auto PlayerR_Ptr = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_R", false);
+		auto PlayerR_Pos = PlayerR_Ptr->GetComponent<Transform>()->GetPosition();
+		auto PlayerR_Velo = PlayerR_Ptr->GetComponent<Rigidbody>()->GetVelocity();
+
+		//コントローラの取得
+		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		//通常移動時
+		if (m_RotBoostflg == false) {
+			if (CntlVec[0].fThumbLX > 0.5) {
+				////右にいたときの
+				if (PlayerL_Pos.x < PlayerR_Pos.x) {
+					GetStage()->AddGameObject<PlayerBoost>(PlayerL_Pos, Vector3(2,2, 2), L"Spark_TX", 1.0f, 8);
+				}
+				else if (PlayerR_Pos.x < PlayerL_Pos.x) {
+					GetStage()->AddGameObject<PlayerBoost>(PlayerR_Pos, Vector3(2, 2, 2), L"Spark_TX", 1.0f, 8);
+				}
+			}
+			else if (CntlVec[0].fThumbLX < -0.5) {
+				//左 
+				if (PlayerL_Pos.x > PlayerR_Pos.x) {
+					GetStage()->AddGameObject<PlayerBoost>(PlayerL_Pos, Vector3(2, 2, 2), L"Spark_TX", 1.0f, 8);
+				}
+				else
+					if (PlayerR_Pos.x > PlayerL_Pos.x) {
+						GetStage()->AddGameObject<PlayerBoost>(PlayerR_Pos, Vector3(2, 2, 2), L"Spark_TX", 1.0f, 8);
+					}
+			}
+			else if (CntlVec[0].fThumbLY > 0.5) {
+				//上
+				if (PlayerL_Pos.z < PlayerR_Pos.z) {
+					GetStage()->AddGameObject<PlayerBoost>(PlayerL_Pos, Vector3(2, 2, 2), L"Spark_TX", 1.0f, 8);
+				}
+				else if (PlayerR_Pos.z < PlayerL_Pos.z) {
+						GetStage()->AddGameObject<PlayerBoost>(PlayerR_Pos, Vector3(2, 2, 2), L"Spark_TX", 1.0f, 8);
+					}
+			}
+			else if (CntlVec[0].fThumbLY < -0.5) {
+				////下
+				if (PlayerL_Pos.z > PlayerR_Pos.z) {
+					GetStage()->AddGameObject<PlayerBoost>(PlayerL_Pos, Vector3(2, 2, 2), L"Spark_TX", 1.0f, 8);
+				}
+				else
+					if (PlayerR_Pos.z > PlayerL_Pos.z) {
+						GetStage()->AddGameObject<PlayerBoost>(PlayerR_Pos, Vector3(2, 2, 2), L"Spark_TX", 1.0f, 8);
+					}
+			}
+			
+		}
+		//回転時
+		if (CntlVec[0].wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER || CntlVec[0].wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
+			m_RotBoostflg = true;
+			GetStage()->AddGameObject<PlayerBoost>(PlayerL_Pos, Vector3(2, 2, 2), L"Spark_TX", 1.0f,2);
+			GetStage()->AddGameObject<PlayerBoost>(PlayerR_Pos, Vector3(2, 2, 2), L"Spark_TX", 1.0f,2);
+		}
+		else {
+			if (m_RotBoostflg) {
+				m_RotBoostflg = false;
+			}
+		}
+		
+		
+	
+	}
 	/////////////////////////////////////////////////////////////////////////////////
 	////////////////////////ステートシェンジ関数///////////////////////////////////
 	void PlayerManager::StateChangeDoingInterpose() {
@@ -666,8 +735,9 @@ namespace basecross {
 		InputRotation();
 		PlayerAngle();
 		StintArea();
+		PlayerbBooth();
 
-		if (CntlVec[0].wButtons &XINPUT_GAMEPAD_A) {
+		if (CntlVec[0].wButtons &XINPUT_GAMEPAD_A &&!(CntlVec[0].wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER || CntlVec[0].wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) ) {
 			//ステート移動
 			GetStateMachine_Manager()->ChangeState(LeaveState_Manager::Instance());
 		}
@@ -1110,7 +1180,123 @@ namespace basecross {
 		}
 	}
 
+	////--------------------------------------------------------------------------------------
+	////	class PlayerParticle : public GameObject;
+	////	用途　プレイヤーブースト
+	////--------------------------------------------------------------------------------------
+	PlayerBoost::PlayerBoost(const shared_ptr<Stage>& StagePtr,const Vector3& InitPos,const Vector3& scale,const wstring& TextureName,const int& DeleteTime, const int& PlusTimeSpeed):
+	GameObject(StagePtr),
+	m_InitPos(InitPos),
+	m_scale(scale),
+	m_TextureName(TextureName),
+	m_DeleteTime(DeleteTime),
+	m_PlusTimeSpeed(PlusTimeSpeed)
+	
+	{}
+	void PlayerBoost::OnCreate() {
+		auto Trans = AddComponent<Transform>();
+		Trans->SetPosition(m_InitPos);
+		Trans->SetScale(m_scale);
+		Trans->SetRotation(0, 0, 0);
+			//描画設定
+			auto Draw = AddComponent<PNTStaticDraw>();
+			Draw->SetMeshResource(L"DEFAULT_SQUARE");
+			Draw->SetTextureResource(m_TextureName);
+			SetAlphaActive(true);
+	}
+	void PlayerBoost::OnUpdate() {
+		m_CuntTime += App::GetApp()->GetElapsedTime()* m_PlusTimeSpeed;
+		if (m_CuntTime > m_DeleteTime) {
+			SetDrawActive(false);
+			SetUpdateActive(false);
 
+		}
+	}
+
+	////--------------------------------------------------------------------------------------
+	////	class PlayerParticle : public GameObject;
+	////	用途:プレイヤーパーティクル
+	////--------------------------------------------------------------------------------------
+	//PlayerParticle::PlayerParticle(const  shared_ptr<Stage>& StagePtr) :
+	//GameObject(StagePtr)
+	//{}
+
+	//void PlayerParticle::OnUpdate(){
+	//	//パーティクルを出しているか？
+	//	if (m_NowParticleFlg)
+	//	{
+	//		bool CreateFlg = false;
+	//		//位置更新
+	//		
+	//		for (auto v : m_Particle)
+	//		{
+	//			float m_Count = 0;
+	//			//描画されてたら
+	//			if (v->GetDrawActive())
+	//			{
+	//				while(flg == true) 
+	//				{
+	//					m_Count += App::GetApp()->GetElapsedTime()/2;
+	//					if (m_Count > 10) {
+	//						v->SetDrawActive(false);
+	//						m_Count = 0;
+	//						flg = false;
+	//					}
+	//				}
+	//			}
+	//			flg = true;
+	//		}
+	//		if (CreateFlg)
+	//		{
+	//			//無かったら生成
+	//			CreateParticle();
+	//		}
+	//	}
+	//	
+	//}
+	//void PlayerParticle::OnParticle(Vector3 InitPos, Vector3 scale, wstring TextureName, bool DeleteFlg, float CreateInterval, int Layer, float deleteTime){
+	//	//初期位置
+	//	m_InitPos = InitPos;
+	//	//大きさ設定
+	//	m_Scale = scale;
+	//	//テクスチャの名前設定
+	//	m_TextureName = TextureName;
+	//	//消滅演出設定
+	//	m_DeleteFlg = DeleteFlg;
+	//	//作成間隔設定
+	//	m_CreateInterval = CreateInterval;
+	//	//レイヤー設定
+	//	m_Layer = Layer;
+	//	//消滅時間
+	//	m_DeleteTime = deleteTime;
+
+	//	m_NowParticleFlg = true;
+
+	//}
+	//void PlayerParticle::CreateParticle() {
+	//	//生成
+	//	auto obj = GetStage()->AddGameObject<GameObject>();
+	//	auto Trans = obj->AddComponent<Transform>();
+	//	//生成位置調整
+	//	Vector3 pos = m_InitPos;
+	//	//位置設定
+	//	Trans->SetPosition(pos);
+	//	//大きさ設定
+	//	Trans->SetScale(m_Scale);
+
+	//	//描画設定
+	//	auto Draw = obj->AddComponent<PNTStaticDraw>();
+	//	Draw->SetMeshResource(L"DEFAULT_SQUARE");
+	//	Draw->SetTextureResource(m_TextureName);
+	//	obj->SetAlphaActive(true);
+	//	obj->SetDrawLayer(m_Layer);
+
+	//
+	//	//各自の消える時間
+	//	m_Particle.push_back(obj);
+	//}
+
+	
 	
 	//--------------------------------------------------------------------------------------
 	//	class SkySphere : public GameObject;

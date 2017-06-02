@@ -26,6 +26,8 @@ namespace basecross {
 		//数字のスプライト
 		strTexture = DataDir + L"number.png";
 		App::GetApp()->RegisterTexture(L"NUMBER_TX", strTexture);
+		strTexture = DataDir + L"spark.png";
+		App::GetApp()->RegisterTexture(L"Spark_TX", strTexture);
 
 		//Abe20170602
 		//タイム下地

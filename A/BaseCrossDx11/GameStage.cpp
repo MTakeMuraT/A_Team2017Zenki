@@ -104,7 +104,7 @@ namespace basecross
 	//実装したいものをテストする時に使用
 	void GameStage::CreateTestLin() {
 		AddGameObject<SkySphere>(
-			Vector3(300,300,300),
+			Vector3(500,500,500),
 			Vector3(0,0,0));
 		AddGameObject<Ground_GameStage>(
 			Vector3(300, 300, 300),

@@ -110,6 +110,9 @@ namespace basecross {
 		//ダメージ用
 		bool m_DamePower = false;
 		float m_LimitTime = 0;
+		//演出ブーストのflg
+		bool m_RotBoostflg = false;
+
 
 	public:
 
@@ -167,14 +170,15 @@ namespace basecross {
 
 		//エリア外への進行を防ぐ関数
 		void StintArea();
-
+		//回転するかのフラグ
 		bool GetRotateFlg() {
 			return m_RotateFlg;
 		}
 		void SetRotateFlg(bool flg) {
 			m_RotateFlg = flg;
 		}
-		
+		//ブーストエフェクト表示場所とタイミング
+		void PlayerbBooth();
 
 	};
 	//--------------------------------------------------------------------------------------
@@ -314,7 +318,8 @@ namespace basecross {
 		//ステートにから抜けるときに呼ばれる関数
 		virtual void Exit(const shared_ptr<PlayerManager>& Obj)override;
 	};
-
+	
+	
 	//--------------------------------------------------------------------------------------
 	//	class SkySphere : public GameObject;
 	//	用途: スカイボックスの背景
@@ -333,8 +338,64 @@ namespace basecross {
 		virtual void OnCreate() override;
 		//操作
 	};
+	////--------------------------------------------------------------------------------------
+	////	class PlayerParticle : public GameObject;
+	////	用途:プレイヤーパーティクル
+	////--------------------------------------------------------------------------------------
+	//class  PlayerParticle :public GameObject
+	//{
+	//private:
+	//	//初期位置
+	//	Vector3 m_InitPos = Vector3(0,0,0);
+	//	//大きさ
+	//	Vector3 m_Scale = Vector3(0, 0, 0);
+	//	//作成する間隔
+	//	float m_CreateInterval = 0.0f;
+	//	//テクスチャの名前
+	//	wstring m_TextureName;
+	//	//消滅演出
+	//	bool m_DeleteFlg = false;
+	//	//現在パーティクルを出しているかどうか
+	//	bool m_NowParticleFlg = false;
+	//	//レイヤー
+	//	int m_Layer = 0;
+	//	//消える時間
+	//	float m_DeleteTime = 1.0f;
+	//	//float m_Count = 0.0f;
+	//	//パーティクルデータ
+	//	vector<shared_ptr<GameObject>> m_Particle;
+	//	vector<int>m_DeleteIntvec;
+	//	bool flg = true;
+	//public:
+	//	PlayerParticle(const shared_ptr<Stage>& StagePtr);
+	//	~PlayerParticle() {};
+	//	virtual void OnUpdate() override;
+	//	//初期位置、大きさ、テクスチャの名前、消える時間,作成間隔、レイヤー、消える時間
+	//	void OnParticle(Vector3 InitPos, Vector3 scale, wstring TextureName, bool DeleteFlg, float CreateInterval, int Layer, float deleteTime);
+	//	void CreateParticle();
 
-	
+	//};
+	////--------------------------------------------------------------------------------------
+	////	class PlayerBoost : public GameObject;
+	////	用途:プレイヤーブースト
+	////--------------------------------------------------------------------------------------
+	class  PlayerBoost :public GameObject
+	{
+	 private:
+		Vector3 m_InitPos = Vector3(0, 0, 0);
+		Vector3 m_scale = Vector3(0, 0, 0);
+		wstring m_TextureName;
+
+		float m_DeleteTime = 0.0f;
+		float m_CuntTime = 0.0f;
+		int m_PlusTimeSpeed = 0;
+		 public:
+			 PlayerBoost(const shared_ptr<Stage>& StagePtr,const Vector3& InitPos,const Vector3& scale,const wstring& TextureName,const int& DeleteTime, const int& PlusTimeSpeed);
+		 	~PlayerBoost() {};
+			virtual void OnCreate() override;
+		 	virtual void OnUpdate() override;
+	};
+
 
 	//--------------------------------------------------------------------------------------
 	//	class PlayerHP : public GameObject;

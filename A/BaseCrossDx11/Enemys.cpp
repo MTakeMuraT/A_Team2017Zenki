@@ -1695,7 +1695,7 @@ namespace basecross
 			);
 
 		//Œ©‚½–Ú
-		auto Draw = AddComponent<PNTStaticModelDraw>();
+		auto Draw = AddComponent<PNTBoneModelDraw>();
 		//ƒƒbƒVƒ…İ’è
 		Draw->SetMeshResource(L"BOMBENEMY_MODEL");
 		//ƒ‚ƒfƒ‹‘å‚«‚³’²®
