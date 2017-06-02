@@ -302,8 +302,9 @@ namespace basecross
 	//ゲームオーバー処理
 	void GameStage::GameOver()
 	{
-		auto ptr = GetSharedGameObject<GameObject>(L"GameOverS", false);
-		if (!ptr)
+		auto ptr = GetSharedGameObject<GameObject>(L"ResultS", false);
+		auto ptr2 = GetSharedGameObject<GameObject>(L"GameOverS", false);
+		if (!ptr && !ptr2)
 		{
 			SetSharedGameObject(L"GameOverS",AddGameObject<GameOverS>());
 		}
@@ -349,7 +350,8 @@ namespace basecross
 	void GameStage::Result()
 	{
 		auto ptr = GetSharedGameObject<GameObject>(L"ResultS", false);
-		if (!ptr)
+		auto ptr2 = GetSharedGameObject<GameObject>(L"GameOverS", false);
+		if (!ptr && !ptr2)
 		{
 			SetSharedGameObject(L"ResultS", AddGameObject<ResultS>());
 		}
