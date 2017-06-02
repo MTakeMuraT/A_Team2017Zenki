@@ -488,7 +488,7 @@ namespace basecross
 		//ŒvZ—pŠÔ
 		float m_time = 0;
 		//‰æ‘œØ‚è‘Ö‚¦ŠÔŠu
-		const float m_IntervalTime = 0.05f;
+		const float m_IntervalTime = 0.01f;
 	public:
 		BombEffect(const shared_ptr<Stage>& StagePtr);
 

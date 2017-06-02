@@ -212,9 +212,9 @@ namespace basecross
 			//Abe20170523IzumiHikitugi
 
 			//Abe20170602
-			auto ob = AddGameObject<BombEffect>();
-			ob->SetPosActive(Vector3(0, 5, 0));
-			ob->SetDrawLayer(10);
+			//auto ob = AddGameObject<BombEffect>();
+			//ob->SetPosActive(Vector3(0, 5, 0));
+			//ob->SetDrawLayer(10);
 			//Abe20170602
 
 		}

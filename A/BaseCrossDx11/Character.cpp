@@ -2196,7 +2196,7 @@ namespace basecross {
 		DrawW->SetMeshResource(L"DEFAULT_SQUARE");
 		DrawW->SetDiffuse(Color4(1, 1, 1, 0));
 
-		White->SetDrawLayer(10);
+		White->SetDrawLayer(11);
 		White->SetAlphaActive(true);
 
 		m_White = White;
@@ -2316,8 +2316,8 @@ namespace basecross {
 						obj->SetPosActive(m_Player1->GetComponent<Transform>()->GetPosition());
 						obj2->SetPosActive(m_Player2->GetComponent<Transform>()->GetPosition());
 
-						obj->SetLayer(8);
-						obj2->SetLayer(8);
+						obj->SetLayer(10);
+						obj2->SetLayer(10);
 
 						//キャラ非表示
 						m_Player1->SetDrawActive(false);
@@ -2364,7 +2364,7 @@ namespace basecross {
 					Draw->SetTextureResource(L"OVERNOISE_TX");
 					Draw->SetDiffuse(Color4(1, 1, 1, 0));
 
-					obj->SetDrawLayer(10);
+					obj->SetDrawLayer(12);
 					obj->SetAlphaActive(true);
 
 					m_Noise = obj;
@@ -2380,7 +2380,7 @@ namespace basecross {
 					Draw2->SetTextureResource(L"OVERLASTBLACK_TX");
 					Draw2->SetDiffuse(Color4(1, 1, 1, 0));
 
-					obj2->SetDrawLayer(11);
+					obj2->SetDrawLayer(13);
 					obj2->SetAlphaActive(true);
 
 					m_BlackSprite = obj2;
@@ -2440,7 +2440,7 @@ namespace basecross {
 					Draw->SetTextureResource(L"OVERLOGO_TX");
 					Draw->SetDiffuse(Color4(1, 1, 1, 0));
 
-					obj->SetDrawLayer(12);
+					obj->SetDrawLayer(14);
 					obj->SetAlphaActive(true);
 
 					m_GameOverLogo = obj;
@@ -2475,7 +2475,7 @@ namespace basecross {
 					auto Draw = obj->AddComponent<PCTSpriteDraw>();
 					Draw->SetTextureResource(L"OVERRETRYLOGO_TX");
 
-					obj->SetDrawLayer(12);
+					obj->SetDrawLayer(14);
 					obj->SetAlphaActive(true);
 
 					m_OverRetryLogo = obj;
@@ -2490,7 +2490,7 @@ namespace basecross {
 					Draw = obj->AddComponent<PCTSpriteDraw>();
 					Draw->SetTextureResource(L"OVERSTASELELOGO_TX");
 
-					obj->SetDrawLayer(12);
+					obj->SetDrawLayer(14);
 					obj->SetAlphaActive(true);
 
 					m_OverStageSelectLogo = obj;
@@ -2505,7 +2505,7 @@ namespace basecross {
 					Draw = obj->AddComponent<PCTSpriteDraw>();
 					Draw->SetTextureResource(L"OVERTITLELOGO_TX");
 
-					obj->SetDrawLayer(12);
+					obj->SetDrawLayer(14);
 					obj->SetAlphaActive(true);
 
 					m_OverTitleLogo = obj;
@@ -2523,7 +2523,7 @@ namespace basecross {
 					CDraw->SetTextureResource(L"OVERCURSOR_TX");
 
 					//レイヤー設定
-					CursorSprite->SetDrawLayer(13);
+					CursorSprite->SetDrawLayer(15);
 
 					//透明度有効化
 					CursorSprite->SetAlphaActive(true);
@@ -2590,7 +2590,7 @@ namespace basecross {
 								m_Cursor->GetComponent<Transform>()->SetScale(250, 100, 1);
 								break;
 							case 2:
-								m_Cursor->GetComponent<Transform>()->SetPosition(300, -240, 0);
+								m_Cursor->GetComponent<Transform>()->SetPosition(310, -240, 0);
 								m_Cursor->GetComponent<Transform>()->SetScale(180, 100, 1);
 								break;
 							default:

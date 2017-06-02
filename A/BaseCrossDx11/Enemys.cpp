@@ -2179,7 +2179,7 @@ namespace basecross
 				if (m_NowSpriteNum > m_SpriteNum)
 				{
 					m_NowSpriteNum = 0;
-					//m_ActiveFlg = false;
+					m_ActiveFlg = false;
 				}
 			}
 			/*
