@@ -1029,62 +1029,74 @@ namespace basecross
 			m_ShotChild = true;
 			//起動してないのあれば再利用
 			bool flgg = false;
+
+			int count = 0;
 			for (auto obj : m_ChildS)
 			{
 				auto ptr = dynamic_pointer_cast<ShotEnemyChild>(obj);
-				//死んでたら再利用
-				if (ptr)
+				if (ptr->GetDrawActive())
 				{
-					if (!ptr->GetDrawActive())
+					count++;
+				}
+			}
+			if (count < 2)
+			{
+				for (auto obj : m_ChildS)
+				{
+					auto ptr = dynamic_pointer_cast<ShotEnemyChild>(obj);
+					//死んでたら再利用
+					if (ptr)
 					{
-						Vector3 PPOS = GetComponent<Transform>()->GetPosition();
-						PPOS.y += GetComponent<Transform>()->GetScale().y;
-						int Tangle = (int)angle % 360;
-						//とりあえず10～20、-10～-20度の範囲で飛ばす
-						if (rand() % 2 == 0)
+						if (!ptr->GetDrawActive())
 						{
-							Tangle += rand() % 11 + 10;
-						}
-						else
-						{
-							Tangle += rand() % 11 - 20;
-						}
+							Vector3 PPOS = GetComponent<Transform>()->GetPosition();
+							PPOS.y += GetComponent<Transform>()->GetScale().y;
+							int Tangle = (int)angle % 360;
+							//とりあえず10～20、-10～-20度の範囲で飛ばす
+							if (rand() % 2 == 0)
+							{
+								Tangle += rand() % 11 + 10;
+							}
+							else
+							{
+								Tangle += rand() % 11 - 20;
+							}
 
-						float angle2 = Tangle * 3.14159265f / 180;
-						ptr->SetVelocity(Vector3(cos(angle2) * (float)(rand() % 3 + 1) * m_ParScale / 2, rand() % 5 + 5, sin(angle2) * (float)(rand() % 3 + 1))* m_ParScale / 2);
+							float angle2 = Tangle * 3.14159265f / 180;
+							ptr->SetVelocity(Vector3(cos(angle2) * (float)(rand() % 3 + 1) * m_ParScale / 2, rand() % 5 + 5, sin(angle2) * (float)(rand() % 3 + 1))* m_ParScale / 2);
 
-						flgg = true;
-						break;
+							flgg = true;
+							break;
+						}
 					}
 				}
-			}
-			//いなかったら作る
-			if (!flgg)
-			{
-				Vector3 PPOS = GetComponent<Transform>()->GetPosition();
-				PPOS.y += GetComponent<Transform>()->GetScale().y;
-				auto pptr = GetStage()->AddGameObject<ShotEnemyChild>(PPOS, Vector3(1, 1, 1), 2);
-				int Tangle = (int)angle % 360;
-				//とりあえず10～20、-10～-20度の範囲で飛ばす
-				if (rand() % 2 == 0)
+				//いなかったら作る
+				if (!flgg)
 				{
-					Tangle += rand() % 11 + 10;
+					Vector3 PPOS = GetComponent<Transform>()->GetPosition();
+					PPOS.y += GetComponent<Transform>()->GetScale().y;
+					auto pptr = GetStage()->AddGameObject<ShotEnemyChild>(PPOS, Vector3(1, 1, 1), 2);
+					int Tangle = (int)angle % 360;
+					//とりあえず10～20、-10～-20度の範囲で飛ばす
+					if (rand() % 2 == 0)
+					{
+						Tangle += rand() % 11 + 10;
+					}
+					else
+					{
+						Tangle += rand() % 11 - 20;
+					}
+
+					float angle2 = Tangle * 3.14159265f / 180;
+					pptr->SetVelocity(Vector3(cos(angle2) * (float)(rand() % 3 + 1) * m_ParScale / 2, rand() % 5 + 5, sin(angle2) * (float)(rand() % 3 + 1))* m_ParScale / 2);
+					m_ChildS.push_back(pptr);
+
+					//グループに入れる
+					GetStage()->GetSharedObjectGroup(L"CollisionGroup")->IntoGroup(pptr);
+					GetStage()->GetSharedObjectGroup(L"EnemyGroup")->IntoGroup(pptr);
+
 				}
-				else
-				{
-					Tangle += rand() % 11 - 20;
-				}
-
-				float angle2 = Tangle * 3.14159265f / 180;
-				pptr->SetVelocity(Vector3(cos(angle2) * (float)(rand() % 3 + 1) * m_ParScale / 2, rand() % 5 + 5, sin(angle2) * (float)(rand() % 3 + 1))* m_ParScale / 2);
-				m_ChildS.push_back(pptr);
-
-				//グループに入れる
-				GetStage()->GetSharedObjectGroup(L"CollisionGroup")->IntoGroup(pptr);
-				GetStage()->GetSharedObjectGroup(L"EnemyGroup")->IntoGroup(pptr);
-
 			}
-
 		}
 
 		//もしある程度離れたら
