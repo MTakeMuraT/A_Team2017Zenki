@@ -644,7 +644,10 @@ namespace basecross
 				SetDrawActive(false);
 				m_Hp = 0;
 				m_ActiveFlg = false;
-
+				//Abe20170605
+				//索敵サークル除去
+				m_SearchCircle->SetDrawActive(false);
+				//Abe20170605
 			}
 			else
 			{
@@ -1210,6 +1213,11 @@ namespace basecross
 				m_Hp = 0;
 				m_ActiveFlg = false;
 
+				//Abe20170605
+				//索敵サークル除去
+				m_SearchCircle->SetDrawActive(false);
+				//Abe20170605
+
 			}
 			else
 			{
@@ -1638,6 +1646,11 @@ namespace basecross
 			SetDrawActive(false);
 			m_Hp = 0;
 			m_ActiveFlg = false;
+
+			//Abe20170605
+			//索敵サークル除去
+			m_SearchCircle->SetDrawActive(false);
+			//Abe20170605
 
 			//子機収納
 			for (auto obj : m_Drawns)
@@ -2081,6 +2094,11 @@ namespace basecross
 			SetDrawActive(false);
 			m_Hp = 0;
 			m_ActiveFlg = false;
+
+			//Abe20170605
+			//索敵サークル除去
+			m_SearchCircle->SetDrawActive(false);
+			//Abe20170605
 
 		}
 
