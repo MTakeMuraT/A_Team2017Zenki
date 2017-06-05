@@ -635,28 +635,30 @@ namespace basecross
 	//UŒ‚ó‚¯‚½‚Æ‚«
 	void TackleEnemy::DamagePlayer()
 	{
-		if (!m_MutekiFlg)
+		if (m_ActiveFlg)
 		{
-			//‚à‚µHP‚ª1ˆÈ‰º‚È‚ç
-			if (m_Hp <= 1)
+			if (!m_MutekiFlg)
 			{
-				//ƒ^ƒq‚Ê
-				SetDrawActive(false);
-				m_Hp = 0;
-				m_ActiveFlg = false;
-				//Abe20170605
-				//õ“GƒT[ƒNƒ‹œ‹
-				m_SearchCircle->SetDrawActive(false);
-				//”j•Ğ¶¬
-				GetStage()->GetSharedGameObject<BakuSanSpawn>(L"BakuSanSpawn", false)->CreateBakusan(rand() % 20, GetComponent<Transform>()->GetPosition());
-				//Abe20170605
+				//‚à‚µHP‚ª1ˆÈ‰º‚È‚ç
+				if (m_Hp <= 1)
+				{
+					//ƒ^ƒq‚Ê
+					SetDrawActive(false);
+					m_Hp = 0;
+					m_ActiveFlg = false;
+					//Abe20170605
+					//õ“GƒT[ƒNƒ‹œ‹
+					m_SearchCircle->SetDrawActive(false);
+					//”j•Ğ¶¬
+					GetStage()->GetSharedGameObject<BakuSanSpawn>(L"BakuSanSpawn", false)->CreateBakusan(rand() % 25 + 5, GetComponent<Transform>()->GetPosition());
+					//Abe20170605
+				}
+				else
+				{
+					m_Hp--;
+					ToMuteki();
+				}
 			}
-			else
-			{
-				m_Hp--;
-				ToMuteki();
-			}
-
 		}
 	}
 
@@ -1205,31 +1207,33 @@ namespace basecross
 	//Abe20170517
 	void ShotEnemy::DamagePlayer()
 	{
-		if (!m_MutekiFlg)
-		{
-			//‚à‚µHP‚ª1ˆÈ‰º‚È‚ç
-			if (m_Hp <= 1)
+		if (m_ActiveFlg)
+		{ 
+			if (!m_MutekiFlg)
 			{
-				//ƒ^ƒq‚Ê
-				SetDrawActive(false);
-				m_Hp = 0;
-				m_ActiveFlg = false;
+				//‚à‚µHP‚ª1ˆÈ‰º‚È‚ç
+				if (m_Hp <= 1)
+				{
+					//ƒ^ƒq‚Ê
+					SetDrawActive(false);
+					m_Hp = 0;
+					m_ActiveFlg = false;
 
-				//Abe20170605
-				//õ“GƒT[ƒNƒ‹œ‹
-				m_SearchCircle->SetDrawActive(false);
-				//”j•Ğ¶¬
-				GetStage()->GetSharedGameObject<BakuSanSpawn>(L"BakuSanSpawn", false)->CreateBakusan(rand() % 20, GetComponent<Transform>()->GetPosition());
-				//Abe20170605
+					//Abe20170605
+					//õ“GƒT[ƒNƒ‹œ‹
+					m_SearchCircle->SetDrawActive(false);
+					//”j•Ğ¶¬
+					GetStage()->GetSharedGameObject<BakuSanSpawn>(L"BakuSanSpawn", false)->CreateBakusan(rand() % 25 + 5, GetComponent<Transform>()->GetPosition());
+					//Abe20170605
 
+				}
+				else
+				{
+					m_Hp--;
+					ToMuteki();
+
+				}
 			}
-			else
-			{
-				m_Hp--;
-				ToMuteki();
-
-			}
-
 		}
 	}
 
@@ -1643,32 +1647,35 @@ namespace basecross
 	//UŒ‚ó‚¯‚½‚Æ‚«
 	void TeleportEnemy::DamagePlayer()
 	{
-		//‚à‚µHP‚ª1ˆÈ‰º‚È‚ç
-		if (m_Hp <= 1)
+		if (GetDrawActive())
 		{
-			//ƒ^ƒq‚Ê
-			SetDrawActive(false);
-			m_Hp = 0;
-			m_ActiveFlg = false;
-
-			//Abe20170605
-			//õ“GƒT[ƒNƒ‹œ‹
-			m_SearchCircle->SetDrawActive(false);
-			//”j•Ğ¶¬
-			GetStage()->GetSharedGameObject<BakuSanSpawn>(L"BakuSanSpawn", false)->CreateBakusan(rand() % 20, GetComponent<Transform>()->GetPosition());
-			//Abe20170605
-
-			//q‹@û”[
-			for (auto obj : m_Drawns)
+			//‚à‚µHP‚ª1ˆÈ‰º‚È‚ç
+			if (m_Hp <= 1)
 			{
-				dynamic_pointer_cast<SearchDrawn>(obj)->UpDrawns();
+				//ƒ^ƒq‚Ê
+				SetDrawActive(false);
+				m_Hp = 0;
+				m_ActiveFlg = false;
+
+				//Abe20170605
+				//õ“GƒT[ƒNƒ‹œ‹
+				m_SearchCircle->SetDrawActive(false);
+				//”j•Ğ¶¬
+				GetStage()->GetSharedGameObject<BakuSanSpawn>(L"BakuSanSpawn", false)->CreateBakusan(rand() % 25 + 5, GetComponent<Transform>()->GetPosition());
+				//Abe20170605
+
+				//q‹@û”[
+				for (auto obj : m_Drawns)
+				{
+					dynamic_pointer_cast<SearchDrawn>(obj)->UpDrawns();
+
+				}
 
 			}
-
-		}
-		else
-		{
-			m_Hp--;
+			else
+			{
+				m_Hp--;
+			}
 		}
 	}
 
@@ -2088,41 +2095,43 @@ namespace basecross
 	//ƒvƒŒƒCƒ„[‚Ö‚ÌUŒ‚”»’è
 	void BombEnemy::ToDamagePlayer()
 	{
-		//UŒ‚’†‚È‚ç
-		if (m_TackleFlg)
-		{
-			//HP‚ğŒ¸‚ç‚·
-			auto PtrPlayerHP = GetStage()->GetSharedGameObject<PlayerHP>(L"PlayerHP", false);
-			PtrPlayerHP->SetDamage_int(m_Power);
-			PtrPlayerHP->SetHit(true);
+			//UŒ‚’†‚È‚ç
+			if (m_TackleFlg)
+			{
+				//HP‚ğŒ¸‚ç‚·
+				auto PtrPlayerHP = GetStage()->GetSharedGameObject<PlayerHP>(L"PlayerHP", false);
+				PtrPlayerHP->SetDamage_int(m_Power);
+				PtrPlayerHP->SetHit(true);
 
-			//©”š‚Ìˆ×Á–Å
-			SetDrawActive(false);
-			m_Hp = 0;
-			m_ActiveFlg = false;
-
-			//Abe20170605
-			//õ“GƒT[ƒNƒ‹œ‹
-			m_SearchCircle->SetDrawActive(false);
-			//Abe20170605
-
-		}
-
-	}
-		void BombEnemy::DamagePlayer()
-		{	
-				//ƒ^ƒq‚Ê
+				//©”š‚Ìˆ×Á–Å
 				SetDrawActive(false);
 				m_Hp = 0;
 				m_ActiveFlg = false;
-				//”j•Ğ¶¬
-				GetStage()->GetSharedGameObject<BakuSanSpawn>(L"BakuSanSpawn", false)->CreateBakusan(rand() % 20, GetComponent<Transform>()->GetPosition());
+
 				//Abe20170605
 				//õ“GƒT[ƒNƒ‹œ‹
 				m_SearchCircle->SetDrawActive(false);
 				//Abe20170605
 
+			}
+		
+	}
+	void BombEnemy::DamagePlayer()
+	{
+		if (GetDrawActive())
+		{
+			//ƒ^ƒq‚Ê
+			SetDrawActive(false);
+			m_Hp = 0;
+			m_ActiveFlg = false;
+			//”j•Ğ¶¬
+			//GetStage()->GetSharedGameObject<BakuSanSpawn>(L"BakuSanSpawn", false)->CreateBakusan(rand() % 20, GetComponent<Transform>()->GetPosition());
+			//Abe20170605
+			//õ“GƒT[ƒNƒ‹œ‹
+			m_SearchCircle->SetDrawActive(false);
+			//Abe20170605
 		}
+	}
 
 	//Abe20170508
 	//======================ˆÈ‰ºq‹@ŒQ=======================
