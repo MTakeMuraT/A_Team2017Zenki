@@ -2580,7 +2580,7 @@ namespace basecross {
 					//ずっと動けないように
 					else
 					{
-						if (abs(CntlVec[0].fThumbLX) < 0.5f && abs(CntlVec[0].fThumbLY) < 0.5f)
+						if (abs(CntlVec[0].fThumbLX) < 0.5f && abs(CntlVec[0].fThumbLX) > -0.5f)
 						{
 							m_MoveFlg = true;
 						}
@@ -3474,7 +3474,7 @@ namespace basecross {
 					//ずっと動けないように
 					else
 					{
-						if (abs(CntlVec[0].fThumbLX) < 0.5f && abs(CntlVec[0].fThumbLY) < 0.5f)
+						if (abs(CntlVec[0].fThumbLX) < 0.5f && abs(CntlVec[0].fThumbLX) > -0.5f)
 						{
 							m_MoveFlg = true;
 						}
@@ -3615,20 +3615,108 @@ namespace basecross {
 		//ゲームに戻る
 		auto togame = GetStage()->AddGameObject<GameObject>();
 		auto TransTG = togame->AddComponent<Transform>();
-		TransTG->SetPosition(-500, 200, 0);
-		TransTG->SetScale(500, 100, 1);
+		TransTG->SetPosition(-400, 100, 0);
+		TransTG->SetScale(600, 150, 1);
 		TransTG->SetRotation(0, 0, 0);
 
 		auto DrawTG = togame->AddComponent<PCTSpriteDraw>();
-		DrawTG->SetTextureResource(L"");
+		DrawTG->SetTextureResource(L"PAUSE_TOGAME_TX");
 
 		togame->SetAlphaActive(true);
-		togame->SetDrawLayer(6);
+		togame->SetDrawLayer(7);
+		togame->SetDrawActive(false);
+
+		m_ToGame = togame;
 		//リトライ
+		auto retry = GetStage()->AddGameObject<GameObject>();
+		auto TransRT = retry->AddComponent<Transform>();
+		TransRT->SetPosition(-500, 0, 0);
+		TransRT->SetScale(600, 150, 1);
+		TransRT->SetRotation(0, 0, 0);
+
+		auto DrawRT = retry->AddComponent<PCTSpriteDraw>();
+		DrawRT->SetTextureResource(L"PAUSE_RETRY_TX");
+
+		retry->SetAlphaActive(true);
+		retry->SetDrawLayer(7);
+		retry->SetDrawActive(false);
+
+		m_ToRetry = retry;
 		//ステセレ
+		auto stesele = GetStage()->AddGameObject<GameObject>();
+		auto TransSS = stesele->AddComponent<Transform>();
+		TransSS->SetPosition(-500, -100, 0);
+		TransSS->SetScale(600, 150, 1);
+		TransSS->SetRotation(0, 0, 0);
+
+		auto DrawSS = stesele->AddComponent<PCTSpriteDraw>();
+		DrawSS->SetTextureResource(L"PAUSE_TOSELECT_TX");
+
+		stesele->SetAlphaActive(true);
+		stesele->SetDrawLayer(7);
+		stesele->SetDrawActive(false);
+
+		m_ToSteSele = stesele;
 		//タイトル
+		auto title = GetStage()->AddGameObject<GameObject>();
+		auto TransTI = title->AddComponent<Transform>();
+		TransTI->SetPosition(-500, -200, 0);
+		TransTI->SetScale(600, 150, 1);
+		TransTI->SetRotation(0, 0, 0);
+
+		auto DrawTI = title->AddComponent<PCTSpriteDraw>();
+		DrawTI->SetTextureResource(L"PAUSE_TOTITLE_TX");
+
+		title->SetAlphaActive(true);
+		title->SetDrawLayer(7);
+		title->SetDrawActive(false);
+
+		m_ToTitle = title;
 		//エネミーの数
+		auto enemys = GetStage()->AddGameObject<GameObject>();
+		auto TransEN = enemys->AddComponent<Transform>();
+		TransEN->SetPosition(250, -50, 0);
+		TransEN->SetScale(700, 600, 1);
+		TransEN->SetRotation(0, 0, 0);
+
+		auto DrawEN = enemys->AddComponent<PCTSpriteDraw>();
+		DrawEN->SetTextureResource(L"PAUSE_ENEMYS_TX");
+
+		enemys->SetAlphaActive(true);
+		enemys->SetDrawLayer(7);
+		enemys->SetDrawActive(false);
+
+		m_EnemyS = enemys;
+
+		//数字
+		auto num1 = GetStage()->AddGameObject<NumberSprite>(0, Vector2(220, 70), Vector2(100, 100), 8);
+		num1->SetNumDraw(false);
+		m_TackleSp = num1;
+		
+		auto num2 = GetStage()->AddGameObject<NumberSprite>(0, Vector2(520, 70), Vector2(100, 100), 8);
+		num2->SetNumDraw(false);
+		m_ShotSp = num2;
+		auto num3 = GetStage()->AddGameObject<NumberSprite>(0, Vector2(220, -230), Vector2(100, 100), 8);
+		num3->SetNumDraw(false);
+		m_TerepoSp = num3;
+		auto num4 = GetStage()->AddGameObject<NumberSprite>(0, Vector2(520, -230), Vector2(100, 100), 8);
+		num4->SetNumDraw(false);
+		m_BombSp = num4;
 		//ポーズロゴ
+		auto pauselogo = GetStage()->AddGameObject<GameObject>();
+		auto TransPL = pauselogo->AddComponent<Transform>();
+		TransPL->SetPosition(0, 300, 0);
+		TransPL->SetScale(800, 100, 1);
+		TransPL->SetRotation(0, 0, 0);
+
+		auto DrawPL = pauselogo->AddComponent<PCTSpriteDraw>();
+		DrawPL->SetTextureResource(L"PAUSE_LOGO_TX");
+
+		pauselogo->SetAlphaActive(true);
+		pauselogo->SetDrawLayer(7);
+		pauselogo->SetDrawActive(false);
+
+		m_PauseLogo = pauselogo;
 		//暗転
 		auto black = GetStage()->AddGameObject<GameObject>();
 		auto TransB = black->AddComponent<Transform>();
@@ -3637,14 +3725,347 @@ namespace basecross {
 		TransB->SetRotation(0, 0, 0);
 
 		auto DrawB = black->AddComponent<PCTSpriteDraw>();
-		DrawB->SetTextureResource(L"");
+		DrawB->SetTextureResource(L"PAUSE_BLACK_TX");
+		DrawB->SetDiffuse(Color4(1, 1, 1, 0.5f));
 
 		black->SetAlphaActive(true);
-		black->SetDrawLayer(5);
+		black->SetDrawLayer(6);
+		black->SetDrawActive(false);
+
+		m_Black = black;
+
+		//アップデート停止
+		SetUpdateActive(false);
 	}
 
 	void PauseMenu::OnUpdate()
 	{
+		//コントローラ取得
+		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		if (CntlVec[0].bConnected)
+		{
+			//STARTボタンで消す
+			//if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_START)
+			//{
+			//	Close();
+			//}
+
+			//カーソル動かす処理
+			if (m_MoveFlg)
+			{
+				//下
+				if (CntlVec[0].fThumbLY < -0.5f)
+				{
+					m_SelectNum++;
+					if (m_SelectNum > 3)
+					{
+						m_SelectNum = 0;
+					}
+					//動けるフラグ止める
+					m_MoveFlg = false;
+
+				}
+				//上
+				if (CntlVec[0].fThumbLY > 0.5f)
+				{
+					m_SelectNum--;
+					if (m_SelectNum < 0)
+					{
+						m_SelectNum = 3;
+					}
+					//動けるフラグ止める
+					m_MoveFlg = false;
+				}
+
+				if (!m_MoveFlg)
+				{
+					//移動
+					switch (m_SelectNum)
+					{
+						//ゲームに戻る
+					case 0:
+						m_ToGame->GetComponent<Transform>()->SetPosition(-400, 100, 0);
+						m_ToRetry->GetComponent<Transform>()->SetPosition(-500, 0, 0);
+						m_ToSteSele->GetComponent<Transform>()->SetPosition(-500, -100, 0);
+						m_ToTitle->GetComponent<Transform>()->SetPosition(-500, -200, 0);
+						break;
+						//リトライ
+					case 1:
+						m_ToGame->GetComponent<Transform>()->SetPosition(-500, 100, 0);
+						m_ToRetry->GetComponent<Transform>()->SetPosition(-400, 0, 0);
+						m_ToSteSele->GetComponent<Transform>()->SetPosition(-500, -100, 0);
+						m_ToTitle->GetComponent<Transform>()->SetPosition(-500, -200, 0);
+						break;
+						//ステセレ
+					case 2:
+						m_ToGame->GetComponent<Transform>()->SetPosition(-500, 100, 0);
+						m_ToRetry->GetComponent<Transform>()->SetPosition(-500, 0, 0);
+						m_ToSteSele->GetComponent<Transform>()->SetPosition(-400, -100, 0);
+						m_ToTitle->GetComponent<Transform>()->SetPosition(-500, -200, 0);
+						break;
+						//タイトル
+					case 3:
+						m_ToGame->GetComponent<Transform>()->SetPosition(-500, 100, 0);
+						m_ToRetry->GetComponent<Transform>()->SetPosition(-500, 0, 0);
+						m_ToSteSele->GetComponent<Transform>()->SetPosition(-500, -100, 0);
+						m_ToTitle->GetComponent<Transform>()->SetPosition(-400, -200, 0);
+						break;
+					}
+				}
+
+			}
+			//ずっと動けないように
+			else
+			{
+				if (abs(CntlVec[0].fThumbLY) < 0.5f && abs(CntlVec[0].fThumbLY) > -0.5f)
+				{
+					m_MoveFlg = true;
+				}
+			}
+
+			//ボタン押されたら
+			if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B)
+			{
+				switch (m_SelectNum)
+				{
+					//戻る
+				case 0:
+					Close();
+					break;
+					//リトライ
+				case 1:
+					if (true)
+					{
+						//切り替え演出
+						auto ob = GetStage()->AddGameObject<SceneChangeSS>();
+						ob->OnAnim();
+						ob->SetLayer(10);
+
+						auto ScenePtr = App::GetApp()->GetScene<Scene>();
+						PostEvent(2.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToGameStage");
+					}
+					break;
+					//ステセレ
+				case 2:
+					if (true)
+					{
+						//切り替え演出
+						auto ob = GetStage()->AddGameObject<SceneChangeSS>();
+						ob->OnAnim();
+						ob->SetLayer(10);
+
+						auto ScenePtr = App::GetApp()->GetScene<Scene>();
+						PostEvent(2.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToStageSelectScene");
+					}
+					break;
+					//タイトル
+				case 3:
+					if (true)
+					{				
+						//切り替え演出
+						auto ob = GetStage()->AddGameObject<SceneChangeSS>();
+						ob->OnAnim();
+						ob->SetLayer(10);
+
+						auto ScenePtr = App::GetApp()->GetScene<Scene>();
+						PostEvent(2.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToTitleScene");
+					}
+					break;
+				}
+			}
+
+		}
+	}
+
+	void PauseMenu::Open()
+	{
+		//ポーズオブジェ表示
+		m_PauseLogo->SetDrawActive(true);
+		m_ToGame->SetDrawActive(true);
+		m_ToRetry->SetDrawActive(true);
+		m_ToSteSele->SetDrawActive(true);
+		m_ToTitle->SetDrawActive(true);
+		m_EnemyS->SetDrawActive(true);
+		m_Black->SetDrawActive(true);
+		m_TackleSp->SetDrawActive(true);
+		m_ShotSp->SetDrawActive(true);
+		m_TerepoSp->SetDrawActive(true);
+		m_BombSp->SetDrawActive(true);
+
+		//アップデート起動
+		SetUpdateActive(true);
+
+		//全部の動くオブジェクトを止める
+		auto ColGroup = GetStage()->GetSharedObjectGroup(L"CollisionGroup")->GetGroupVector();
+		auto EnemyGroup = GetStage()->GetSharedObjectGroup(L"EnemyGroup")->GetGroupVector();
+		auto SearchChildGroup = GetStage()->GetSharedObjectGroup(L"SearchChildGroup")->GetGroupVector();
+		auto UgokuGroup = GetStage()->GetSharedObjectGroup(L"UgokuGroup")->GetGroupVector();
+
+		//プレイヤーを止める
+		GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_L")->SetUpdateActive(false);
+		GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_R")->SetUpdateActive(false);
+
+		//プレイヤー管理してるやつ止める
+		GetStage()->GetSharedGameObject<PlayerManager>(L"PtrPlayerManager", false)->SetUpdateActive(false);
+
+		//全部止める
+		for (auto obj : ColGroup)
+		{
+			auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+			if (ptr)
+			{
+				if (ptr->GetDrawActive())
+				{
+					ptr->SetUpdateActive(false);
+				}
+			}
+		}
+		for (auto obj : EnemyGroup)
+		{
+			auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+			if (ptr)
+			{
+				if (ptr->GetDrawActive())
+				{
+					ptr->SetUpdateActive(false);
+				}
+			}
+		}
+		for (auto obj : SearchChildGroup)
+		{
+			auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+			if (ptr)
+			{
+				if (ptr->GetDrawActive())
+				{
+					ptr->SetUpdateActive(false);
+				}
+			}
+		}
+		for (auto obj : UgokuGroup)
+		{
+			auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+			if (ptr)
+			{
+				if (ptr->GetDrawActive())
+				{
+					ptr->SetUpdateActive(false);
+				}
+			}
+		}
+
+		//敵の数取得
+		//まず初期化
+		m_TackleCount = 0;
+		m_ShotCount = 0;
+		m_TereportCount = 0;
+		m_BombCount = 0;
+	
+		for (auto obj : EnemyGroup)
+		{
+			/*
+			auto ptr = dynamic_pointer_cast<TackleEnemy>(obj.lock());
+			if (ptr)
+			{
+				m_TackleCount++;
+			}
+			ptr = dynamic_pointer_cast<ShotEnemy>(obj.lock());
+			if (ptr)
+			{
+				m_ShotCount++;
+			}
+			ptr = dynamic_pointer_cast<TeleportEnemy>(obj.lock());
+			if (ptr)
+			{
+				m_TereportCount++;
+			}
+			ptr = dynamic_pointer_cast<BombEnemy>(obj.lock());
+			if (ptr)
+			{
+				m_BombCount++;
+			}
+			*/
+		}
+
+		//数字(見た目)設定
+		dynamic_pointer_cast<NumberSprite>(m_TackleSp)->SetNum(m_TackleCount);
+		dynamic_pointer_cast<NumberSprite>(m_ShotSp)->SetNum(m_ShotCount);
+		dynamic_pointer_cast<NumberSprite>(m_TerepoSp)->SetNum(m_TereportCount);
+		dynamic_pointer_cast<NumberSprite>(m_BombSp)->SetNum(m_BombCount);
+
+	}
+
+	void PauseMenu::Close()
+	{
+		//ポーズオブジェ非表示
+		m_PauseLogo->SetDrawActive(false);
+		m_ToGame->SetDrawActive(false);
+		m_ToRetry->SetDrawActive(false);
+		m_ToSteSele->SetDrawActive(false);
+		m_ToTitle->SetDrawActive(false);
+		m_EnemyS->SetDrawActive(false);
+		m_Black->SetDrawActive(false);
+		m_TackleSp->SetDrawActive(false);
+		m_ShotSp->SetDrawActive(false);
+		m_TerepoSp->SetDrawActive(false);
+		m_BombSp->SetDrawActive(false);
+
+		//アップデート停止
+		SetUpdateActive(false);
+
+		//位置更新
+		m_ToGame->GetComponent<Transform>()->SetPosition(-400, 100, 0);
+		m_ToRetry->GetComponent<Transform>()->SetPosition(-500, 0, 0);
+		m_ToSteSele->GetComponent<Transform>()->SetPosition(-500, -100, 0);
+		m_ToTitle->GetComponent<Transform>()->SetPosition(-500, -200, 0);
+		//選択番号リセット
+		m_SelectNum = 0;
+
+		//全部の動くオブジェクトを動かす
+		auto ColGroup = GetStage()->GetSharedObjectGroup(L"CollisionGroup")->GetGroupVector();
+		auto EnemyGroup = GetStage()->GetSharedObjectGroup(L"EnemyGroup")->GetGroupVector();
+		auto SearchChildGroup = GetStage()->GetSharedObjectGroup(L"SearchChildGroup")->GetGroupVector();
+		auto UgokuGroup = GetStage()->GetSharedObjectGroup(L"UgokuGroup")->GetGroupVector();
+		//プレイヤーを動かす
+		GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_L")->SetUpdateActive(true);
+		GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_R")->SetUpdateActive(true);
+
+		//プレイヤー管理してるやつ動かす
+		GetStage()->GetSharedGameObject<PlayerManager>(L"PtrPlayerManager", false)->SetUpdateActive(true);
+
+		//全部動かす
+		for (auto obj : ColGroup)
+		{
+			auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+			if (ptr)
+			{
+				ptr->SetUpdateActive(true);
+			}
+		}
+		for (auto obj : EnemyGroup)
+		{
+			auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+			if (ptr)
+			{
+				ptr->SetUpdateActive(true);
+			}
+		}
+		for (auto obj : SearchChildGroup)
+		{
+			auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+			if (ptr)
+			{
+				ptr->SetUpdateActive(true);
+			}
+		}
+		for (auto obj : UgokuGroup)
+		{
+			auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+			if (ptr)
+			{
+				ptr->SetUpdateActive(true);
+			}
+		}
 
 	}
 	//Abe20170605

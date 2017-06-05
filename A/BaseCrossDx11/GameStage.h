@@ -52,6 +52,13 @@ namespace basecross
 		//Abe20170530
 		bool m_CameraMoveFlg = true;
 		//Abe20170530
+
+		//Abe20170605
+		//ポーズ作成
+		void CreatePause();
+		//Abe20170605
+
+
 		//演出に移る時のBGMストップ
 		bool StopBGM = true;
 	public:

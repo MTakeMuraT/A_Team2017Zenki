@@ -160,7 +160,15 @@ namespace basecross
 	}
 	//エネミーカウント作成--------------------------------------------
 
-	
+	//Abe20170605
+	//ポーズ作成--------------------------------------------
+	void GameStage::CreatePause()
+	{
+		SetSharedGameObject(L"PauseMenu",AddGameObject<PauseMenu>());
+	}
+	//ポーズ作成--------------------------------------------
+	//Abe20170605
+
 	void GameStage::OnCreate()
 	{
 		try {
@@ -210,6 +218,11 @@ namespace basecross
 			//アタリ判定作成
 			CreateCollision();
 
+			//Abe20170605
+			//ポーズ作成
+			CreatePause();
+			//Abe20170605
+
 			//2017/05/17今泉CSV//
 			AddGameObject<InputCSV>();
 			/////////////////////////
@@ -255,6 +268,17 @@ namespace basecross
 			}
 		}
 
+		//コントローラ取得
+		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		if (CntlVec[0].bConnected)
+		{
+			//STARTボタンでポーズ
+			if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_START)
+			{
+				//ポーズ表示
+				GetSharedGameObject<PauseMenu>(L"PauseMenu", false)->Open();
+			}
+		}
 		//キーの入力
 		auto KeylVec = App::GetApp()->GetInputDevice().GetKeyState();
 		if (KeylVec.m_bPressedKeyTbl['A']) {
@@ -270,6 +294,8 @@ namespace basecross
 			//破片
 			//GetSharedGameObject<BakuSanSpawn>(L"BakuSanSpawn", false)->CreateBakusan(20, Vector3(0, 0.5f, -3));
 
+			//ポーズ表示
+		//	GetSharedGameObject<PauseMenu>(L"PauseMenu", false)->Open();
 		}
 
 		//Abe20170531

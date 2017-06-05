@@ -273,6 +273,9 @@ namespace basecross {
 		//タイトルに
 		strTexture = DataDir + L"Pause\\ToTitle.png";
 		App::GetApp()->RegisterTexture(L"PAUSE_TOTITLE_TX", strTexture);
+		//クロ	
+		strTexture = DataDir + L"Pause\\PauseBlack.png";
+		App::GetApp()->RegisterTexture(L"PAUSE_BLACK_TX", strTexture);
 
 		//Abe20170605
 

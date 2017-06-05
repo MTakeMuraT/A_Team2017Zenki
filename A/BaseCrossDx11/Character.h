@@ -998,6 +998,13 @@ namespace basecross{
 		shared_ptr<GameObject> m_EnemyS;
 		//暗転下敷き
 		shared_ptr<GameObject> m_Black;
+
+		//エネミーの数
+		shared_ptr<GameObject> m_TackleSp;
+		shared_ptr<GameObject> m_ShotSp;
+		shared_ptr<GameObject> m_TerepoSp;
+		shared_ptr<GameObject> m_BombSp;
+
 		//-----エネミーの数-----
 		//突撃
 		int m_TackleCount = 0;
@@ -1014,11 +1021,21 @@ namespace basecross{
 		int m_SelectX = 0;
 		//非選択座標X
 		int m_NotSelectX = 0;
+		//動かせるフラグ
+		bool m_MoveFlg = true;
+
+		//-----関数-----
 	public:
 		PauseMenu(const shared_ptr<Stage>& StagePtr) :GameObject(StagePtr) {};
 
 		void OnCreate() override;
 		void OnUpdate() override;
+
+		//開く
+		void Open();
+		//閉じる
+		void Close();
+
 	};
 	//Abe20170605
 
