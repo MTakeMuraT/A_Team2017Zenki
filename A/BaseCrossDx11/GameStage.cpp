@@ -168,7 +168,9 @@ namespace basecross
 			//m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
 			//m_AudioObjectPtr->AddAudioResource(L"GameStage_01_BGM");
 			//m_AudioObjectPtr->Start(L"GameStage_01_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);
-			
+			//m_AudioObjectPtr->AddAudioResource(L"Win_SE");
+
+
 			//グループ類作成
 			auto TereportGroup = CreateSharedObjectGroup(L"TereportPointGroup");
 			auto BomGroup = CreateSharedObjectGroup(L"BombGroup");
@@ -232,6 +234,16 @@ namespace basecross
 	// シーン遷移
 	void GameStage::OnUpdate()
 	{
+		auto PlayerLifePtr = GetSharedGameObject<Player_Life>(L"Life", false);
+		if (PlayerLifePtr) {
+			if (PlayerLifePtr->GetDieFlg() == false) {
+				if (StopBGM == true) {
+					m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
+					StopBGM = false;
+				}
+			}
+		}
+
 		//キーの入力
 		auto KeylVec = App::GetApp()->GetInputDevice().GetKeyState();
 		if (KeylVec.m_bPressedKeyTbl['A']) {
@@ -250,6 +262,10 @@ namespace basecross
 		//仮でリザルト表示**********デバッグ*********
 		if (KeylVec.m_bPressedKeyTbl['B'])
 		{
+			m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
+			m_AudioObjectPtr->Start(L"Win_SE", 0, 0.5f);
+
+
 			Result();
 		}
 		//仮でリザルト表示**********デバッグ*********
@@ -301,7 +317,9 @@ namespace basecross
 		CameraP->SetAt(At);
 	}
 	GameStage::~GameStage() {
-		//m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
+		if (StopBGM == true) {
+			//m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
+		}
 	}
 
 	//Abe20170529
