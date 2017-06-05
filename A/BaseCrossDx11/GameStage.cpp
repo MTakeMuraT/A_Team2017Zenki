@@ -181,6 +181,12 @@ namespace basecross
 			CreateSharedObjectGroup(L"SearchChildGroup");
 			CreateSharedObjectGroup(L"UgokuGroup");
 			//Abe20170529
+			//Abe20170605
+			//爆散するオブジェクトのグループ
+			CreateSharedObjectGroup(L"BakusanObjGroup");
+			//爆散するオブジェクトを生成するオブジェクト
+			SetSharedGameObject(L"BakuSanSpawn",AddGameObject<BakuSanSpawn>());
+			//Abe20170605
 
 			//ビューとライトの作成
 			CreateViewLight();
@@ -219,6 +225,11 @@ namespace basecross
 			//ob->SetDrawLayer(10);
 			//Abe20170602
 
+			//Abe20170605
+			//****でバック
+			//AddGameObject<BakuSanObj>()->SetPosScaleVelo(Vector3(0, 5, 0), Vector3(0.5f, 0.5f, 0.5f), Vector3(0, 10, 5));
+			//Abe20170605
+
 		}
 		catch (...) {
 
@@ -238,7 +249,7 @@ namespace basecross
 		if (PlayerLifePtr) {
 			if (PlayerLifePtr->GetDieFlg() == false) {
 				if (StopBGM == true) {
-					m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
+					//m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
 					StopBGM = false;
 				}
 			}
@@ -256,14 +267,17 @@ namespace basecross
 			//ライフ減らす
 			GetSharedGameObject<Player_Life>(L"Life")->LifeDown(1);
 
+			//破片
+			//GetSharedGameObject<BakuSanSpawn>(L"BakuSanSpawn", false)->CreateBakusan(20, Vector3(0, 0.5f, -3));
+
 		}
 
 		//Abe20170531
 		//仮でリザルト表示**********デバッグ*********
 		if (KeylVec.m_bPressedKeyTbl['B'])
 		{
-			m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
-			m_AudioObjectPtr->Start(L"Win_SE", 0, 0.5f);
+			//m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
+			//m_AudioObjectPtr->Start(L"Win_SE", 0, 0.5f);
 
 
 			Result();

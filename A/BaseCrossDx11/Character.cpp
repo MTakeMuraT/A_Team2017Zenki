@@ -694,27 +694,6 @@ namespace basecross {
 	}
 	//Abe20170413
 
-	//Abe20170519
-	//--------------------------------------------------------------------------------------
-	//	class PauseMenu : public GameObject;
-	//	用途: ポーズ
-	//--------------------------------------------------------------------------------------
-	PauseMenu::PauseMenu(const shared_ptr<Stage>& StagePtr):
-		GameObject(StagePtr)
-	{}
-
-	void PauseMenu::OnCreate()
-	{
-
-	}
-
-	void PauseMenu::OnUpdate()
-	{
-
-	}
-	//Abe20170519
-
-
 	//Abe20170418
 	//--------------------------------------------------------------------------------------
 	//	class NumberSprite : public GameObject;
@@ -3625,6 +3604,50 @@ namespace basecross {
 		}
 	}
 	//Abe20170531
+
+	//Abe20170605
+	//--------------------------------------------------------------------------------------
+	//	ポーズ
+	//--------------------------------------------------------------------------------------
+	void PauseMenu::OnCreate()
+	{
+		//-----生成------
+		//ゲームに戻る
+		auto togame = GetStage()->AddGameObject<GameObject>();
+		auto TransTG = togame->AddComponent<Transform>();
+		TransTG->SetPosition(-500, 200, 0);
+		TransTG->SetScale(500, 100, 1);
+		TransTG->SetRotation(0, 0, 0);
+
+		auto DrawTG = togame->AddComponent<PCTSpriteDraw>();
+		DrawTG->SetTextureResource(L"");
+
+		togame->SetAlphaActive(true);
+		togame->SetDrawLayer(6);
+		//リトライ
+		//ステセレ
+		//タイトル
+		//エネミーの数
+		//ポーズロゴ
+		//暗転
+		auto black = GetStage()->AddGameObject<GameObject>();
+		auto TransB = black->AddComponent<Transform>();
+		TransB->SetPosition(0, 0, 0);
+		TransB->SetScale(1280, 720, 1);
+		TransB->SetRotation(0, 0, 0);
+
+		auto DrawB = black->AddComponent<PCTSpriteDraw>();
+		DrawB->SetTextureResource(L"");
+
+		black->SetAlphaActive(true);
+		black->SetDrawLayer(5);
+	}
+
+	void PauseMenu::OnUpdate()
+	{
+
+	}
+	//Abe20170605
 
 }
 	//end basecross

@@ -716,4 +716,47 @@ namespace basecross
 	};
 	//Abe20170523IzumiHikitugi
 
+	//Abe20170605
+	//************************************
+	//	爆散して飛ぶやつ
+	//************************************
+	class BakuSanObj : public GameObject
+	{
+	private :
+		//速度
+		Vector3 m_Velocity;
+		//大きさ
+		Vector3 m_Scale;
+		//位置
+		Vector3 m_Pos;
+
+		//回転(ランダムで決める)
+		Vector3 m_RotPow;
+	public :
+		BakuSanObj(const shared_ptr<Stage>& StagePtr):GameObject(StagePtr) {}
+
+		void OnCreate() override;
+
+		void OnUpdate() override;
+
+		//位置、大きさ、速度セット
+		void SetPosScaleVelo(Vector3, Vector3, Vector3);
+	};
+	//************************************
+	//	爆散して飛ぶやつを生成するやつ
+	//************************************
+	class BakuSanSpawn : public GameObject
+	{
+	private :
+	public :
+		BakuSanSpawn(const shared_ptr<Stage>& StagePtr):GameObject(StagePtr) {}
+
+		//とりあえず
+		void OnCreate() {}
+
+		//生成 引数出す数
+		void CreateBakusan(int num , Vector3 pos);
+	};
+	//Abe20170605
+
 }

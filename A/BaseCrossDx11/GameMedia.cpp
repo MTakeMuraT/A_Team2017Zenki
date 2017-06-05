@@ -309,6 +309,31 @@ namespace basecross {
 		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"GameStage\\Background\\Background_Effect.bmf");
 		App::GetApp()->RegisterResource(L"Background_Model", MadelMesh);
 
+		//Abe20170605
+		//パーツ群
+		//1
+		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Parts\\Parts1.bmf");
+		App::GetApp()->RegisterResource(L"PARTS1_MODEL", MadelMesh);
+		//2
+		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Parts\\Parts2.bmf");
+		App::GetApp()->RegisterResource(L"PARTS2_MODEL", MadelMesh);
+		//3
+		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Parts\\Parts3.bmf");
+		App::GetApp()->RegisterResource(L"PARTS3_MODEL", MadelMesh);
+		//4
+		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Parts\\Parts4.bmf");
+		App::GetApp()->RegisterResource(L"PARTS4_MODEL", MadelMesh);
+		//5
+		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Parts\\Parts5.bmf");
+		App::GetApp()->RegisterResource(L"PARTS5_MODEL", MadelMesh);
+		//6
+		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Parts\\Parts6.bmf");
+		App::GetApp()->RegisterResource(L"PARTS6_MODEL", MadelMesh);
+		//7
+		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Parts\\Parts7.bmf");
+		App::GetApp()->RegisterResource(L"PARTS7_MODEL", MadelMesh);
+		//Abe20170605
+
 		//検証するのに重いので一時的に消します Abe20170505
 		//BGM
 		/*wstring strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Title\\Title_01.wav";

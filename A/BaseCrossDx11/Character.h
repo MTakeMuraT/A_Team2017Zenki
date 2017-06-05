@@ -284,34 +284,6 @@ namespace basecross{
 	};
 	//Abe20170412
 
-	//Abe20170519
-	//--------------------------------------------------------------------------------------
-	//	class PauseMenu : public GameObject;
-	//	用途: ポーズ
-	//--------------------------------------------------------------------------------------
-	class PauseMenu : public GameObject
-	{
-	private:
-		//ポーズ背景(暗幕)
-		shared_ptr<GameObject> m_PauseBackBlack;
-		//ポーズ背景(残存勢力)
-		shared_ptr<GameObject> m_PauseBackEnemyS;
-		//選択項目
-		//ゲームに戻る
-		shared_ptr<GameObject> m_BackGameSprite;
-		//リトライ
-		shared_ptr<GameObject> m_RetrySprite;
-		//ステージセレクト
-		shared_ptr<GameObject> m_StageSelectSprite;
-		//タイトル
-		shared_ptr<GameObject> m_TitleSprite;
-	public:
-		PauseMenu(const shared_ptr<Stage>& StagePtr);
-
-		void OnCreate() override;
-		void OnUpdate() override;
-	};
-	//Abe20170519
 
 	//Abe20170418
 	//--------------------------------------------------------------------------------------
@@ -1003,5 +975,51 @@ namespace basecross{
 	};
 	//Abe20170530
 #pragma endregion
+
+	//Abe20170605
+	//--------------------------------------------------------------------------------------
+	//	ポーズ
+	//--------------------------------------------------------------------------------------
+	class PauseMenu : public GameObject
+	{
+	private:
+		//-----オブジェクト-----
+		//ポーズロゴ
+		shared_ptr<GameObject> m_PauseLogo;
+		//ゲームに戻る
+		shared_ptr<GameObject> m_ToGame;
+		//リトライ
+		shared_ptr<GameObject> m_ToRetry;
+		//ステセレ
+		shared_ptr<GameObject> m_ToSteSele;
+		//タイトル
+		shared_ptr<GameObject> m_ToTitle;
+		//敵情報
+		shared_ptr<GameObject> m_EnemyS;
+		//暗転下敷き
+		shared_ptr<GameObject> m_Black;
+		//-----エネミーの数-----
+		//突撃
+		int m_TackleCount = 0;
+		//玉
+		int m_ShotCount = 0;
+		//テレポート
+		int m_TereportCount = 0;
+		//爆弾
+		int m_BombCount = 0;
+		//-----制御系-----
+		//選択項目 0:ゲームに戻る 1:リトライ 2:せれ 3:タイトル
+		int m_SelectNum = 0;
+		//選択座標X
+		int m_SelectX = 0;
+		//非選択座標X
+		int m_NotSelectX = 0;
+	public:
+		PauseMenu(const shared_ptr<Stage>& StagePtr) :GameObject(StagePtr) {};
+
+		void OnCreate() override;
+		void OnUpdate() override;
+	};
+	//Abe20170605
 
 }

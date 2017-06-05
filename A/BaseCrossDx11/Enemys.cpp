@@ -647,6 +647,8 @@ namespace basecross
 				//Abe20170605
 				//索敵サークル除去
 				m_SearchCircle->SetDrawActive(false);
+				//破片生成
+				GetStage()->GetSharedGameObject<BakuSanSpawn>(L"BakuSanSpawn", false)->CreateBakusan(rand() % 20, GetComponent<Transform>()->GetPosition());
 				//Abe20170605
 			}
 			else
@@ -1216,6 +1218,8 @@ namespace basecross
 				//Abe20170605
 				//索敵サークル除去
 				m_SearchCircle->SetDrawActive(false);
+				//破片生成
+				GetStage()->GetSharedGameObject<BakuSanSpawn>(L"BakuSanSpawn", false)->CreateBakusan(rand() % 20, GetComponent<Transform>()->GetPosition());
 				//Abe20170605
 
 			}
@@ -1650,6 +1654,8 @@ namespace basecross
 			//Abe20170605
 			//索敵サークル除去
 			m_SearchCircle->SetDrawActive(false);
+			//破片生成
+			GetStage()->GetSharedGameObject<BakuSanSpawn>(L"BakuSanSpawn", false)->CreateBakusan(rand() % 20, GetComponent<Transform>()->GetPosition());
 			//Abe20170605
 
 			//子機収納
@@ -2109,7 +2115,13 @@ namespace basecross
 				SetDrawActive(false);
 				m_Hp = 0;
 				m_ActiveFlg = false;
-		
+				//破片生成
+				GetStage()->GetSharedGameObject<BakuSanSpawn>(L"BakuSanSpawn", false)->CreateBakusan(rand() % 20, GetComponent<Transform>()->GetPosition());
+				//Abe20170605
+				//索敵サークル除去
+				m_SearchCircle->SetDrawActive(false);
+				//Abe20170605
+
 		}
 
 	//Abe20170508
@@ -2896,5 +2908,182 @@ namespace basecross
 		UpdateAnimeTime(App::GetApp()->GetElapsedTime()/2);
 	}
 	//Abe20170523IzumiHikitugi
+
+	//Abe20170605
+	//************************************
+	//	爆散して飛ぶやつ
+	//************************************
+	void BakuSanObj::OnCreate()
+	{
+		auto Trans = AddComponent<Transform>();
+		Trans->SetPosition(0, 0, 0);
+		Trans->SetScale(1, 1, 1);
+		Trans->SetRotation(0, 0, 0);
+
+		//モデルとトランスフォームの間の差分
+		Matrix4X4 Mat;
+		Mat.DefTransformation(
+			Vector3(1.0, 1.0f, 1.0f),
+			Vector3(0.0f, -90 * 3.14159265f / 180, 0.0f),
+			Vector3(0.0f, 0.0f, 0.0f)
+			);
+
+		//見た目
+		auto Draw = AddComponent<PNTStaticModelDraw>();
+		//メッシュ設定
+		Draw->SetMeshResource(L"PARTS1_MODEL");
+		//モデル大きさ調整
+		Draw->SetMeshToTransformMatrix(Mat);
+
+		//透明処理
+		SetAlphaActive(true);
+		SetDrawActive(false);
+		SetUpdateActive(false);
+	}
+
+	void BakuSanObj::OnUpdate()
+	{
+		Vector3 pos = GetComponent<Transform>()->GetPosition();
+
+		//設定した力で動かす
+		pos += m_Velocity * App::GetApp()->GetElapsedTime();
+		GetComponent<Transform>()->SetPosition(pos);
+
+		//重力
+		m_Velocity.y += -9.8f * App::GetApp()->GetElapsedTime();
+
+		//適当に回転
+		Vector3 rot = GetComponent<Transform>()->GetRotation();
+		rot += m_RotPow * App::GetApp()->GetElapsedTime();
+		GetComponent<Transform>()->SetRotation(rot);
+
+		//地面にあたったら消す
+		if (pos.y < 0)
+		{
+			SetDrawActive(false);
+			SetUpdateActive(false);
+		}
+	}
+
+	void BakuSanObj::SetPosScaleVelo(Vector3 pos, Vector3 sca, Vector3 vel)
+	{
+		//描画してアップデート起動
+		SetDrawActive(true);
+		SetUpdateActive(true);
+
+		//位置と大きさと速度設定
+		GetComponent<Transform>()->SetPosition(pos);
+		GetComponent<Transform>()->SetScale(sca);
+		m_Velocity = vel;
+
+		//回転力を設定
+		m_RotPow = Vector3(((rand() % 30) / 10), ((rand() % 30) / 10), ((rand() % 30) / 10));
+
+		//メッシュ変更1～100
+		int random = rand() % 100+1;
+		int meshnum = 0;
+		if (1 <= random && random <= 29)
+		{
+			meshnum = 0;
+		}
+		else if (30 <= random && random <= 49)
+		{
+			meshnum = 1;
+		}
+		else if (50 <= random && random <= 68)
+		{
+			meshnum = 2;
+		}
+		else if (69 <= random && random <= 79)
+		{
+			meshnum = 3;
+		}
+		else if (80 <= random && random <= 87)
+		{
+			meshnum = 4;
+		}
+		else if (88 <= random && random <= 95)
+		{
+			meshnum = 5;
+		}
+		else if (96 <= random && random <= 100)
+		{
+			meshnum = 6;
+		}
+
+		switch (meshnum)
+		{
+		case 0:
+			GetComponent<PNTStaticModelDraw>()->SetMeshResource(L"PARTS1_MODEL");
+			break;
+		case 1:
+			GetComponent<PNTStaticModelDraw>()->SetMeshResource(L"PARTS2_MODEL");
+			break;
+		case 2:
+			GetComponent<PNTStaticModelDraw>()->SetMeshResource(L"PARTS3_MODEL");
+			break;
+		case 3:
+			GetComponent<PNTStaticModelDraw>()->SetMeshResource(L"PARTS4_MODEL");
+			break;
+		case 4:
+			GetComponent<PNTStaticModelDraw>()->SetMeshResource(L"PARTS5_MODEL");
+			break;
+		case 5:
+			GetComponent<PNTStaticModelDraw>()->SetMeshResource(L"PARTS6_MODEL");
+			break;
+		case 6:
+			GetComponent<PNTStaticModelDraw>()->SetMeshResource(L"PARTS7_MODEL");
+			break;
+
+		}
+	}
+
+	//************************************
+	//	爆散して飛ぶやつ管理するやつ
+	//************************************
+	void BakuSanSpawn::CreateBakusan(int num,Vector3 pos)
+	{
+		for (int i = 0; i < num; i++)
+		{
+			//描画されてないやつを再利用
+			auto BakuGroup = GetStage()->GetSharedObjectGroup(L"BakusanObjGroup")->GetGroupVector();
+			//描画されてないフラグ
+			bool DrawFlg = false;
+			for (auto obj : BakuGroup)
+			{
+				auto ptr = dynamic_pointer_cast<BakuSanObj>(obj.lock());
+				if (!ptr->GetDrawActive())
+				{
+					DrawFlg = true;
+
+					//設定
+					//位置はそのまま
+					//大きさランダム 0.5～0.1
+					Vector3 ransca = Vector3((rand() % 5) / 10.0f + 0.1f, (rand() % 5) / 10.0f + 0.1f, (rand() % 5) / 10.0f + 0.1f);
+					//速度ランダム 10～-10
+					Vector3 ranvel = Vector3(((rand() % 200) - 100) / 10.0f, (rand() % 100) / 10.0f + 2.0f, ((rand() % 200) - 100) / 10.0f);
+					ptr->SetPosScaleVelo(pos, ransca, ranvel);
+					break;
+				}
+			}
+
+			//どれも使えなければ作る
+			if (!DrawFlg)
+			{
+				auto obj = GetStage()->AddGameObject<BakuSanObj>();
+				GetStage()->GetSharedObjectGroup(L"BakusanObjGroup")->IntoGroup(obj);
+
+				//設定
+				//位置はそのまま
+				//大きさランダム 0.5～0.1
+				Vector3 ransca = Vector3((rand() % 5) / 10.0f + 0.1f, (rand() % 5) / 10.0f + 0.1f, (rand() % 5) / 10.0f + 0.1f);
+				//速度ランダム 10～-10
+				Vector3 ranvel = Vector3(((rand() % 200) - 100) / 10.0f, (rand() % 100) / 10.0f + 2.0f, ((rand() % 200) - 100) / 10.0f);
+				obj->SetPosScaleVelo(pos, ransca, ranvel);
+
+			}
+		}
+	}
+	//Abe20170605
 
 }
