@@ -82,7 +82,7 @@ namespace basecross {
 	}
 	//”jŠü
 	 TitleScene::~TitleScene() {
-		 //m_AudioObjectPtr->Stop(L"Title_01_BGM");
+		// m_AudioObjectPtr->Stop(L"Title_01_BGM");
 	}
 
 }

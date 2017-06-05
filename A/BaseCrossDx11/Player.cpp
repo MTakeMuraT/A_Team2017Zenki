@@ -1208,6 +1208,8 @@ namespace basecross {
 		SetAlphaActive(true);
 		PtrDraw->SetDiffuse(Color4(1, 1, 1, m_Opacity));
 		m_OpacityColor = 1.0f;
+		SetDrawActive(false);
+		SetDrawLayer(10);
 	}
 	void PlayerShield::OnUpdate() {
 		auto PlayerLifePtr = GetStage()->GetSharedGameObject<Player_Life>(L"Life", false);

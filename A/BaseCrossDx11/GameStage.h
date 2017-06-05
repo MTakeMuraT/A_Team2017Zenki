@@ -52,7 +52,8 @@ namespace basecross
 		//Abe20170530
 		bool m_CameraMoveFlg = true;
 		//Abe20170530
-
+		//演出に移る時のBGMストップ
+		bool StopBGM = true;
 	public:
 		//構築と破棄
 		GameStage() :Stage() {}
