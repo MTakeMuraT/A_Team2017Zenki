@@ -253,6 +253,30 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"STAGESELECTGROUND_TX", strTexture);
 		//Abe20170524
 
+		//Abe20170605
+		//ポーズ
+		//ポーズの残り敵数
+		strTexture = DataDir + L"Pause\\Pause_EnemyS.png";
+		App::GetApp()->RegisterTexture(L"PAUSE_ENEMYS_TX", strTexture);
+		//ポーズロゴ
+		strTexture = DataDir + L"Pause\\PauseLogo.png";
+		App::GetApp()->RegisterTexture(L"PAUSE_LOGO_TX", strTexture);
+		//リトライ
+		strTexture = DataDir + L"Pause\\ReTry.png";
+		App::GetApp()->RegisterTexture(L"PAUSE_RETRY_TX", strTexture);
+		//ゲームに戻る
+		strTexture = DataDir + L"Pause\\ToGame.png";
+		App::GetApp()->RegisterTexture(L"PAUSE_TOGAME_TX", strTexture);
+		//セレクトに
+		strTexture = DataDir + L"Pause\\ToSelect.png";
+		App::GetApp()->RegisterTexture(L"PAUSE_TOSELECT_TX", strTexture);
+		//タイトルに
+		strTexture = DataDir + L"Pause\\ToTitle.png";
+		App::GetApp()->RegisterTexture(L"PAUSE_TOTITLE_TX", strTexture);
+
+		//Abe20170605
+
+
 		////モデル（ボーンあり
 		auto MadelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Player\\PlayerModel\\Player_animation.bmf");
 		App::GetApp()->RegisterResource(L"Player_Model", MadelMesh);
