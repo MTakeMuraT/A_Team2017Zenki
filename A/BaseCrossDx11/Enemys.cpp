@@ -2345,6 +2345,9 @@ namespace basecross
 				{
 					m_NowSpriteNum = 0;
 					m_ActiveFlg = false;
+					SetDrawActive(false);
+					//Ç†Ç∆à íuí≤êÆ
+					GetComponent<Transform>()->SetPosition(0, -10, 0);
 				}
 			}
 			/*
@@ -2482,6 +2485,9 @@ namespace basecross
 				m_NowSpriteNum = 0;
 				SetUpdateActive(false);
 				SetDrawActive(false);
+
+				//Ç†Ç∆à íuí≤êÆ
+				GetComponent<Transform>()->SetPosition(0, -10, 0);
 
 			}
 		}
