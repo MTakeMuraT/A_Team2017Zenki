@@ -2245,7 +2245,7 @@ namespace basecross
 	{
 		auto Trans = AddComponent<Transform>();
 		Trans->SetPosition(0,0,0);
-		Trans->SetScale(3, 3, 3);
+		Trans->SetScale(9, 9, 9);
 		Trans->SetRotation(45*3.14159265f/180, 0, 0);
 
 		auto Draw = AddComponent<PCTStaticDraw>();
