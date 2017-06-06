@@ -276,8 +276,13 @@ namespace basecross {
 		//クロ	
 		strTexture = DataDir + L"Pause\\PauseBlack.png";
 		App::GetApp()->RegisterTexture(L"PAUSE_BLACK_TX", strTexture);
-
 		//Abe20170605
+
+		//Abe20170606
+		//爆散エフェクト
+		strTexture = DataDir + L"EF\\bakusan.png";
+		App::GetApp()->RegisterTexture(L"BAKUSANEF_TX", strTexture);
+		//Abe20170606
 
 
 		////モデル（ボーンあり

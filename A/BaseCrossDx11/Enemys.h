@@ -473,7 +473,7 @@ namespace basecross
 	{
 	private:
 		//状態
-		int m_State = 0;
+		//int m_State = 0;
 		//アクティブフラグ
 		bool m_ActiveFlg = false;
 
@@ -499,6 +499,35 @@ namespace basecross
 		void SetPosActive(Vector3);
 
 		//レイヤー設定
+		void SetLayer(int num) { SetDrawLayer(num); }
+	};
+
+	//************************************
+	//	敵の爆散エフェクト
+	//	分割でーーーーす
+	//************************************
+	class BakusanEF : public GameObject
+	{
+	private :
+		//分割分のvector配列
+		vector<shared_ptr<MeshResource>> m_SpriteS;
+
+		//分割数
+		int m_SpriteNum = 0;
+		//今の番号
+		int m_NowSpriteNum = 0;
+		//計算用時間
+		float m_time = 0;
+		//画像切り替え間隔
+		float m_IntervalTime = 0.03f;
+	public :
+		BakusanEF(const shared_ptr<Stage>& StagePtr): GameObject(StagePtr) {}
+
+		void OnCreate() override;
+		void OnUpdate() override;
+
+		void SetPosScaActive(Vector3,Vector3);
+
 		void SetLayer(int num) { SetDrawLayer(num); }
 	};
 

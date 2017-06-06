@@ -195,6 +195,9 @@ namespace basecross
 			//爆散するオブジェクトを生成するオブジェクト
 			SetSharedGameObject(L"BakuSanSpawn",AddGameObject<BakuSanSpawn>());
 			//Abe20170605
+			//Abe20170606
+			CreateSharedObjectGroup(L"BakusanEFGroup");
+			//Abe20170606
 
 			//ビューとライトの作成
 			CreateViewLight();
@@ -242,6 +245,11 @@ namespace basecross
 			//****でバック
 			//AddGameObject<BakuSanObj>()->SetPosScaleVelo(Vector3(0, 5, 0), Vector3(0.5f, 0.5f, 0.5f), Vector3(0, 10, 5));
 			//Abe20170605
+
+			//Abe20170606
+			//*****デバック
+			//AddGameObject<BakusanEF>()->SetPosScaActive(Vector3(0, 1, 0), Vector3(100, 100, 100));
+			//Abe20170606
 
 		}
 		catch (...) {

@@ -652,6 +652,28 @@ namespace basecross
 					//破片生成
 					GetStage()->GetSharedGameObject<BakuSanSpawn>(L"BakuSanSpawn", false)->CreateBakusan(rand() % 25 + 5, GetComponent<Transform>()->GetPosition());
 					//Abe20170605
+
+					//Abe20170606
+					//爆散エフェクト作成
+					auto BakusanGroup = GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->GetGroupVector();
+					bool bakuflg = false;
+					for (auto obj : BakusanGroup)
+					{
+						auto ptr = dynamic_pointer_cast<BakusanEF>(obj.lock());
+						if (!ptr->GetDrawActive())
+						{
+							bakuflg = true;
+							ptr->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+						}
+					}
+					if (!bakuflg)
+					{
+						auto obj = GetStage()->AddGameObject<BakusanEF>();
+						obj->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+						GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->IntoGroup(obj);
+					}
+					//Abe20170606
+
 				}
 				else
 				{
@@ -1226,6 +1248,27 @@ namespace basecross
 					GetStage()->GetSharedGameObject<BakuSanSpawn>(L"BakuSanSpawn", false)->CreateBakusan(rand() % 25 + 5, GetComponent<Transform>()->GetPosition());
 					//Abe20170605
 
+					//Abe20170606
+					//爆散エフェクト作成
+					auto BakusanGroup = GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->GetGroupVector();
+					bool bakuflg = false;
+					for (auto obj : BakusanGroup)
+					{
+						auto ptr = dynamic_pointer_cast<BakusanEF>(obj.lock());
+						if (!ptr->GetDrawActive())
+						{
+							bakuflg = true;
+							ptr->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+						}
+					}
+					if (!bakuflg)
+					{
+						auto obj = GetStage()->AddGameObject<BakusanEF>();
+						obj->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+						GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->IntoGroup(obj);
+					}
+					//Abe20170606
+
 				}
 				else
 				{
@@ -1670,6 +1713,27 @@ namespace basecross
 					dynamic_pointer_cast<SearchDrawn>(obj)->UpDrawns();
 
 				}
+
+				//Abe20170606
+				//爆散エフェクト作成
+				auto BakusanGroup = GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->GetGroupVector();
+				bool bakuflg = false;
+				for (auto obj : BakusanGroup)
+				{
+					auto ptr = dynamic_pointer_cast<BakusanEF>(obj.lock());
+					if (!ptr->GetDrawActive())
+					{
+						bakuflg = true;
+						ptr->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+					}
+				}
+				if (!bakuflg)
+				{
+					auto obj = GetStage()->AddGameObject<BakusanEF>();
+					obj->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+					GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->IntoGroup(obj);
+				}
+				//Abe20170606
 
 			}
 			else
@@ -2130,6 +2194,28 @@ namespace basecross
 			//索敵サークル除去
 			m_SearchCircle->SetDrawActive(false);
 			//Abe20170605
+
+			//Abe20170606
+			//爆散エフェクト作成
+			auto BakusanGroup = GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->GetGroupVector();
+			bool bakuflg = false;
+			for (auto obj : BakusanGroup)
+			{
+				auto ptr = dynamic_pointer_cast<BakusanEF>(obj.lock());
+				if (!ptr->GetDrawActive())
+				{
+					bakuflg = true;
+					ptr->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+				}
+			}
+			if (!bakuflg)
+			{
+				auto obj = GetStage()->AddGameObject<BakusanEF>();
+				obj->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+				GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->IntoGroup(obj);
+			}
+			//Abe20170606
+
 		}
 	}
 
@@ -2276,6 +2362,100 @@ namespace basecross
 		GetComponent<Transform>()->SetPosition(pos);
 	}
 
+	//************************************
+	//	敵の爆散エフェクト
+	//	分割でーーーーす
+	//************************************
+	void BakusanEF::OnCreate()
+	{
+		auto Trans = AddComponent<Transform>();
+		Trans->SetPosition(0, 0, 0);
+		Trans->SetScale(3, 3, 3);
+		Trans->SetRotation(45 * 3.14159265f / 180, 0, 0);
+
+		auto Draw = AddComponent<PCTStaticDraw>();
+		//Draw->SetMeshResource(L"DEFAULT_SQUARE");
+		Draw->SetTextureResource(L"BAKUSANEF_TX");
+
+		//透明処理
+		SetAlphaActive(true);
+		SetDrawActive(false);
+
+		SetDrawLayer(5);
+		//画像分割
+
+		//スプライトの数リセット
+		m_SpriteNum = -1;
+		//7x4
+		//画像作成-------------------------
+		for (int i = 0; i < 28; i++)
+		{
+			m_SpriteNum++;
+			//頂点配列
+			vector<VertexPositionNormalTexture> vertices;
+			//インデックスを作成するための配列
+			vector<uint16_t> indices;
+			//Squareの作成(ヘルパー関数を利用)
+			MeshUtill::CreateSquare(1.0f, vertices, indices);
+			//UV値の変更
+			float fromX = (i % 7) / 7.0f;
+			float toX = fromX + (1.0f / 7.0f);
+			float fromY = (i / 7) / 4.0f;
+			float toY = fromY + (1.0f / 4.0f);
+			//左上頂点
+			vertices[0].textureCoordinate = Vector2(fromX, fromY);
+			//右上頂点
+			vertices[1].textureCoordinate = Vector2(toX, fromY);
+			//左下頂点
+			vertices[2].textureCoordinate = Vector2(fromX, toY);
+			//右下頂点
+			vertices[3].textureCoordinate = Vector2(toX, toY);
+			//頂点の型を変えた新しい頂点を作成
+			vector<VertexPositionColorTexture> new_vertices;
+			for (auto& v : vertices) {
+				VertexPositionColorTexture nv;
+				nv.position = v.position;
+				nv.color = Color4(1.0f, 1.0f, 1.0f, 1.0f);
+				nv.textureCoordinate = v.textureCoordinate;
+				new_vertices.push_back(nv);
+			}
+			//メッシュ作成
+			m_SpriteS.push_back(MeshResource::CreateMeshResource<VertexPositionColorTexture>(new_vertices, indices, true));
+		}
+		//画像作成-------------------------
+		Draw->SetMeshResource(m_SpriteS[0]);
+
+	}
+
+	void BakusanEF::OnUpdate()
+	{
+		//画像遷移
+		m_time += App::GetApp()->GetElapsedTime();
+		if (m_time > m_IntervalTime)
+		{
+			m_time = 0;
+			GetComponent<PCTStaticDraw>()->SetMeshResource(m_SpriteS[m_NowSpriteNum++]);
+
+			//もし分割数より多かったら
+			if (m_NowSpriteNum > m_SpriteNum)
+			{
+				m_NowSpriteNum = 0;
+				SetUpdateActive(false);
+				SetDrawActive(false);
+
+			}
+		}
+	}
+
+	void BakusanEF::SetPosScaActive(Vector3 pos,Vector3 sca)
+	{
+		SetDrawActive(true);
+		SetUpdateActive(true);
+
+		Vector3 scale = sca * 2;
+		GetComponent<Transform>()->SetPosition(pos);
+		GetComponent<Transform>()->SetScale(scale);
+	}
 	//************************************************************************
 	//	爆弾
 	//	一定時間で起動
