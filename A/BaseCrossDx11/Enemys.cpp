@@ -2465,9 +2465,9 @@ namespace basecross
 		SetUpdateActive(true);
 
 		Vector3 pos2 = pos;
-		Vector3 ransca = sca*10;
+		Vector3 ransca = sca*20;
 		pos2 += Vector3((rand() % (int)(sca.x * 2) - sca.x) / 10, (rand() % (int)(sca.y * 2) - sca.y) / 10, (rand() % (int)(sca.z * 2) - sca.z) / 10);
-		Vector3 scale = sca * 4;
+		Vector3 scale = sca * 10;
 
 		GetComponent<Transform>()->SetPosition(pos2);
 		GetComponent<Transform>()->SetScale(scale);
