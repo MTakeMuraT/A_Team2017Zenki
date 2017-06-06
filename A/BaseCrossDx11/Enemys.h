@@ -411,6 +411,9 @@ namespace basecross
 		void Rot();
 		//Abe20170519
 
+		//爆発範囲
+		float m_BombDistance;
+
 
 
 		//以下パラメータ
@@ -427,6 +430,9 @@ namespace basecross
 		//突撃回数
 		int m_TackleCount;
 
+
+		//爆発エフェクト
+		shared_ptr<GameObject> m_Effect;
 
 	public:
 		//引数 位置(pos)、大きさ(parscale)、HP(hp)、索敵距離(serchdistance)、速度(speed)、攻撃力(power)

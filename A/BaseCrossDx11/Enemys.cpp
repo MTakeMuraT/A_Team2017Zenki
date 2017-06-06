@@ -1849,6 +1849,11 @@ namespace basecross
 		m_StageSize = ScenePtr->GetStageSize() / 2;
 
 
+		//爆発エフェクト作成
+		m_Effect = GetStage()->AddGameObject<BombEffect>();
+
+		m_BombDistance = 6.0f;
+
 	}
 
 	void BombEnemy::OnUpdate()
@@ -2059,8 +2064,6 @@ namespace basecross
 				m_TackleFlg = true;	
 			}
 		}
-	
-		
 		//m_TackleFlgがtrue、以下突撃中の動作
 		else
 		{
@@ -2107,6 +2110,8 @@ namespace basecross
 				SetDrawActive(false);
 				m_Hp = 0;
 				m_ActiveFlg = false;
+
+				ToDamagePlayer();
 			}
 		}
 	}
@@ -2168,27 +2173,49 @@ namespace basecross
 	//プレイヤーへの攻撃判定
 	void BombEnemy::ToDamagePlayer()
 	{
-			//攻撃中なら
-			if (m_TackleFlg)
-			{
-				//HPを減らす
-				auto PtrPlayerHP = GetStage()->GetSharedGameObject<PlayerHP>(L"PlayerHP", false);
-				PtrPlayerHP->SetDamage_int(m_Power);
-				PtrPlayerHP->SetHit(true);
+		//距離測ってHPを減らす
+		//判定
+		//プレイヤーのアクセサー的なのをはじめにもってきておく
+		auto Player1 = GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_L");
+		auto Player2 = GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_R");
 
-				//自爆の為消滅
-				SetDrawActive(false);
-				m_Hp = 0;
-				m_ActiveFlg = false;
+		//プレイヤーの座標を持ってくる
+		Vector3 ppos1 = Player1->GetComponent<Transform>()->GetPosition();
+		Vector3 ppos2 = Player2->GetComponent<Transform>()->GetPosition();
 
-				//Abe20170605
-				//索敵サークル除去
-				m_SearchCircle->SetDrawActive(false);
-				//Abe20170605
+		//距離を測る(プレイヤー同士の体の大きさは変わらないと思うので1体目を参照)
+		float half = Player1->GetComponent<Transform>()->GetScale().x / 2 + m_BombDistance / 2;
+		//平方根とらないように
+		half *= half;
+		//それぞれの差を計算
+		Vector3 dist1 = GetComponent<Transform>()->GetPosition() - Player1->GetComponent<Transform>()->GetPosition();
+		Vector3 dist2 = GetComponent<Transform>()->GetPosition() - Player2->GetComponent<Transform>()->GetPosition();
+		dist1 = dist1 * dist1;
+		dist2 = dist2 * dist2;
 
-			}
-		
+		//どっちか当たる
+		if (half > dist1.x + dist1.z || half > dist2.x + dist2.z)
+		{
+			//ダメージを与える
+			auto PtrPlayerHP = GetStage()->GetSharedGameObject<PlayerHP>(L"PlayerHP", false);
+			PtrPlayerHP->SetDamage_int(m_Power);
+			PtrPlayerHP->SetHit(true);
+		}
+
+		//自爆の為消滅
+		SetDrawActive(false);
+		m_Hp = 0;
+		m_ActiveFlg = false;
+
+		//爆風作成
+		dynamic_pointer_cast<BombEffect>(m_Effect)->SetPosActive(GetComponent<Transform>()->GetPosition());
+
+		//Abe20170605
+		//索敵サークル除去
+		m_SearchCircle->SetDrawActive(false);
+		//Abe20170605		
 	}
+
 	void BombEnemy::DamagePlayer()
 	{
 		if (GetDrawActive())

@@ -2494,7 +2494,7 @@ namespace basecross {
 					//À•W
 					auto CTrans = CursorSprite->AddComponent<Transform>();
 					CTrans->SetPosition(-300, -240, 0);
-					CTrans->SetScale(180, 100, 1);
+					CTrans->SetScale(180, 20, 1);
 					CTrans->SetRotation(0, 0, 0);
 
 					//•`‰æ
@@ -2562,15 +2562,15 @@ namespace basecross {
 							{
 							case 0:
 								m_Cursor->GetComponent<Transform>()->SetPosition(-300, -240, 0);
-								m_Cursor->GetComponent<Transform>()->SetScale(180, 100, 1);
+								m_Cursor->GetComponent<Transform>()->SetScale(180, 20, 1);
 								break;
 							case 1:
 								m_Cursor->GetComponent<Transform>()->SetPosition(0, -240, 0);
-								m_Cursor->GetComponent<Transform>()->SetScale(250, 100, 1);
+								m_Cursor->GetComponent<Transform>()->SetScale(250, 20, 1);
 								break;
 							case 2:
 								m_Cursor->GetComponent<Transform>()->SetPosition(310, -240, 0);
-								m_Cursor->GetComponent<Transform>()->SetScale(180, 100, 1);
+								m_Cursor->GetComponent<Transform>()->SetScale(180, 20, 1);
 								break;
 							default:
 								break;
