@@ -655,22 +655,25 @@ namespace basecross
 
 					//Abe20170606
 					//爆散エフェクト作成
-					auto BakusanGroup = GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->GetGroupVector();
-					bool bakuflg = false;
-					for (auto obj : BakusanGroup)
+					for (int i = 0; i < 3; i++)
 					{
-						auto ptr = dynamic_pointer_cast<BakusanEF>(obj.lock());
-						if (!ptr->GetDrawActive())
+						auto BakusanGroup = GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->GetGroupVector();
+						bool bakuflg = false;
+						for (auto obj : BakusanGroup)
 						{
-							bakuflg = true;
-							ptr->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+							auto ptr = dynamic_pointer_cast<BakusanEF>(obj.lock());
+							if (!ptr->GetDrawActive())
+							{
+								bakuflg = true;
+								ptr->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+							}
 						}
-					}
-					if (!bakuflg)
-					{
-						auto obj = GetStage()->AddGameObject<BakusanEF>();
-						obj->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
-						GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->IntoGroup(obj);
+						if (!bakuflg)
+						{
+							auto obj = GetStage()->AddGameObject<BakusanEF>();
+							obj->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+							GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->IntoGroup(obj);
+						}
 					}
 					//Abe20170606
 
@@ -1250,22 +1253,25 @@ namespace basecross
 
 					//Abe20170606
 					//爆散エフェクト作成
-					auto BakusanGroup = GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->GetGroupVector();
-					bool bakuflg = false;
-					for (auto obj : BakusanGroup)
+					for (int i = 0; i < 3; i++)
 					{
-						auto ptr = dynamic_pointer_cast<BakusanEF>(obj.lock());
-						if (!ptr->GetDrawActive())
+						auto BakusanGroup = GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->GetGroupVector();
+						bool bakuflg = false;
+						for (auto obj : BakusanGroup)
 						{
-							bakuflg = true;
-							ptr->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+							auto ptr = dynamic_pointer_cast<BakusanEF>(obj.lock());
+							if (!ptr->GetDrawActive())
+							{
+								bakuflg = true;
+								ptr->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+							}
 						}
-					}
-					if (!bakuflg)
-					{
-						auto obj = GetStage()->AddGameObject<BakusanEF>();
-						obj->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
-						GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->IntoGroup(obj);
+						if (!bakuflg)
+						{
+							auto obj = GetStage()->AddGameObject<BakusanEF>();
+							obj->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+							GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->IntoGroup(obj);
+						}
 					}
 					//Abe20170606
 
@@ -1716,22 +1722,25 @@ namespace basecross
 
 				//Abe20170606
 				//爆散エフェクト作成
-				auto BakusanGroup = GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->GetGroupVector();
-				bool bakuflg = false;
-				for (auto obj : BakusanGroup)
+				for (int i = 0; i < 3; i++)
 				{
-					auto ptr = dynamic_pointer_cast<BakusanEF>(obj.lock());
-					if (!ptr->GetDrawActive())
+					auto BakusanGroup = GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->GetGroupVector();
+					bool bakuflg = false;
+					for (auto obj : BakusanGroup)
 					{
-						bakuflg = true;
-						ptr->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+						auto ptr = dynamic_pointer_cast<BakusanEF>(obj.lock());
+						if (!ptr->GetDrawActive())
+						{
+							bakuflg = true;
+							ptr->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+						}
 					}
-				}
-				if (!bakuflg)
-				{
-					auto obj = GetStage()->AddGameObject<BakusanEF>();
-					obj->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
-					GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->IntoGroup(obj);
+					if (!bakuflg)
+					{
+						auto obj = GetStage()->AddGameObject<BakusanEF>();
+						obj->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+						GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->IntoGroup(obj);
+					}
 				}
 				//Abe20170606
 
@@ -2197,22 +2206,25 @@ namespace basecross
 
 			//Abe20170606
 			//爆散エフェクト作成
-			auto BakusanGroup = GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->GetGroupVector();
-			bool bakuflg = false;
-			for (auto obj : BakusanGroup)
+			for (int i = 0; i < 3; i++)
 			{
-				auto ptr = dynamic_pointer_cast<BakusanEF>(obj.lock());
-				if (!ptr->GetDrawActive())
+				auto BakusanGroup = GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->GetGroupVector();
+				bool bakuflg = false;
+				for (auto obj : BakusanGroup)
 				{
-					bakuflg = true;
-					ptr->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+					auto ptr = dynamic_pointer_cast<BakusanEF>(obj.lock());
+					if (!ptr->GetDrawActive())
+					{
+						bakuflg = true;
+						ptr->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+					}
 				}
-			}
-			if (!bakuflg)
-			{
-				auto obj = GetStage()->AddGameObject<BakusanEF>();
-				obj->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
-				GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->IntoGroup(obj);
+				if (!bakuflg)
+				{
+					auto obj = GetStage()->AddGameObject<BakusanEF>();
+					obj->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+					GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->IntoGroup(obj);
+				}
 			}
 			//Abe20170606
 
@@ -2452,7 +2464,11 @@ namespace basecross
 		SetDrawActive(true);
 		SetUpdateActive(true);
 
-		Vector3 scale = sca * 2;
+		Vector3 pos = pos;
+		Vector3 ransca = sca*10;
+		pos += Vector3((rand() % (int)(sca.x * 2) - sca.x) / 10, (rand() % (int)(sca.y * 2) - sca.y) / 10, (rand() % (int)(sca.z * 2) - sca.z) / 10);
+		Vector3 scale = sca * 4;
+
 		GetComponent<Transform>()->SetPosition(pos);
 		GetComponent<Transform>()->SetScale(scale);
 	}
