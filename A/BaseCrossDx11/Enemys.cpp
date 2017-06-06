@@ -2464,12 +2464,12 @@ namespace basecross
 		SetDrawActive(true);
 		SetUpdateActive(true);
 
-		Vector3 pos = pos;
+		Vector3 pos2 = pos;
 		Vector3 ransca = sca*10;
-		pos += Vector3((rand() % (int)(sca.x * 2) - sca.x) / 10, (rand() % (int)(sca.y * 2) - sca.y) / 10, (rand() % (int)(sca.z * 2) - sca.z) / 10);
+		pos2 += Vector3((rand() % (int)(sca.x * 2) - sca.x) / 10, (rand() % (int)(sca.y * 2) - sca.y) / 10, (rand() % (int)(sca.z * 2) - sca.z) / 10);
 		Vector3 scale = sca * 4;
 
-		GetComponent<Transform>()->SetPosition(pos);
+		GetComponent<Transform>()->SetPosition(pos2);
 		GetComponent<Transform>()->SetScale(scale);
 	}
 	//************************************************************************
