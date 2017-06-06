@@ -2282,6 +2282,7 @@ namespace basecross
 		//“§–¾ˆ—
 		SetAlphaActive(true);
 		SetDrawActive(false);
+		SetDrawLayer(7);
 
 		//‰æ‘œ•ªŠ„
 
