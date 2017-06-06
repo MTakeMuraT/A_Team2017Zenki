@@ -273,7 +273,7 @@ namespace basecross
 		if (CntlVec[0].bConnected)
 		{
 			//STARTボタンでポーズ
-			if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_START)
+			if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_START && GetSharedGameObject<GameObject>(L"ResultS", false) && GetSharedGameObject<GameObject>(L"GameOverS", false))
 			{
 				//ポーズ表示
 				GetSharedGameObject<PauseMenu>(L"PauseMenu", false)->Open();
