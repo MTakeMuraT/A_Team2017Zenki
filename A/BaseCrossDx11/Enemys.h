@@ -396,8 +396,8 @@ namespace basecross
 
 		//攻撃までのタメ時間
 		float m_AttackTime = 2.0f;
-		//攻撃中(これ、攻撃状態でもあるんで、DamageFlgっても呼ぶかも)
-		bool m_TackleFlg = false;
+		//攻撃中判定
+		bool m_AttackFlg = false;
 		//攻撃してる対象
 		int m_TargetNum = 0;
 		//突撃してる時間
@@ -427,9 +427,6 @@ namespace basecross
 		float m_Speed;
 		//攻撃力
 		int m_Power;
-		//突撃回数
-		int m_TackleCount;
-
 
 		//爆発エフェクト
 		shared_ptr<GameObject> m_Effect;
@@ -465,6 +462,7 @@ namespace basecross
 		void DamagePlayer();
 
 		void TurnVecolity(bool, bool);
+		bool GetAttack() { return m_AttackFlg; }
 		int GetPower() { return m_Power; }
 
 	};

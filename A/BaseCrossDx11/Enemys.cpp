@@ -1810,26 +1810,6 @@ namespace basecross
 		m_Player1 = GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_L");
 		m_Player2 = GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_R");
 
-		//õ“G”ÍˆÍì¬
-		//auto circle = GetStage()->AddGameObject<GameObject>();
-		//auto TransCi = circle->AddComponent<Transform>();
-		//Vector3 posci = m_InitPos;
-		////‘«Œ³‚ÖˆÚ“®
-		//posci.y = 1;
-		//TransCi->SetPosition(posci);
-		//TransCi->SetScale(Vector3(m_SearchDistance, m_SearchDistance, m_SearchDistance));
-		//TransCi->SetRotation(90 * 3.14159265 / 180, 0, 0);
-
-		//auto DrawCi = circle->AddComponent<PNTStaticDraw>();
-		//DrawCi->SetTextureResource(L"SEARCHCIRCLE_TX");
-		//DrawCi->SetMeshResource(L"DEFAULT_SQUARE");
-
-		//circle->SetAlphaActive(true);
-		////ƒŒƒCƒ„[İ’è
-		//circle->SetDrawLayer(2);
-
-		//m_SearchCircle = circle;
-
 		//Abe20170523
 		//õ“G”ÍˆÍì¬
 		auto circle = GetStage()->AddGameObject<SearchCircle>();
@@ -1861,8 +1841,6 @@ namespace basecross
 		//¶‚«‚Ä‚ê‚Î
 		if (m_ActiveFlg)
 		{
-			//m_Debugtxt->SetText(Util::IntToWStr(m_State));
-
 			switch (m_State)
 			{
 				//õ“G
@@ -2052,67 +2030,52 @@ namespace basecross
 
 	void BombEnemy::Attack()
 	{
-		if (!m_TackleFlg)
+
+		//‘¬“xŒvZ
+		//‚P‘Ì–Ú‚É“ËŒ‚
+		if (m_TargetNum == 1)
 		{
-			//ŠÔ‰ÁZ
-			m_time += App::GetApp()->GetElapsedTime();
-			
-			//UŒ‚‚Ü‚Å‚Ìƒ`ƒƒ[ƒW‚ªI—¹
-			if (m_time > m_AttackTime)
-			{
-				m_time = 0;
-				m_TackleFlg = true;	
-			}
+			Vector3 dis = m_Player1->GetComponent<Transform>()->GetPosition() - GetComponent<Transform>()->GetPosition();
+
+			//Šp“xZo
+			float angle = atan2(dis.z, dis.x);
+			//‘¬“x“ü‚ê‚é
+			m_Velocity = Vector3(cos(angle), 0, sin(angle)) * m_Speed;
 		}
-		//m_TackleFlg‚ªtrueAˆÈ‰º“ËŒ‚’†‚Ì“®ì
+		//‚Q‘Ì–Ú‚É“ËŒ‚
 		else
 		{
-			//‘¬“xŒvZ
-			//‚P‘Ì–Ú‚É“ËŒ‚
-			if (m_TargetNum == 1)
-			{
-				Vector3 dis = m_Player1->GetComponent<Transform>()->GetPosition() - GetComponent<Transform>()->GetPosition();
+			Vector3 dis = m_Player2->GetComponent<Transform>()->GetPosition() - GetComponent<Transform>()->GetPosition();
 
-				//Šp“xZo
-				float angle = atan2(dis.z, dis.x);
-				//‘¬“x“ü‚ê‚é
-				m_Velocity = Vector3(cos(angle), 0, sin(angle)) * m_Speed;
-			}
-			//‚Q‘Ì–Ú‚É“ËŒ‚
-			else
-			{
-				Vector3 dis = m_Player2->GetComponent<Transform>()->GetPosition() - GetComponent<Transform>()->GetPosition();
+			//Šp“xZo
+			float angle = atan2(dis.z, dis.x);
+			//‘¬“x“ü‚ê‚é
+			m_Velocity = Vector3(cos(angle), 0, sin(angle)) * m_Speed;
+		}
 
-				//Šp“xZo
-				float angle = atan2(dis.z, dis.x);
-				//‘¬“x“ü‚ê‚é
-				m_Velocity = Vector3(cos(angle), 0, sin(angle)) * m_Speed;
-			}
-			
-			//ŠÔ‰ÁZ
-			m_time += App::GetApp()->GetElapsedTime();
 
-			//UŒ‚ŠÔ‰ß‚¬‚é‚Ü‚ÅˆÚ“®
-			if (m_time < m_TackleTime)
-			{
-				Vector3 pos = GetComponent<Transform>()->GetPosition();
-				pos += m_Velocity/10;
-				GetComponent<Transform>()->SetPosition(pos);
-			}
-			//“ËŒ‚ŠÔI‚í‚Á‚½‚ç
-			else 
-			{
-				m_time = 0;
-				//UŒ‚ƒtƒ‰ƒO‰ğœ
-				//m_TackleFlg = false;
+		//ŠÔ‰ÁZ
+		m_time += App::GetApp()->GetElapsedTime();
 
-				//“ËŒ‚ŒãA©”š‚Ìˆ×Á–Å
-				SetDrawActive(false);
-				m_Hp = 0;
-				m_ActiveFlg = false;
+		//UŒ‚ŠÔ‰ß‚¬‚é‚Ü‚ÅˆÚ“®
+		if (m_time < m_TackleTime)
+		{
+			Vector3 pos = GetComponent<Transform>()->GetPosition();
+			pos += m_Velocity / 10;
+			GetComponent<Transform>()->SetPosition(pos);
+		}
+		//“ËŒ‚ŠÔI‚í‚Á‚½‚ç
+		else
+		{
+			m_time = 0;
 
-				ToDamagePlayer();
-			}
+			//“ËŒ‚ŒãA©”š‚Ìˆ×Á–Å
+			SetDrawActive(false);
+			m_Hp = 0;
+			m_ActiveFlg = false;
+			m_AttackFlg = false;
+
+			ToDamagePlayer();
 		}
 	}
 

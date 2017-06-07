@@ -252,18 +252,31 @@ namespace basecross
 		//自爆エネミー
 		if (dynamic_pointer_cast<BombEnemy>(obj))
 		{
-			if (dynamic_pointer_cast<TackleEnemy>(obj2))
+			bool flg = false;
+			//攻撃するときのみ
+			if (dynamic_pointer_cast<BombEnemy>(obj)->GetAttack())
 			{
-				dynamic_pointer_cast<TackleEnemy>(obj2)->Damage((int)dynamic_pointer_cast<BombEnemy>(obj)->GetPower());
+				if (dynamic_pointer_cast<TackleEnemy>(obj2))
+				{
+					flg = true;
+					dynamic_pointer_cast<TackleEnemy>(obj2)->Damage((int)dynamic_pointer_cast<BombEnemy>(obj)->GetPower());
+				}
+
+				if (dynamic_pointer_cast<TeleportEnemy>(obj2))
+				{
+					flg = true;
+					dynamic_pointer_cast<TeleportEnemy>(obj2)->Damage((int)dynamic_pointer_cast<BombEnemy>(obj)->GetPower());
+				}
+				if (dynamic_pointer_cast<ShotEnemy>(obj2))
+				{
+					flg = true;
+					dynamic_pointer_cast<ShotEnemy>(obj2)->Damage((int)dynamic_pointer_cast<BombEnemy>(obj)->GetPower());
+				}
 			}
 
-			if (dynamic_pointer_cast<TeleportEnemy>(obj2))
+			if (flg)
 			{
-				dynamic_pointer_cast<TeleportEnemy>(obj2)->Damage((int)dynamic_pointer_cast<BombEnemy>(obj)->GetPower());
-			}
-			if (dynamic_pointer_cast<ShotEnemy>(obj2))
-			{
-				dynamic_pointer_cast<ShotEnemy>(obj2)->Damage((int)dynamic_pointer_cast<BombEnemy>(obj)->GetPower());
+				dynamic_pointer_cast<BombEnemy>(obj)->ToDamagePlayer();
 			}
 		}
 
@@ -349,17 +362,30 @@ namespace basecross
 		//自爆エネミー
 		if (dynamic_pointer_cast<BombEnemy>(obj2))
 		{
-			if (dynamic_pointer_cast<TackleEnemy>(obj))
+			//攻撃するときのみ
+			if (dynamic_pointer_cast<BombEnemy>(obj2)->GetAttack())
 			{
-				dynamic_pointer_cast<TackleEnemy>(obj)->Damage((int)dynamic_pointer_cast<BombEnemy>(obj2)->GetPower());
-			}
-			if (dynamic_pointer_cast<TeleportEnemy>(obj))
-			{
-				dynamic_pointer_cast<TeleportEnemy>(obj)->Damage((int)dynamic_pointer_cast<BombEnemy>(obj2)->GetPower());
-			}
-			if (dynamic_pointer_cast<ShotEnemy>(obj))
-			{
-				dynamic_pointer_cast<ShotEnemy>(obj)->Damage((int)dynamic_pointer_cast<BombEnemy>(obj2)->GetPower());
+				bool flg = false;
+				if (dynamic_pointer_cast<TackleEnemy>(obj))
+				{
+					flg = true;
+					dynamic_pointer_cast<TackleEnemy>(obj)->Damage((int)dynamic_pointer_cast<BombEnemy>(obj2)->GetPower());
+				}
+				if (dynamic_pointer_cast<TeleportEnemy>(obj))
+				{
+					flg = true;
+					dynamic_pointer_cast<TeleportEnemy>(obj)->Damage((int)dynamic_pointer_cast<BombEnemy>(obj2)->GetPower());
+				}
+				if (dynamic_pointer_cast<ShotEnemy>(obj))
+				{
+					flg = true;
+					dynamic_pointer_cast<ShotEnemy>(obj)->Damage((int)dynamic_pointer_cast<BombEnemy>(obj2)->GetPower());
+				}
+
+				if (flg)
+				{
+					dynamic_pointer_cast<BombEnemy>(obj2)->ToDamagePlayer();
+				}
 			}
 		}
 
