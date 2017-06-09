@@ -2631,7 +2631,7 @@ namespace basecross {
 						Draw->SetTextureResource(L"OVERBLACK_TX");
 						Draw->SetDiffuse(Color4(1, 1, 1, 0));
 
-						obj->SetDrawLayer(13);
+						obj->SetDrawLayer(15);
 						obj->SetAlphaActive(true);
 
 						m_BlackLast = obj;
@@ -3167,7 +3167,7 @@ namespace basecross {
 					auto obj = GetStage()->AddGameObject<GameObject>();
 					auto Trans = obj->AddComponent<Transform>();
 					Trans->SetPosition(-200, -250, 0);
-					Trans->SetScale(500, 100, 1);
+					Trans->SetScale(600, 100, 1);
 					Trans->SetRotation(0, 0, 0);
 
 					auto Draw = obj->AddComponent<PCTSpriteDraw>();
@@ -3240,12 +3240,27 @@ namespace basecross {
 
 
 				Vector3 sca = m_RankSp->GetComponent<Transform>()->GetScale();
-				sca *= 0.98f;
-				if (sca.x < 500)
+				if (m_TotalScore >= 7000)
+				{
+					sca *= 0.98f;
+				}
+				else if (m_TotalScore >= 5000)
+				{
+					sca *= 0.96f;
+				}
+				else if (m_TotalScore >= 3000)
+				{
+					sca *= 0.94f;
+				}
+				else
+				{
+					sca *= 0.90f;
+				}
+				if (sca.x < 300)
 				{
 					//大きさ固定
-					sca.x = 500;
-					sca.y = 500;
+					sca.x = 300;
+					sca.y = 300;
 					sca.z = 1;
 					//状態変更
 					m_State = 12;
@@ -4395,6 +4410,7 @@ namespace basecross {
 			case 3:
 				if (true)
 				{
+					m_State = 4;
 					//全部の動くオブジェクトを動かす
 					auto ColGroup = GetStage()->GetSharedObjectGroup(L"CollisionGroup")->GetGroupVector();
 					auto EnemyGroup = GetStage()->GetSharedObjectGroup(L"EnemyGroup")->GetGroupVector();
@@ -4455,6 +4471,8 @@ namespace basecross {
 					}
 
 				}
+
+				SetUpdateActive(false);
 				break;
 		}
 

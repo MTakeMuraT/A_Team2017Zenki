@@ -1103,6 +1103,8 @@ namespace basecross{
 
 		void OnCreate() override;
 		void OnUpdate() override;
+
+		bool GetFinish() { if (m_State >= 4) { return true; } else { return false; } }
 	};
 	//Abe20170609
 
