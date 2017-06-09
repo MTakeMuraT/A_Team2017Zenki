@@ -61,6 +61,7 @@ namespace basecross
 
 		//演出に移る時のBGMストップ
 		bool StopBGM = true;
+
 	public:
 		//構築と破棄
 		GameStage() :Stage() {}

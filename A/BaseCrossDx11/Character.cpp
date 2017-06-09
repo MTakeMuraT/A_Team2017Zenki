@@ -4224,6 +4224,241 @@ namespace basecross {
 
 	}
 
+	//************************************
+	//　始まる演出
+	//************************************
+	void StartState::OnCreate()
+	{
+		//スタートロゴ作成
+		auto stlogo = GetStage()->AddGameObject<GameObject>();
+		auto TransSt = stlogo->AddComponent<Transform>();
+		TransSt->SetPosition(0,0,0);
+		TransSt->SetRotation(0, 0, 0);
+		TransSt->SetScale(1500, 500, 1);
+
+		auto DrawSt = stlogo->AddComponent<PCTSpriteDraw>();
+		DrawSt->SetTextureResource(L"STARTSTARTLOGO_TX");
+		DrawSt->SetDiffuse(Color4(1, 1, 1, 0));
+		stlogo->SetDrawLayer(6);
+		stlogo->SetAlphaActive(true);
+
+		m_StartLogo = stlogo;
+
+		//ステージロゴ作成
+		auto stalogo = GetStage()->AddGameObject<GameObject>();
+		auto TransSta = stalogo->AddComponent<Transform>();
+		TransSta->SetPosition(-1000, 200, 0);
+		TransSta->SetRotation(0, 0, 0);
+		TransSta->SetScale(400, 100, 1);
+
+		auto DrawSta = stalogo->AddComponent<PCTSpriteDraw>();
+		DrawSta->SetTextureResource(L"STARTSTAGELOGO_TX");
+
+		stalogo->SetDrawLayer(6);
+		stalogo->SetAlphaActive(true);
+
+		m_StageLogo = stalogo;
+
+		//数字作成
+		auto nump = GetStage()->AddGameObject<NumberSprite>(0,Vector2(-700,200),Vector2(140,140) , 7);
+		m_NumSp = nump;
+	}
+
+	void StartState::OnUpdate()
+	{
+		//初期起動
+		if (m_Init)
+		{
+			m_Init = false;
+			//全部の動くオブジェクトを止める
+			auto ColGroup = GetStage()->GetSharedObjectGroup(L"CollisionGroup")->GetGroupVector();
+			auto EnemyGroup = GetStage()->GetSharedObjectGroup(L"EnemyGroup")->GetGroupVector();
+			auto SearchChildGroup = GetStage()->GetSharedObjectGroup(L"SearchChildGroup")->GetGroupVector();
+			auto UgokuGroup = GetStage()->GetSharedObjectGroup(L"UgokuGroup")->GetGroupVector();
+
+			//プレイヤーを止める
+			GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_L")->SetUpdateActive(false);
+			GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_R")->SetUpdateActive(false);
+
+			//プレイヤー管理してるやつ止める
+			GetStage()->GetSharedGameObject<PlayerManager>(L"PtrPlayerManager", false)->SetUpdateActive(false);
+
+			//全部止める
+			for (auto obj : ColGroup)
+			{
+				auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+				if (ptr)
+				{
+					if (ptr->GetDrawActive())
+					{
+						ptr->SetUpdateActive(false);
+					}
+				}
+			}
+			for (auto obj : EnemyGroup)
+			{
+				auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+				if (ptr)
+				{
+					if (ptr->GetDrawActive())
+					{
+						ptr->SetUpdateActive(false);
+					}
+				}
+			}
+			for (auto obj : SearchChildGroup)
+			{
+				auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+				if (ptr)
+				{
+					if (ptr->GetDrawActive())
+					{
+						ptr->SetUpdateActive(false);
+					}
+				}
+			}
+			for (auto obj : UgokuGroup)
+			{
+				auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+				if (ptr)
+				{
+					if (ptr->GetDrawActive())
+					{
+						ptr->SetUpdateActive(false);
+					}
+				}
+			}
+
+			return;
+		}
+
+		//動く
+		switch (m_State)
+		{
+			//右からステージと番号来る
+			case 0:
+				if (true)
+				{
+					//ロゴ
+					Vector3 pos = m_StageLogo->GetComponent<Transform>()->GetPosition();
+					pos.x += 1000 * App::GetApp()->GetElapsedTime();
+					m_StageLogo->GetComponent<Transform>()->SetPosition(pos);
+
+					//数字
+					m_NumSp->MoveNums(Vector3(1000 * App::GetApp()->GetElapsedTime(), 0, 0));
+
+					if (pos.x > -200)
+					{
+						m_State = 1;
+						m_time = 0;
+					}
+				}
+				break;
+				//ちょっと待つ
+			case 1:
+				if (true)
+				{
+					m_time += App::GetApp()->GetElapsedTime();
+					if (m_time > 1.0f)
+					{
+						m_State = 2;
+					}
+				}
+				break;
+				//中心にスタートロゴ出して透明にしてく
+			case 2:
+				if (true)
+				{
+					//実体化
+					m_Alpha += 0.5f * App::GetApp()->GetElapsedTime();
+					m_StartLogo->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_Alpha));
+					
+					m_StageLogo->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, 1 - m_Alpha));
+
+					//小さく
+					Vector3 sca = m_StartLogo->GetComponent<Transform>()->GetScale();
+					sca *= 0.95f;
+					m_StartLogo->GetComponent<Transform>()->SetScale(sca);
+
+					//文字どっか飛ばす
+					m_NumSp->MoveNums(Vector3(2000, -1000, 0) * App::GetApp()->GetElapsedTime());
+					if (sca.x < 50)
+					{
+						m_State = 3;
+						m_StageLogo->SetDrawActive(false);
+						m_StartLogo->SetDrawActive(false);
+						m_NumSp->SetNumDraw(false);
+					}
+				}
+				break;
+				//終了
+			case 3:
+				if (true)
+				{
+					//全部の動くオブジェクトを動かす
+					auto ColGroup = GetStage()->GetSharedObjectGroup(L"CollisionGroup")->GetGroupVector();
+					auto EnemyGroup = GetStage()->GetSharedObjectGroup(L"EnemyGroup")->GetGroupVector();
+					auto SearchChildGroup = GetStage()->GetSharedObjectGroup(L"SearchChildGroup")->GetGroupVector();
+					auto UgokuGroup = GetStage()->GetSharedObjectGroup(L"UgokuGroup")->GetGroupVector();
+
+					//プレイヤーを動かす
+					GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_L")->SetUpdateActive(true);
+					GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_R")->SetUpdateActive(true);
+
+					//プレイヤー管理してるやつ動かす
+					GetStage()->GetSharedGameObject<PlayerManager>(L"PtrPlayerManager", true)->SetUpdateActive(true);
+
+					//全部動かす
+					for (auto obj : ColGroup)
+					{
+						auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+						if (ptr)
+						{
+							if (ptr->GetDrawActive())
+							{
+								ptr->SetUpdateActive(true);
+							}
+						}
+					}
+					for (auto obj : EnemyGroup)
+					{
+						auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+						if (ptr)
+						{
+							if (ptr->GetDrawActive())
+							{
+								ptr->SetUpdateActive(true);
+							}
+						}
+					}
+					for (auto obj : SearchChildGroup)
+					{
+						auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+						if (ptr)
+						{
+							if (ptr->GetDrawActive())
+							{
+								ptr->SetUpdateActive(true);
+							}
+						}
+					}
+					for (auto obj : UgokuGroup)
+					{
+						auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+						if (ptr)
+						{
+							if (ptr->GetDrawActive())
+							{
+								ptr->SetUpdateActive(true);
+							}
+						}
+					}
+
+				}
+				break;
+		}
+
+	}
 	//Abe20170609
 }
 	//end basecross

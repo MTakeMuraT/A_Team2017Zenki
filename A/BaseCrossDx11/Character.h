@@ -1072,6 +1072,38 @@ namespace basecross{
 
 		void SetLayer(int num) { SetDrawLayer(num); }
 	};
+
+
+	//************************************
+	//　始まる演出
+	//************************************
+	class StartState : public GameObject
+	{
+	private:
+		//ステージのロゴ
+		shared_ptr<GameObject> m_StageLogo;
+		//ステージの番号
+		shared_ptr<NumberSprite> m_NumSp;
+		//スタートのロゴ
+		shared_ptr<GameObject> m_StartLogo;
+
+		//状態
+		int m_State = 0;
+
+		//初期起動
+		bool m_Init = true;
+
+		//透明度
+		float m_Alpha = 0;
+
+		//ちょっと待つ
+		float m_time = 0;
+	public :
+		StartState(const shared_ptr<Stage>& StagePtr) : GameObject(StagePtr) {}
+
+		void OnCreate() override;
+		void OnUpdate() override;
+	};
 	//Abe20170609
 
 }

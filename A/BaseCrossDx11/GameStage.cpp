@@ -283,6 +283,16 @@ namespace basecross
 	// シーン遷移
 	void GameStage::OnUpdate()
 	{
+		//Abe20170609
+		//始まり演出
+		if (!GetSharedGameObject<StartState>(L"StartState", false))
+		{
+			SetSharedGameObject(L"StartState",AddGameObject<StartState>());
+			return;
+		}
+		//Abe20170609
+
+
 		auto PlayerLifePtr = GetSharedGameObject<Player_Life>(L"Life", false);
 		if (PlayerLifePtr) {
 			if (PlayerLifePtr->GetDieFlg() == false) {

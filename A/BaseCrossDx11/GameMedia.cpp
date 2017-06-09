@@ -288,8 +288,14 @@ namespace basecross {
 		//ぶつかりエフェクト
 		strTexture = DataDir + L"EF\\spark.png";
 		App::GetApp()->RegisterTexture(L"BUTUKARIEF_TX", strTexture);
+		//始まり演出
+		//スタートロゴ
+		strTexture = DataDir + L"StageStart\\Start.png";
+		App::GetApp()->RegisterTexture(L"STARTSTARTLOGO_TX", strTexture);
+		//ステージロゴ
+		strTexture = DataDir + L"StageStart\\StageLogo.png";
+		App::GetApp()->RegisterTexture(L"STARTSTAGELOGO_TX", strTexture);
 		//Abe20170609
-
 
 		////モデル（ボーンあり
 		auto MadelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Player\\PlayerModel\\Player_animation.bmf");
