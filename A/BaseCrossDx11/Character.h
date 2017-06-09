@@ -1023,7 +1023,8 @@ namespace basecross{
 		int m_NotSelectX = 0;
 		//動かせるフラグ
 		bool m_MoveFlg = true;
-
+		//スタートBUTTON押せるようにするフラグ
+		bool m_StartPushFlg = true;
 		//-----関数-----
 	public:
 		PauseMenu(const shared_ptr<Stage>& StagePtr) :GameObject(StagePtr) {};
@@ -1036,6 +1037,9 @@ namespace basecross{
 		//閉じる
 		void Close();
 
+		//消した瞬間にでなくするようにするためのアクセサー
+		bool GetPushFlg() { return m_StartPushFlg; }
+		void SetPushFlg(bool flg) { m_StartPushFlg = flg; }
 	};
 	//Abe20170605
 

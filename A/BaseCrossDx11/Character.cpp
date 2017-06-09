@@ -3643,8 +3643,8 @@ namespace basecross {
 		//ゲームに戻る
 		auto togame = GetStage()->AddGameObject<GameObject>();
 		auto TransTG = togame->AddComponent<Transform>();
-		TransTG->SetPosition(-400, 100, 0);
-		TransTG->SetScale(600, 150, 1);
+		TransTG->SetPosition(-350, 100, 0);
+		TransTG->SetScale(400, 150, 1);
 		TransTG->SetRotation(0, 0, 0);
 
 		auto DrawTG = togame->AddComponent<PCTSpriteDraw>();
@@ -3658,8 +3658,8 @@ namespace basecross {
 		//リトライ
 		auto retry = GetStage()->AddGameObject<GameObject>();
 		auto TransRT = retry->AddComponent<Transform>();
-		TransRT->SetPosition(-500, 0, 0);
-		TransRT->SetScale(600, 150, 1);
+		TransRT->SetPosition(-450, 0, 0);
+		TransRT->SetScale(400, 150, 1);
 		TransRT->SetRotation(0, 0, 0);
 
 		auto DrawRT = retry->AddComponent<PCTSpriteDraw>();
@@ -3673,8 +3673,8 @@ namespace basecross {
 		//ステセレ
 		auto stesele = GetStage()->AddGameObject<GameObject>();
 		auto TransSS = stesele->AddComponent<Transform>();
-		TransSS->SetPosition(-500, -100, 0);
-		TransSS->SetScale(600, 150, 1);
+		TransSS->SetPosition(-450, -100, 0);
+		TransSS->SetScale(400, 150, 1);
 		TransSS->SetRotation(0, 0, 0);
 
 		auto DrawSS = stesele->AddComponent<PCTSpriteDraw>();
@@ -3688,8 +3688,8 @@ namespace basecross {
 		//タイトル
 		auto title = GetStage()->AddGameObject<GameObject>();
 		auto TransTI = title->AddComponent<Transform>();
-		TransTI->SetPosition(-500, -200, 0);
-		TransTI->SetScale(600, 150, 1);
+		TransTI->SetPosition(-450, -200, 0);
+		TransTI->SetScale(400, 150, 1);
 		TransTI->SetRotation(0, 0, 0);
 
 		auto DrawTI = title->AddComponent<PCTSpriteDraw>();
@@ -3717,19 +3717,26 @@ namespace basecross {
 		m_EnemyS = enemys;
 
 		//数字
-		auto num1 = GetStage()->AddGameObject<NumberSprite>(0, Vector2(220, 70), Vector2(100, 100), 8);
+		auto num1 = GetStage()->AddGameObject<NumberSprite>(0, Vector2(220, 110), Vector2(100, 100), 8);
+		num1->SetLayer(8);
 		num1->SetNumDraw(false);
 		m_TackleSp = num1;
 		
-		auto num2 = GetStage()->AddGameObject<NumberSprite>(0, Vector2(520, 70), Vector2(100, 100), 8);
+		auto num2 = GetStage()->AddGameObject<NumberSprite>(0, Vector2(520, 110), Vector2(100, 100), 8);
+		num2->SetLayer(8);
 		num2->SetNumDraw(false);
 		m_ShotSp = num2;
-		auto num3 = GetStage()->AddGameObject<NumberSprite>(0, Vector2(220, -230), Vector2(100, 100), 8);
+
+		auto num3 = GetStage()->AddGameObject<NumberSprite>(0, Vector2(220, -190), Vector2(100, 100), 8);
+		num3->SetLayer(8);
 		num3->SetNumDraw(false);
 		m_TerepoSp = num3;
-		auto num4 = GetStage()->AddGameObject<NumberSprite>(0, Vector2(520, -230), Vector2(100, 100), 8);
+
+		auto num4 = GetStage()->AddGameObject<NumberSprite>(0, Vector2(520, -190), Vector2(100, 100), 8);
+		num4->SetLayer(8);
 		num4->SetNumDraw(false);
 		m_BombSp = num4;
+
 		//ポーズロゴ
 		auto pauselogo = GetStage()->AddGameObject<GameObject>();
 		auto TransPL = pauselogo->AddComponent<Transform>();
@@ -3762,6 +3769,9 @@ namespace basecross {
 
 		m_Black = black;
 
+		//起動バグ修正用
+		m_StartPushFlg = true;
+
 		//アップデート停止
 		SetUpdateActive(false);
 	}
@@ -3772,12 +3782,6 @@ namespace basecross {
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		if (CntlVec[0].bConnected)
 		{
-			//STARTボタンで消す
-			//if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_START)
-			//{
-			//	Close();
-			//}
-
 			//カーソル動かす処理
 			if (m_MoveFlg)
 			{
@@ -3812,31 +3816,31 @@ namespace basecross {
 					{
 						//ゲームに戻る
 					case 0:
-						m_ToGame->GetComponent<Transform>()->SetPosition(-400, 100, 0);
-						m_ToRetry->GetComponent<Transform>()->SetPosition(-500, 0, 0);
-						m_ToSteSele->GetComponent<Transform>()->SetPosition(-500, -100, 0);
-						m_ToTitle->GetComponent<Transform>()->SetPosition(-500, -200, 0);
+						m_ToGame->GetComponent<Transform>()->SetPosition(-350, 100, 0);
+						m_ToRetry->GetComponent<Transform>()->SetPosition(-450, 0, 0);
+						m_ToSteSele->GetComponent<Transform>()->SetPosition(-450, -100, 0);
+						m_ToTitle->GetComponent<Transform>()->SetPosition(-450, -200, 0);
 						break;
 						//リトライ
 					case 1:
-						m_ToGame->GetComponent<Transform>()->SetPosition(-500, 100, 0);
-						m_ToRetry->GetComponent<Transform>()->SetPosition(-400, 0, 0);
-						m_ToSteSele->GetComponent<Transform>()->SetPosition(-500, -100, 0);
-						m_ToTitle->GetComponent<Transform>()->SetPosition(-500, -200, 0);
+						m_ToGame->GetComponent<Transform>()->SetPosition(-450, 100, 0);
+						m_ToRetry->GetComponent<Transform>()->SetPosition(-350, 0, 0);
+						m_ToSteSele->GetComponent<Transform>()->SetPosition(-450, -100, 0);
+						m_ToTitle->GetComponent<Transform>()->SetPosition(-450, -200, 0);
 						break;
 						//ステセレ
 					case 2:
-						m_ToGame->GetComponent<Transform>()->SetPosition(-500, 100, 0);
-						m_ToRetry->GetComponent<Transform>()->SetPosition(-500, 0, 0);
-						m_ToSteSele->GetComponent<Transform>()->SetPosition(-400, -100, 0);
-						m_ToTitle->GetComponent<Transform>()->SetPosition(-500, -200, 0);
+						m_ToGame->GetComponent<Transform>()->SetPosition(-450, 100, 0);
+						m_ToRetry->GetComponent<Transform>()->SetPosition(-450, 0, 0);
+						m_ToSteSele->GetComponent<Transform>()->SetPosition(-350, -100, 0);
+						m_ToTitle->GetComponent<Transform>()->SetPosition(-450, -200, 0);
 						break;
 						//タイトル
 					case 3:
-						m_ToGame->GetComponent<Transform>()->SetPosition(-500, 100, 0);
-						m_ToRetry->GetComponent<Transform>()->SetPosition(-500, 0, 0);
-						m_ToSteSele->GetComponent<Transform>()->SetPosition(-500, -100, 0);
-						m_ToTitle->GetComponent<Transform>()->SetPosition(-400, -200, 0);
+						m_ToGame->GetComponent<Transform>()->SetPosition(-450, 100, 0);
+						m_ToRetry->GetComponent<Transform>()->SetPosition(-450, 0, 0);
+						m_ToSteSele->GetComponent<Transform>()->SetPosition(-450, -100, 0);
+						m_ToTitle->GetComponent<Transform>()->SetPosition(-350, -200, 0);
 						break;
 					}
 				}
@@ -3915,10 +3919,10 @@ namespace basecross {
 		m_ToTitle->SetDrawActive(true);
 		m_EnemyS->SetDrawActive(true);
 		m_Black->SetDrawActive(true);
-		m_TackleSp->SetDrawActive(true);
-		m_ShotSp->SetDrawActive(true);
-		m_TerepoSp->SetDrawActive(true);
-		m_BombSp->SetDrawActive(true);
+		dynamic_pointer_cast<NumberSprite>(m_TackleSp)->SetNumDraw(true);
+		dynamic_pointer_cast<NumberSprite>(m_ShotSp)->SetNumDraw(true);
+		dynamic_pointer_cast<NumberSprite>(m_TerepoSp)->SetNumDraw(true);
+		dynamic_pointer_cast<NumberSprite>(m_BombSp)->SetNumDraw(true);
 
 		//アップデート起動
 		SetUpdateActive(true);
@@ -3988,32 +3992,47 @@ namespace basecross {
 		m_ShotCount = 0;
 		m_TereportCount = 0;
 		m_BombCount = 0;
-	
-		for (auto obj : EnemyGroup)
+		
+		//Vector4 EnemyCount = GetStage()->GetSharedGameObject<CollisionManager>(L"CollisionManager",false)->GetEnemyCount();
+		Vector4 EnemyCountS;
+		for (auto obj : GetStage()->GetSharedObjectGroup(L"EnemyGroup")->GetGroupVector())
 		{
-			/*
-			auto ptr = dynamic_pointer_cast<TackleEnemy>(obj.lock());
-			if (ptr)
+
+			if (dynamic_pointer_cast<TackleEnemy>(obj.lock()))
 			{
-				m_TackleCount++;
+				if (dynamic_pointer_cast<GameObject>(obj.lock())->GetDrawActive())
+				{
+					EnemyCountS.x++;
+				}
 			}
-			ptr = dynamic_pointer_cast<ShotEnemy>(obj.lock());
-			if (ptr)
+			if (dynamic_pointer_cast<ShotEnemy>(obj.lock()))
 			{
-				m_ShotCount++;
+				if (dynamic_pointer_cast<GameObject>(obj.lock())->GetDrawActive())
+				{
+					EnemyCountS.y++;
+				}
 			}
-			ptr = dynamic_pointer_cast<TeleportEnemy>(obj.lock());
-			if (ptr)
+			if (dynamic_pointer_cast<TeleportEnemy>(obj.lock()))
 			{
-				m_TereportCount++;
+				if (dynamic_pointer_cast<GameObject>(obj.lock())->GetDrawActive())
+				{
+					EnemyCountS.z++;
+				}
 			}
-			ptr = dynamic_pointer_cast<BombEnemy>(obj.lock());
-			if (ptr)
+			if (dynamic_pointer_cast<BombEnemy>(obj.lock()))
 			{
-				m_BombCount++;
+				if (dynamic_pointer_cast<GameObject>(obj.lock())->GetDrawActive())
+				{
+					EnemyCountS.w++;
+				}
 			}
-			*/
+
 		}
+
+		m_TackleCount = EnemyCountS.x;
+		m_ShotCount = EnemyCountS.y;
+		m_TereportCount = EnemyCountS.z;
+		m_BombCount = EnemyCountS.w;
 
 		//数字(見た目)設定
 		dynamic_pointer_cast<NumberSprite>(m_TackleSp)->SetNum(m_TackleCount);
@@ -4033,19 +4052,19 @@ namespace basecross {
 		m_ToTitle->SetDrawActive(false);
 		m_EnemyS->SetDrawActive(false);
 		m_Black->SetDrawActive(false);
-		m_TackleSp->SetDrawActive(false);
-		m_ShotSp->SetDrawActive(false);
-		m_TerepoSp->SetDrawActive(false);
-		m_BombSp->SetDrawActive(false);
+		dynamic_pointer_cast<NumberSprite>(m_TackleSp)->SetNumDraw(false);
+		dynamic_pointer_cast<NumberSprite>(m_ShotSp)->SetNumDraw(false);
+		dynamic_pointer_cast<NumberSprite>(m_TerepoSp)->SetNumDraw(false);
+		dynamic_pointer_cast<NumberSprite>(m_BombSp)->SetNumDraw(false);
 
 		//アップデート停止
 		SetUpdateActive(false);
 
 		//位置更新
-		m_ToGame->GetComponent<Transform>()->SetPosition(-400, 100, 0);
-		m_ToRetry->GetComponent<Transform>()->SetPosition(-500, 0, 0);
-		m_ToSteSele->GetComponent<Transform>()->SetPosition(-500, -100, 0);
-		m_ToTitle->GetComponent<Transform>()->SetPosition(-500, -200, 0);
+		m_ToGame->GetComponent<Transform>()->SetPosition(-350, 100, 0);
+		m_ToRetry->GetComponent<Transform>()->SetPosition(-450, 0, 0);
+		m_ToSteSele->GetComponent<Transform>()->SetPosition(-450, -100, 0);
+		m_ToTitle->GetComponent<Transform>()->SetPosition(-450, -200, 0);
 		//選択番号リセット
 		m_SelectNum = 0;
 

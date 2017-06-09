@@ -287,8 +287,23 @@ namespace basecross
 			//STARTボタンでポーズ
 			if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_START && !GetSharedGameObject<GameObject>(L"ResultS", false) && !GetSharedGameObject<GameObject>(L"GameOverS", false))
 			{
-				//ポーズ表示
-				GetSharedGameObject<PauseMenu>(L"PauseMenu", false)->Open();
+				if (GetSharedGameObject<PauseMenu>(L"PauseMenu", false)->GetPushFlg())
+				{
+					//ポーズ表示
+					GetSharedGameObject<PauseMenu>(L"PauseMenu", false)->Open();
+
+					//バグ回避用
+					GetSharedGameObject<PauseMenu>(L"PauseMenu", false)->SetPushFlg(false);
+				}
+				else
+				{
+					//ポーズ表示
+					GetSharedGameObject<PauseMenu>(L"PauseMenu", false)->Close();
+
+					//バグ回避用
+					GetSharedGameObject<PauseMenu>(L"PauseMenu", false)->SetPushFlg(true);
+
+				}
 			}
 		}
 		//キーの入力
