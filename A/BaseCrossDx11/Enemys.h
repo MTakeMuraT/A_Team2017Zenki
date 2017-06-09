@@ -191,7 +191,7 @@ namespace basecross
 		//ミサイル
 		vector<shared_ptr<GameObject>> m_MissileS;
 		//ミサイルの大きさ
-		Vector3 m_MissileScale = Vector3(0.5f, 0.5f, 0.5f);
+		Vector3 m_MissileScale = Vector3(0.8f, 0.8f, 0.8f);
 		//子機
 		vector<shared_ptr<GameObject>> m_ChildS;
 
@@ -414,6 +414,8 @@ namespace basecross
 		//爆発範囲
 		float m_BombDistance;
 
+		//攻撃するまで待つふらぐ
+		bool m_Tackleflg = false;
 
 
 		//以下パラメータ

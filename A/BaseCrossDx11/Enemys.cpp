@@ -1832,7 +1832,7 @@ namespace basecross
 		//爆発エフェクト作成
 		m_Effect = GetStage()->AddGameObject<BombEffect>();
 
-		m_BombDistance = 6.0f;
+		m_BombDistance = 8.0f;
 
 	}
 
@@ -2030,7 +2030,15 @@ namespace basecross
 
 	void BombEnemy::Attack()
 	{
-
+		if (!m_Tackleflg)
+		{
+			m_time += App::GetApp()->GetElapsedTime();
+			if (m_time >= 2.0f)
+			{
+				m_Tackleflg = true;
+			}
+			return;
+		}
 		//速度計算
 		//１体目に突撃
 		if (m_TargetNum == 1)
@@ -2901,7 +2909,7 @@ namespace basecross
 		//見た目
 		auto Draw = AddComponent<PNTStaticModelDraw>();
 		//メッシュ設定
-		Draw->SetMeshResource(L"MISSILE_MODEL");
+		Draw->SetMeshResource(L"Missile_Model");
 		//モデル大きさ調整
 		Draw->SetMeshToTransformMatrix(Mat);
 
@@ -2949,6 +2957,24 @@ namespace basecross
 			pos += m_Velocity * App::GetApp()->GetElapsedTime();
 			GetComponent<Transform>()->SetPosition(pos);
 			
+			//回転
+			Vector3 rot = GetComponent<Transform>()->GetRotation();
+			float angleZ = 0;
+			if (m_Velocity.z < 0 && m_Velocity.x < 0)
+			{
+				angleZ = atan2(m_Velocity.x, m_Velocity.y) + 90 * 3.14159265f/ 180;
+			}
+			else if (m_Velocity.z < 0 && m_Velocity.x >= 0)
+			{
+				angleZ = atan2(m_Velocity.y, m_Velocity.x);
+			}
+			else
+			{
+				angleZ = atan2(m_Velocity.y, m_Velocity.z);
+			}
+			rot = Vector3(0, atan2(m_Velocity.z,m_Velocity.x) * -1,angleZ);
+			GetComponent<Transform>()->SetRotation(rot);
+
 			//影移動
 			pos.y = 1;
 			m_Shadow->GetComponent<Transform>()->SetPosition(pos);

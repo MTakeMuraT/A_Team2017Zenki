@@ -1396,7 +1396,7 @@ namespace basecross {
 		//モデルとトランスフォームの間の差分
 		Matrix4X4 ShotEnemyChildMat;
 		ShotEnemyChildMat.DefTransformation(
-			Vector3(1.0, 1.0f, 1.0f),
+			Vector3(0.2f, 0.2f, 0.2f),
 			Vector3(0,140,0),
 			Vector3(0.0f, -0.61f, 0.0f)
 		);
@@ -1408,9 +1408,9 @@ namespace basecross {
 		Trans->SetRotation(0,0 ,0);
 		AddComponent<Rigidbody>();
 		//描画設定
-		auto Draw = AddComponent<PNTStaticDraw>();
+		auto Draw = AddComponent<PNTBoneModelDraw>();
 		//メッシュ設定
-		Draw->SetMeshResource(L"MissileEnemyChildModl");
+		Draw->SetMeshResource(L"MissileEnemyChildModel");
 	//	Draw->SetTextureResource(L"Glass_TX");
 		//SetDrawActive(false);
 		//文字列をつける
@@ -1423,9 +1423,14 @@ namespace basecross {
 		m_ReferencePoint2_Vec3 = Vector3(m_Position.x + (m_Scale.x / 2) / 2, m_Position.y, m_Position.z - m_Scale.z / 2);//左
 		m_CenterPoint_Vec3 = Vector3(m_Position.x, m_Position.y, m_Position.z - m_Scale.z / 2);
 		SetDrawLayer(-20);
-		auto PtrDraw = GetComponent<PNTStaticDraw>();
-		PtrDraw->SetMeshToTransformMatrix(ShotEnemyChildMat);
+		Draw->SetMeshToTransformMatrix(ShotEnemyChildMat);
 
+		//Abe20170609
+		//アニメーション追加
+		Draw->AddAnimation(L"Shot", 0, 60, true, 60);
+		//アニメーション設定
+		Draw->ChangeCurrentAnimation(L"Shot");
+		//Abe20170609
 
 	}
 	void ShotEnemyChild::OnUpdate() {
@@ -1438,6 +1443,11 @@ namespace basecross {
 			PintNewPos();
 			Direction();
 			Shot();
+
+			//アニメーション更新
+			float ElapsedTime = App::GetApp()->GetElapsedTime();
+			GetComponent<PNTBoneModelDraw>()->UpdateAnimation(ElapsedTime);
+
 		}
 		else
 		{
@@ -1460,6 +1470,8 @@ namespace basecross {
 		{
 			m_ShotFlg = true;
 		}
+
+
 	}
 	//Abe20170517
 
@@ -1566,13 +1578,13 @@ namespace basecross {
 			auto ColGroup = GetStage()->GetSharedObjectGroup(L"CollisionGroup");
 			auto obj = GetStage()->AddGameObject<ShotEnemyChildMissile>(
 				Vector3(GetPos(true)),
-				Vector3(0.5, 0.5, 0.5),
+				Vector3(0.8, 0.8, 0.8),
 				Vector3(0, 0, 0),
 				m_getCenter);
 			ColGroup->IntoGroup(obj);
 			obj = GetStage()->AddGameObject<ShotEnemyChildMissile>(
 				Vector3(GetPos(false)),
-				Vector3(0.5, 0.5, 0.5),
+				Vector3(0.8, 0.8, 0.8),
 				Vector3(0, 0, 0),
 				m_getCenter);
 			ColGroup->IntoGroup(obj);
@@ -1609,12 +1621,28 @@ namespace basecross {
 		Trans->SetRotation(m_Rotation);
 		AddComponent<Rigidbody>();
 		//描画設定
-		auto Draw = AddComponent<PNTStaticDraw>();
+		auto Draw = AddComponent<PNTStaticModelDraw>();
 		//メッシュ設定
-		Draw->SetMeshResource(L"DEFAULT_SPHERE");
-		Draw->SetTextureResource(L"Glass_TX");
+		//Draw->SetMeshResource(L"DEFAULT_SPHERE");
+		//Draw->SetTextureResource(L"Glass_TX");
+		Draw->SetMeshResource(L"Missile_Model");
 		//撃つ
 		m_ShotActive = true;
+		//モデルとトランスフォームの間の差分
+		Matrix4X4 ShotEnemyChildMat;
+		ShotEnemyChildMat.DefTransformation(
+			Vector3(0.8f, 0.8f, 0.8f),
+			Vector3(0, -90*3.14159265f/180, 0),
+			Vector3(0.0f, 0.0f, 0.0f)
+			);
+
+		Draw->SetMeshToTransformMatrix(ShotEnemyChildMat);
+
+		//角度設定
+		float angle = atan2(m_Direction.z, m_Direction.x) * -1;
+		Vector3 rot = GetComponent<Transform>()->GetRotation();
+		rot.y = angle;
+		GetComponent<Transform>()->SetRotation(rot);
 	}
 	void ShotEnemyChildMissile::OnUpdate() {
 		if (m_ShotActive) {

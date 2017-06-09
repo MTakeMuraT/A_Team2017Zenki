@@ -295,7 +295,7 @@ namespace basecross {
 		//テレポートエネミー
 		MadelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Enemy\\EnemyModel\\Teleport\\Teleport.bmf");
 		App::GetApp()->RegisterResource(L"TELEPORT_MODEL", MadelMesh);
-		//ミサイルエネミー
+		//ミサイルエネミー/使ってない
 		MadelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Enemy\\EnemyModel\\Missile_Enemy\\Missile_Enemy.bmf");
 		App::GetApp()->RegisterResource(L"MISSILE_MODEL", MadelMesh);
 		//ドローン
@@ -308,8 +308,9 @@ namespace basecross {
 		MadelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Enemy\\EnemyModel\\Bomb\\Bomb.bmf");
 		App::GetApp()->RegisterResource(L"BOMB_MODEL", MadelMesh);
 		//Abe20170519
-		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Enemy\\Missile_Enemy_Child\\Missile_Enemy_Child.bmf");
-		App::GetApp()->RegisterResource(L"MissileEnemyChildModl", MadelMesh); 
+		//ミサイル子機
+		MadelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Enemy\\ShotChild\\Missile_Enemy_Child.bmf");
+		App::GetApp()->RegisterResource(L"MissileEnemyChildModel", MadelMesh); 
 		//ミサイル
 		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Enemy\\Missile\\Missile.bmf");
 		App::GetApp()->RegisterResource(L"Missile_Model", MadelMesh); 

@@ -251,6 +251,10 @@ namespace basecross
 			//AddGameObject<BakusanEF>()->SetPosScaActive(Vector3(0, 1, 0), Vector3(100, 100, 100));
 			//Abe20170606
 
+			//Abe20170609
+			//AddGameObject<ShotEnemyChildMissile>(Vector3(0, 1, 0), Vector3(1, 1, 1), Vector3(0, 0, 0), Vector3(0, 0, 0));
+			//Abe20170609
+
 		}
 		catch (...) {
 
