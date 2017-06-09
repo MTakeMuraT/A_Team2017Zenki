@@ -1043,4 +1043,35 @@ namespace basecross{
 	};
 	//Abe20170605
 
+	//Abe20170609
+	//************************************
+	//　プレイヤーABUTTON話してぶつかった時のエフェクト
+	//	分割ざまーーーーーーす
+	//************************************
+	class ButukariEf : public GameObject
+	{
+	private:
+		//分割分のvector配列
+		vector<shared_ptr<MeshResource>> m_SpriteS;
+
+		//分割数
+		int m_SpriteNum = 0;
+		//今の番号
+		int m_NowSpriteNum = 0;
+		//計算用時間
+		float m_time = 0;
+		//画像切り替え間隔
+		float m_IntervalTime = 0.01f;
+	public:
+		ButukariEf(const shared_ptr<Stage>& StagePtr) : GameObject(StagePtr) {}
+
+		void OnCreate() override;
+		void OnUpdate() override;
+
+		void SetPosScaActive(Vector3, Vector3);
+
+		void SetLayer(int num) { SetDrawLayer(num); }
+	};
+	//Abe20170609
+
 }

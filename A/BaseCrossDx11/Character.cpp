@@ -4117,5 +4117,113 @@ namespace basecross {
 	}
 	//Abe20170605
 
+	//Abe20170609
+	//************************************
+	//　プレイヤーABUTTON話してぶつかった時のエフェクト
+	//	分割ざまーーーーーーす
+	//************************************
+
+	void ButukariEf::OnCreate()
+	{
+		auto Trans = AddComponent<Transform>();
+		Trans->SetPosition(0, 0, 0);
+		Trans->SetScale(3, 3, 3);
+		Trans->SetRotation(45 * 3.14159265f / 180, 0, 0);
+
+		auto Draw = AddComponent<PCTStaticDraw>();
+		//Draw->SetMeshResource(L"DEFAULT_SQUARE");
+		Draw->SetTextureResource(L"BUTUKARIEF_TX");
+
+		//透明処理
+		SetAlphaActive(true);
+		SetDrawActive(false);
+
+		SetDrawLayer(5);
+		//画像分割
+
+		//スプライトの数リセット
+		m_SpriteNum = -1;
+		//3x3
+		//ます数
+		Vector2 TexSize = Vector2(3, 3);
+
+		//画像作成-------------------------
+		for (int i = 0; i < TexSize.x * TexSize.y; i++)
+		{
+			m_SpriteNum++;
+			//頂点配列
+			vector<VertexPositionNormalTexture> vertices;
+			//インデックスを作成するための配列
+			vector<uint16_t> indices;
+			//Squareの作成(ヘルパー関数を利用)
+			MeshUtill::CreateSquare(1.0f, vertices, indices);
+			//UV値の変更
+			float fromX = (i % (int)(TexSize.x)) / TexSize.x;
+			float toX = fromX + (1.0f / TexSize.x);
+			float fromY = (int)(i / TexSize.x) / TexSize.y;
+			float toY = fromY + (1.0f / TexSize.y);
+			//左上頂点
+			vertices[0].textureCoordinate = Vector2(fromX, fromY);
+			//右上頂点
+			vertices[1].textureCoordinate = Vector2(toX, fromY);
+			//左下頂点
+			vertices[2].textureCoordinate = Vector2(fromX, toY);
+			//右下頂点
+			vertices[3].textureCoordinate = Vector2(toX, toY);
+			//頂点の型を変えた新しい頂点を作成
+			vector<VertexPositionColorTexture> new_vertices;
+			for (auto& v : vertices) {
+				VertexPositionColorTexture nv;
+				nv.position = v.position;
+				nv.color = Color4(1.0f, 1.0f, 1.0f, 1.0f);
+				nv.textureCoordinate = v.textureCoordinate;
+				new_vertices.push_back(nv);
+			}
+			//メッシュ作成
+			m_SpriteS.push_back(MeshResource::CreateMeshResource<VertexPositionColorTexture>(new_vertices, indices, true));
+		}
+		//画像作成-------------------------
+		Draw->SetMeshResource(m_SpriteS[0]);
+
+	}
+	void ButukariEf::OnUpdate()
+	{
+		//画像遷移
+		m_time += App::GetApp()->GetElapsedTime();
+		if (m_time > m_IntervalTime)
+		{
+			m_time = 0;
+			GetComponent<PCTStaticDraw>()->SetMeshResource(m_SpriteS[m_NowSpriteNum++]);
+
+			//もし分割数より多かったら
+			if (m_NowSpriteNum > m_SpriteNum)
+			{
+				m_NowSpriteNum = 0;
+				SetUpdateActive(false);
+				SetDrawActive(false);
+
+				//あと位置調整
+				GetComponent<Transform>()->SetPosition(0, -10, 0);
+
+			}
+		}
+	}
+
+	void ButukariEf::SetPosScaActive(Vector3 pos , Vector3 sca)
+	{
+		SetDrawActive(true);
+		SetUpdateActive(true);
+
+		Vector3 pos2 = pos;
+		Vector3 ransca = sca * 10;
+		pos2 += Vector3((rand() % (int)(ransca.x * 2) - ransca.x) / 10, (rand() % (int)(ransca.y * 2) - ransca.y) / 10, (rand() % (int)(ransca.z * 2) - ransca.z) / 10);
+		Vector3 scale = sca * 10;
+
+		GetComponent<Transform>()->SetPosition(pos2);
+		GetComponent<Transform>()->SetScale(scale);
+
+	}
+
+	//Abe20170609
 }
 	//end basecross

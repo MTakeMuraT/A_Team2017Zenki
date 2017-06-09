@@ -284,6 +284,12 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"BAKUSANEF_TX", strTexture);
 		//Abe20170606
 
+		//Abe20170609
+		//ぶつかりエフェクト
+		strTexture = DataDir + L"EF\\spark.png";
+		App::GetApp()->RegisterTexture(L"BUTUKARIEF_TX", strTexture);
+		//Abe20170609
+
 
 		////モデル（ボーンあり
 		auto MadelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Player\\PlayerModel\\Player_animation.bmf");

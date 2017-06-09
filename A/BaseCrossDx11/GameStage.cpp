@@ -147,9 +147,14 @@ namespace basecross
 	//アタリ判定作成--------------------------------------------
 	void GameStage::CreateCollision()
 	{
-		AddGameObject<CollisionManager>();
+		auto ColMan = AddGameObject<CollisionManager>();
 		auto ColSandPtr = AddGameObject<CollisionSand>();
 		SetSharedGameObject(L"CollisionSand", ColSandPtr);
+
+		//動くグループに追加
+		GetSharedObjectGroup(L"UgokuGroup")->IntoGroup(ColMan);
+		GetSharedObjectGroup(L"UgokuGroup")->IntoGroup(ColSandPtr);
+
 	}
 	//アタリ判定作成--------------------------------------------
 
@@ -198,6 +203,12 @@ namespace basecross
 			//Abe20170606
 			CreateSharedObjectGroup(L"BakusanEFGroup");
 			//Abe20170606
+
+			//Abe20170609
+			//ぶつかったエフェクトグループ
+			CreateSharedObjectGroup(L"ButukariEFGroup");
+			//Abe20170609
+
 
 			//ビューとライトの作成
 			CreateViewLight();
@@ -252,7 +263,9 @@ namespace basecross
 			//Abe20170606
 
 			//Abe20170609
+			//*****デバック
 			//AddGameObject<ShotEnemyChildMissile>(Vector3(0, 1, 0), Vector3(1, 1, 1), Vector3(0, 0, 0), Vector3(0, 0, 0));
+			//AddGameObject<ButukariEf>()->SetPosScaActive(Vector3(0,5,0),Vector3(1,1,1));
 			//Abe20170609
 
 		}
