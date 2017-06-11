@@ -52,30 +52,32 @@ namespace basecross {
 	//ÉXÉeÅ[ÉWÉ{ÉbÉNÉXçÏê¨
 	void StageSelectScene::CreateStageBox()
 	{
+		SetSharedGameObject(L"StageModeControl", AddGameObject<StageModeControl>());
+
 		//åvéZÇﬂÇÒÇ«Ç¢ÇÃÇ≈íºë≈Çø
 		//ÇPÅ`ÇS
-		AddGameObject<StageBox>(Vector3(-8, 0.5f, 5), Vector3(2, 2, 2), 1);
-		AddGameObject<StageBox>(Vector3(8, 0.5f, 5), Vector3(2, 2, 2), 2);
-		AddGameObject<StageBox>(Vector3(-8, 0.5f, -5), Vector3(2, 2, 2), 3);
-		AddGameObject<StageBox>(Vector3(8, 0.5f, -5), Vector3(2, 2, 2), 4);
-		
-		//ÇTÅ`ÇW
-		AddGameObject<StageBox>(Vector3(-8, 0.5f, -22), Vector3(2, 2, 2), 5);
-		AddGameObject<StageBox>(Vector3(8, 0.5f, -22), Vector3(2, 2, 2), 6);
-		AddGameObject<StageBox>(Vector3(-8, 0.5f, -32), Vector3(2, 2, 2), 7);
-		AddGameObject<StageBox>(Vector3(8, 0.5f, -32), Vector3(2, 2, 2), 8);
-		
-		//ÇXÅ`ÇPÇQ
-		AddGameObject<StageBox>(Vector3(36, 0.5f, -22), Vector3(2, 2, 2), 9);
-		AddGameObject<StageBox>(Vector3(56, 0.5f, -22), Vector3(2, 2, 2), 10);
-		AddGameObject<StageBox>(Vector3(36, 0.5f, -32), Vector3(2, 2, 2), 11);
-		AddGameObject<StageBox>(Vector3(56, 0.5f, -32), Vector3(2, 2, 2), 12);
-		
-		//ÇPÇRÅ`ÇPÇU
-		AddGameObject<StageBox>(Vector3(36, 0.5f, 5), Vector3(2, 2, 2), 13);
-		AddGameObject<StageBox>(Vector3(56, 0.5f, 5), Vector3(2, 2, 2), 14);
-		AddGameObject<StageBox>(Vector3(36, 0.5f, -5), Vector3(2, 2, 2), 15);
-		AddGameObject<StageBox>(Vector3(56, 0.5f, -5), Vector3(2, 2, 2), 16);
+		//AddGameObject<StageBox>(Vector3(-8, 0.5f, 5), Vector3(2, 2, 2), 1);
+		//AddGameObject<StageBox>(Vector3(8, 0.5f, 5), Vector3(2, 2, 2), 2);
+		//AddGameObject<StageBox>(Vector3(-8, 0.5f, -5), Vector3(2, 2, 2), 3);
+		//AddGameObject<StageBox>(Vector3(8, 0.5f, -5), Vector3(2, 2, 2), 4);
+		//
+		////ÇTÅ`ÇW
+		//AddGameObject<StageBox>(Vector3(-8, 0.5f, -22), Vector3(2, 2, 2), 5);
+		//AddGameObject<StageBox>(Vector3(8, 0.5f, -22), Vector3(2, 2, 2), 6);
+		//AddGameObject<StageBox>(Vector3(-8, 0.5f, -32), Vector3(2, 2, 2), 7);
+		//AddGameObject<StageBox>(Vector3(8, 0.5f, -32), Vector3(2, 2, 2), 8);
+		//
+		////ÇXÅ`ÇPÇQ
+		//AddGameObject<StageBox>(Vector3(36, 0.5f, -22), Vector3(2, 2, 2), 9);
+		//AddGameObject<StageBox>(Vector3(56, 0.5f, -22), Vector3(2, 2, 2), 10);
+		//AddGameObject<StageBox>(Vector3(36, 0.5f, -32), Vector3(2, 2, 2), 11);
+		//AddGameObject<StageBox>(Vector3(56, 0.5f, -32), Vector3(2, 2, 2), 12);
+		//
+		////ÇPÇRÅ`ÇPÇU
+		//AddGameObject<StageBox>(Vector3(36, 0.5f, 5), Vector3(2, 2, 2), 13);
+		//AddGameObject<StageBox>(Vector3(56, 0.5f, 5), Vector3(2, 2, 2), 14);
+		//AddGameObject<StageBox>(Vector3(36, 0.5f, -5), Vector3(2, 2, 2), 15);
+		//AddGameObject<StageBox>(Vector3(56, 0.5f, -5), Vector3(2, 2, 2), 16);
 		
 	}
 
@@ -84,13 +86,13 @@ namespace basecross {
 	{
 		//ínñ çÏê¨
 		//ç∂è„
-		AddGameObject<SelectGroud>(Vector3(0, -0.5, 0), Vector3(45, 1, 25));
+		//AddGameObject<SelectGroud>(Vector3(0, -0.5, 0), Vector3(45, 1, 25));
 		//ç∂â∫
-		AddGameObject<SelectGroud>(Vector3(0, -0.5, -26), Vector3(45, 1, 25));
+		//AddGameObject<SelectGroud>(Vector3(0, -0.5, -26), Vector3(45, 1, 25));
 		//âEâ∫
-		AddGameObject<SelectGroud>(Vector3(46, -0.5, -26), Vector3(45, 1, 25));
+		//AddGameObject<SelectGroud>(Vector3(46, -0.5, -26), Vector3(45, 1, 25));
 		//âEè„
-		AddGameObject<SelectGroud>(Vector3(46, -0.5, 0), Vector3(45, 1, 25));
+		//AddGameObject<SelectGroud>(Vector3(46, -0.5, 0), Vector3(45, 1, 25));
 	}
 
 
@@ -113,24 +115,24 @@ namespace basecross {
 	void StageSelectScene::CreateGroundSquareS()
 	{
 		//ñÓàÛ
-		//ç∂è„
-		AddGameObject<SelectGroundSquare>(Vector3(0, 0.5f, -10), Vector3(5, 5, 5), L"YAZIRUSHI_TX", 270);
-		AddGameObject<SelectGroundSquare>(Vector3(18, 0.5f, 0), Vector3(5, 5, 5), L"YAZIRUSHI_TX", 0);
-		//ç∂â∫
-		AddGameObject<SelectGroundSquare>(Vector3(0, 0.5f, -18), Vector3(5, 5, 5), L"YAZIRUSHI_TX", 90);
-		AddGameObject<SelectGroundSquare>(Vector3(18, 0.5f, -27), Vector3(5, 5, 5), L"YAZIRUSHI_TX", 0);
-		//âEâ∫
-		AddGameObject<SelectGroundSquare>(Vector3(46, 0.5f, -18), Vector3(5, 5, 5), L"YAZIRUSHI_TX", 90);
-		AddGameObject<SelectGroundSquare>(Vector3(28, 0.5f, -27), Vector3(5, 5, 5), L"YAZIRUSHI_TX", 180);
-		//âEè„
-		AddGameObject<SelectGroundSquare>(Vector3(46, 0.5f, -10), Vector3(5, 5, 5), L"YAZIRUSHI_TX", 270);
-		AddGameObject<SelectGroundSquare>(Vector3(28, 0.5f, 0), Vector3(5, 5, 5), L"YAZIRUSHI_TX", 180);
+		////ç∂è„
+		//AddGameObject<SelectGroundSquare>(Vector3(0, 0.5f, -10), Vector3(5, 5, 5), L"YAZIRUSHI_TX", 270);
+		//AddGameObject<SelectGroundSquare>(Vector3(18, 0.5f, 0), Vector3(5, 5, 5), L"YAZIRUSHI_TX", 0);
+		////ç∂â∫
+		//AddGameObject<SelectGroundSquare>(Vector3(0, 0.5f, -18), Vector3(5, 5, 5), L"YAZIRUSHI_TX", 90);
+		//AddGameObject<SelectGroundSquare>(Vector3(18, 0.5f, -27), Vector3(5, 5, 5), L"YAZIRUSHI_TX", 0);
+		////âEâ∫
+		//AddGameObject<SelectGroundSquare>(Vector3(46, 0.5f, -18), Vector3(5, 5, 5), L"YAZIRUSHI_TX", 90);
+		//AddGameObject<SelectGroundSquare>(Vector3(28, 0.5f, -27), Vector3(5, 5, 5), L"YAZIRUSHI_TX", 180);
+		////âEè„
+		//AddGameObject<SelectGroundSquare>(Vector3(46, 0.5f, -10), Vector3(5, 5, 5), L"YAZIRUSHI_TX", 270);
+		//AddGameObject<SelectGroundSquare>(Vector3(28, 0.5f, 0), Vector3(5, 5, 5), L"YAZIRUSHI_TX", 180);
 
 		//Easy
 		//AddGameObject<SelectGroundSquare>(Vector3(0, 0.5f, 0), Vector3(15, 10, 11), L"EASY_TX", 0);
 		//Abe20170529
 		//SSî≈
-		AddGameObject<SelectGroundSquareSS>(Vector3(0, 0.5f, 0), Vector3(1,1,1), L"SS\\EASY_animation\\", L"EASY.ssae", 0);
+		//AddGameObject<SelectGroundSquareSS>(Vector3(0, 0.5f, 0), Vector3(1,1,1), L"SS\\EASY_animation\\", L"EASY.ssae", 0);
 
 		//Abe20170529
 
@@ -245,48 +247,48 @@ namespace basecross {
 		*/
 		//Abe20170427
 		//ÉJÉÅÉâà⁄ìÆ
-		if (m_moveCameraFlg)
-		{
-			CameraMove();
-		}
-		else
-		{
-			//ÉvÉåÉCÉÑÅ[ç¿ïWéÊìæ
-			auto pptr = GetSharedGameObject<SelectPlayer>(L"SelectPlayer", false);
-			Vector3 ppos = pptr->GetPos();
+		//if (m_moveCameraFlg)
+		//{
+		//	//CameraMove();
+		//}
+		//else
+		//{
+		//	//ÉvÉåÉCÉÑÅ[ç¿ïWéÊìæ
+		//	auto pptr = GetSharedGameObject<SelectPlayer>(L"SelectPlayer", false);
+		//	Vector3 ppos = pptr->GetPos();
 
-			//ç∂è„Ç…à⁄ìÆ
-			//îÕàÕ(X[-26~26]Y[16~-16])
-			if ((ppos.x > -26 && ppos.x < 26) && (ppos.z > -16 && ppos.z < 16) && m_CameraNum != 0)
-			{
-				MoveCamera(0);
-				m_CameraNum = 0;
-			}
-			//ç∂â∫Ç…à⁄ìÆ
-			//îÕàÕ(X[-26~26]Y[-10~-33])
-			else if ((ppos.x > -26 && ppos.x < 26) && (ppos.z > -33 && ppos.z < -10) && m_CameraNum != 1)
-			{
-				MoveCamera(1);
-				m_CameraNum = 1;
-			}
+		//	//ç∂è„Ç…à⁄ìÆ
+		//	//îÕàÕ(X[-26~26]Y[16~-16])
+		//	if ((ppos.x > -26 && ppos.x < 26) && (ppos.z > -16 && ppos.z < 16) && m_CameraNum != 0)
+		//	{
+		//		MoveCamera(0);
+		//		m_CameraNum = 0;
+		//	}
+		//	//ç∂â∫Ç…à⁄ìÆ
+		//	//îÕàÕ(X[-26~26]Y[-10~-33])
+		//	else if ((ppos.x > -26 && ppos.x < 26) && (ppos.z > -33 && ppos.z < -10) && m_CameraNum != 1)
+		//	{
+		//		MoveCamera(1);
+		//		m_CameraNum = 1;
+		//	}
 
-			//âEè„Ç…à⁄ìÆ
-			//îÕàÕ(X[18~63]Y[16~-16])
-			else if ((ppos.x > 18 && ppos.x < 63) && (ppos.z > -16 && ppos.z < 16) && m_CameraNum != 2)
-			{
-				MoveCamera(2);
-				m_CameraNum = 2;
-			}
+		//	//âEè„Ç…à⁄ìÆ
+		//	//îÕàÕ(X[18~63]Y[16~-16])
+		//	else if ((ppos.x > 18 && ppos.x < 63) && (ppos.z > -16 && ppos.z < 16) && m_CameraNum != 2)
+		//	{
+		//		MoveCamera(2);
+		//		m_CameraNum = 2;
+		//	}
 
-			//âEâ∫Ç…à⁄ìÆ
-			//îÕàÕ(X[18~63]Y[-10~-33])
-			else if ((ppos.x > 18 && ppos.x < 63) && (ppos.z > -33 && ppos.z < -10) && m_CameraNum != 3)
-			{
-				MoveCamera(3);
-				m_CameraNum = 3;
-			}
+		//	//âEâ∫Ç…à⁄ìÆ
+		//	//îÕàÕ(X[18~63]Y[-10~-33])
+		//	else if ((ppos.x > 18 && ppos.x < 63) && (ppos.z > -33 && ppos.z < -10) && m_CameraNum != 3)
+		//	{
+		//		MoveCamera(3);
+		//		m_CameraNum = 3;
+		//	}
 
-		}
+		//}
 
 		//Abe20170524
 		/*ÉJÉÅÉâç¿ïWämîFóp*/
@@ -344,7 +346,7 @@ namespace basecross {
 
 			//ÉvÉåÉCÉÑÅ[ìÆÇØÇÈÇÊÇ§Ç…(ÇƒÇ¢Ç§Ç©ÉAÉ^ÉäîªíËñﬂÇ∑)
 			auto pptr = GetSharedGameObject<SelectPlayer>(L"SelectPlayer", false);
-			pptr->ActiveMove();
+			//pptr->ActiveMove();
 			return;
 		}
 

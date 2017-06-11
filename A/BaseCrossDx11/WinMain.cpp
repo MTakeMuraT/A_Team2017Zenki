@@ -146,7 +146,7 @@ int MainLoop(HINSTANCE hInstance, HWND hWnd, bool isFullScreen, int iClientWidth
 		//キーボード入力用
 		//ここに設定したキーボード入力を得る
 		vector<DWORD> UseKeyVec = {
-		'A','D','B',VK_UP,VK_RIGHT,VK_DOWN,VK_LEFT
+		'A','D','B',VK_UP,VK_RIGHT,VK_DOWN,VK_LEFT,'W','E','R','T','Y','N'
 		};
 		while (WM_QUIT != msg.message) {
 			if (!App::GetApp()->ResetInputState(hWnd, UseKeyVec)) {

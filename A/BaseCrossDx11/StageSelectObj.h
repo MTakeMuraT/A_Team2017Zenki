@@ -62,21 +62,17 @@ namespace basecross
 
 		//初期で離れてる距離
 		float m_DifLength = 2;
-
-		//回転速度
-		float m_RotSpeedPerSec = 180;
-
+		//距離
+		float m_dist = 2;
+		
 		//プレイヤーの実態
 		vector<shared_ptr<GameObject>> m_Player;
-
+		//初期プレヤー位置
+		vector<Vector3> m_InitPlayerPos;
 		//プレイヤーが合体する状態になってるか
 		bool m_SandFlg = false;
 		//ある程度近づいた後戻ってる状態か
 		bool m_SandFinishFlg = false;
-		//関数群
-		void SandMove();
-		//回転
-		void Rot();
 
 		//キャンセルしたときにくっつかないように
 		bool m_CancelFlg = false;
@@ -89,10 +85,22 @@ namespace basecross
 		shared_ptr<GameObject> m_Debugtxt;
 		//Abe20170524
 
+		bool m_InitMoveFlg = true;
 		bool m_Model_flg = true;
 		bool m_Animeflg = true;
 		bool m_WaitFlg = true;
 
+		//右の移動最大値と最小値と初期位置の設定
+		Vector3 m_RightSandMinit = Vector3(0, 0, 0);
+		Vector3 m_RightLeaveMax = Vector3(0, 0, 0);
+		Vector3 m_RightInitPos = Vector3(0, 0, 0);
+		//左の移動最大値と最小値と初期位置の設定
+		Vector3 m_leftSandMinit = Vector3(0, 0, 0);
+		Vector3 m_leftLeaveMax = Vector3(0, 0, 0);
+		Vector3 m_leftInitPos = Vector3(0, 0, 0);
+		int StateNam = 0;
+		int selecflg = true;
+		
 	public :
 		SelectPlayer(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, float speed);
 
@@ -101,7 +109,6 @@ namespace basecross
 
 		//アップデート制御
 		void SetPlayerUpdate(bool flg);
-
 		//はさむフラグオン
 		void SandFlgOn() { m_SandFlg = true; }
 		//元の位置に戻るフラグオン
@@ -112,15 +119,198 @@ namespace basecross
 		void SetPos(Vector3);
 		//座標とれる
 		Vector3 GetPos();
-		//動けるようにする関数
-		void ActiveMove();
+		void InitPosMove();
+		void SandMove();
+		void LeaveMove();
+		void SetLeaveMove(bool OnTrue) { m_InitMoveFlg = OnTrue; };
 		//モデルの最初の向き
 		void Model();
 		void AnimationWait();
-		void AnimationRotL();
-		void AnimationRotR();
 		bool UpdateAnyAnimation();
 		bool UpdateAnyAnimation2();
+		//ステージ選択時にキャンセルが押されたときにスイッチの内容を書き換えるセッター
+		void SetChangeNum(int ChangNum) { StateNam = ChangNum; };
+	
+	};
+	//--------------------------------------------------------------------------------------
+	//	ステージ難易度とステージ選択
+	//--------------------------------------------------------------------------------------
+	class StageModeControl :public GameObject
+	{
+	private:
+		//難易度
+		vector<int> m_Type;
+		//ステージ種類
+		vector<shared_ptr<GameObject>> m_Easy;
+		vector<shared_ptr<GameObject>> m_Normal;
+		vector<shared_ptr<GameObject>> m_Hard;
+		//各ステージ種類の限界値
+		int m_AddEasy = 0;
+		int m_AddNormal = 0;
+		int m_AddHard = 0;
+		//ステージBOXの基準値
+		Vector3 m_EasyPosCenter = Vector3(0, 0, 0);
+		Vector3 m_EasyPosUP = Vector3(0, 0, 0);
+		Vector3 m_EasyPosDown = Vector3(0, 0, 0);
+		Vector3 m_EasyOtherPos = Vector3(0, 0, 0);
+		Vector3 m_EasyTopPos = Vector3(0, 0, 0);
+		//ノーマル
+		Vector3 m_NormalPosCenter = Vector3(0, 0, 0);
+		Vector3 m_NormalPosUP = Vector3(0, 0, 0);
+		Vector3 m_NormalPosDown = Vector3(0, 0, 0);
+		Vector3 m_NormalOtherPos = Vector3(0, 0, 0);
+		Vector3 m_NormalTopPos = Vector3(0, 0, 0);
+		//ハード
+		Vector3 m_HardPosCenter = Vector3(0, 0, 0);
+		Vector3 m_HardPosUP = Vector3(0, 0, 0);
+		Vector3 m_HardPosDown = Vector3(0, 0, 0);
+		Vector3 m_HardOtherPos = Vector3(0, 0, 0);
+		Vector3 m_HardTopPos = Vector3(0, 0, 0);
+		//ステージ選択用
+		int m_EasyStageCenter = 0;
+		int m_EasyStageUP = 0;
+		int m_EasyStageDown = 0;
+		int m_NormalStageCenter = 0;
+		int m_NormalStageUP = 0;
+		int m_NormalStageDown = 0;
+		int m_HardStageCenter = 0;
+		int m_HardStageUP = 0;
+		int m_HardStageDown = 0;
+		//配列指定用
+		int m_NormalUP = 0;
+		int m_NormalDown = 0;
+		//難易度の移動が可能か
+		bool m_ModeMove = false;
+		//基準
+		Vector3 m_CenterScalse = Vector3(2, 2, 2);
+		Vector3 m_NoCenterScalse = Vector3(1, 1, 1);
+		//はじめだけ入るフラグ
+		bool InitOneflg = true;
+		//要素数の検出　センター
+		int m_ElementCenter = 0;
+		int m_ElementUp = 0;
+		int m_ElementDown = 0;
+		int m_ElementTop = 0;
+		//移動スピード
+		float m_MoveSpeed = 0;
+		//配列から取る位置の保存
+		Vector3 m_Center = Vector3(0, 0, 0);
+		Vector3 m_Up = Vector3(0, 0, 0);
+		Vector3 m_Down = Vector3(0, 0, 0);
+		Vector3 m_Top = Vector3(0, 0, 0);
+		bool m_Flg = false;
+		bool m_ElementNumTopFlg = false;
+		//なんのステージがセンターにいるのか？ センター:true それ以外:false　StageBoxクラスで使用　
+		int m_CenterStageNum = 0;
+		//難易度の移動終わりのフラグ
+		bool m_ModeMoveEnd = true;
+		bool m_GetModeflg = true;
+	public:
+		StageModeControl(const shared_ptr<Stage>& StagePtr);
+		~StageModeControl() {};
+		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
+		//イージーのステージBOXの配置
+		void EasySelect();
+		void NormalSelect();
+		void HardSelect();
+		
+		//難易度の移動ができるかを返すゲッタ
+		bool GetModeMove(){ return m_ModeMove; };
+
+		//位置の設定
+		void  StandardEasyPos();
+		void StandardNormalPos();
+		void StandardHardPos();
+		//最大と最小値を超えていないかを見る関数
+		int ExceedNum(int MIni,int Max,int Num);
+		//センターから他の場所の要素を検出
+		void ElementNum(int Mini, int Max, int CenterNum);
+		//移動処理
+		void StageMove();
+		void EasyMove();
+		void NormalMove();
+		void EasySideMove();
+		void NormalSideMove();
+		void HardMove();
+		void HardSideMove();
+		//拡大縮小処理
+		void EasyScale();
+		void NormalScale();
+		void HardScale();
+		//初期配置
+		void Init();
+		void InitSetCenter();
+		void InitSetUp();
+		void InitSetDown();
+		void InitSetOther();
+		//難易度の回転が終わったときのフラグ
+		bool ModeMoveEnd() { return m_ModeMoveEnd; };
+	};
+
+	//--------------------------------------------------------------------------------------
+	//	ステージ難易度のスプライト ステージモード
+	//--------------------------------------------------------------------------------------
+	class ModeSelect : public GameObject
+	{
+	private:
+		Vector3 m_Pos = Vector3(0, 0, 0);
+		Vector3 m_Scale = Vector3(0, 0, 0);
+		bool m_Centerflg = false;
+		int m_ModeNum = 0;
+		int m_NowModeNum = 0;
+		int m_MoveNum = 0;
+		//3つの規定位置
+		//中心
+		Vector3 m_CenterPos = Vector3(0, 0, 0);
+		//右
+		Vector3 m_RightPos = Vector3(10, 1, 0);
+		//左
+		Vector3 m_LeftPos = Vector3(-10, 0, 0);
+		//スピード
+		float m_Speed = 3.0f;
+		//回転フラグ
+		bool m_Rotflg = false;
+		bool m_RotCenterflg = false;
+		bool m_RotRightflg = false;
+		bool m_RotLeftflg = false;
+		//移動が終わっているか？
+		bool m_EndMove = true;
+		bool m_CenterMoveEnd = true;
+		bool m_RightMoveEnd = true;
+		bool m_LeftMoveEnd = true;
+		bool m_MoveSidFlgEnd = true;
+		bool m_Leftflg = true;
+	public:
+		ModeSelect(const shared_ptr<Stage>& StagePtr, const Vector3& Pos, const Vector3& Scale, const int& ModeNum, const bool& Centerflg, const int& MoveNum);
+		~ModeSelect() {};
+		virtual void OnCreate();
+		virtual void OnUpdate();
+		void SetModeSelectNum(int SetModeNum) { m_NowModeNum = SetModeNum; };
+		//各難易度の位置移動が終わったかのゲッター //終わってたらfalse　移動中だとtrue
+		bool GetRotCenterflg() { return m_RotCenterflg; };
+		bool GetRotRightflg() { return m_RotRightflg; };
+		bool GetRotLeftflg() { return m_RotLeftflg; };
+		//
+		int GetMoveNum() { return m_MoveNum; };
+		//センターフラグ　センターならtrue それ以外ならfalse
+		bool GetCenter() { return m_Centerflg; };
+		//難易度の移動
+		void ModeSelectMove();
+		//センターに移動
+		void CenterMove();
+		//左に移動
+		void LiftMove();
+		//右に移動
+		void RightMove();
+		//移動が終わったか？ゲッター 終わってたらtrue 終わってなかったらfalse
+		bool EndMove();
+
+		bool GetCenterMoveEnd() { return m_CenterMoveEnd; };
+		bool GetRightMoveEnd() { return m_RightMoveEnd; };
+		bool GetLeftMoveEnd() { return  m_LeftMoveEnd; };
+		bool GetSidMoveEnd() { return m_MoveSidFlgEnd; };
+		void SetLeftflg(bool flg) { m_Leftflg = flg; };
 	};
 
 	//--------------------------------------------------------------------------------------
@@ -147,7 +337,7 @@ namespace basecross
 
 		//アタリ判定(リブ)
 		virtual void OnCollisionExcute(vector<shared_ptr<GameObject>>& OtherVec) override;
-
+	
 		//ステージに行くか確認する処理
 		void CheckGo();
 	};

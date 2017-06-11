@@ -1,13 +1,13 @@
 #include "stdafx.h"
 #include "Project.h"
 
-namespace basecross 
+namespace basecross
 {
 	//Abe20170421
 	//--------------------------------------------------------------------------------------
 	//	フレームスプライト
 	//--------------------------------------------------------------------------------------
-	SelectFlame::SelectFlame(const shared_ptr<Stage>& StagePtr, Vector2 pos, Vector2 scale, int layer):
+	SelectFlame::SelectFlame(const shared_ptr<Stage>& StagePtr, Vector2 pos, Vector2 scale, int layer) :
 		GameObject(StagePtr),
 		m_InitPos(pos),
 		m_InitScale(scale),
@@ -65,7 +65,7 @@ namespace basecross
 	//--------------------------------------------------------------------------------------
 	//	プレイヤー
 	//--------------------------------------------------------------------------------------
-	SelectPlayer::SelectPlayer(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale,float speed):
+	SelectPlayer::SelectPlayer(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, float speed) :
 		GameObject(StagePtr),
 		m_InitPos(pos),
 		m_InitScale(scale),
@@ -82,33 +82,52 @@ namespace basecross
 			auto Trans = PlayerPtr->AddComponent<Transform>();
 			//座標変更
 			Vector3 pos = m_InitPos;
-			pos.x += -m_DifLength + (i * m_DifLength*2);
+			pos.x += -m_DifLength + (i * m_DifLength * 2);
 			Trans->SetPosition(pos);
 			Trans->SetScale(m_InitScale);
 			Trans->SetRotation(0, 0, 0);
 
 			//描画設定
 			auto PtrDraw = PlayerPtr->AddComponent<PNTBoneModelDraw>();
-			
-			PtrDraw->SetMeshResource(L"Player_Model");
-		//	PtrDraw->SetTextureResource(L"TRACE_TX");
 
-			//透明処理
+			PtrDraw->SetMeshResource(L"Player_Model");
+			//	PtrDraw->SetTextureResource(L"TRACE_TX");
+
+				//透明処理
 			SetAlphaActive(true);
 
 			//Rigidbodyをつける
 			auto PtrRedid = PlayerPtr->AddComponent<Rigidbody>();
 			//衝突判定をつける
 			auto PtrCol = PlayerPtr->AddComponent<CollisionSphere>();
-			
+			PtrCol->SetDrawActive(true);
+			PtrCol->SetUpdateActive(false);
 			PlayerPtr->SetDrawLayer(0);
 
 			//プレイヤーのアクセサ?
 			m_Player.push_back(PlayerPtr);
+			//Player初期位置
+			m_InitPlayerPos.push_back(pos);
 			PtrDraw->AddAnimation(L"Wait", 0, 30, true, 30.0f);
 			PtrDraw->AddAnimation(L"LeftRot", 80, 15, false, 30.0f);
 			PtrDraw->AddAnimation(L"RightRot", 120, 15, false, 30.0f);
-
+			//左のPLayer
+			if (i == 0) {
+				//離れる最大値の設定
+				m_leftLeaveMax = Vector3(pos.x - 1, pos.y, pos.z);
+				//挟む最小値の設定
+				m_leftSandMinit = Vector3(pos.x + 1, pos.y, pos.z);
+				//初期位置の設定
+				m_leftInitPos = Vector3(pos);
+			}
+			else if (i == 1) {
+				//離れる最大値の設定
+				m_RightLeaveMax = Vector3(pos.x + 1, pos.y, pos.z);
+				//挟む最小値の設定
+				m_RightSandMinit = Vector3(pos.x - 1, pos.y, pos.z);
+				//初期位置の設定
+				m_RightInitPos = Vector3(pos);
+			}
 		}
 		//デバッグ文字生成
 		auto debtxt = GetStage()->AddGameObject<DebugTxt>();
@@ -120,430 +139,146 @@ namespace basecross
 
 		m_Debugtxt = debtxt;
 		//Abe20170524
-	
-		
 
+		m_InitMoveFlg = true;
+
+		
 	}
 
 	void SelectPlayer::OnUpdate()
 	{
-		AnimationWait();
-		Model();
+		//難易度の移動がされたときのプレイヤーの当たり判定を消す
 		//コントローラ取得
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 
-#pragma region //*******デバッグ用*******//
-		//*******デバッグ用*******//
-		//auto KeylVec = App::GetApp()->GetInputDevice().GetKeyState();
-
-		////移動
-		//Vector2 InputXY = Vector2((KeylVec.m_bPushKeyTbl[VK_RIGHT] + -KeylVec.m_bPushKeyTbl[VK_LEFT]), (KeylVec.m_bPushKeyTbl[VK_UP] + -KeylVec.m_bPushKeyTbl[VK_DOWN])) * m_Speed;
-		////もしステージ幅制限を越えるなら動かさない
-		////１体目の座標
-		//Vector3 ppos1 = m_Player[0]->GetComponent<Transform>()->GetPosition();
-		////２体目の座標
-		//Vector3 ppos2 = m_Player[1]->GetComponent<Transform>()->GetPosition();
-		//ppos1.x += InputXY.x * App::GetApp()->GetElapsedTime();
-		//ppos1.z += InputXY.y * App::GetApp()->GetElapsedTime();
-		//ppos2.x += InputXY.x * App::GetApp()->GetElapsedTime();
-		//ppos2.z += InputXY.y * App::GetApp()->GetElapsedTime();
-		////制限(左-20右+66上+10下-36)
-		//if ((ppos1.x < MoveLimit.x || ppos2.x < MoveLimit.x) || (ppos1.x > MoveLimit.y || ppos2.x > MoveLimit.y))
-		//{
-		//	InputXY.x = 0;
-		//}
-		//if ((ppos1.z < MoveLimit.w || ppos2.z < MoveLimit.w) || (ppos1.z > MoveLimit.z || ppos2.z > MoveLimit.z))
-		//{
-		//	InputXY.y = 0;
-		//}
-		////wstring txt;
-		////txt += L"1X:" + Util::FloatToWStr(ppos1.x) + L"1Z:" + Util::FloatToWStr(ppos1.z) +
-		////	L"\n2X:" + Util::FloatToWStr(ppos2.x) + L"1Z:" + Util::FloatToWStr(ppos2.z);
-		////dynamic_pointer_cast<DebugTxt>(m_Debugtxt)->SetText(txt);
-		//Vector3 ppos31 = (ppos1 + ppos2) / 2;
-
-		//dynamic_pointer_cast<DebugTxt>(m_Debugtxt)->SetText(L"X:" + Util::FloatToWStr(ppos31.x) + L"Z:" + Util::FloatToWStr(ppos31.z));
-
-		////*******デバッグ用*******//
-
-		////移動
-		//for (auto obj : m_Player)
-		//{
-		//	//挟んでる間は別のVelocityが入れられるのでここ更新しても動かない
-		//	obj->GetComponent<Rigidbody>()->SetVelocity(InputXY.x, 0, InputXY.y);
-		//}
-
-#pragma endregion
-
-		if (CntlVec[0].bConnected)
-		{
-			Vector3 ppos11 = m_Player[0]->GetComponent<Transform>()->GetPosition();
-			Vector3 ppos21 = m_Player[1]->GetComponent<Transform>()->GetPosition();
-
-			Vector3 ppos31 = (ppos11 + ppos21) / 2;
-
-			//移動
-			Vector2 InputXY = Vector2(CntlVec[0].fThumbLX, CntlVec[0].fThumbLY) * m_Speed;
-
-			//もしステージ幅制限を越えるなら動かさない
-			//制限(左-20右+66上+10下-36)
-			//１体目の座標
-			Vector3 ppos1 = m_Player[0]->GetComponent<Transform>()->GetPosition();
-			//２体目の座標
-			Vector3 ppos2 = m_Player[1]->GetComponent<Transform>()->GetPosition();
-			ppos1.x += InputXY.x * App::GetApp()->GetElapsedTime();
-			ppos1.z += InputXY.y * App::GetApp()->GetElapsedTime();
-			ppos2.x += InputXY.x * App::GetApp()->GetElapsedTime();
-			ppos2.z += InputXY.y * App::GetApp()->GetElapsedTime();
-			//制限(左-20右+66上+10下-36)
-			if ((ppos1.x < MoveLimit.x || ppos2.x < MoveLimit.x) || (ppos1.x > MoveLimit.y || ppos2.x > MoveLimit.y))
-			{
-				InputXY.x = 0;
-			}
-			if ((ppos1.z < MoveLimit.w || ppos2.z < MoveLimit.w) || (ppos1.z > MoveLimit.z || ppos2.z > MoveLimit.z))
-			{
-				InputXY.y = 0;
-			}
-
-			//移動
-			for (auto obj : m_Player)
-			{
-				//挟んでる間は別のVelocityが入れられるのでここ更新しても動かない
-				obj->GetComponent<Rigidbody>()->SetVelocity(InputXY.x, 0, InputXY.y);
-			}
-
-			if (!m_SandFlg)
-			{
-				//回転処理
-				//Rot();
-				if (!m_CancelFlg)
-				{
-					//Aボタン押してる間離れる
-					if (CntlVec[0].wButtons & XINPUT_GAMEPAD_A)
-					{
-						//進む方向を決める
-						Vector3 difpos = m_Player[0]->GetComponent<Transform>()->GetPosition() - m_Player[1]->GetComponent<Transform>()->GetPosition();
-						//ある程度離れてないかを確認 半径10以下
-						if (difpos.x*difpos.x + difpos.z*difpos.z < 100)
-						{
-							//absを使うとifで反転させるより遅くなるけどそんなに重い処理ないしおｋだよね？
-							float xPlusz = abs(difpos.x) + abs(difpos.z);
-							difpos = Vector3(difpos.x / xPlusz, 0, difpos.z / xPlusz);
-							difpos *= m_Speed;
-
-							for (auto obj : m_Player)
-							{
-								obj->GetComponent<Rigidbody>()->SetVelocity(difpos);
-								difpos *= -1;
-							}
-						}
-					}
-				}
-
-				if (m_CancelFlg)
-				{
-					if (CntlVec[0].wReleasedButtons & XINPUT_GAMEPAD_A)
-					{
-						m_CancelFlg = false;
-					}
-				}
-				else
-				{
-					//Aボタン離したら
-					if (CntlVec[0].wReleasedButtons & XINPUT_GAMEPAD_A)
-					{
-						m_SandFlg = true;
-					}
-				}
-			}
+		if (CntlVec[0].wButtons & XINPUT_GAMEPAD_A && selecflg == true && StateNam == 0) {
+			StateNam = 1;
+			selecflg = false;
 		}
-
-		//もしはさむ状態になってたら
-		if (m_SandFlg)
-		{
-			SandMove();
-		}
-
-		//高さ設定
-		for (auto obj : m_Player)
-		{
-			Vector3 pppos = obj->GetComponent<Transform>()->GetPosition();
-			pppos.y = 0.6f;
-			obj->GetComponent<Transform>()->SetPosition(pppos);
-		}
-		//もう片方に向く
-		Vector3 ppos2 = m_Player[0]->GetComponent<Transform>()->GetPosition();
-		Vector3 ppos3 = m_Player[1]->GetComponent<Transform>()->GetPosition();
-		Vector3 dif = ppos3 - ppos2;
-		float angle = atan2(dif.z, dif.x) * -1;
-		angle += 90 * 3.14159265f / 180;
-		Vector3 dif2 = ppos2 - ppos3;
-		float angle2 = atan2(dif2.z, dif2.x) * -1;
-		angle2 += 90 * 3.14159265f / 180;
-
-
-		m_Player[0]->GetComponent<Transform>()->SetRotation(0, angle2, 0);
-		m_Player[1]->GetComponent<Transform>()->SetRotation(0, angle, 0);
-	}
-
-	//回転処理
-	void SelectPlayer::Rot()
-	{
 		
-		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
-		if (CntlVec[0].bConnected)
-		{
-			
-			//左肩
-			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
-			{
-				m_WaitFlg = false;
-				AnimationRotL();
-				//座標取得
-				Vector3 pos1 = m_Player[0]->GetComponent<Transform>()->GetPosition();
-				Vector3 pos2 = m_Player[1]->GetComponent<Transform>()->GetPosition();
-				Vector3 centerpos = (pos1 + pos2) / 2;
-
-				//中心からの角度算出して加算して計算しなおして座標に入れる
-				Vector3 dif = pos1 - centerpos;
-				float angle1 = atan2(dif.z, dif.x) * 180/3.14159265f;
-				angle1 += 360;
-				int an1 = (int)angle1 % 360;
-				an1 += (int)(m_RotSpeedPerSec * App::GetApp()->GetElapsedTime());
-				//角度から求めて中心からの距離をかける
-				Vector3 vel = Vector3(cos(an1*3.14159265f / 180), 0, sin(an1*3.14159265f / 180)) * m_DifLength;
-				pos1 = centerpos + vel;
-
-				//２体目
-				Vector3 dif2 = pos2 - centerpos;
-				float angle2 = atan2(dif2.z, dif2.x) * 180 / 3.14159265f;
-				angle2 += 360;
-				int an2 = (int)angle2 % 360;
-				an2 += (int)(m_RotSpeedPerSec * App::GetApp()->GetElapsedTime());
-				//角度から求めて中心からの距離をかける
-				Vector3 vel2 = Vector3(cos(an2*3.14159265f / 180), 0, sin(an2*3.14159265f / 180)) * m_DifLength;
-				pos2 = centerpos + vel2;
-
-#pragma region 押し出し処理
-				//押し出し処理
-				//左押し出し
-				if (pos1.x < MoveLimit.x)
-				{
-					float disX = MoveLimit.x - pos1.x;
-					pos1.x += disX;
-					pos2.x += disX;
+		switch (StateNam) {
+		case 0:
+			break;
+		case 1:
+			LeaveMove();
+			break;
+		case 2:
+			SandMove();
+			break;
+		case 3:
+			InitPosMove();
+			break;
+		}
+		 
+	}
+	//行動関数
+	//挟むから初期位置に戻る時に使用
+	void SelectPlayer::InitPosMove() {
+			//プレイヤーの取得
+			auto Player1 = m_Player[0];
+			auto Player1Trans = Player1->GetComponent<Transform>();
+			auto Player2 = m_Player[1];
+			auto Player2Trans = Player2->GetComponent<Transform>();
+			//移動
+			if (Player1) {
+				if (Player1Trans->GetPosition() <= m_leftInitPos) {
+					Player1Trans->SetPosition(m_leftInitPos);
 				}
-				if (pos2.x < MoveLimit.x)
-				{
-					float disX = MoveLimit.x - pos2.x;
-					pos1.x += disX;
-					pos2.x += disX;
+				else if (!(Player1Trans->GetPosition() <= m_leftInitPos)) {
+					auto Pos = Player1Trans->GetPosition();
+					Pos.x -= m_Speed * App::GetApp()->GetElapsedTime();
+					Player1Trans->SetPosition(Pos);
 				}
-				//右押し出し
-				if (pos1.x > MoveLimit.y)
-				{
-					float disX = MoveLimit.y - pos1.x;
-					pos1.x += disX;
-					pos2.x += disX;
-				}
-				if (pos2.x > MoveLimit.y)
-				{
-					float disX = MoveLimit.y - pos2.x;
-					pos1.x += disX;
-					pos2.x += disX;
-				}
-				//上押し出し
-				if (pos1.z > MoveLimit.z)
-				{
-					float disZ = MoveLimit.z - pos1.z;
-					pos1.z += disZ;
-					pos2.z += disZ;
-				}
-				if (pos2.z > MoveLimit.z)
-				{
-					float disZ = MoveLimit.z - pos2.z;
-					pos1.z += disZ;
-					pos2.z += disZ;
-				}
-				//下押し出し
-				if (pos1.z < MoveLimit.w)
-				{
-					float disZ = MoveLimit.z - pos1.z;
-					pos1.z += disZ;
-					pos2.z += disZ;
-				}
-				if (pos2.z < MoveLimit.w)
-				{
-					float disZ = MoveLimit.z - pos2.z;
-					pos1.z += disZ;
-					pos2.z += disZ;
-				}
-				
-#pragma endregion
-
-				//移動
-				m_Player[0]->GetComponent<Transform>()->SetPosition(pos1);
-				m_Player[1]->GetComponent<Transform>()->SetPosition(pos2);
-
 			}
-			else {
-				m_WaitFlg = true;
+			if (Player2) {
+				if (Player2Trans->GetPosition() >= m_RightInitPos) {
+					Player2Trans->SetPosition(m_RightInitPos);
+				}
+				else if (!(Player2Trans->GetPosition() >= m_RightInitPos)) {
+					auto Pos = Player2Trans->GetPosition();
+					Pos.x += m_Speed * App::GetApp()->GetElapsedTime();
+					Player2Trans->SetPosition(Pos);
+				}
 			}
-			//右肩
-			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
-			{
-				m_WaitFlg = false;
-				AnimationRotR();
-				//座標取得
-				Vector3 pos1 = m_Player[0]->GetComponent<Transform>()->GetPosition();
-				Vector3 pos2 = m_Player[1]->GetComponent<Transform>()->GetPosition();
-				Vector3 centerpos = (pos1 + pos2) / 2;
-
-				//中心からの角度算出して加算して計算しなおして座標に入れる
-				Vector3 dif = pos1 - centerpos;
-				float angle1 = atan2(dif.z, dif.x) * 180 / 3.14159265f;
-				angle1 += 360;
-				int an1 = (int)angle1 % 360;
-				an1 += -(int)(m_RotSpeedPerSec * App::GetApp()->GetElapsedTime());
-				//角度から求めて中心からの距離をかける
-				Vector3 vel = Vector3(cos(an1*3.14159265f / 180), 0, sin(an1*3.14159265f / 180)) * m_DifLength;
-				pos1 = centerpos + vel;
-
-				//２体目
-				Vector3 dif2 = pos2 - centerpos;
-				float angle2 = atan2(dif2.z, dif2.x) * 180 / 3.14159265f;
-				angle2 += 360;
-				int an2 = (int)angle2 % 360;
-				an2 += -(int)(m_RotSpeedPerSec * App::GetApp()->GetElapsedTime());
-				//角度から求めて中心からの距離をかける
-				Vector3 vel2 = Vector3(cos(an2*3.14159265f / 180), 0, sin(an2*3.14159265f / 180)) * m_DifLength;
-				pos2 = centerpos + vel2;
-
-#pragma region 押し出し処理
-				//押し出し処理
-				//左押し出し
-				if (pos1.x < MoveLimit.x)
-				{
-					float disX = MoveLimit.x - pos1.x;
-					pos1.x += disX;
-					pos2.x += disX;
-				}
-				if (pos2.x < MoveLimit.x)
-				{
-					float disX = MoveLimit.x - pos2.x;
-					pos1.x += disX;
-					pos2.x += disX;
-				}
-				//右押し出し
-				if (pos1.x > MoveLimit.y)
-				{
-					float disX = MoveLimit.y - pos1.x;
-					pos1.x += disX;
-					pos2.x += disX;
-				}
-				if (pos2.x > MoveLimit.y)
-				{
-					float disX = MoveLimit.y - pos2.x;
-					pos1.x += disX;
-					pos2.x += disX;
-				}
-				//上押し出し
-				if (pos1.z > MoveLimit.z)
-				{
-					float disZ = MoveLimit.z - pos1.z;
-					pos1.z += disZ;
-					pos2.z += disZ;
-				}
-				if (pos2.z > MoveLimit.z)
-				{
-					float disZ = MoveLimit.z - pos2.z;
-					pos1.z += disZ;
-					pos2.z += disZ;
-				}
-				//下押し出し
-				if (pos1.z < MoveLimit.w)
-				{
-					float disZ = MoveLimit.z - pos1.z;
-					pos1.z += disZ;
-					pos2.z += disZ;
-				}
-				if (pos2.z < MoveLimit.w)
-				{
-					float disZ = MoveLimit.z - pos2.z;
-					pos1.z += disZ;
-					pos2.z += disZ;
-				}
-#pragma endregion
-
-				//移動
-				m_Player[0]->GetComponent<Transform>()->SetPosition(pos1);
-				m_Player[1]->GetComponent<Transform>()->SetPosition(pos2);
-
+			////限界値
+			//if (Player1Trans->GetPosition() <= m_RightInitPos) {
+			//	Player1Trans->SetPosition(m_RightInitPos);
+			//}
+			//if (Player2Trans->GetPosition() >= m_leftInitPos) {
+			//	Player2Trans->SetPosition(m_leftInitPos);
+			//}
+			//現在の二つのPlayerの位置の取得
+			auto Player1Pos = Player1Trans->GetPosition();
+			auto Player2Pos = Player2Trans->GetPosition();
+			//どちらも初期値に戻ったら
+			if (Player1Pos <= m_leftInitPos && Player2Pos >= m_RightInitPos) {
+				//初期値に戻る行動をfalseにする
+				//m_InitMoveFlg = false;
+				StateNam = 0;
 			}
-			else {
-				m_WaitFlg = true;
+	}
+	//挟むときに使用
+	void SelectPlayer::SandMove() {
+		//プレイヤーの取得
+		auto Player1 = m_Player[0];
+		auto Player1Trans = Player1->GetComponent<Transform>();
+	//	Player1->GetComponent<CollisionSphere>()->SetUpdateActive(true);
+		auto Player2 = m_Player[1];
+		auto Player2Trans = Player2->GetComponent<Transform>();
+	//	Player2->GetComponent<CollisionSphere>()->SetUpdateActive(true);
+		if (Player1) {
+			auto Pos = Player1Trans->GetPosition();
+			Pos.x += m_Speed * App::GetApp()->GetElapsedTime();
+			Player1Trans->SetPosition(Pos);
+		}
+		else if(m_leftSandMinit >= Player1Trans->GetPosition()){
+			Player1Trans->SetPosition(m_leftSandMinit);
+		}
+		if (Player2) {
+			auto Pos = Player2Trans->GetPosition();
+			Pos.x -= m_Speed * App::GetApp()->GetElapsedTime();
+			Player2Trans->SetPosition(Pos);
+		}
+		else if (m_RightSandMinit <= Player2Trans->GetPosition()) {
+			Player2Trans->SetPosition(m_RightSandMinit);
+		}
+		if (m_leftSandMinit >= Player1Trans->GetPosition() &&
+			m_RightSandMinit <= Player2Trans->GetPosition()) {
+			StateNam = 2;
+		}
+	}
+	//離れる時に使用
+	void SelectPlayer::LeaveMove() {
+		//プレイヤーの取得
+		auto Player1 = m_Player[0];
+		auto Player1Trans = Player1->GetComponent<Transform>();
+	//	Player1->GetComponent<CollisionSphere>()->SetUpdateActive(false);
+		auto Player2 = m_Player[1];
+		auto Player2Trans = Player2->GetComponent<Transform>();
+		//Player2->GetComponent<CollisionSphere>()->SetUpdateActive(false);
+		if (Player1) {
+			auto Pos = Player1Trans->GetPosition();
+			Pos.x -= m_Speed * App::GetApp()->GetElapsedTime();
+			Player1Trans->SetPosition(Pos);
+			if (m_leftLeaveMax >= Player1Trans->GetPosition()) {
+				Player1Trans->SetPosition(m_leftLeaveMax);
 			}
+		}
+		if (Player2) {
+			auto Pos = Player2Trans->GetPosition();
+			Pos.x += m_Speed * App::GetApp()->GetElapsedTime();
+			Player2Trans->SetPosition(Pos);
+			if (m_RightLeaveMax >= Player1Trans->GetPosition()) {
+				Player2Trans->SetPosition(m_RightLeaveMax);
+			}
+		}
+		if (m_leftLeaveMax == Player1Trans->GetPosition() &&
+			m_RightLeaveMax == Player2Trans->GetPosition()) {
+			StateNam = 2;
 		}
 	}
 
-	//引き合う処理
-	void SelectPlayer::SandMove()
-	{
-		//近づいてない状態
-		if (!m_SandFinishFlg)
-		{
-			//進む方向を決める
-			Vector3 difpos = m_Player[1]->GetComponent<Transform>()->GetPosition() - m_Player[0]->GetComponent<Transform>()->GetPosition();
-			//ある程度 半径1.5くらい以上
-			if (difpos.x*difpos.x + difpos.z*difpos.z > 4)
-			{
-				//absを使うとifで反転させるより遅くなるけどそんなに重い処理ないしおｋだよね？
-				float xPlusz = abs(difpos.x) + abs(difpos.z);
-				difpos = Vector3(difpos.x / xPlusz, 0, difpos.z / xPlusz);
-				//正規化できてるか確認
-				//GetComponent<StringSprite>()->SetText(L"x:" + Util::FloatToWStr(difpos.x) + L"z:" + Util::FloatToWStr(difpos.z));
-				difpos *= m_Speed;
 
-				for (auto obj : m_Player)
-				{
-					obj->GetComponent<Rigidbody>()->SetVelocity(difpos);
-					difpos *= -1;
-				}
-			}
-			//設定した距離まで近づいた
-			else
-			{
-				m_SandFinishFlg = true;
-			}
-		}
-		else
-		{
-			//進む方向を決める
-			Vector3 difpos = m_Player[0]->GetComponent<Transform>()->GetPosition() - m_Player[1]->GetComponent<Transform>()->GetPosition();
-			//初期の座標の差より離れたら(距離m_difLengthは半径のため２倍*２体分)
-			if (difpos.x*difpos.x + difpos.z*difpos.z < 4*(m_DifLength*m_DifLength))
-			{
-				//absを使うとifで反転させるより遅くなるけどそんなに重い処理ないしおｋだよね？
-				float xPlusz = abs(difpos.x) + abs(difpos.z);
-				difpos = Vector3(difpos.x / xPlusz, 0, difpos.z / xPlusz);
-				//正規化できてるか確認
-				//GetComponent<StringSprite>()->SetText(L"x:" + Util::FloatToWStr(difpos.x) + L"z:" + Util::FloatToWStr(difpos.z));
-				difpos *= m_Speed;
-
-				for (auto obj : m_Player)
-				{
-					obj->GetComponent<Rigidbody>()->SetVelocity(difpos);
-					difpos *= -1;
-				}
-			}
-			//初期距離より離れた
-			else
-			{
-				m_SandFlg = false;
-				m_SandFinishFlg = false;
-			}
-		}
-	}
 
 	void SelectPlayer::SetPlayerUpdate(bool flg)
 	{
@@ -582,13 +317,6 @@ namespace basecross
 		return (ppos1 + ppos2) / 2;
 	}
 
-	void SelectPlayer::ActiveMove()
-	{	
-		for (auto obj : m_Player)
-		{
-			obj->GetComponent<CollisionSphere>()->SetUpdateActive(true);
-		}
-	}
 	//モデルの向き
 	void SelectPlayer::Model() {
 		if (m_Model_flg) {
@@ -611,32 +339,7 @@ namespace basecross
 		UpdateAnyAnimation();
 		UpdateAnyAnimation2();
 	}
-	//回転アニメション関数 左
-	void SelectPlayer::AnimationRotL() {
-		auto PtrDraw = m_Player[0]->GetComponent<PNTBoneModelDraw>();
-		auto PtrDraw2 = m_Player[1]->GetComponent<PNTBoneModelDraw>();
-
-
-		if (PtrDraw->GetCurrentAnimation() != L"LeftRot"){
-			PtrDraw->ChangeCurrentAnimation(L"LeftRot");
-			PtrDraw2->ChangeCurrentAnimation(L"LeftRot");
-		}
-		UpdateAnyAnimation();
-		UpdateAnyAnimation2();
-	}
-	//右
-	void SelectPlayer::AnimationRotR() {
-		auto PtrDraw = m_Player[0]->GetComponent<PNTBoneModelDraw>();
-		auto PtrDraw2 = m_Player[1]->GetComponent<PNTBoneModelDraw>();
-
-		if (!(PtrDraw->GetCurrentAnimation() == L"RightRot")) {
-			PtrDraw->ChangeCurrentAnimation(L"RightRot");
-			PtrDraw2->ChangeCurrentAnimation(L"RightRot");
-
-		}
-		UpdateAnyAnimation();
-		UpdateAnyAnimation2();
-	}
+	
 	//アニメーション更新関数
 	bool SelectPlayer::UpdateAnyAnimation() {
 		auto PtrDraw = m_Player[0]->GetComponent<PNTBoneModelDraw>();
@@ -648,6 +351,846 @@ namespace basecross
 		float ElapsedTime = App::GetApp()->GetElapsedTime();
 		return PtrDraw->UpdateAnimation(ElapsedTime);
 	}
+
+	//--------------------------------------------------------------------------------------
+	//	ステージ難易度とステージ選択
+	//--------------------------------------------------------------------------------------
+	StageModeControl::StageModeControl(const shared_ptr<Stage>& StagePtr):
+	GameObject(StagePtr)
+	{}
+
+	void StageModeControl::OnCreate() {
+		//難易度スプライトの追加
+		
+		GetStage()->SetSharedGameObject(L"Easy",GetStage()->AddGameObject<ModeSelect>(Vector3(0, 1, 0), Vector3(5, 15,1), 1,false,1));
+		GetStage()->SetSharedGameObject(L"Normal", GetStage()->AddGameObject<ModeSelect>(Vector3(10, 1, 0), Vector3(5, 15, 1), 2,false,3));
+		GetStage()->SetSharedGameObject(L"Hard", GetStage()->AddGameObject<ModeSelect>(Vector3(-10, 1, 0), Vector3(5, 15, 1), 3,false,2));
+
+
+		//ステージの追加
+		int m_AddEasy = 4;
+		int m_AddNormal = 12;
+		int m_AddHard = 16;
+		//難易度の取得
+		auto EasyPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Easy", false);
+		auto EasyTrans = EasyPtr->GetComponent<Transform>();
+		auto EasyPos = EasyTrans->GetPosition();
+		auto EasyScale = EasyTrans->GetScale();
+		auto NormalPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Normal", false);
+		auto NormalTrans = NormalPtr->GetComponent<Transform>();
+		auto NormalPos = NormalTrans->GetPosition();
+		auto NormalScale = NormalTrans->GetScale();
+		auto HardPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Hard", false);
+		auto HardTrans = HardPtr->GetComponent<Transform>();
+		auto HardPos = HardTrans->GetPosition();
+		auto HardScale = HardTrans->GetScale();
+		
+
+
+		//各ステージの生成
+		for (int StageNumber = 1; StageNumber < 17; StageNumber++) {
+			//難易度の配列にステージを追加する
+			if (StageNumber <= m_AddEasy) {
+				m_Easy.push_back(GetStage()->AddGameObject<StageBox>(Vector3(EasyPos.x, EasyPos.y, EasyPos.z), Vector3(1, 1, 1), StageNumber));
+			}
+			else if (StageNumber <= m_AddNormal) {
+				m_Normal.push_back(GetStage()->AddGameObject<StageBox>(Vector3(NormalPos.x, NormalPos.y, NormalPos.z), Vector3(1, 1, 1), StageNumber));
+			}
+			else if (StageNumber <= m_AddHard) {
+				m_Hard.push_back(GetStage()->AddGameObject<StageBox>(Vector3(HardPos.x, HardPos.y, HardPos.z), Vector3(1,1,1), StageNumber));
+			}
+		}
+		m_NormalStageCenter = 0;
+		m_NormalUP = 7;
+		m_NormalDown = 1;
+
+		 m_CenterScalse = Vector3(2,2,2);
+		 m_NoCenterScalse = Vector3(1, 1, 1);
+		 m_MoveSpeed = 0.5;
+		 m_Center = Vector3(0, 0, 0);
+		 m_Up = Vector3(0, 0, 0);
+		 m_Down = Vector3(0, 0, 0);
+		 m_Top = Vector3(0, 0, 0);
+		 m_ElementNumTopFlg = true;
+		 m_EasyStageCenter = 0;
+
+	}
+	void StageModeControl::OnUpdate() {
+		
+		auto KeylVec = App::GetApp()->GetInputDevice().GetKeyState();
+		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		auto EasyPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Easy", false);
+		auto NormalPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Normal", false);
+		auto HardPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Hard", false);
+		auto PtrStageModeControl = GetStage()->GetSharedGameObject<StageModeControl>(L"StageModeControl", false);
+
+		//はじめだけ一回入る
+		if (InitOneflg == true) {
+			StandardEasyPos();
+			StandardNormalPos();
+			StandardHardPos();
+			//InitSetCenter　InitSetUp　InitSetDown　InitSetOtherの４つの
+			Init();
+			InitOneflg = false;
+		}
+		else {
+			//wキーで難易度の移動がしたときに位置更新
+			if (KeylVec.m_bPressedKeyTbl['W'] || KeylVec.m_bPressedKeyTbl['E']) {
+				m_ElementCenter = 0;
+				m_ElementUp = 0;
+				m_ElementDown = 0;
+				m_ElementTop = 0;
+				m_Center = Vector3(0, 0, 0);
+				m_Up = Vector3(0, 0, 0);
+				m_Down = Vector3(0, 0, 0);
+				m_Top = Vector3(0, 0, 0);
+			
+			}
+		}
+		//各ステージの移動
+		StageMove();
+		//ModeSelectクラスにWによる移動をできるように知らせるフラグ
+		m_ModeMove = true;
+		if (KeylVec.m_bPressedKeyTbl['Y'] /*|| CntlVec[0].wPressedButtons& XINPUT_GAMEPAD_A*/) {
+			GetStage()->GetSharedGameObject<ModeSelect>(L"Easy", false)->SetUpdateActive(false);
+			GetStage()->GetSharedGameObject<ModeSelect>(L"Normal", false)->SetUpdateActive(false);
+			GetStage()->GetSharedGameObject<ModeSelect>(L"Hard", false)->SetUpdateActive(false);
+			//確認ウィンドウ起動
+			GetStage()->GetSharedGameObject<GoStageCheck>(L"GoStageCheck", false)->OpenCheck();
+			GetStage()->GetSharedGameObject<GoStageCheck>(L"GoStageCheck", false)->SetStageNumber(m_CenterStageNum);
+			GetStage()->GetSharedGameObject<EnemyCount>(L"Count", false)->Count();
+		}
+		
+	}
+
+	//基準となる位置の設定
+	void StageModeControl::StandardEasyPos() {
+		auto EasyPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Easy", false);
+		auto EasyTrans = EasyPtr->GetComponent<Transform>();
+		auto EasyPos = EasyTrans->GetPosition();
+		//基準位置の取得
+		m_EasyPosCenter = EasyPos;
+		m_EasyPosUP = Vector3(EasyPos.x, EasyPos.y, EasyPos.z + 5);
+		m_EasyPosDown = Vector3(EasyPos.x, EasyPos.y, EasyPos.z - 5);
+		m_EasyOtherPos = Vector3(EasyPos.x, EasyPos.y, EasyPos.z -10);
+		m_EasyTopPos = Vector3(EasyPos.x, EasyPos.y, m_EasyPosUP.z + 5);
+	}
+	void StageModeControl::StandardNormalPos() {
+		auto NormalPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Normal", false);
+		auto NormalTrans = NormalPtr->GetComponent<Transform>();
+		auto NormalPos = NormalTrans->GetPosition();
+		//基準位置の取得
+		m_NormalPosCenter = NormalPos;
+		m_NormalPosUP = Vector3(NormalPos.x, NormalPos.y, NormalPos.z + 5);
+		m_NormalPosDown = Vector3(NormalPos.x, NormalPos.y, NormalPos.z - 5);
+		m_NormalOtherPos = Vector3(m_NormalPosDown.x, m_NormalPosDown.y, m_NormalPosDown.z - 5);
+		m_NormalTopPos = Vector3(NormalPos.x, NormalPos.y, m_NormalPosUP.z + 5);
+	}
+	void StageModeControl::StandardHardPos() {
+		auto HardPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Hard", false);
+		auto HardTrans = HardPtr->GetComponent<Transform>();
+		auto HardPos = HardTrans->GetPosition();
+		//基準位置の取得
+		m_HardPosCenter = HardPos;
+		m_HardPosUP = Vector3(HardPos.x, HardPos.y, HardPos.z + 5);
+		m_HardPosDown = Vector3(HardPos.x, HardPos.y, HardPos.z - 5);
+		m_HardOtherPos = Vector3(m_HardPosDown.x, m_HardPosDown.y, m_HardPosDown.z - 5);
+		m_HardTopPos = Vector3(HardPos.x, HardPos.y, m_HardPosUP.z + 5);
+
+	}
+	//各難易度の各ステージの初期配置
+	void StageModeControl::Init() {
+		InitSetCenter();
+		InitSetUp();
+		InitSetDown();
+		InitSetOther();
+	}
+	void StageModeControl::InitSetCenter() {
+		m_Easy[0]->GetComponent<Transform>()->SetPosition(m_EasyPosCenter);
+		m_Easy[0]->GetComponent<Transform>()->SetScale(m_CenterScalse);
+		m_Normal[0]->GetComponent<Transform>()->SetPosition(m_NormalPosCenter);
+		m_Hard[0]->GetComponent<Transform>()->SetPosition(m_HardPosCenter);
+	}
+	void StageModeControl::InitSetUp() {
+		m_Easy[3]->GetComponent<Transform>()->SetPosition(m_EasyPosUP);
+		m_Normal[7]->GetComponent<Transform>()->SetPosition(m_NormalPosUP);
+		m_Hard[3]->GetComponent<Transform>()->SetPosition(m_HardPosUP);
+	}
+	void StageModeControl::InitSetDown() {
+		auto EasyPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Easy", false);
+		m_Easy[1]->GetComponent<Transform>()->SetPosition(m_EasyPosDown);
+		m_Normal[1]->GetComponent<Transform>()->SetPosition(m_NormalPosDown);
+		m_Hard[1]->GetComponent<Transform>()->SetPosition(m_HardPosDown);
+
+
+	}
+	void StageModeControl::InitSetOther() {
+			m_Easy[2]->GetComponent<Transform>()->SetPosition(m_EasyOtherPos);
+			m_Easy[2]->GetComponent<PNTStaticDraw>()->SetDrawActive(false);
+			for (int i = 0; i < 8; i++)
+			{
+				if (i != 0 && i != 1 && i != 7) {
+					m_Normal[i]->GetComponent<Transform>()->SetPosition(m_NormalOtherPos);
+					m_Normal[i]->GetComponent<PNTStaticDraw>()->SetDrawActive(false);
+				}
+			}
+			m_Hard[2]->GetComponent<Transform>()->SetPosition(m_HardOtherPos);
+			m_Hard[2]->GetComponent<PNTStaticDraw>()->SetDrawActive(false);
+
+
+		
+	}
+	//イージの移動処理を呼ぶとこ
+	void StageModeControl::EasySelect() {
+		auto EasyPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Easy", false);
+		auto KeylVec = App::GetApp()->GetInputDevice().GetKeyState();
+		//難易度イージーがセンターにあったらステージ選択が出来る
+		if (EasyPtr->GetCenter()) {
+				StandardEasyPos();
+			if (KeylVec.m_bPressedKeyTbl['R']) {
+				m_EasyStageCenter++;
+				m_Flg = true;
+				m_ElementNumTopFlg = true;
+			}
+			if (KeylVec.m_bPressedKeyTbl['T']) {
+			//	m_EasyStageCenter--;
+			//	m_Flg = true;
+			//	m_ElementNumTopFlg = true;
+			}
+			if (m_EasyStageCenter > 3) {
+				m_EasyStageCenter = 0;
+			}
+			if (m_EasyStageCenter < 0) {
+				m_EasyStageCenter = 3;
+			}
+
+			switch (m_EasyStageCenter)
+			{
+			case 0:
+				ElementNum(0, 3, m_EasyStageCenter);
+				EasyScale();
+				EasyMove();
+				m_CenterStageNum = 1;
+				break;
+			case 1:
+				ElementNum(0, 3, m_EasyStageCenter);
+				EasyScale();
+				EasyMove();
+				m_CenterStageNum = 2;
+				break;
+			case 2:
+				ElementNum(0, 3, m_EasyStageCenter);
+				EasyScale();
+				EasyMove();
+				m_CenterStageNum = 3;
+				break;
+			case 3:
+				ElementNum(0, 3, m_EasyStageCenter);
+				EasyScale();
+				EasyMove();
+				m_CenterStageNum = 4;
+				break;
+			}
+		}	
+	}
+	//ノーマルの選択移動を呼ぶとこ
+	void StageModeControl::NormalSelect() {
+		auto NormalPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Normal", false);
+		auto KeylVec = App::GetApp()->GetInputDevice().GetKeyState();
+		//難易度ノーマルがセンターにあったらステージ選択が出来る
+		if (NormalPtr->GetCenter()) {
+			StandardNormalPos();
+			if (KeylVec.m_bPressedKeyTbl['R']) {
+				m_NormalStageCenter++;
+				m_Flg = true;
+				m_ElementNumTopFlg = true;
+			}
+			if (KeylVec.m_bPressedKeyTbl['T']) {
+				//	m_NormalStageCenter--;
+			//	m_Flg = true;
+				//m_ElementNumTopFlg = true;
+			}
+			if (m_NormalStageCenter > 7) {
+				m_NormalStageCenter = 0;
+			}
+			if (m_NormalStageCenter < 0) {
+				m_NormalStageCenter = 7;
+			}
+			switch (m_NormalStageCenter)
+			{
+			case 0:
+				ElementNum(0, 7, m_NormalStageCenter);
+				NormalScale();
+				NormalMove();
+				m_CenterStageNum = 5;
+				break;
+			case 1:
+				ElementNum(0, 7, m_NormalStageCenter);
+				NormalScale();
+				NormalMove();
+				m_CenterStageNum = 6;
+				break;
+			case 2:
+				ElementNum(0, 7, m_NormalStageCenter);
+				NormalScale();
+				NormalMove();
+				m_CenterStageNum = 7;
+				break;
+			case 3:
+				ElementNum(0, 7, m_NormalStageCenter);
+				NormalScale();
+				NormalMove();
+				m_CenterStageNum = 8;
+				break;
+			case 4:
+				ElementNum(0, 7, m_NormalStageCenter);
+				NormalScale();
+				NormalMove();
+				m_CenterStageNum = 9;
+				break;
+			case 5:
+				ElementNum(0, 7, m_NormalStageCenter);
+				NormalScale();
+				NormalMove();
+				m_CenterStageNum = 10;
+				break;
+			case 6:
+				ElementNum(0, 7, m_NormalStageCenter);
+				NormalScale();
+				NormalMove();
+				m_CenterStageNum = 11;
+				break;
+			case 7:
+				ElementNum(0, 7, m_NormalStageCenter);
+				NormalScale();
+				NormalMove();
+				m_CenterStageNum = 12;
+				break;
+
+			}
+		}
+		NormalSideMove();
+	}
+	//ハード選択移動を呼ぶとこ
+	void StageModeControl::HardSelect() {
+		auto HardPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Hard", false);
+		auto KeylVec = App::GetApp()->GetInputDevice().GetKeyState();
+		//難易度イージーがセンターにあったらステージ選択が出来る
+		if (HardPtr->GetCenter()) {
+			StandardHardPos();
+			if (KeylVec.m_bPressedKeyTbl['R']) {
+				m_HardStageCenter++;
+				m_Flg = true;
+				m_ElementNumTopFlg = true;
+			}
+			if (KeylVec.m_bPressedKeyTbl['T']) {
+			//	m_HardStageCenter--;
+			//	m_Flg = true;
+			//	m_ElementNumTopFlg = true;
+			}
+			if (m_HardStageCenter > 3) {
+				m_HardStageCenter = 0;
+			}
+			if (m_HardStageCenter < 0) {
+				m_HardStageCenter = 3;
+			}
+			switch (m_HardStageCenter)
+			{
+			case 0:
+				ElementNum(0, 3, m_HardStageCenter);
+				HardScale();
+				HardMove();
+				m_CenterStageNum = 13;
+				break;
+			case 1:
+				ElementNum(0, 3, m_HardStageCenter);
+				HardScale();
+				HardMove();
+				m_CenterStageNum = 14;
+				break;
+			case 2:
+				ElementNum(0, 3, m_HardStageCenter);
+				HardScale();
+				HardMove();
+				m_CenterStageNum = 15;
+				break;
+			case 3:
+				ElementNum(0, 3, m_HardStageCenter);
+				HardScale();
+				HardMove();
+				m_CenterStageNum = 16;
+				break;
+			}
+		}
+	}
+	//移動処理 Center＝下からセンターに UP＝センターから上に移動　Down＝下からセンターに移動
+	//各難易度のステージ移動
+	void StageModeControl::EasyMove() {
+		m_Center = m_Easy[m_ElementCenter]->GetComponent<Transform>()->GetPosition();
+		m_Up = m_Easy[m_ElementUp]->GetComponent<Transform>()->GetPosition();
+		m_Down = m_Easy[m_ElementDown]->GetComponent<Transform>()->GetPosition();
+		m_Top = m_Easy[m_ElementTop]->GetComponent<Transform>()->GetPosition();
+		//移動処理 センター移動してなかったら
+		if (m_Center.z != m_EasyPosCenter.z) {
+			m_Center.z += m_MoveSpeed;
+			m_Easy[m_ElementCenter]->GetComponent<PNTStaticDraw>()->SetDrawActive(true);
+			m_Easy[m_ElementCenter]->GetComponent<Transform>()->SetPosition(m_Center);
+		}
+
+		//上に移動してなかったら
+		if (m_Up.z != m_EasyPosUP.z) {
+			m_Up.z += m_MoveSpeed;
+			m_Easy[m_ElementUp]->GetComponent<PNTStaticDraw>()->SetDrawActive(true);
+			m_Easy[m_ElementUp]->GetComponent<Transform>()->SetPosition(m_Up);
+
+		}//下に移動してなかったら
+		if (m_Down.z != m_EasyPosDown.z) {
+			m_Down.z += m_MoveSpeed;
+			m_Easy[m_ElementDown]->GetComponent<PNTStaticDraw>()->SetDrawActive(true);
+			m_Easy[m_ElementDown]->GetComponent<Transform>()->SetPosition(m_Down);
+
+		}
+		//見えてない上の部分に移動してなかったら
+		if (m_Flg == true) {
+			if (m_Top.z != m_EasyTopPos.z) {
+				//上にあげて消す
+				m_Top.z += m_MoveSpeed;
+				m_Easy[m_ElementTop]->GetComponent<PNTStaticDraw>()->SetDrawActive(true);
+				m_Easy[m_ElementTop]->GetComponent<Transform>()->SetPosition(m_Top);
+			}
+			if (m_Top.z >= m_EasyTopPos.z) {
+				m_Flg = false;
+				m_Easy[m_ElementTop]->GetComponent<PNTStaticDraw>()->SetDrawActive(false);
+				m_Easy[m_ElementTop]->GetComponent<Transform>()->SetPosition(m_EasyOtherPos);
+			}
+		}
+		//上記に当てはまらない物の検出と移動
+		for (int i = 0; i < 4; i++) {
+			if (m_ElementUp != i && m_ElementCenter != i && m_ElementDown != i && m_ElementTop != i) {
+				m_Easy[i]->GetComponent<Transform>()->SetPosition(m_EasyOtherPos);
+				m_Easy[i]->GetComponent<PNTStaticDraw>()->SetDrawActive(false);
+
+			}
+		}
+	}	
+	void StageModeControl::NormalMove() {
+		auto NormalPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Normal", false);
+		m_Center = m_Normal[m_ElementCenter]->GetComponent<Transform>()->GetPosition();
+		m_Up = m_Normal[m_ElementUp]->GetComponent<Transform>()->GetPosition();
+		m_Down = m_Normal[m_ElementDown]->GetComponent<Transform>()->GetPosition();
+		m_Top = m_Normal[m_ElementTop]->GetComponent<Transform>()->GetPosition();
+		//移動処理 センター移動してなかったら
+		if (m_Center.z != m_NormalPosCenter.z) {
+			m_Center.z += m_MoveSpeed;
+			m_Normal[m_ElementCenter]->GetComponent<PNTStaticDraw>()->SetDrawActive(true);
+			m_Normal[m_ElementCenter]->GetComponent<Transform>()->SetPosition(m_Center);
+
+		}
+	
+
+		//上に移動してなかったら
+		if (m_Up.z != m_NormalPosUP.z) {
+			m_Up.z += m_MoveSpeed;
+			m_Normal[m_ElementUp]->GetComponent<PNTStaticDraw>()->SetDrawActive(true);
+			m_Normal[m_ElementUp]->GetComponent<Transform>()->SetPosition(m_Up);
+
+		}
+
+		//下に移動してなかったら
+		if (m_Down.z != m_NormalPosDown.z) {
+			m_Down.z += m_MoveSpeed;
+			m_Normal[m_ElementDown]->GetComponent<PNTStaticDraw>()->SetDrawActive(true);
+			m_Normal[m_ElementDown]->GetComponent<Transform>()->SetPosition(m_Down);
+
+		}
+
+		//見えてない上の部分に移動してなかったら
+		if (m_Flg == true) {
+			if (m_Top.z != m_NormalTopPos.z) {
+				//上にあげて消す
+				m_Top.z += m_MoveSpeed;
+				m_Normal[m_ElementTop]->GetComponent<PNTStaticDraw>()->SetDrawActive(true);
+				m_Normal[m_ElementTop]->GetComponent<Transform>()->SetPosition(m_Top);
+			}
+			if (m_Top.z >= m_NormalTopPos.z) {
+				m_Flg = false;
+				m_Normal[m_ElementTop]->GetComponent<PNTStaticDraw>()->SetDrawActive(false);
+				m_Normal[m_ElementTop]->GetComponent<Transform>()->SetPosition(m_NormalOtherPos);
+			}
+		}
+		//上記に当てはまらない物の検出と移動
+		for (int i = 0; i < 8; i++) {
+			if (m_ElementUp != i && m_ElementCenter != i && m_ElementDown != i && m_ElementTop != i) {
+				m_Normal[i]->GetComponent<Transform>()->SetPosition(m_NormalOtherPos);
+				m_Normal[i]->GetComponent<PNTStaticDraw>()->SetDrawActive(false);
+
+			}
+		}
+	}
+	void StageModeControl::HardMove() {
+		m_Center = m_Hard[m_ElementCenter]->GetComponent<Transform>()->GetPosition();
+		m_Up = m_Hard[m_ElementUp]->GetComponent<Transform>()->GetPosition();
+		m_Down = m_Hard[m_ElementDown]->GetComponent<Transform>()->GetPosition();
+		m_Top = m_Hard[m_ElementTop]->GetComponent<Transform>()->GetPosition();
+		//移動処理 センター移動してなかったら
+		if (m_Center.z != m_HardPosCenter.z) {
+			m_Center.z += m_MoveSpeed;
+			m_Hard[m_ElementCenter]->GetComponent<PNTStaticDraw>()->SetDrawActive(true);
+			m_Hard[m_ElementCenter]->GetComponent<Transform>()->SetPosition(m_Center);
+		}
+		
+		//上に移動してなかったら
+		if (m_Up.z != m_HardPosUP.z) {
+			m_Up.z += m_MoveSpeed;
+			m_Hard[m_ElementUp]->GetComponent<PNTStaticDraw>()->SetDrawActive(true);
+			m_Hard[m_ElementUp]->GetComponent<Transform>()->SetPosition(m_Up);
+
+		}//下に移動してなかったら
+		if (m_Down.z != m_HardPosDown.z) {
+			m_Down.z += m_MoveSpeed;
+			m_Hard[m_ElementDown]->GetComponent<PNTStaticDraw>()->SetDrawActive(true);
+			m_Hard[m_ElementDown]->GetComponent<Transform>()->SetPosition(m_Down);
+
+		}
+		//見えてない上の部分に移動してなかったら
+		if (m_Flg == true) {
+			if (m_Top.z != m_HardTopPos.z) {
+				//上にあげて消す
+				m_Top.z += m_MoveSpeed;
+				m_Hard[m_ElementTop]->GetComponent<PNTStaticDraw>()->SetDrawActive(true);
+				m_Hard[m_ElementTop]->GetComponent<Transform>()->SetPosition(m_Top);
+			}
+			if (m_Top.z >= m_HardTopPos.z) {
+				m_Flg = false;
+				m_Hard[m_ElementTop]->GetComponent<PNTStaticDraw>()->SetDrawActive(false);
+				m_Hard[m_ElementTop]->GetComponent<Transform>()->SetPosition(m_HardOtherPos);
+			}
+		}
+		//上記に当てはまらない物の検出と移動
+		for (int i = 0; i < 4; i++) {
+			if (m_ElementUp != i && m_ElementCenter != i && m_ElementDown != i && m_ElementTop != i) {
+				m_Hard[i]->GetComponent<Transform>()->SetPosition(m_HardOtherPos);
+				m_Hard[i]->GetComponent<PNTStaticDraw>()->SetDrawActive(false);
+
+			}
+		}
+	}
+	//拡大縮小
+	void StageModeControl::EasyScale() {
+		auto EasyPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Easy", false);
+		if (EasyPtr->GetCenter()) {
+			m_Easy[m_ElementCenter]->GetComponent<Transform>()->SetScale(m_CenterScalse);
+			m_Easy[m_ElementUp]->GetComponent<Transform>()->SetScale(m_NoCenterScalse);
+			m_Easy[m_ElementDown]->GetComponent<Transform>()->SetScale(m_NoCenterScalse);
+		}
+		else
+		{
+			for (int i = 0; i < 4; i++) {
+				m_Easy[i]->GetComponent<Transform>()->SetScale(m_NoCenterScalse);
+			}
+		}
+	}
+	void StageModeControl::NormalScale() {
+		auto NormalPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Normal", false);
+		if (NormalPtr->GetCenter()) {
+			m_Normal[m_ElementCenter]->GetComponent<Transform>()->SetScale(m_CenterScalse);
+			m_Normal[m_ElementUp]->GetComponent<Transform>()->SetScale(m_NoCenterScalse);
+			m_Normal[m_ElementDown]->GetComponent<Transform>()->SetScale(m_NoCenterScalse);
+		}
+		else {
+			for (int i = 0; i < 8; i++) {
+				m_Normal[i]->GetComponent<Transform>()->SetScale(m_NoCenterScalse);
+			}
+		}
+	}
+	void StageModeControl::HardScale() {
+		auto HardPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Hard", false);
+		if (HardPtr->GetCenter()) {
+			m_Hard[m_ElementCenter]->GetComponent<Transform>()->SetScale(m_CenterScalse);
+			m_Hard[m_ElementUp]->GetComponent<Transform>()->SetScale(m_NoCenterScalse);
+			m_Hard[m_ElementDown]->GetComponent<Transform>()->SetScale(m_NoCenterScalse);
+		}
+		else{
+		for (int i = 0; i < 4; i++) {
+			m_Hard[i]->GetComponent<Transform>()->SetScale(m_NoCenterScalse);
+			}
+		}
+	}
+	//最小か最大値を超えていないかを見る　超えてたら調整してreturnする
+	int StageModeControl::ExceedNum(int Mini,int Max,int Num) {
+		if (Num < Mini)
+		{
+			//最小値より下回ったら最大値を返す
+			return Max;
+		}
+		else if(Num >Max )
+		{
+			//最大値を上回ったら最小値を返す
+			return Mini;
+		}
+		else
+		{
+			return Num;
+		}
+	}
+	//センターから要素数を検出
+	void StageModeControl::ElementNum(int Mini,int Max, int CenterNum) {
+			m_ElementCenter = CenterNum;
+			m_ElementUp = CenterNum - 1;
+			m_ElementDown = CenterNum + 1;
+			if (m_ElementNumTopFlg == true) {
+				m_ElementTop = m_ElementCenter - 2;
+				m_ElementUp;
+				m_ElementDown;
+			}
+			else if(m_ElementNumTopFlg == false){
+			//1一回目以降の値を上書きされないようにする
+			  m_ElementTop = m_ElementTop;
+			}
+		 if(m_ElementUp < Mini){
+			 m_ElementUp = Max;
+		}
+		
+		if (m_ElementDown > Max) {
+			m_ElementDown = Mini;
+		}
+		
+		if (m_ElementNumTopFlg == true) {
+			if (m_ElementTop < Mini) {
+				if (m_ElementTop <= -2) {
+					m_ElementTop = Max - 1;
+				}
+				else if (m_ElementTop <= -1) {
+					m_ElementTop = Max;
+				}
+			}
+			m_ElementNumTopFlg = false;
+		}
+		
+		
+		
+	}
+	//左右の移動 処理内容　適切な難易度の横の移動
+	void StageModeControl::EasySideMove() {
+		auto EasyPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Easy", false);
+		auto EasyTrans = EasyPtr->GetComponent<Transform>();
+		auto EasyPos = EasyTrans->GetPosition();
+		for (int i = 0; i < 4;i++) {
+			auto Pos = m_Easy[i]->GetComponent<Transform>()->GetPosition();
+			m_Easy[i]->GetComponent<Transform>()->SetPosition(EasyPos.x, Pos.y, Pos.z);
+		}
+	}
+	void StageModeControl::NormalSideMove() {
+		auto NormalPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Normal", false);
+		auto NormalTrans = NormalPtr->GetComponent<Transform>();
+		auto NormalPos = NormalTrans->GetPosition();
+		for (int i = 0; i < 8; i++) {
+			auto Pos = m_Normal[i]->GetComponent<Transform>()->GetPosition();
+			m_Normal[i]->GetComponent<Transform>()->SetPosition(NormalPos.x, Pos.y, Pos.z);
+		}
+	}
+	void StageModeControl::HardSideMove() {
+		auto HardPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Hard", false);
+		auto HardTrans = HardPtr->GetComponent<Transform>();
+		auto HardPos = HardTrans->GetPosition();
+		for (int i = 0; i < 4; i++) {
+			auto Pos = m_Hard[i]->GetComponent<Transform>()->GetPosition();
+			m_Hard[i]->GetComponent<Transform>()->SetPosition(HardPos.x, Pos.y, Pos.z);
+		}
+	}
+	//ModeSelectクラスからセンターのフラグを取得し適切な難易度の移動を出来るようにする
+	void StageModeControl::StageMove() {
+		auto EasyPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Easy", false);
+		auto NormalPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Normal", false);
+		auto HardPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Hard", false);
+
+		if (EasyPtr->GetCenter()) {
+			EasySelect();
+		}
+		else {
+			EasyScale();
+		}
+		if (NormalPtr->GetCenter()) {
+			NormalSelect();
+		}
+		else {
+			NormalScale();
+		}
+	    if (HardPtr->GetCenter()) {
+			HardSelect();
+		}
+		else {
+			HardScale();
+		}
+		EasySideMove();
+		NormalSideMove();
+		HardSideMove();
+
+
+	}
+	
+	
+	//--------------------------------------------------------------------------------------
+	//	ステージ難易度のスプライト
+	//--------------------------------------------------------------------------------------
+	ModeSelect::ModeSelect(const shared_ptr<Stage>& StagePtr, const Vector3& Pos, const Vector3& Scale, const int& ModeNum,const bool& Centerflg,const int& MoveNum) :
+		GameObject(StagePtr),
+		m_Pos(Pos),
+		m_Scale(Scale),
+		m_ModeNum(ModeNum),
+		m_Centerflg(Centerflg),
+		m_MoveNum(MoveNum)
+	{}
+
+	void ModeSelect::OnCreate() {
+		auto Trans = AddComponent<Transform>();
+		Trans->SetPosition(m_Pos);
+		Trans->SetScale(m_Scale);
+		Trans->SetRotation(3.14 /2, 0, 0);
+		auto Draw = AddComponent<PNTStaticDraw>();
+		//テクスチャの分岐
+		if (m_ModeNum == 1) {
+			Draw->SetTextureResource(L"SKY_TX");
+			Draw->SetDiffuse(Color4(1, 1, 1, 1));
+		}
+		else if (m_ModeNum == 2) {
+			Draw->SetTextureResource(L"Glass_TX");
+			//Draw->SetDiffuse(Color4(1, 1, 1, 0));
+
+		}
+		else if (m_ModeNum == 3) {
+			//Draw->SetTextureResource(L"SKY_TX");
+			//Draw->SetDiffuse(Color4(1, 1, 1, 0));
+
+		}
+		Draw->SetMeshResource(L"DEFAULT_SQUARE");
+		SetAlphaActive(true);
+		m_NowModeNum = 1;
+		m_Speed = 1.0f;
+		//中心
+		 m_CenterPos = Vector3(0, 0, 0);
+		//右
+		 m_RightPos = Vector3(10, 1, 0);
+		//左
+		 m_LeftPos = Vector3(-10, 0, 0);
+		// Draw->SetDrawActive(false);
+	}
+	void ModeSelect::OnUpdate() {
+		ModeSelectMove();
+		EndMove();
+	}
+	
+	//移動関数
+	void ModeSelect::ModeSelectMove() {
+		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		auto KeylVec = App::GetApp()->GetInputDevice().GetKeyState();
+		auto PtrStageModeControl = GetStage()->GetSharedGameObject<StageModeControl>(L"StageModeControl", false);
+		if (PtrStageModeControl->GetModeMove()) {
+			if (KeylVec.m_bPressedKeyTbl['W'] || CntlVec[0].fThumbLX < -0.5f && EndMove() == true) {
+				m_Speed = 1.0f;
+				m_MoveNum++;
+			}
+			if (KeylVec.m_bPressedKeyTbl['E'] && EndMove() ==true) {
+				if (m_ModeNum == 1) {
+					m_CenterMoveEnd = false;
+				}
+				else if (m_ModeNum == 2) {
+					m_RightMoveEnd = false;
+				}
+				else if (m_ModeNum == 3) {
+					m_LeftMoveEnd = false;
+				}
+			m_Speed = 1.0f;
+			m_MoveNum--;
+			}
+			if (m_MoveNum > 3) {
+				m_MoveNum = 1;
+			}
+			if (m_MoveNum <= 0) {
+				m_MoveNum = 3;
+			}
+		}
+		
+		switch (m_MoveNum)
+		{
+		case 1://センターに移動
+			m_Centerflg = true;
+			CenterMove();
+			break;
+		case 2://左に移動
+			m_Centerflg = false;
+			LiftMove();
+			break;
+		case 3://右に移動
+			m_Centerflg = false;
+			RightMove();
+			break;
+		}
+
+	
+	}
+	//センターに移動
+	void ModeSelect::CenterMove() {
+		auto Draw = GetComponent<PNTStaticDraw>();
+		Draw->SetDiffuse(Color4(1, 1, 1, 1));
+		auto Pos = GetComponent<Transform>()->GetPosition();
+		//右からセンター
+		if (GetComponent<Transform>()->GetPosition().x <= m_CenterPos.x) {
+			GetComponent<Transform>()->SetPosition(m_CenterPos);
+			m_Speed = 0;
+			m_CenterMoveEnd = true;
+			
+		}
+		else {
+			Pos.x -= m_Speed;
+			GetComponent<Transform>()->SetPosition(Pos);
+		}
+	}
+	//左に移動
+	void ModeSelect::LiftMove() {
+		auto Draw = GetComponent<PNTStaticDraw>();
+		Draw->SetDiffuse(Color4(1, 1, 1, 0.5));
+		auto Pos = GetComponent<Transform>()->GetPosition();
+		//基準左よりも小さくなったら
+		if (GetComponent<Transform>()->GetPosition().x <= m_LeftPos.x) {
+			GetComponent<Transform>()->SetPosition(m_LeftPos);
+			m_Speed = 0;
+			m_LeftMoveEnd = true;
+			m_MoveSidFlgEnd = true;
+		}
+		else {
+			Pos.x -= m_Speed;
+			GetComponent<Transform>()->SetPosition(Pos);
+		}
+	}
+	//右に移動
+	void ModeSelect::RightMove() {
+		auto Draw = GetComponent<PNTStaticDraw>();
+		Draw->SetDiffuse(Color4(1, 1, 1, 0.5));
+		auto Pos = GetComponent<Transform>()->GetPosition();
+		//基準右よりも大きくなったら
+		if (GetComponent<Transform>()->GetPosition().x >= m_RightPos.x) {
+			GetComponent<Transform>()->SetPosition(m_RightPos);
+			m_Speed = 0;
+			m_RightMoveEnd = true;
+		}
+		else {
+			//左から右
+			Pos.x += m_Speed;
+			GetComponent<Transform>()->SetPosition(Pos);
+		}
+	}
+	//移動が終わっているかを返す関数
+	bool ModeSelect::EndMove() {
+		auto PtrStageModeControl = GetStage()->GetSharedGameObject<StageModeControl>(L"StageModeControl", false);
+	if (PtrStageModeControl->ModeMoveEnd()) {
+		 return true;
+		}
+		return false;
+	}
+	
+
+	
 
 	//--------------------------------------------------------------------------------------
 	//	ステージの箱
@@ -670,6 +1213,7 @@ namespace basecross
 		//描画設定
 		auto PtrDraw = AddComponent<PNTStaticDraw>();
 		PtrDraw->SetMeshResource(L"DEFAULT_CUBE");
+		//PtrDraw->SetDrawActive(false);
 		wstring stageString = L"STAGEBOX_" + Util::IntToWStr(m_stagenumber) + L"_TX";
 		PtrDraw->SetTextureResource(stageString);
 
@@ -677,28 +1221,40 @@ namespace basecross
 		auto PtrRedid = AddComponent<Rigidbody>();
 		//衝突判定をつける
 		auto PtrCol = AddComponent<CollisionSphere>();
+		PtrCol->SetFixed(true);
+
+		PtrCol->SetDrawActive(false);
+
 
 	}
 
 	void StageBox::OnUpdate()
 	{
-		//プレイヤーが１体以上当たってるときのみ処理
-		if (m_PlayerHitFlg)
-		{
-			//プレイヤーが当たってる数が２体
-			if (m_PlayerHitNum == 2)
-			{
-				//Aボタン押されてるかの処理はいらん。Aはなされなければ引かれないしな
-				CheckGo();
-			}
-			//なんにも当たってなければ
-			else if(m_PlayerHitNum == 0)
-			{
-				//余計な処理しないように切っておく(本来はアップデート自体止めるのがいいんだけどバグ落ちする)
-				m_PlayerHitFlg = false;
-			}
-			m_PlayerHitNum = 0;
-		}
+		
+		////取得
+		//auto PtrCol = GetComponent<CollisionSphere>();
+		//
+		//		if (!(PtrCol->GetUpdateActive())) {
+		//			PtrCol->SetFixed(false);
+		//		}
+		//
+		////プレイヤーが１体以上当たってるときのみ処理
+		//if (m_PlayerHitFlg)
+		//{
+		//	//プレイヤーが当たってる数が２体
+		//	if (m_PlayerHitNum == 2)
+		//	{
+		//		//Aボタン押されてるかの処理はいらん。Aはなされなければ引かれないしな
+		//		CheckGo();
+		//	}
+		//	//なんにも当たってなければ
+		//	else if(m_PlayerHitNum == 0)
+		//	{
+		//		//余計な処理しないように切っておく(本来はアップデート自体止めるのがいいんだけどバグ落ちする)
+		//		m_PlayerHitFlg = false;
+		//	}
+		//	m_PlayerHitNum = 0;
+		//}
 	}
 
 	void StageBox::OnCollisionExcute(vector<shared_ptr<GameObject>>& OtherVec)
@@ -724,7 +1280,7 @@ namespace basecross
 
 		//いったんアップデート止める
 		GetStage()->GetSharedGameObject<SelectPlayer>(L"SelectPlayer", false)->SetPlayerUpdate(false);
-
+		
 		//確認ウィンドウ起動
 		GetStage()->GetSharedGameObject<GoStageCheck>(L"GoStageCheck", false)->OpenCheck();
 		GetStage()->GetSharedGameObject<GoStageCheck>(L"GoStageCheck", false)->SetStageNumber(m_stagenumber);
@@ -846,6 +1402,8 @@ namespace basecross
 		{
 			//コントローラ取得
 			auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+			auto KeylVec = App::GetApp()->GetInputDevice().GetKeyState();
+
 			if (CntlVec[0].bConnected)
 			{
 				//コントローラーが左に倒されたら
@@ -865,7 +1423,7 @@ namespace basecross
 				}
 
 				//AかBボタン押されたら
-				if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B)
+				if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B || KeylVec.m_bPressedKeyTbl['N'])
 				{
 					switch (m_selectnum)
 					{
@@ -940,8 +1498,12 @@ namespace basecross
 
 		//プレイヤーのアップデート再開
 		GetStage()->GetSharedGameObject<SelectPlayer>(L"SelectPlayer", false)->SetUpdateActive(true);
+		GetStage()->GetSharedGameObject<ModeSelect>(L"Easy", false)->SetUpdateActive(true);
+		GetStage()->GetSharedGameObject<ModeSelect>(L"Normal", false)->SetUpdateActive(true);
+		GetStage()->GetSharedGameObject<ModeSelect>(L"Hard", false)->SetUpdateActive(true);
 		//離れさせる
 		GetStage()->GetSharedGameObject<SelectPlayer>(L"SelectPlayer", false)->SandFinishFlgOn();
+		GetStage()->GetSharedGameObject<SelectPlayer>(L"SelectPlayer", false)->SetChangeNum(3);
 	}
 	//Abe20170421
 
