@@ -268,6 +268,11 @@ namespace basecross
 			//AddGameObject<ButukariEf>()->SetPosScaActive(Vector3(0,5,0),Vector3(1,1,1));
 			//Abe20170609
 
+			//Abe20170612
+			//シールド
+			//SetSharedGameObject(L"Shield",AddGameObject<EnemyShield>(3, Vector3(0, 1, 0), Vector3(1, 1, 1), 1));
+			//Abe20170612
+
 		}
 		catch (...) {
 
@@ -343,6 +348,10 @@ namespace basecross
 			//ライフ減らす
 			GetSharedGameObject<Player_Life>(L"Life")->LifeDown(1);
 
+			//Abe2010612
+			//デバッグシールド減らす
+			//GetSharedGameObject<EnemyShield>(L"Shield")->Damage(10);
+			//Abe2010612
 			//破片
 			//GetSharedGameObject<BakuSanSpawn>(L"BakuSanSpawn", false)->CreateBakusan(20, Vector3(0, 0.5f, -3));
 

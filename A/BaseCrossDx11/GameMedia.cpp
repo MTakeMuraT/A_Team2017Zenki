@@ -329,6 +329,9 @@ namespace basecross {
 		//”wŒiMOD
 		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"GameStage\\Background\\Background_Effect.bmf");
 		App::GetApp()->RegisterResource(L"Background_Model", MadelMesh);
+		//‘•b
+		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Enemy\\Shield\\Shild_Player_Sub.bmf");
+		App::GetApp()->RegisterResource(L"Shield_Model", MadelMesh);
 
 		//Abe20170605
 		//ƒp[ƒcŒQ
