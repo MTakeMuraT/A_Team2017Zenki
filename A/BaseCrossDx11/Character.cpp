@@ -3356,10 +3356,10 @@ namespace basecross {
 				//移動
 				Vector3 pos = m_RankSp->GetComponent<Transform>()->GetPosition();
 				pos.y += 300 * App::GetApp()->GetElapsedTime();
-				if (pos.y > 200)
+				if (pos.y > 150)
 				{
 					//高さ固定
-					pos.y = 200;
+					pos.y = 150;
 
 					//状態移動
 					m_State = 14;
@@ -3722,7 +3722,7 @@ namespace basecross {
 		auto enemys = GetStage()->AddGameObject<GameObject>();
 		auto TransEN = enemys->AddComponent<Transform>();
 		TransEN->SetPosition(250, -50, 0);
-		TransEN->SetScale(700, 600, 1);
+		TransEN->SetScale(780, 500, 1);
 		TransEN->SetRotation(0, 0, 0);
 
 		auto DrawEN = enemys->AddComponent<PCTSpriteDraw>();
@@ -3735,22 +3735,22 @@ namespace basecross {
 		m_EnemyS = enemys;
 
 		//数字
-		auto num1 = GetStage()->AddGameObject<NumberSprite>(0, Vector2(220, 110), Vector2(100, 100), 8);
+		auto num1 = GetStage()->AddGameObject<NumberSprite>(0, Vector2(220, 90), Vector2(100, 100), 8);
 		num1->SetLayer(8);
 		num1->SetNumDraw(false);
 		m_TackleSp = num1;
 		
-		auto num2 = GetStage()->AddGameObject<NumberSprite>(0, Vector2(520, 110), Vector2(100, 100), 8);
+		auto num2 = GetStage()->AddGameObject<NumberSprite>(0, Vector2(520, 90), Vector2(100, 100), 8);
 		num2->SetLayer(8);
 		num2->SetNumDraw(false);
 		m_ShotSp = num2;
 
-		auto num3 = GetStage()->AddGameObject<NumberSprite>(0, Vector2(220, -190), Vector2(100, 100), 8);
+		auto num3 = GetStage()->AddGameObject<NumberSprite>(0, Vector2(220, -160), Vector2(100, 100), 8);
 		num3->SetLayer(8);
 		num3->SetNumDraw(false);
 		m_TerepoSp = num3;
 
-		auto num4 = GetStage()->AddGameObject<NumberSprite>(0, Vector2(520, -190), Vector2(100, 100), 8);
+		auto num4 = GetStage()->AddGameObject<NumberSprite>(0, Vector2(520, -160), Vector2(100, 100), 8);
 		num4->SetLayer(8);
 		num4->SetNumDraw(false);
 		m_BombSp = num4;
@@ -3758,8 +3758,8 @@ namespace basecross {
 		//ポーズロゴ
 		auto pauselogo = GetStage()->AddGameObject<GameObject>();
 		auto TransPL = pauselogo->AddComponent<Transform>();
-		TransPL->SetPosition(0, 300, 0);
-		TransPL->SetScale(800, 100, 1);
+		TransPL->SetPosition(0, 280, 0);
+		TransPL->SetScale(800, 280, 1);
 		TransPL->SetRotation(0, 0, 0);
 
 		auto DrawPL = pauselogo->AddComponent<PCTSpriteDraw>();
@@ -4252,7 +4252,7 @@ namespace basecross {
 		auto TransSt = stlogo->AddComponent<Transform>();
 		TransSt->SetPosition(0,0,0);
 		TransSt->SetRotation(0, 0, 0);
-		TransSt->SetScale(1500, 500, 1);
+		TransSt->SetScale(1500, 800, 1);
 
 		auto DrawSt = stlogo->AddComponent<PCTSpriteDraw>();
 		DrawSt->SetTextureResource(L"STARTSTARTLOGO_TX");
@@ -4265,9 +4265,9 @@ namespace basecross {
 		//ステージロゴ作成
 		auto stalogo = GetStage()->AddGameObject<GameObject>();
 		auto TransSta = stalogo->AddComponent<Transform>();
-		TransSta->SetPosition(-1000, 200, 0);
+		TransSta->SetPosition(-800, 200, 0);
 		TransSta->SetRotation(0, 0, 0);
-		TransSta->SetScale(400, 100, 1);
+		TransSta->SetScale(700, 300, 1);
 
 		auto DrawSta = stalogo->AddComponent<PCTSpriteDraw>();
 		DrawSta->SetTextureResource(L"STARTSTAGELOGO_TX");
@@ -4278,7 +4278,7 @@ namespace basecross {
 		m_StageLogo = stalogo;
 
 		//数字作成
-		auto nump = GetStage()->AddGameObject<NumberSprite>(0,Vector2(-700,200),Vector2(140,140) , 7);
+		auto nump = GetStage()->AddGameObject<NumberSprite>(0,Vector2(-600,200),Vector2(100,100) , 7);
 		auto ScenePtr = App::GetApp()->GetScene<Scene>();
 		nump->SetNum(ScenePtr->GetStageNum());
 		m_NumSp = nump;
@@ -4367,7 +4367,7 @@ namespace basecross {
 					//数字
 					m_NumSp->MoveNums(Vector3(1000 * App::GetApp()->GetElapsedTime(), 0, 0));
 
-					if (pos.x > -200)
+					if (pos.x > 0)
 					{
 						m_State = 1;
 						m_time = 0;
@@ -4390,7 +4390,7 @@ namespace basecross {
 				if (true)
 				{
 					//実体化
-					m_Alpha += 0.5f * App::GetApp()->GetElapsedTime();
+					m_Alpha += 1.0f * App::GetApp()->GetElapsedTime();
 					m_StartLogo->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_Alpha));
 					
 					m_StageLogo->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, 1 - m_Alpha));
