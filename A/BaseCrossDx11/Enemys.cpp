@@ -2651,9 +2651,10 @@ namespace basecross
 			);
 
 		//Œ©‚½–Ú
-		auto Draw = AddComponent<PNTStaticModelDraw>();
+		auto Draw = AddComponent<PNTBoneModelDraw>();
 		//ƒƒbƒVƒ…Ý’è
 		Draw->SetMeshResource(L"SEARCHDRAWN_MODEL");
+
 		//ƒ‚ƒfƒ‹‘å‚«‚³’²®
 		Draw->SetMeshToTransformMatrix(Mat);
 
