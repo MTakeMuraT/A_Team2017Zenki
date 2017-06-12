@@ -1147,8 +1147,6 @@ namespace basecross {
 	{
 		dmg = true;
 
-
-
 		m_Life += -num;
 		if (m_Life <= 0)
 		{
@@ -1158,7 +1156,12 @@ namespace basecross {
 			//ゲームオーバー関数を呼ぶ
 			dynamic_pointer_cast<GameStage>(GetStage())->GameOver();
 		}
+		else
+		{
+			//死んでなけらばカメラ演出
+			dynamic_pointer_cast<GameStage>(GetStage())->DamageCameraOn();
 
+		}
 		//HP消す
 		for (int i = m_LifeMax - 1; i > m_Life - 1; i--)
 		{
@@ -4276,6 +4279,8 @@ namespace basecross {
 
 		//数字作成
 		auto nump = GetStage()->AddGameObject<NumberSprite>(0,Vector2(-700,200),Vector2(140,140) , 7);
+		auto ScenePtr = App::GetApp()->GetScene<Scene>();
+		nump->SetNum(ScenePtr->GetStageNum());
 		m_NumSp = nump;
 	}
 
@@ -4396,7 +4401,7 @@ namespace basecross {
 					m_StartLogo->GetComponent<Transform>()->SetScale(sca);
 
 					//文字どっか飛ばす
-					m_NumSp->MoveNums(Vector3(2000, -1000, 0) * App::GetApp()->GetElapsedTime());
+					m_NumSp->MoveNums(Vector3(0, 2000, 0) * App::GetApp()->GetElapsedTime());
 					if (sca.x < 50)
 					{
 						m_State = 3;
