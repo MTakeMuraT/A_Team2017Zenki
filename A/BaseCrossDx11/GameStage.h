@@ -62,6 +62,19 @@ namespace basecross
 		//演出に移る時のBGMストップ
 		bool StopBGM = true;
 
+		//Abe20170612
+		//ダメージ揺れる演出
+		bool m_DamageFlg = false;
+		//揺らしてる時間測る
+		float m_damageTime = 0;
+		//揺らす間隔
+		float m_damageinterval = 0.02f;
+		//揺らす回数
+		int m_damageCameraCount = 0;
+		//カメラ揺らす演出
+		void DamageCamera();
+		//Abe20170612
+
 	public:
 		//構築と破棄
 		GameStage() :Stage() {}
@@ -93,6 +106,10 @@ namespace basecross
 		void CameraStop() { m_CameraMoveFlg = false; }
 		//Abe20170530
 
+		//Abe20170612
+		//カメラダメージ演出起動
+		void DamageCameraOn() { m_DamageFlg = true; m_damageCameraCount = 0; m_CameraMoveFlg = false; }
+		//Abe20170612
 
 	};
 

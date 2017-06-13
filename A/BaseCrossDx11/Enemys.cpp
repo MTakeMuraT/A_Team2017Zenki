@@ -102,7 +102,10 @@ namespace basecross
 		m_StageSize = ScenePtr->GetStageSize() / 2;
 		//Abe20170515
 
-
+		//Abe20170612
+		//シールド作成
+		m_Shield = GetStage()->AddGameObject<EnemyShield>(m_Hp-1, Trans->GetPosition(), Trans->GetScale(), m_ParScale);
+		//Abe20170612
 	}
 
 	void TackleEnemy::OnUpdate()
@@ -680,6 +683,8 @@ namespace basecross
 				}
 				else
 				{
+					//シールド破壊
+					m_Shield->Damage(1);
 					m_Hp--;
 					ToMuteki();
 				}
@@ -697,6 +702,9 @@ namespace basecross
 			{
 				m_Hp = 1;
 			}
+
+			//シールド減らす
+			m_Shield->Damage(num);
 
 			ToMuteki();
 		}
@@ -794,6 +802,10 @@ namespace basecross
 		m_SearchCircle = circle;
 		//Abe20170523
 
+		//Abe20170612
+		//シールド作成
+		m_Shield = GetStage()->AddGameObject<EnemyShield>(m_Hp - 1, Trans->GetPosition(), Trans->GetScale(), m_ParScale);
+		//Abe20170612
 	}
 
 	void ShotEnemy::OnUpdate()
@@ -1278,6 +1290,9 @@ namespace basecross
 				}
 				else
 				{
+					//シールド破壊
+					m_Shield->Damage(1);
+
 					m_Hp--;
 					ToMuteki();
 
@@ -1296,6 +1311,9 @@ namespace basecross
 			{
 				m_Hp = 1;
 			}
+
+			//シールド減らす
+			m_Shield->Damage(num);
 
 			ToMuteki();
 		}
@@ -2497,7 +2515,7 @@ namespace basecross
 	{
 		//その他決定
 		m_Scale = Vector3(1, 1, 1);
-		m_BombDistance = 6.0f;
+		m_BombDistance = 8.0f;
 		m_Power = 3.0f;
 		m_ExplosionTime = 3.0f;
 	}
@@ -2651,9 +2669,10 @@ namespace basecross
 			);
 
 		//見た目
-		auto Draw = AddComponent<PNTStaticModelDraw>();
+		auto Draw = AddComponent<PNTBoneModelDraw>();
 		//メッシュ設定
 		Draw->SetMeshResource(L"SEARCHDRAWN_MODEL");
+
 		//モデル大きさ調整
 		Draw->SetMeshToTransformMatrix(Mat);
 
@@ -3313,5 +3332,126 @@ namespace basecross
 		}
 	}
 	//Abe20170605
+
+	//Abe20170612
+	//************************************
+	//　シールド
+	//************************************
+	EnemyShield::EnemyShield(const shared_ptr<Stage>& StagePtr,int num, Vector3 pos, Vector3 sca,float half) :
+		GameObject(StagePtr),
+		m_ShieldAmout(num),
+		m_ShieldPos(pos),
+		m_ShieldScale(sca),
+		m_Half(half)
+	{}
+
+	void EnemyShield::OnCreate()
+	{
+		//シールドの数を保存
+		m_NowShieldNum = m_ShieldAmout;
+		//回数分シールド作成
+		for (int i = 0; i < m_ShieldAmout; i++)
+		{
+			float angle = 360 / m_ShieldAmout * i;
+
+			Vector3 pos = m_ShieldPos;
+			
+			pos += Vector3(cos(angle*3.14159265f / 180), 0, sin(angle*3.14159265f / 180)) * m_Half;
+
+			auto obj = GetStage()->AddGameObject<GameObject>();
+			auto Trans = obj->AddComponent<Transform>();
+			Trans->SetPosition(pos);
+			Trans->SetRotation(0, -angle*3.14159265f / 180, 0);
+			Trans->SetScale(m_ShieldScale);
+
+			auto Draw = obj->AddComponent<PNTStaticModelDraw>();
+			Draw->SetMeshResource(L"Shield_Model");
+			//透明不可
+			//Draw->SetDiffuse(Color4(1, 1, 1, 0.5f));
+			//モデルとトランスフォームの間の差分
+			Matrix4X4 Mat;
+			Mat.DefTransformation(
+				Vector3(0.5f, 0.5f, 0.5f),
+				Vector3(0.0f, -90 * 3.14159265f / 180, 0.0f),
+				Vector3(0.0f, 0.0f, 0.0f)
+				);
+			//モデル大きさ調整
+			Draw->SetMeshToTransformMatrix(Mat);
+
+			//obj->SetAlphaActive(true);
+
+			m_ShieldS.push_back(obj);
+			m_ShieldAngleS.push_back(angle);
+		}
+	}
+
+	void EnemyShield::OnUpdate()
+	{
+		for (int i = 0; i < m_ShieldS.size(); i++)
+		{
+			//回転(数値的に)させる
+			m_ShieldAngleS[i] += 180 * App::GetApp()->GetElapsedTime();
+			float angle = m_ShieldAngleS[i];
+
+			//回転移動
+			Vector3 pos = m_ShieldPos;
+			Vector3 pluspos = Vector3(cos(angle*3.14159265f / 180), 0, sin(angle*3.14159265f / 180)) * m_Half;
+			pos += pluspos;
+			m_ShieldS[i]->GetComponent<Transform>()->SetPosition(pos);
+			//回転
+			Vector3 rot = Vector3(0, -m_ShieldAngleS[i] * 3.14159265f / 180, 0);
+			m_ShieldS[i]->GetComponent<Transform>()->SetRotation(rot);
+		}
+	}
+
+	void EnemyShield::SetPos(Vector3 inVec3)
+	{
+		m_ShieldPos = inVec3;
+	}
+
+	void EnemyShield::Damage(int dam)
+	{
+		//自分のシールドが1個以上かつ、減らした分が1個以上残る場合
+		if (m_NowShieldNum > 0 && m_NowShieldNum - dam > 0)
+		{
+			//ダメージ喰らった分消す
+			int deletecount = 0;
+			while (deletecount < dam)
+			{
+				for (int i = 0; i < m_ShieldS.size(); i++)
+				{
+					//描画されてたら消す
+					if (m_ShieldS[i]->GetDrawActive())
+					{
+						//消した数数える
+						deletecount++;
+						//消す
+						m_ShieldS[i]->SetDrawActive(false);
+
+						//数減らす
+						m_NowShieldNum--;
+						break;
+					}
+
+					//最後まで来たら
+					if (i >= m_ShieldS.size())
+					{
+						//消したことにして処理終了
+						deletecount = dam;
+					}
+
+				}
+			}
+		}
+		else
+		{
+			//一応全部消す
+			for (int i = 0; i < m_ShieldS.size(); i++)
+			{
+				m_ShieldS[i]->SetDrawActive(false);
+			}
+		}
+	}
+	//Abe20170612
 
 }

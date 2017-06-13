@@ -20,6 +20,41 @@ enum EnemyState
 
 namespace basecross
 {
+
+	//Abe20170612
+	//************************************
+	//　シールド
+	//************************************
+	class EnemyShield : public GameObject
+	{
+	private:
+		//シールドの数
+		int m_ShieldAmout = 0;
+		//シールド
+		vector<shared_ptr<GameObject>> m_ShieldS;
+		//シールドの角度
+		vector<float> m_ShieldAngleS;
+		//シールドの中心座標
+		Vector3 m_ShieldPos;
+		//シールドの大きさ
+		Vector3 m_ShieldScale;
+		//中心からの距離
+		float m_Half;
+
+		//現在のシールドの数
+		int m_NowShieldNum;
+	public:
+		EnemyShield(const shared_ptr<Stage>& StagePtr, int num, Vector3 pos, Vector3 sca, float half);
+
+		void OnCreate() override;
+		void OnUpdate() override;
+
+		void SetPos(Vector3 pos);
+
+		void Damage(int dam);
+	};
+	//Abe20170612
+
 	//************************************
 	//	突撃エネミー
 	//	索敵で引っかかったプレイヤーを狙う。たぶん同時に入ったら２体目を狙う
@@ -113,6 +148,10 @@ namespace basecross
 		void ChangeAnimation(string);
 		//Abe20170526
 
+		//Abe20170612
+		//シールド
+		shared_ptr<EnemyShield> m_Shield;
+		//Abe20170612
 	public :
 		//引数 位置(pos)、大きさ(parscale)、HP(hp)、索敵距離(serchdistance)、クールタイム(cooltime)、速度(speed)、攻撃力(power)、突撃回数(tacklecount)
 		TackleEnemy(const shared_ptr<Stage>& StagePtr,Vector3 pos,float parscale,int hp,float searchdistance,float cooltime,float speed,int power,int tacklecount);
@@ -236,6 +275,12 @@ namespace basecross
 		float m_ShotChildInterval;
 		//発射数(ミサイル)
 		int m_ShotAmount;
+
+		//Abe20170612
+		//シールド
+		shared_ptr<EnemyShield> m_Shield;
+		//Abe20170612
+
 	public:
 		//引数 位置(pos)、大きさ(parscale)、HP(hp)、索敵距離(serchdistance)、クールタイム(cooltime)、攻撃力(power)、子機発射間隔(shotchildinterval)、発射数(shotamount)
 		ShotEnemy(const shared_ptr<Stage>& StagePtr, Vector3 pos, float parscale, int hp, float searchdistance, float cooltime,int power, float shotchildinterval,int shotamount);

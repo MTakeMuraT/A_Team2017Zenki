@@ -311,7 +311,7 @@ namespace basecross {
 		MadelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Enemy\\EnemyModel\\Missile_Enemy\\Missile_Enemy.bmf");
 		App::GetApp()->RegisterResource(L"MISSILE_MODEL", MadelMesh);
 		//ドローン
-		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Enemy\\EnemyModel\\Dorawn\\Dorawn.bmf");
+		MadelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Enemy\\EnemyModel\\Dorawn\\Dorawn.bmf");
 		App::GetApp()->RegisterResource(L"SEARCHDRAWN_MODEL", MadelMesh);
 		//自爆エネミー
 		MadelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Enemy\\EnemyModel\\BombEnemy\\Suicide_bomb.bmf");
@@ -329,6 +329,9 @@ namespace basecross {
 		//背景MOD
 		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"GameStage\\Background\\Background_Effect.bmf");
 		App::GetApp()->RegisterResource(L"Background_Model", MadelMesh);
+		//装甲
+		MadelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Enemy\\Shield\\Shild_Player_Sub.bmf");
+		App::GetApp()->RegisterResource(L"Shield_Model", MadelMesh);
 
 		//Abe20170605
 		//パーツ群

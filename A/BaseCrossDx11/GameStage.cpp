@@ -268,6 +268,11 @@ namespace basecross
 			//AddGameObject<ButukariEf>()->SetPosScaActive(Vector3(0,5,0),Vector3(1,1,1));
 			//Abe20170609
 
+			//Abe20170612
+			//シールド
+			//SetSharedGameObject(L"Shield",AddGameObject<EnemyShield>(3, Vector3(0, 1, 0), Vector3(1, 1, 1), 1));
+			//Abe20170612
+
 		}
 		catch (...) {
 
@@ -343,6 +348,10 @@ namespace basecross
 			//ライフ減らす
 			GetSharedGameObject<Player_Life>(L"Life")->LifeDown(1);
 
+			//Abe2010612
+			//デバッグシールド減らす
+			//GetSharedGameObject<EnemyShield>(L"Shield")->Damage(10);
+			//Abe2010612
 			//破片
 			//GetSharedGameObject<BakuSanSpawn>(L"BakuSanSpawn", false)->CreateBakusan(20, Vector3(0, 0.5f, -3));
 
@@ -367,6 +376,12 @@ namespace basecross
 		{
 			//カメラ更新
 			UpdateCamera();
+		}
+		//ダメージ受けてるとき
+		if (m_DamageFlg)
+		{
+			//ダメージカメラ
+			DamageCamera();
 		}
 	}
 
@@ -408,6 +423,8 @@ namespace basecross
 		CameraP->SetEye(Pos);
 		CameraP->SetAt(At);
 	}
+
+
 	GameStage::~GameStage() {
 		if (StopBGM == true) {
 			//m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
@@ -515,6 +532,52 @@ namespace basecross
 
 	}
 	//Abe20170531
+
+	//Abe20170612
+	//ダメージカメラ演出
+	void GameStage::DamageCamera()
+	{
+		m_CameraMoveFlg = false;
+
+		m_damageTime += App::GetApp()->GetElapsedTime();
+		if (m_damageTime > m_damageinterval)
+		{
+			//計算用時間
+			m_damageTime = 0;
+
+			//揺らすカウント
+			m_damageCameraCount++;
+
+			//カメラ揺らす
+			auto View = GetView();
+			auto CameraP = View->GetTargetCamera();
+			//座標
+			Vector3 pos = CameraP->GetEye();
+			Vector3 at = CameraP->GetAt();
+
+			Vector3 randvec3 = Vector3((rand() % 30 - 15) / 10, 0, (rand() % 30 - 15) / 10);
+			pos += randvec3;
+			at += randvec3;
+
+			//カメラ移動
+			CameraP->SetEye(pos);
+			CameraP->SetAt(at);
+
+			//指定回数分回ったら
+			if (m_damageCameraCount >= 5)
+			{
+				m_DamageFlg = false;
+				m_damageCameraCount = 0;
+				m_CameraMoveFlg = true;
+
+			}
+		}
+		else if (m_damageTime > m_damageinterval/2)
+		{
+			m_CameraMoveFlg = true;
+		}
+	}
+	//Abe20170612
 
 	//////////////////////////////////////////////////////////////////
 	// class Ground_GameStage : public GameObject
