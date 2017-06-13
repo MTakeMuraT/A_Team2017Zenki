@@ -205,6 +205,14 @@ namespace basecross
 		//難易度の移動終わりのフラグ
 		bool m_ModeMoveEnd = true;
 		bool m_GetModeflg = true;
+		bool m_StageMoveEnd = true;
+		//スティックが元に戻った（0.2より小さい-0.2より大きい）
+		bool m_StickDown = false;
+		//押され続けてたときのflg
+		bool m_APush = false;
+		bool m_KeepApudh = false;
+		//Aが押し続けてなければfalseになり押し続けている検証をしない
+		bool m_KeepPushing = true;
 	public:
 		StageModeControl(const shared_ptr<Stage>& StagePtr);
 		~StageModeControl() {};
@@ -246,6 +254,8 @@ namespace basecross
 		void InitSetOther();
 		//難易度の回転が終わったときのフラグ
 		bool ModeMoveEnd() { return m_ModeMoveEnd; };
+		bool StageEndMove() { return m_StageMoveEnd; };
+
 	};
 
 	//--------------------------------------------------------------------------------------
@@ -276,11 +286,9 @@ namespace basecross
 		bool m_RotLeftflg = false;
 		//移動が終わっているか？
 		bool m_EndMove = true;
-		bool m_CenterMoveEnd = true;
-		bool m_RightMoveEnd = true;
-		bool m_LeftMoveEnd = true;
-		bool m_MoveSidFlgEnd = true;
-		bool m_Leftflg = true;
+		//コントローラの連続入力の防止
+		bool m_StickDown = false;
+		
 	public:
 		ModeSelect(const shared_ptr<Stage>& StagePtr, const Vector3& Pos, const Vector3& Scale, const int& ModeNum, const bool& Centerflg, const int& MoveNum);
 		~ModeSelect() {};
@@ -304,13 +312,8 @@ namespace basecross
 		//右に移動
 		void RightMove();
 		//移動が終わったか？ゲッター 終わってたらtrue 終わってなかったらfalse
-		bool EndMove();
-
-		bool GetCenterMoveEnd() { return m_CenterMoveEnd; };
-		bool GetRightMoveEnd() { return m_RightMoveEnd; };
-		bool GetLeftMoveEnd() { return  m_LeftMoveEnd; };
-		bool GetSidMoveEnd() { return m_MoveSidFlgEnd; };
-		void SetLeftflg(bool flg) { m_Leftflg = flg; };
+		bool EndMove() {return m_EndMove;};
+		
 	};
 
 	//--------------------------------------------------------------------------------------
@@ -381,6 +384,12 @@ namespace basecross
 		//自爆
 		shared_ptr<NumberSprite> m_BombNumSpr;
 		//Abe20170525
+		bool m_Closeflg = true;
+		//押され続けてたときのflg
+		bool m_APush = false;
+		bool m_KeepApudh = false;
+		//Aが押し続けてなければfalseになり押し続けている検証をしない
+		bool m_KeepPushing = true;
 	public :
 		GoStageCheck(const shared_ptr<Stage>& StagePtr, Vector2 scale);
 
@@ -404,6 +413,8 @@ namespace basecross
 		void SetEnemyNum(int tackle, int shot, int terepo, int bomb);
 		//Abe20170525
 
+		bool GetCloseflg() { return m_Closeflg; };
+		void SetCloseflg(bool flg) { m_Closeflg = flg; };
 	};
 	//Abe20170421
 

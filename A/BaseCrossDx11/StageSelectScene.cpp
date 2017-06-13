@@ -154,9 +154,9 @@ namespace basecross {
 	{
 		try {
 			////ŒŸØ‚·‚é‚Ì‚Éd‚¢‚Ì‚Åˆê“I‚ÉÁ‚µ‚Ü‚· Abe20170505
-			//m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
-			//m_AudioObjectPtr->AddAudioResource(L"StageSelect_01_BGM");
-			//m_AudioObjectPtr->Start(L"StageSelect_01_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);
+			/*m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
+			m_AudioObjectPtr->AddAudioResource(L"StageSelect_01_BGM");
+			m_AudioObjectPtr->Start(L"StageSelect_01_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);*/
 			
 			CreateViewLight();
 			//CreatTestLin();

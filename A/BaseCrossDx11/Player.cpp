@@ -809,6 +809,7 @@ namespace basecross {
 		//Aが話されたら攻撃ステートに移動
 		if (!(CntlVec[0].wButtons& XINPUT_GAMEPAD_A)) {
 			if (m_DamePower) {
+
 				GetStateMachine_Manager()->ChangeState(ToAttractState_Manager::Instance());
 			}
 			else {
@@ -841,7 +842,48 @@ namespace basecross {
 		m_LimitTime += App::GetApp()->GetElapsedTime();
 
 
+
 		if (1.5 > abs(Distance_Vec3.x) && 1.5 > abs(Distance_Vec3.z)) {
+
+			//Abe20170609
+			auto group = GetStage()->GetSharedObjectGroup(L"ButukariEFGroup")->GetGroupVector();
+			bool flg = false;
+			for (auto obj : group)
+			{
+				auto ptr = dynamic_pointer_cast<ButukariEf>(obj.lock());
+				if (ptr)
+				{
+					if (ptr->GetDrawActive())
+					{
+						//中心点設定
+						Vector3 pos = GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_L")->GetComponent<Transform>()->GetPosition() + GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_R")->GetComponent<Transform>()->GetPosition();
+						pos /= 2;
+						pos.y = 0.1;
+
+						Vector3 sca = Vector3(2.0f, 2.0f, 2.0f);// +Vector3(((rand() % 60) - 15) / 10, ((rand() % 15) - 15) / 10, ((rand() % 15) - 15) / 10);
+						ptr->SetPosScaActive(pos, sca);
+
+						flg = true;
+						break;
+					}
+				}
+
+			}
+			if (!flg)
+			{
+				auto obj = GetStage()->AddGameObject<ButukariEf>();
+				//中心点設定
+				Vector3 pos = GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_L")->GetComponent<Transform>()->GetPosition() + GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_R")->GetComponent<Transform>()->GetPosition();
+				pos /= 2;
+				pos.y = 0.1;
+
+				Vector3 sca = Vector3(2.0f, 2.0f, 2.0f);// +Vector3(((rand() % 60) - 15) / 10, ((rand() % 60) - 15) / 10, ((rand() % 60) - 15) / 10);
+
+				obj->SetPosScaActive(pos, sca);
+
+				GetStage()->GetSharedObjectGroup(L"ButukariEFGroup")->IntoGroup(obj);
+			}
+			//Abe20170609
 
 			//SE
 			auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
