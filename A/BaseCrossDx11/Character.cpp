@@ -1579,6 +1579,7 @@ namespace basecross {
 			//Abe20170504
 			//アタリ判定するオブジェクトにいれてやるやり方やってみるのでちょいと変更します
 			auto ColGroup = GetStage()->GetSharedObjectGroup(L"CollisionGroup");
+			/*
 			auto obj = GetStage()->AddGameObject<ShotEnemyChildMissile>(
 				Vector3(GetPos(true)),
 				Vector3(0.8, 0.8, 0.8),
@@ -1591,6 +1592,19 @@ namespace basecross {
 				Vector3(0, 0, 0),
 				m_getCenter);
 			ColGroup->IntoGroup(obj);
+			*/
+
+			//Abe20170614
+			auto obj = GetStage()->AddGameObject<Missile>();
+			m_getCenter.y = 0;
+			obj->SetMissileActive(GetPos(true), Vector3(0.8f, 0.8f, 0.8f), m_getCenter*5, false,1);
+			
+			ColGroup->IntoGroup(obj);
+			auto obj2 = GetStage()->AddGameObject<Missile>();
+			obj->SetMissileActive(GetPos(false), Vector3(0.8f, 0.8f, 0.8f), m_getCenter*5, false, 1);
+			ColGroup->IntoGroup(obj2);
+			//Abe20170614
+
 			//Abe20170504
 
 		}
@@ -1649,8 +1663,8 @@ namespace basecross {
 	}
 	void ShotEnemyChildMissile::OnUpdate() {
 		if (m_ShotActive) {
-			ChildMissileMove();
-			ObjDelete();
+			//ChildMissileMove();
+			//ObjDelete();
 		}
 	}
 	void ShotEnemyChildMissile::ChildMissileMove() {
