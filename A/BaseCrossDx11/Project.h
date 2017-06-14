@@ -18,6 +18,7 @@
 #include "TitleScene.h"
 #include "StageSelectScene.h"
 #include "GameStage.h"
+#include "Tutorial.h"
 //オブジェ
 #include "Character.h"
 //アタリ判定
