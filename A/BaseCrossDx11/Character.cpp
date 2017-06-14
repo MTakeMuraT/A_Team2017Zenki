@@ -3287,8 +3287,9 @@ namespace basecross {
 
 					m_White12 = obj2;
 
+					//“§–¾“xÝ’è
 					m_BlackAlpha = 1;
-
+					m_RankAlpha = 1;
 				}
 				m_RankSp->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_RankAlpha));
 

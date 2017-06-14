@@ -755,7 +755,7 @@ namespace basecross
 
 		//ˆÈ‰ºƒpƒ‰ƒ[ƒ^
 		//UŒ‚—Í
-		int m_power = 0;
+		int m_power = 1;
 	public :
 		Missile(const shared_ptr<Stage>& StagePtr);
 

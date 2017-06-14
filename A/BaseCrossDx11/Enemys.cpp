@@ -174,6 +174,8 @@ namespace basecross
 
 			//回転
 			Rot();
+			//シールド移動
+			m_Shield->SetPos(GetComponent<Transform>()->GetPosition());
 
 			//アニメーション更新
 			float ElapsedTime = App::GetApp()->GetElapsedTime();
@@ -2965,6 +2967,10 @@ namespace basecross
 
 		m_Shadow = circle;
 		//Abe20170519
+
+		//Abe20170614
+		m_power = 1;
+		//Abe20170614
 	}
 
 	void Missile::OnUpdate()
