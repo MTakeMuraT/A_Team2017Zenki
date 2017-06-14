@@ -1597,11 +1597,11 @@ namespace basecross {
 			//Abe20170614
 			auto obj = GetStage()->AddGameObject<Missile>();
 			m_getCenter.y = 0;
-			obj->SetMissileActive(GetPos(true), Vector3(0.8f, 0.8f, 0.8f), m_getCenter*5, false,1);
+			obj->SetMissileActive(GetPos(true), Vector3(0.8f, 0.8f, 0.8f), m_getCenter * 10, false, 1);
 			
 			ColGroup->IntoGroup(obj);
 			auto obj2 = GetStage()->AddGameObject<Missile>();
-			obj->SetMissileActive(GetPos(false), Vector3(0.8f, 0.8f, 0.8f), m_getCenter*5, false, 1);
+			obj->SetMissileActive(GetPos(false), Vector3(0.8f, 0.8f, 0.8f), m_getCenter * 10, false, 1);
 			ColGroup->IntoGroup(obj2);
 			//Abe20170614
 

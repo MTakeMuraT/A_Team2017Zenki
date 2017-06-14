@@ -771,7 +771,7 @@ namespace basecross
 		//プレイヤーに攻撃した場合
 		void ToDamagePleyer();
 
-		int GetPower() { return m_power; DeleteMissile()}
+		int GetPower() { DeleteMissile(); return m_power;  }
 
 		//属性アクセサー
 		int GetZokusei() { return m_Zokusei; }
