@@ -1446,7 +1446,27 @@ namespace basecross {
 			m_DeleteTime += App::GetApp()->GetElapsedTime();
 			if (m_DeleteTime > 5.0f)
 			{
+				m_ShotFlg = false;
+				m_DeleteTime = 0;
+				SetUpdateActive(false);
 				SetDrawActive(false);
+				
+				bool flg = false;
+				for (auto obj : GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->GetGroupVector())
+				{
+					auto ptr = dynamic_pointer_cast<BakusanEF>(obj.lock());
+					if (ptr)
+					{
+						ptr->SetPosScaActive(GetComponent<Transform>()->GetPosition(), Vector3(2, 2, 2));
+						flg = true;
+						break;
+					}
+				}
+				if (!flg)
+				{
+					auto obj = GetStage()->AddGameObject<BakusanEF>();
+					obj->SetPosScaActive(GetComponent<Transform>()->GetPosition(), Vector3(2, 2, 2));
+				}
 			}
 			//Abe20170614
 
@@ -1482,7 +1502,7 @@ namespace basecross {
 		{
 			m_ShotFlg = true;
 		}
-		m_time = 0;
+		m_DeleteTime = 0;
 
 	}
 	//Abe20170517

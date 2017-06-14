@@ -604,6 +604,9 @@ namespace basecross{
 		void SetVelocity(Vector3 vel)
 		{
 			m_Velocity = vel;
+			//m_ShotFlg = true;
+			SetUpdateActive(true);
+			SetDrawActive(true);
 		}
 		//Abe20170517
 
