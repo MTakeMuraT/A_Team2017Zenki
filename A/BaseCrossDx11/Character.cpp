@@ -4267,7 +4267,7 @@ namespace basecross {
 		auto TransSt = stlogo->AddComponent<Transform>();
 		TransSt->SetPosition(0,0,0);
 		TransSt->SetRotation(0, 0, 0);
-		TransSt->SetScale(1500, 800, 1);
+		TransSt->SetScale(30, 16, 1);
 
 		auto DrawSt = stlogo->AddComponent<PCTSpriteDraw>();
 		DrawSt->SetTextureResource(L"STARTSTARTLOGO_TX");
@@ -4412,12 +4412,12 @@ namespace basecross {
 
 					//¬‚³‚­
 					Vector3 sca = m_StartLogo->GetComponent<Transform>()->GetScale();
-					sca *= 0.95f;
+					sca *= 1.05f;
 					m_StartLogo->GetComponent<Transform>()->SetScale(sca);
 
 					//•¶Žš‚Ç‚Á‚©”ò‚Î‚·
 					m_NumSp->MoveNums(Vector3(0, 2000, 0) * App::GetApp()->GetElapsedTime());
-					if (sca.x < 50)
+					if (sca.x > 2000)
 					{
 						m_State = 3;
 						m_StageLogo->SetDrawActive(false);
