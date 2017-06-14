@@ -297,6 +297,19 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"STARTSTAGELOGO_TX", strTexture);
 		//Abe20170609
 
+		//Abe20170614
+		//タイトル土台
+		strTexture = DataDir + L"Title_Lin\\DODAI.png";
+		App::GetApp()->RegisterTexture(L"TITLEDODAI_TX", strTexture);
+		//ゲームスタート
+		strTexture = DataDir + L"Title_Lin\\Game_start.png";
+		App::GetApp()->RegisterTexture(L"TITLEGAMESTART_TX", strTexture);
+		//チュートリアル
+		strTexture = DataDir + L"Title_Lin\\Tutorial.png";
+		App::GetApp()->RegisterTexture(L"TITLETUTORIAL_TX", strTexture);
+		//Abe20170614
+
+
 		////モデル（ボーンあり
 		auto MadelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Player\\PlayerModel\\Player_animation.bmf");
 		App::GetApp()->RegisterResource(L"Player_Model", MadelMesh);

@@ -22,8 +22,8 @@ namespace basecross{
 			srand((unsigned)time(NULL));
 
 			//最初のアクティブステージの設定
-			//ResetActiveStage<TitleScene>();
 			ResetActiveStage<TitleScene>();
+			//ResetActiveStage<StageSelectScene>();
 
 		}
 		catch (...) {
@@ -48,7 +48,10 @@ namespace basecross{
 		if (event->m_MsgStr == L"ToGameStage") {
 			ResetActiveStage<GameStage>();
 		}
-	
+		if (event->m_MsgStr == L"ToTutorial") {
+			ResetActiveStage<TutorialScene>();
+		}
+
 	}
 
 
