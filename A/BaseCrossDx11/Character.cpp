@@ -1441,6 +1441,15 @@ namespace basecross {
 		if (m_ShotFlg)
 		//Abe20170517
 		{
+			//Abe20170614
+			//ŽžŠÔ‚½‚Á‚½‚çÁ‚¦‚é
+			m_DeleteTime += App::GetApp()->GetElapsedTime();
+			if (m_DeleteTime > 5.0f)
+			{
+				SetDrawActive(false);
+			}
+			//Abe20170614
+
 			DoingSandRotation();
 			ShotEnemyChildRot();
 			PintNewPos();
@@ -1473,7 +1482,7 @@ namespace basecross {
 		{
 			m_ShotFlg = true;
 		}
-
+		m_time = 0;
 
 	}
 	//Abe20170517

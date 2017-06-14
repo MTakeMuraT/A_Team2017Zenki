@@ -550,6 +550,12 @@ namespace basecross{
 		//‰Á‘¬“x
 		Vector3 m_Velocity;
 		//Abe20170517
+
+		//Abe20170614
+		//ŒvŽZ—pŽžŠÔ
+		float m_DeleteTime = 0;
+		//Abe20170614
+
 	public:
 		ShotEnemyChild(const shared_ptr<Stage>& StagePtr, const Vector3& Position, const Vector3& Scale, const float& ShotInterval);
 		ShotEnemyChild(const shared_ptr<Stage>& StagePtr, const wstring& line);
