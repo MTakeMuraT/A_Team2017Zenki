@@ -336,6 +336,7 @@ namespace basecross
 				}
 			}
 		}
+
 		//ƒL[‚Ì“ü—Í
 		auto KeylVec = App::GetApp()->GetInputDevice().GetKeyState();
 		if (KeylVec.m_bPressedKeyTbl['A']) {

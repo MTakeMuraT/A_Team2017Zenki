@@ -309,6 +309,12 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"TITLETUTORIAL_TX", strTexture);
 		//Abe20170614
 
+		//Abe20170615
+		//チュートリアルのターゲット
+		strTexture = DataDir + L"Tutorial\\Target.png";
+		App::GetApp()->RegisterTexture(L"TUTORIALTARGET_TX", strTexture);
+		//Abe20170615
+
 
 		////モデル（ボーンあり
 		auto MadelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Player\\PlayerModel\\Player_animation.bmf");
