@@ -48,6 +48,45 @@ namespace basecross
 		SetSharedGameObject(L"MoveTarget", obj);
 	}
 
+	//回転時間計測オブジェクト作成
+	void TutorialScene::CreateRotCount()
+	{
+		auto obj = AddGameObject<TutorialRotFixed>();
+		SetSharedGameObject(L"TutorialRotFixed", obj);
+	}
+
+	//スプライトを作成
+	void TutorialScene::CreateSpriteS()
+	{
+		auto obj = AddGameObject<TutorialSpriteS>();
+		SetSharedGameObject(L"TutorialSpriteS", obj);
+	}
+
+	//エネミー作成
+	void TutorialScene::CreateEnemy()
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			auto obj = AddGameObject<TutorialEnemy>();
+			switch (i)
+			{
+			case 0:
+				obj->SetPos(Vector3(0, -2, 10));
+				break;
+			case 1:
+				obj->SetPos(Vector3(5, -2, -5));
+				break;
+			case 2:
+				obj->SetPos(Vector3(-3, -2, -5));
+				break;
+			}
+			GetSharedObjectGroup(L"TutorialEnemyGroup")->IntoGroup(obj);
+		}
+
+		//ついでに破片とかのマネージャー作っとく
+		SetSharedGameObject(L"BakuSanSpawn",AddGameObject<BakuSanSpawn>());
+	}
+
 	void TutorialScene::OnCreate()
 	{
 		try 
@@ -60,6 +99,25 @@ namespace basecross
 			CreatePlayer();
 			//移動ターゲット作成
 			CreateMoveTarget();
+			//回転計測オブジェクト作成
+			CreateRotCount();
+			//スプライトたちを作成
+			CreateSpriteS();
+
+			//エネミーのグループ作成
+			CreateSharedObjectGroup(L"TutorialEnemyGroup");
+			//爆発エフェクトグループ
+			CreateSharedObjectGroup(L"BakusanEFGroup");
+			//爆散オブジェクト
+			CreateSharedObjectGroup(L"BakusanObjGroup");
+			
+			//エネミー作成
+			CreateEnemy();
+
+			//カメラ更新
+			m_CameraMoveFlg = true;
+
+			m_EnemyFlg = false;
 		}
 
 		catch (...) {
@@ -69,8 +127,11 @@ namespace basecross
 
 	void TutorialScene::OnUpdate()
 	{
-		//カメラ更新
-		UpdateCamera();
+		if (m_CameraMoveFlg)
+		{
+			//カメラ更新
+			UpdateCamera();
+		}
 
 		//デバック********************************
 		//キーの入力
@@ -81,6 +142,22 @@ namespace basecross
 			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToTutorial");
 		}
 
+		if (m_EnemyFlg)
+		{
+			//エネミーの数数えていなくなったら演出起動
+			int count = 0;
+			for (auto obj : GetSharedObjectGroup(L"TutorialEnemyGroup")->GetGroupVector())
+			{
+				if (dynamic_pointer_cast<GameObject>(obj.lock())->GetDrawActive())
+				{
+					count++;
+				}
+			}
+			if (count == 0 && !GetSharedGameObject<ResultS>(L"Result",false))
+			{
+				SetSharedGameObject(L"Result",AddGameObject<ResultS>(true));
+			}
+		}
 	}
 
 	//破棄
@@ -128,6 +205,48 @@ namespace basecross
 		CameraP->SetAt(At);
 	}
 
+	//リザルトカメラ制御
+	bool TutorialScene::ResultCamera(Vector3 pos)
+	{
+		auto View = GetView();
+		auto CameraP = View->GetTargetCamera();
+		//座標
+		Vector3 Pos = CameraP->GetEye();
+		//見る部分
+		Vector3 At = CameraP->GetAt();
+
+		//移動
+		Vector3 targetpos = pos;
+		//ちょっと後ろ上にずらす
+		targetpos += Vector3(0, 2, -8);
+		Vector3 dis = targetpos - Pos;
+		dis /= 10;
+		Pos += dis;
+
+		//Atも移動、移動先は(プレイヤーの中心)
+		Vector3 targetAt = pos;
+		//ちょっとずらす
+		targetAt += Vector3(0, 1, 0);
+		Vector3 disAt = targetAt - At;
+		disAt /= 10;
+		At += disAt;
+
+		//目標地点に近ければtrueを返して遠ければカメラを移動してfalseを返す
+		if (abs(targetpos.x - Pos.x) + abs(targetpos.y - Pos.y) + abs(targetpos.z - Pos.z) < 0.1f)
+		{
+			return true;
+		}
+		else
+		{
+			//カメラ移動
+			CameraP->SetEye(Pos);
+			CameraP->SetAt(At);
+
+			return false;
+		}
+
+	}
+
 	//--------------------------------------------------------------------------------------
 	//	こっから下は専用のオブジェクトだぜぇ～？
 	//--------------------------------------------------------------------------------------
@@ -135,6 +254,7 @@ namespace basecross
 	//**************************************************************************************
 	//**************************************************************************************
 
+#pragma region TutorialPlayerS
 
 	//**************************************************************************************
 	//	[TutorialPlayerS]
@@ -170,15 +290,17 @@ namespace basecross
 		//制御系
 		//-----------------------
 		m_moveFlg = true;
-		m_rotFlg = true;
-		m_AButtonFlg = true;
+		m_rotFlg = false;
+		m_AButtonFlg = false;
+
+		m_DontMoveFlg2 = false;
 		//-----------------------------
 
 		for (int i = 0; i < 2; i++)
 		{
 			auto obj = GetStage()->AddGameObject<GameObject>();
 			auto Trans = obj->AddComponent<Transform>();
-			Trans->SetPosition(0, 0, 0);
+			Trans->SetPosition(0, 0.5f, 0);
 			Trans->SetScale(1, 1, 1);
 			Trans->SetRotation(0, 3.14159265f/ 180 * 180 * (1-i), 0);
 
@@ -187,7 +309,7 @@ namespace basecross
 			PlayerMat.DefTransformation(
 				Vector3(1.0, 1.0f, 1.0f),
 				Vector3(0, -90 * 3.14159265f/180, 0),
-				Vector3(0.0f, 90 * 3.14159265f/180, 0.0f)
+				Vector3(0.0f, 0.0f, 0.0f)
 				);
 
 			auto Draw = obj->AddComponent<PNTBoneModelDraw>();
@@ -209,12 +331,18 @@ namespace basecross
 
 			obj->SetAlphaActive(true);
 			obj->SetDrawLayer(3);
+
 			if (i == 0)
 			{
+				GetStage()->SetSharedGameObject(L"GamePlayer_R", obj);
+
 				m_Player1 = obj;
+
 			}
 			else
 			{
+				GetStage()->SetSharedGameObject(L"GamePlayer_L", obj);
+
 				m_Player2 = obj;
 			}
 		}
@@ -243,6 +371,10 @@ namespace basecross
 		//アニメーション更新
 		UpdateAnimation();
 
+		if (m_DontMoveFlg2)
+		{
+			return;
+		}
 		//暗転中は動かせない
 		if (m_DontMoveFlg)
 		{
@@ -455,7 +587,6 @@ namespace basecross
 				m_BlackAlphaFlg = false;
 				m_DontMoveFlg = false;
 			}
-
 		}
 	}
 
@@ -500,7 +631,9 @@ namespace basecross
 		vec3.push_back(m_Player2->GetComponent<Transform>()->GetPosition());
 		return vec3;
 	}
+#pragma endregion
 
+#pragma region MoveTarget
 	//**************************************************************************************
 	//	移動ターゲット
 	//	物だけ
@@ -508,7 +641,7 @@ namespace basecross
 	void MoveTarget::OnCreate()
 	{
 		auto TransTar = AddComponent<Transform>();
-		TransTar->SetPosition(0, 0.5f, 10);
+		TransTar->SetPosition(0, 0.2f, 10);
 		TransTar->SetRotation(90 * 3.14159265f / 180, 0, 0);
 		TransTar->SetScale(7, 7, 7);
 
@@ -520,38 +653,344 @@ namespace basecross
 		SetDrawLayer(1);
 
 		m_Alpha = 1;
+		m_ActiveFlg = true;
 	}
 
 	void MoveTarget::OnUpdate()
 	{
-		//透明に
-		if (!m_AlphaFlg)
+		if (m_ActiveFlg)
 		{
-			m_Alpha += -App::GetApp()->GetElapsedTime();
-			if (m_Alpha < 0.5f)
+			//透明に
+			if (!m_AlphaFlg)
 			{
-				m_Alpha = 0.5f;
-				m_AlphaFlg = true;
+				m_Alpha += -App::GetApp()->GetElapsedTime();
+				if (m_Alpha < 0.5f)
+				{
+					m_Alpha = 0.5f;
+					m_AlphaFlg = true;
+				}
 			}
-		}
-		else
-		{
-			m_Alpha += App::GetApp()->GetElapsedTime();
-			if (m_Alpha > 1.0f)
+			else
 			{
-				m_Alpha = 1.0f;
-				m_AlphaFlg = false;
+				m_Alpha += App::GetApp()->GetElapsedTime();
+				if (m_Alpha > 1.0f)
+				{
+					m_Alpha = 1.0f;
+					m_AlphaFlg = false;
+				}
 			}
-		}
-		GetComponent<PNTStaticDraw>()->SetDiffuse(Color4(1, 1, 1, m_Alpha));
+			GetComponent<PNTStaticDraw>()->SetDiffuse(Color4(1, 1, 1, m_Alpha));
 
-		//プレイヤーがいるか
-		Vector3 pos = GetStage()->GetSharedGameObject<TutorialPlayerS>(L"TutorialPlayerS", false)->GetComponent<Transform>()->GetPosition();
-		Vector3 dis = pos - GetComponent<Transform>()->GetPosition();
+			//プレイヤーがいるか判定
+			Vector3 pos = GetStage()->GetSharedGameObject<TutorialPlayerS>(L"TutorialPlayerS", false)->GetComponent<Transform>()->GetPosition();
+			////カメラの角度からちょっとずれてるのでその分修正
+			Vector3 mypos = GetComponent<Transform>()->GetPosition();
+			////mypos.x += 0.3f;
+			//mypos.z += -0.8f;
+			Vector3 dis = pos - mypos;
 
-		if (abs(dis.x) + abs(dis.z) <= 3.0f)
-		{
-			SetDrawActive(false);
+			if (abs(dis.x) + abs(dis.z) <= 1.0f)
+			{
+				//描画切る
+				SetDrawActive(false);
+				//プレイヤーの移動を制限、回転を解除
+				auto pptr = GetStage()->GetSharedGameObject<TutorialPlayerS>(L"TutorialPlayerS", false);
+				pptr->SetMoveCont(false);
+				pptr->SetRotCont(true);
+
+				//回転計測オブジェクト起動
+
+				GetStage()->GetSharedGameObject<TutorialRotFixed>(L"TutorialRotFixed", false)->StartCount();
+
+				//動きとめる
+				m_ActiveFlg = false;
+			}
+
 		}
 	}
+#pragma endregion
+	
+#pragma region TutorialRotFixed
+	//**************************************************************************************
+	//	回転のみ使える状態の時
+	//	ある程度回転したら解除
+	//**************************************************************************************
+	void TutorialRotFixed::OnCreate()
+	{
+		m_time = 0;
+		m_LimitTime = 3.0f;
+		m_StartFlg = false;
+	}
+
+	void TutorialRotFixed::OnUpdate()
+	{
+		if (m_StartFlg)
+		{
+			//コントローラ取得
+			auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+			if (CntlVec[0].bConnected)
+			{
+				//肩どっちか押されてたら計測
+				if (CntlVec[0].wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER || CntlVec[0].wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
+				{
+					m_time += App::GetApp()->GetElapsedTime();
+					if (m_time > m_LimitTime)
+					{
+						//プレイヤーの移動と回転を制限、Aボタンを解除
+						auto pptr = GetStage()->GetSharedGameObject<TutorialPlayerS>(L"TutorialPlayerS", false);
+						pptr->SetMoveCont(false);
+						pptr->SetRotCont(false);
+						pptr->SetAbuttonCont(true);
+
+						//エネミーを出す
+						auto egv = GetStage()->GetSharedObjectGroup(L"TutorialEnemyGroup")->GetGroupVector();
+						for (auto ob : egv)
+						{
+							auto ptr = dynamic_pointer_cast<TutorialEnemy>(ob.lock());
+							if (ptr)
+							{
+								ptr->Up();
+							}
+						}
+						//一応初期値に
+						m_time = 0;
+						m_StartFlg = false;
+					}
+				}
+			}
+		}
+	}
+
+	void TutorialRotFixed::StartCount()
+	{
+		m_StartFlg = true;
+		//一応
+		m_time = 0;
+	}
+
+#pragma endregion
+
+#pragma region TutorialEnemy
+	//**************************************************************************************
+	//	的エネミー
+	//	死ぬだけ
+	//**************************************************************************************
+	void TutorialEnemy::OnCreate()
+	{
+		//座標、大きさ、回転
+		auto Trans = AddComponent<Transform>();
+		Trans->SetPosition(0, 0.5f, 10);
+		Trans->SetScale(Vector3(1, 1, 1));
+		Trans->SetRotation(0, 90*3.14159265f/180, 0);
+
+		//モデルとトランスフォームの間の差分
+		Matrix4X4 Mat;
+		Mat.DefTransformation(
+			Vector3(1.0, 1.0f, 1.0f),
+			Vector3(0.0f, -90 * 3.14159265f / 180, 0.0f),
+			Vector3(0.0f, 0.0f, 0.0f)
+			);
+
+		//見た目
+		auto Draw = AddComponent<PNTBoneModelDraw>();
+		//メッシュ設定
+		Draw->SetMeshResource(L"TACKLE_MODEL");
+		//モデル大きさ調整
+		Draw->SetMeshToTransformMatrix(Mat);
+
+		//アニメーション追加
+		Draw->AddAnimation(L"Wait", 40, 30, true, 30);
+
+		Draw->ChangeCurrentAnimation(L"Wait");
+
+		//透明処理
+		SetAlphaActive(true);
+
+		//描画切っとく
+		SetDrawActive(false);
+
+		//下から出すフラグきっとく
+		m_UpFlg = false;
+		//挟まれる判定切っとく
+		m_SandJudgeFlg = false;
+	}
+
+	void TutorialEnemy::OnUpdate()
+	{
+		if (m_UpFlg)
+		{
+			Vector3 pos = GetComponent<Transform>()->GetPosition();
+			pos.y += 10 * App::GetApp()->GetElapsedTime();
+			if (pos.y > 0.5f)
+			{
+				m_UpFlg = false;
+				m_SandJudgeFlg = true;
+				pos.y = 0.5;
+			}
+			GetComponent<Transform>()->SetPosition(pos);
+		}
+
+		//挟まれる判定
+		//プレイヤーが挟んだ時に呼ぶのがいいのだがアクセス系統を作るのが時間かかるので省略。そこまで重い処理にはならないはずだからとりあえずスルー
+		if (m_SandJudgeFlg)
+		{
+			//プレイヤーに挟まれてるか
+			Vector3 pos = GetStage()->GetSharedGameObject<TutorialPlayerS>(L"TutorialPlayerS", false)->GetComponent<Transform>()->GetPosition();
+			Vector3 mypos = GetComponent<Transform>()->GetPosition();
+			Vector3 dis = pos - mypos;
+
+			//プレイヤー同士の距離でなんとかとる
+			float pdistance = GetStage()->GetSharedGameObject<TutorialPlayerS>(L"TutorialPlayerS", false)->GetDistance();
+
+			//中心点の距離が自分とある程度近い　かつ　プレイヤー同士の距離が近いで判定
+			if (abs(dis.x) + abs(dis.z) <= 1.0f && pdistance < 2.0f)
+			{
+				//描画消して判定けして位置を下にずらす
+				SetDrawActive(false);
+				m_SandJudgeFlg = false;
+				//爆散作成
+				GetStage()->GetSharedGameObject<BakuSanSpawn>(L"BakuSanSpawn", false)->CreateBakusan(rand() % 25 + 5, GetComponent<Transform>()->GetPosition());
+
+				//爆散エフェクト作成
+				for (int i = 0; i < 3; i++)
+				{
+					auto BakusanGroup = GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->GetGroupVector();
+					bool bakuflg = false;
+					for (auto obj : BakusanGroup)
+					{
+						auto ptr = dynamic_pointer_cast<BakusanEF>(obj.lock());
+						if (!ptr->GetDrawActive())
+						{
+							bakuflg = true;
+							ptr->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+						}
+					}
+					if (!bakuflg)
+					{
+						auto obj = GetStage()->AddGameObject<BakusanEF>();
+						obj->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+						GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->IntoGroup(obj);
+					}
+				}
+
+				mypos.y = -10;
+				GetComponent<Transform>()->SetPosition(mypos);
+
+
+				//エネミーの数数えさせる
+				dynamic_pointer_cast<TutorialScene>(GetStage())->EnemyCountOn();
+			}
+		}
+	}
+
+	void TutorialEnemy::Up()
+	{
+		SetDrawActive(true);
+		m_UpFlg = true;
+	}
+
+#pragma endregion
+
+#pragma region TutorialSpriteS
+	//**************************************************************************************
+	//	スプライトたち
+	//	状態変えて出す
+	//　大体切り替えで２ステート使うのでNextState()で切り替えたときは２個進める
+	//　ここもクリエイトで初期化
+	//**************************************************************************************
+	void TutorialSpriteS::OnCreate()
+	{
+		//-----------------------------
+		//初期化
+
+		//状態
+		m_state = 0;
+		//状態切り替え時
+		m_ChangestateFlg = true;
+		//時間計測用
+		m_time = 0;
+		//切り替え間隔
+		m_IntervalTime = 1.0f;
+		//-----------------------------
+	}
+
+	void TutorialSpriteS::OnUpdate()
+	{
+		switch (m_state)
+		{
+			//左スティックで移動
+		case 0:
+			if (true)
+			{
+				//初回
+				if (m_ChangestateFlg)
+				{
+
+				}
+			}
+			break;
+		case 1:
+			if (true)
+			{
+
+			}
+			break;
+
+			//RB、LBで回転
+		case 2:
+			if (true)
+			{
+				//初回
+				if (m_ChangestateFlg)
+				{
+
+				}
+
+			}
+			break;
+		case 3:
+			if (true)
+			{
+
+			}
+			break;
+
+			//Aボタンで離れる
+		case 4:
+			if (true)
+			{
+				//初回
+				if (m_ChangestateFlg)
+				{
+
+				}
+
+			}
+			break;
+		case 5:
+			if (true)
+			{
+
+			}
+			break;
+		}
+	}
+
+	void TutorialSpriteS::NextSatte()
+	{
+		//まず偶数で計算
+		int nowstate = m_state / 2;
+		int nextstate = (nowstate+1) * 2;
+		//------------------
+		//例えば
+		//0,1のループ2,3のループで設定してたら (0,1)/2 = 0 (2,3)/2 = 1
+		//それに1足して2かければ (0+1)*2 = 2 (1+1)*2 = 4
+		//次のループの状態にはいれるって寸法よ
+		//------------------
+		m_state = nextstate;
+
+		m_ChangestateFlg = true;
+	}
+
+#pragma endregion
 }

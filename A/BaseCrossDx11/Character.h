@@ -975,8 +975,12 @@ namespace basecross{
 		//動かせるか
 		bool m_MoveFlg = true;
 
+
+		//チュートリアル流用フラグ
+		bool m_TutorialFlg = false;
 	public :
-		ResultS(const shared_ptr<Stage>& StagePtr) :GameObject(StagePtr) {};
+		ResultS(const shared_ptr<Stage>& StagePtr) :GameObject(StagePtr) { m_TutorialFlg = false; };
+		ResultS(const shared_ptr<Stage>& StagePtr,bool flg) : GameObject(StagePtr),m_TutorialFlg(flg) {};
 
 		void OnCreate() override;
 		void OnUpdate() override;
