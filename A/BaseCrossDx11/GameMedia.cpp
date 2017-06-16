@@ -402,9 +402,18 @@ namespace basecross {
 		App::GetApp()->RegisterWav(L"PlayerDie_SE", strMusic);
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Win.wav";
 		App::GetApp()->RegisterWav(L"Win_SE", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Win.wav";
+		App::GetApp()->RegisterWav(L"Win_SE", strMusic);
 		//App::GetApp()->RegisterWav(L"CursorMove_SE", strMusic); 
 		//strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\PrayerExposure.wav";
 		//App::GetApp()->RegisterWav(L"PrayerDie_SE", strMusic); 
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Enemy\\Computer Launch.wav";
+		App::GetApp()->RegisterWav(L"Player_Look_SE", strMusic);
+		/*strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Enemy\\Enemy ArmorBreak.wav";
+		App::GetApp()->RegisterWav(L"Enemy_Damage_SE", strMusic);*/
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Player\\Shield Break.wav";
+		App::GetApp()->RegisterWav(L"Enemy_Damage_SE", strMusic);
+
 		
 
 		//Abe20170530

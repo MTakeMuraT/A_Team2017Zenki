@@ -106,6 +106,12 @@ namespace basecross
 		//シールド作成
 		m_Shield = GetStage()->AddGameObject<EnemyShield>(m_Hp-1, Trans->GetPosition(), Trans->GetScale(), m_ParScale);
 		//Abe20170612
+	
+		//オーディオリソース登録
+		auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
+		pMultiSoundEffect->AddAudioResource(L"Player_Look_SE");
+		pMultiSoundEffect->AddAudioResource(L"Enemy_Damage_SE");
+
 	}
 
 	void TackleEnemy::OnUpdate()
@@ -320,6 +326,9 @@ namespace basecross
 		Vector3 dis = pos1 - mypos;
 		if ((dis.x*dis.x) + (dis.z*dis.z) < distance*distance)
 		{
+			auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+			pMultiSoundEffect->Start(L"Player_Look_SE", 0, 1.0f);
+
 			ToAttack(1);
 			/*1A
 			//チャージ中のぶれぶれ中心座標を記録
@@ -330,6 +339,9 @@ namespace basecross
 		dis = pos2 - mypos;
 		if ((dis.x*dis.x) + (dis.z*dis.z) < distance*distance)
 		{
+			auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+			pMultiSoundEffect->Start(L"Player_Look_SE", 0, 1.0f);
+			
 			ToAttack(2);
 		}
 
@@ -640,8 +652,11 @@ namespace basecross
 	//攻撃受けたとき
 	void TackleEnemy::DamagePlayer()
 	{
+		auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+
 		if (m_ActiveFlg)
 		{
+			
 			if (!m_MutekiFlg)
 			{
 				//もしHPが1以下なら
@@ -688,6 +703,7 @@ namespace basecross
 					//シールド破壊
 					m_Shield->Damage(1);
 					m_Hp--;
+					pMultiSoundEffect->Start(L"Enemy_Damage_SE", 0, 1.0f);
 					ToMuteki();
 				}
 			}
@@ -808,6 +824,13 @@ namespace basecross
 		//シールド作成
 		m_Shield = GetStage()->AddGameObject<EnemyShield>(m_Hp - 1, Trans->GetPosition(), Trans->GetScale(), m_ParScale);
 		//Abe20170612
+	
+	
+		//オーディオリソース登録
+		auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
+		pMultiSoundEffect->AddAudioResource(L"Player_Look_SE");
+		pMultiSoundEffect->AddAudioResource(L"Enemy_Damage_SE");
+
 	}
 
 	void ShotEnemy::OnUpdate()
@@ -898,6 +921,9 @@ namespace basecross
 		Vector3 dis2 = pos2 - mypos;
 		if ((dis.x*dis.x) + (dis.z*dis.z) < distance*distance || ((dis2.x*dis.x) + (dis2.z*dis.z) < distance*distance))
 		{
+			auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+			pMultiSoundEffect->Start(L"Player_Look_SE", 0, 1.0f);
+			
 			ToAttack();
 		}
 
@@ -1246,6 +1272,8 @@ namespace basecross
 	//Abe20170517
 	void ShotEnemy::DamagePlayer()
 	{
+		auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+
 		if (m_ActiveFlg)
 		{ 
 			if (!m_MutekiFlg)
@@ -1294,8 +1322,8 @@ namespace basecross
 				{
 					//シールド破壊
 					m_Shield->Damage(1);
-
 					m_Hp--;
+					pMultiSoundEffect->Start(L"Enemy_Damage_SE", 0, 1.0f);
 					ToMuteki();
 
 				}
@@ -1434,6 +1462,11 @@ namespace basecross
 		//識別番号入れる
 		m_number = count;
 
+		//オーディオリソース登録
+		auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
+		pMultiSoundEffect->AddAudioResource(L"Player_Look_SE");
+		pMultiSoundEffect->AddAudioResource(L"Enemy_Damage_SE");
+
 	}
 
 	void TeleportEnemy::OnUpdate()
@@ -1510,12 +1543,18 @@ namespace basecross
 		Vector3 dis = pos1 - mypos;
 		if ((dis.x*dis.x) + (dis.z*dis.z) < distance*distance)
 		{
+			auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+			pMultiSoundEffect->Start(L"Player_Look_SE", 0, 1.0f);
+
 			ToAttack(1);
 		}
 		//２体目
 		dis = pos2 - mypos;
 		if ((dis.x*dis.x) + (dis.z*dis.z) < distance*distance)
 		{
+			auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+			pMultiSoundEffect->Start(L"Player_Look_SE", 0, 1.0f);
+			
 			ToAttack(2);
 		}
 
@@ -1854,6 +1893,9 @@ namespace basecross
 
 		m_BombDistance = 8.0f;
 
+		//オーディオリソース登録
+		auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
+		pMultiSoundEffect->AddAudioResource(L"Player_Look_SE");
 	}
 
 	void BombEnemy::OnUpdate()
@@ -1988,6 +2030,9 @@ namespace basecross
 		Vector3 dis = pos1 - mypos;
 		if ((dis.x*dis.x) + (dis.z*dis.z) < distance*distance)
 		{
+			auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+			pMultiSoundEffect->Start(L"Player_Look_SE", 0, 1.0f);
+			
 			ToAttack(1);
 		
 		}
@@ -1995,6 +2040,9 @@ namespace basecross
 		dis = pos2 - mypos;
 		if ((dis.x*dis.x) + (dis.z*dis.z) < distance*distance)
 		{
+			auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+			pMultiSoundEffect->Start(L"Player_Look_SE", 0, 1.0f);
+			
 			ToAttack(2);
 		}
 
@@ -2719,6 +2767,10 @@ namespace basecross
 		m_StageSize = ScenePtr->GetStageSize() / 2;
 		//Abe20170515
 
+		//オーディオリソース登録
+		auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
+		pMultiSoundEffect->AddAudioResource(L"Player_Look_SE");
+	
 	}
 
 	void SearchDrawn::OnUpdate()
@@ -2795,6 +2847,9 @@ namespace basecross
 					//自分の番号と一致
 					if (ptr->GetNumber() == m_number)
 					{
+						auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+						pMultiSoundEffect->Start(L"Player_Look_SE", 0, 1.0f);
+						
 						ptr->ToAttack(1);
 						break;
 					}
@@ -2818,6 +2873,9 @@ namespace basecross
 					//自分の番号と一致
 					if (ptr->GetNumber() == m_number)
 					{
+						auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+						pMultiSoundEffect->Start(L"Player_Look_SE", 0, 1.0f);
+						
 						ptr->ToAttack(2);
 						break;
 					}
