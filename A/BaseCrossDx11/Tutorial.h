@@ -193,6 +193,12 @@ namespace basecross
 		float m_LimitTime;
 		//計測フラグ
 		bool m_StartFlg;
+
+		//残り回転スプライト
+		shared_ptr<GameObject> m_NokoriSprite;
+		//枠
+		shared_ptr<GameObject> m_NokoriFrame;
+
 	public :
 		TutorialRotFixed(const shared_ptr<Stage>& StagePtr) : GameObject(StagePtr) {}
 
@@ -244,6 +250,27 @@ namespace basecross
 		float m_time;
 		//切り替え間隔
 		float m_IntervalTime;
+
+		//---------------------
+		//スプライト
+		//---------------------
+		//Aボタン
+		shared_ptr<GameObject> m_ASp;
+		//Aボタン押された時
+		shared_ptr<GameObject> m_APushSp;
+		//RBボタン
+		shared_ptr<GameObject> m_RBSp;
+		//RBボタン押された時
+		shared_ptr<GameObject> m_RBPushSp;
+		//LBボタン
+		shared_ptr<GameObject> m_LBSp;
+		//LBボタン押された時
+		shared_ptr<GameObject> m_LBPushSp;
+		//スティック
+		shared_ptr<GameObject> m_StickSp;
+		//スティック倒された時
+		shared_ptr<GameObject> m_StickPushSp;
+
 	public :
 		TutorialSpriteS(const shared_ptr<Stage>& StagePtr) : GameObject(StagePtr) {}
 

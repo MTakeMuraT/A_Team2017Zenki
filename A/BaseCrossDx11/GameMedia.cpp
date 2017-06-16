@@ -314,6 +314,39 @@ namespace basecross {
 		strTexture = DataDir + L"Tutorial\\Target.png";
 		App::GetApp()->RegisterTexture(L"TUTORIALTARGET_TX", strTexture);
 		//Abe20170615
+		//Abe20170616
+		//Aボタン
+		strTexture = DataDir + L"Tutorial\\A.png";
+		App::GetApp()->RegisterTexture(L"TUTORIAL_A_TX", strTexture);
+		//Aボタン押された時
+		strTexture = DataDir + L"Tutorial\\APush.png";
+		App::GetApp()->RegisterTexture(L"TUTORIAL_APUSH_TX", strTexture);
+		//RBボタン
+		strTexture = DataDir + L"Tutorial\\RB.png";
+		App::GetApp()->RegisterTexture(L"TUTORIAL_RB_TX", strTexture);
+		//RBボタン押された時
+		strTexture = DataDir + L"Tutorial\\RBPush.png";
+		App::GetApp()->RegisterTexture(L"TUTORIAL_RBPUSH_TX", strTexture);
+		//LBボタン
+		strTexture = DataDir + L"Tutorial\\LB.png";
+		App::GetApp()->RegisterTexture(L"TUTORIAL_LB_TX", strTexture);
+		//LBボタン押された時
+		strTexture = DataDir + L"Tutorial\\LBPush.png";
+		App::GetApp()->RegisterTexture(L"TUTORIAL_LBPUSH_TX", strTexture);
+		//スティック
+		strTexture = DataDir + L"Tutorial\\Stick.png";
+		App::GetApp()->RegisterTexture(L"TUTORIAL_STICK_TX", strTexture);
+		//スティック倒された時
+		strTexture = DataDir + L"Tutorial\\StickPush.png";
+		App::GetApp()->RegisterTexture(L"TUTORIAL_STICKPUSH_TX", strTexture);
+
+		//ポッチ
+		strTexture = DataDir + L"Tutorial\\Poch.png";
+		App::GetApp()->RegisterTexture(L"TUTORIAL_POCH_TX", strTexture);
+		//フレーム
+		strTexture = DataDir + L"Tutorial\\Frame.png";
+		App::GetApp()->RegisterTexture(L"TUTORIAL_FRAME_TX", strTexture);
+		//Abe20170616
 
 
 		////モデル（ボーンあり

@@ -9,6 +9,8 @@
 
 namespace basecross 
 {
+
+#pragma region TutorialScene
 	//--------------------------------------------------------------------------------------
 	//	ゲームステージクラス実体
 	//--------------------------------------------------------------------------------------
@@ -136,11 +138,16 @@ namespace basecross
 		//デバック********************************
 		//キーの入力
 		auto KeylVec = App::GetApp()->GetInputDevice().GetKeyState();
-		if (KeylVec.m_bPressedKeyTbl['A']) {
+		if (KeylVec.m_bPressedKeyTbl['A']) 
+		{
 			auto ScenePtr = App::GetApp()->GetScene<Scene>();
 
 			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToTutorial");
 		}
+		//if (KeylVec.m_bPressedKeyTbl['B'])
+		//{
+		//	GetSharedGameObject<TutorialSpriteS>(L"TutorialSpriteS", false)->NextSatte();
+		//}
 
 		if (m_EnemyFlg)
 		{
@@ -155,6 +162,9 @@ namespace basecross
 			}
 			if (count == 0 && !GetSharedGameObject<ResultS>(L"Result",false))
 			{
+				//スプライト進める
+				GetSharedGameObject<TutorialSpriteS>(L"TutorialSpriteS", false)->NextSatte();
+
 				SetSharedGameObject(L"Result",AddGameObject<ResultS>(true));
 			}
 		}
@@ -247,6 +257,7 @@ namespace basecross
 
 	}
 
+#pragma endregion
 	//--------------------------------------------------------------------------------------
 	//	こっから下は専用のオブジェクトだぜぇ～？
 	//--------------------------------------------------------------------------------------
@@ -704,6 +715,10 @@ namespace basecross
 
 				//動きとめる
 				m_ActiveFlg = false;
+
+				//スプライト進める
+				GetStage()->GetSharedGameObject<TutorialSpriteS>(L"TutorialSpriteS", false)->NextSatte();
+
 			}
 
 		}
@@ -720,6 +735,39 @@ namespace basecross
 		m_time = 0;
 		m_LimitTime = 3.0f;
 		m_StartFlg = false;
+
+		//スプライト作成
+		//枠
+		auto obj = GetStage()->AddGameObject<GameObject>();
+		auto Trans = obj->AddComponent<Transform>();
+		Trans->SetPosition(0, 200, 0);
+		Trans->SetScale(500, 50, 1);
+		Trans->SetRotation(0, 0, 0);
+
+		auto Draw = obj->AddComponent<PCTSpriteDraw>();
+		Draw->SetTextureResource(L"TUTORIAL_FRAME_TX");
+
+		obj->SetDrawLayer(2);
+		obj->SetAlphaActive(true);
+		obj->SetDrawActive(false);
+
+		m_NokoriFrame = obj;
+
+		//動く方
+		obj = GetStage()->AddGameObject<GameObject>();
+		Trans = obj->AddComponent<Transform>();
+		Trans->SetPosition(-225, 200, 0);
+		Trans->SetScale(50, 50, 1);
+		Trans->SetRotation(0, 0, 0);
+
+		Draw = obj->AddComponent<PCTSpriteDraw>();
+		Draw->SetTextureResource(L"TUTORIAL_POCH_TX");
+
+		obj->SetDrawLayer(2);
+		obj->SetAlphaActive(true);
+		obj->SetDrawActive(false);
+
+		m_NokoriSprite = obj;
 	}
 
 	void TutorialRotFixed::OnUpdate()
@@ -733,6 +781,13 @@ namespace basecross
 				//肩どっちか押されてたら計測
 				if (CntlVec[0].wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER || CntlVec[0].wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
 				{
+					//ポッチを移動
+					float par = m_time / m_LimitTime;
+					float posx = -225 + (par * 450);
+					Vector3 popos = m_NokoriSprite->GetComponent<Transform>()->GetPosition();
+					popos.x = posx;
+					m_NokoriSprite->GetComponent<Transform>()->SetPosition(popos);
+
 					m_time += App::GetApp()->GetElapsedTime();
 					if (m_time > m_LimitTime)
 					{
@@ -755,6 +810,14 @@ namespace basecross
 						//一応初期値に
 						m_time = 0;
 						m_StartFlg = false;
+
+						//スプライト消す
+						m_NokoriFrame->SetDrawActive(false);
+						m_NokoriSprite->SetDrawActive(false);
+
+						//スプライト進める
+						GetStage()->GetSharedGameObject<TutorialSpriteS>(L"TutorialSpriteS", false)->NextSatte();
+
 					}
 				}
 			}
@@ -766,6 +829,10 @@ namespace basecross
 		m_StartFlg = true;
 		//一応
 		m_time = 0;
+
+		//スプライト表示
+		m_NokoriFrame->SetDrawActive(true);
+		m_NokoriSprite->SetDrawActive(true);
 	}
 
 #pragma endregion
@@ -912,6 +979,133 @@ namespace basecross
 		//切り替え間隔
 		m_IntervalTime = 1.0f;
 		//-----------------------------
+		//Aボタン
+		auto obj = GetStage()->AddGameObject<GameObject>();
+		auto Trans = obj->AddComponent<Transform>();
+		Trans->SetPosition(-350, 0, 0);
+		Trans->SetRotation(0, 0, 0);
+		Trans->SetScale(500, 250, 1);
+
+		auto Draw = obj->AddComponent<PCTSpriteDraw>();
+		Draw->SetTextureResource(L"TUTORIAL_A_TX");
+
+		obj->SetAlphaActive(true);
+		obj->SetDrawLayer(2);
+		//描画切る
+		obj->SetDrawActive(false);
+		m_ASp = obj;
+
+		////Aボタン押された時
+		obj = GetStage()->AddGameObject<GameObject>();
+		Trans = obj->AddComponent<Transform>();
+		Trans->SetPosition(-350, 0, 0);
+		Trans->SetRotation(0, 0, 0);
+		Trans->SetScale(500, 250, 1);
+
+		Draw = obj->AddComponent<PCTSpriteDraw>();
+		Draw->SetTextureResource(L"TUTORIAL_APUSH_TX");
+
+		obj->SetAlphaActive(true);
+		obj->SetDrawLayer(2);
+		//描画切る
+		obj->SetDrawActive(false);
+		m_APushSp = obj;
+
+		////RBボタン
+		obj = GetStage()->AddGameObject<GameObject>();
+		Trans = obj->AddComponent<Transform>();
+		Trans->SetPosition(350, 0, 0);
+		Trans->SetRotation(0, 0, 0);
+		Trans->SetScale(500, 250, 1);
+
+		Draw = obj->AddComponent<PCTSpriteDraw>();
+		Draw->SetTextureResource(L"TUTORIAL_RB_TX");
+
+		obj->SetAlphaActive(true);
+		obj->SetDrawLayer(2);
+		//描画切る
+		obj->SetDrawActive(false);
+		m_RBSp = obj;
+
+		////RBボタン押された時
+		obj = GetStage()->AddGameObject<GameObject>();
+		Trans = obj->AddComponent<Transform>();
+		Trans->SetPosition(350, 0, 0);
+		Trans->SetRotation(0, 0, 0);
+		Trans->SetScale(500, 250, 1);
+
+		Draw = obj->AddComponent<PCTSpriteDraw>();
+		Draw->SetTextureResource(L"TUTORIAL_RBPUSH_TX");
+
+		obj->SetAlphaActive(true);
+		obj->SetDrawLayer(2);
+		//描画切る
+		obj->SetDrawActive(false);
+		m_RBPushSp = obj;
+
+		////LBボタン
+		obj = GetStage()->AddGameObject<GameObject>();
+		Trans = obj->AddComponent<Transform>();
+		Trans->SetPosition(-350, 0, 0);
+		Trans->SetRotation(0, 0, 0);
+		Trans->SetScale(500, 250, 1);
+
+		Draw = obj->AddComponent<PCTSpriteDraw>();
+		Draw->SetTextureResource(L"TUTORIAL_LB_TX");
+
+		obj->SetAlphaActive(true);
+		obj->SetDrawLayer(2);
+		//描画切る
+		obj->SetDrawActive(false);
+		m_LBSp = obj;
+
+		////LBボタン押された時
+		obj = GetStage()->AddGameObject<GameObject>();
+		Trans = obj->AddComponent<Transform>();
+		Trans->SetPosition(-350, 0, 0);
+		Trans->SetRotation(0, 0, 0);
+		Trans->SetScale(500, 250, 1);
+
+		Draw = obj->AddComponent<PCTSpriteDraw>();
+		Draw->SetTextureResource(L"TUTORIAL_LBPUSH_TX");
+
+		obj->SetAlphaActive(true);
+		obj->SetDrawLayer(2);
+		//描画切る
+		obj->SetDrawActive(false);
+		m_LBPushSp = obj;
+
+		////スティック
+		obj = GetStage()->AddGameObject<GameObject>();
+		Trans = obj->AddComponent<Transform>();
+		Trans->SetPosition(-350, 0, 0);
+		Trans->SetRotation(0, 0, 0);
+		Trans->SetScale(500, 250, 1);
+
+		Draw = obj->AddComponent<PCTSpriteDraw>();
+		Draw->SetTextureResource(L"TUTORIAL_STICK_TX");
+
+		obj->SetAlphaActive(true);
+		obj->SetDrawLayer(2);
+		//描画切る
+		obj->SetDrawActive(false);
+		m_StickSp = obj;
+
+		////スティック倒された時
+		obj = GetStage()->AddGameObject<GameObject>();
+		Trans = obj->AddComponent<Transform>();
+		Trans->SetPosition(-350, 0, 0);
+		Trans->SetRotation(0, 0, 0);
+		Trans->SetScale(500, 250, 1);
+
+		Draw = obj->AddComponent<PCTSpriteDraw>();
+		Draw->SetTextureResource(L"TUTORIAL_STICKPUSH_TX");
+
+		obj->SetAlphaActive(true);
+		obj->SetDrawLayer(2);
+		//描画切る
+		obj->SetDrawActive(false);
+		m_StickPushSp = obj;
 	}
 
 	void TutorialSpriteS::OnUpdate()
@@ -925,6 +1119,21 @@ namespace basecross
 				//初回
 				if (m_ChangestateFlg)
 				{
+					m_ChangestateFlg = false;
+
+					m_StickSp->SetDrawActive(true);
+				}
+
+				//切り替え
+				m_time += App::GetApp()->GetElapsedTime();
+				if (m_time > m_IntervalTime)
+				{
+					m_state = 1;
+					m_time = 0;
+
+					//描画切り替え
+					m_StickSp->SetDrawActive(false);
+					m_StickPushSp->SetDrawActive(true);
 
 				}
 			}
@@ -932,6 +1141,18 @@ namespace basecross
 		case 1:
 			if (true)
 			{
+				//切り替え
+				m_time += App::GetApp()->GetElapsedTime();
+				if (m_time > m_IntervalTime)
+				{
+					m_state = 0;
+					m_time = 0;
+
+					//描画切り替え
+					m_StickSp->SetDrawActive(true);
+					m_StickPushSp->SetDrawActive(false);
+
+				}
 
 			}
 			break;
@@ -943,6 +1164,25 @@ namespace basecross
 				//初回
 				if (m_ChangestateFlg)
 				{
+					m_ChangestateFlg = false;
+
+					//描画切り替え
+					m_RBSp->SetDrawActive(true);
+					m_LBSp->SetDrawActive(true);
+				}
+
+				//切り替え
+				m_time += App::GetApp()->GetElapsedTime();
+				if (m_time > m_IntervalTime)
+				{
+					m_state = 3;
+					m_time = 0;
+
+					//描画切り替え
+					m_RBSp->SetDrawActive(false);
+					m_LBSp->SetDrawActive(false);
+					m_RBPushSp->SetDrawActive(true);
+					m_LBPushSp->SetDrawActive(true);
 
 				}
 
@@ -951,6 +1191,19 @@ namespace basecross
 		case 3:
 			if (true)
 			{
+				//切り替え
+				m_time += App::GetApp()->GetElapsedTime();
+				if (m_time > m_IntervalTime)
+				{
+					m_state = 2;
+					m_time = 0;
+					//描画切り替え
+					m_RBSp->SetDrawActive(true);
+					m_LBSp->SetDrawActive(true);
+					m_RBPushSp->SetDrawActive(false);
+					m_LBPushSp->SetDrawActive(false);
+
+				}
 
 			}
 			break;
@@ -962,7 +1215,20 @@ namespace basecross
 				//初回
 				if (m_ChangestateFlg)
 				{
+					m_ChangestateFlg = false;
+					m_ASp->SetDrawActive(true);
+				}
 
+				//切り替え
+				m_time += App::GetApp()->GetElapsedTime();
+				if (m_time > m_IntervalTime)
+				{
+					m_state = 5;
+					m_time = 0;
+					
+					//描画切り替え
+					m_ASp->SetDrawActive(false);
+					m_APushSp->SetDrawActive(true);
 				}
 
 			}
@@ -971,7 +1237,22 @@ namespace basecross
 			if (true)
 			{
 
+				//切り替え
+				m_time += App::GetApp()->GetElapsedTime();
+				if (m_time > m_IntervalTime)
+				{
+					m_state = 4;
+					m_time = 0;
+					//描画切り替え
+					m_ASp->SetDrawActive(true);
+					m_APushSp->SetDrawActive(false);
+
+				}
+
 			}
+			break;
+			//終了
+		case 6:
 			break;
 		}
 	}
@@ -990,6 +1271,16 @@ namespace basecross
 		m_state = nextstate;
 
 		m_ChangestateFlg = true;
+
+		//全部のスプライト描画消す
+		m_ASp->SetDrawActive(false);
+		m_APushSp->SetDrawActive(false);
+		m_RBSp->SetDrawActive(false);
+		m_RBPushSp->SetDrawActive(false);
+		m_LBSp->SetDrawActive(false);
+		m_LBPushSp->SetDrawActive(false);
+		m_StickSp->SetDrawActive(false);
+		m_StickPushSp->SetDrawActive(false);
 	}
 
 #pragma endregion
