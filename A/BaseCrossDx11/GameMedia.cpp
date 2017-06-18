@@ -440,14 +440,41 @@ namespace basecross {
 		//App::GetApp()->RegisterWav(L"CursorMove_SE", strMusic); 
 		//strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\PrayerExposure.wav";
 		//App::GetApp()->RegisterWav(L"PrayerDie_SE", strMusic); 
+		
+		//敵エネミー発見時
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Enemy\\Computer Launch.wav";
 		App::GetApp()->RegisterWav(L"Player_Look_SE", strMusic);
-		/*strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Enemy\\Enemy ArmorBreak.wav";
-		App::GetApp()->RegisterWav(L"Enemy_Damage_SE", strMusic);*/
+		//敵エネミー被ダメ時
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Player\\Shield Break.wav";
 		App::GetApp()->RegisterWav(L"Enemy_Damage_SE", strMusic);
-
+		//敵エネミー撃破時
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\BombEnemy\\Enemy Exposure.wav";
+		App::GetApp()->RegisterWav(L"Enemy_Die_SE", strMusic);
+		//自爆エネミー爆破
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Enemy\\Selfdestruction.wav";
+		App::GetApp()->RegisterWav(L"Bomb_Die_SE", strMusic);
+		//自爆エネミーカウントダウン
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Enemy\\Countdown.wav";
+		App::GetApp()->RegisterWav(L"Bomb_Count_SE", strMusic);
+		//テレポート音
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\TelepoatEnemy\\Teleport.wav";
+		App::GetApp()->RegisterWav(L"Teleport_SE", strMusic);
+		//テレポートボム
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\TelepoatEnemy\\ShortSelfDestruction.wav";
+		App::GetApp()->RegisterWav(L"Teleport_Bomb_SE", strMusic);
+		//突撃音
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\TackleEnemy\\Conflict.wav";
+		App::GetApp()->RegisterWav(L"Tackle_SE", strMusic);
 		
+		//子機投げる(未実装)
+		//子機落下（未実装）
+		//ミサイル発射音(未実装)
+		//着弾時（未実装）
+		
+
+	
+
+
 
 		//Abe20170530
 		//選択音

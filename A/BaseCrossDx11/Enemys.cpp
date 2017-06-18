@@ -111,7 +111,8 @@ namespace basecross
 		auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
 		pMultiSoundEffect->AddAudioResource(L"Player_Look_SE");
 		pMultiSoundEffect->AddAudioResource(L"Enemy_Damage_SE");
-
+		pMultiSoundEffect->AddAudioResource(L"Enemy_Die_SE");
+		pMultiSoundEffect->AddAudioResource(L"Tackle_SE");
 	}
 
 	void TackleEnemy::OnUpdate()
@@ -403,6 +404,7 @@ namespace basecross
 
 	void TackleEnemy::Attack()
 	{
+		auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
 		if (!m_TackleFlg)
 		{
 			//時間加算
@@ -440,6 +442,7 @@ namespace basecross
 					float angle = atan2(dis.z, dis.x);
 					//速度入れる
 					m_Velocity = Vector3(cos(angle), 0, sin(angle)) * m_Speed;
+					pMultiSoundEffect->Start(L"Tackle_SE", 0, 1.0f);
 				}
 				//２体目に突撃
 				else if (m_TargetNum == 2)
@@ -449,6 +452,7 @@ namespace basecross
 					float angle = atan2(dis.z, dis.x);
 					//速度入れる
 					m_Velocity = Vector3(cos(angle), 0, sin(angle)) * m_Speed;
+					pMultiSoundEffect->Start(L"Tackle_SE", 0, 1.0f);
 				}
 			}
 		}
@@ -665,6 +669,7 @@ namespace basecross
 					//タヒぬ
 					SetDrawActive(false);
 					m_Hp = 0;
+					pMultiSoundEffect->Start(L"Enemy_Die_SE", 0, 1.0f);
 					m_ActiveFlg = false;
 					//Abe20170605
 					//索敵サークル除去
@@ -830,6 +835,8 @@ namespace basecross
 		auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
 		pMultiSoundEffect->AddAudioResource(L"Player_Look_SE");
 		pMultiSoundEffect->AddAudioResource(L"Enemy_Damage_SE");
+		pMultiSoundEffect->AddAudioResource(L"Enemy_Die_SE");
+		pMultiSoundEffect->AddAudioResource(L"Shot_SE");
 
 	}
 
@@ -1284,6 +1291,7 @@ namespace basecross
 					//タヒぬ
 					SetDrawActive(false);
 					m_Hp = 0;
+					pMultiSoundEffect->Start(L"Enemy_Die_SE", 0, 1.0f);
 					m_ActiveFlg = false;
 
 					//Abe20170605
@@ -1466,6 +1474,7 @@ namespace basecross
 		auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
 		pMultiSoundEffect->AddAudioResource(L"Player_Look_SE");
 		pMultiSoundEffect->AddAudioResource(L"Enemy_Damage_SE");
+		pMultiSoundEffect->AddAudioResource(L"Enemy_Die_SE");
 
 	}
 
@@ -1563,6 +1572,7 @@ namespace basecross
 	void TeleportEnemy::Attack()
 	{
 		m_time += App::GetApp()->GetElapsedTime();
+		auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
 		//爆弾置く状態になるまで待機
 		if (!m_BombPutFlg)
 		{
@@ -1576,6 +1586,7 @@ namespace basecross
 					pos.x += (rand() % 50 - 25) / 10;
 					pos.y = m_InitPos.y;
 					pos.z += (rand() % 50 - 25) / 10;
+					pMultiSoundEffect->Start(L"Teleport_SE", 0, 1.0f);
 					GetComponent<Transform>()->SetPosition(pos);
 				}
 				//２体目攻撃
@@ -1585,6 +1596,7 @@ namespace basecross
 					pos.x += (rand() % 50 - 25) / 10;
 					pos.y = m_InitPos.y;
 					pos.z += (rand() % 50 - 25) / 10;
+					pMultiSoundEffect->Start(L"Teleport_SE", 0, 1.0f);
 					GetComponent<Transform>()->SetPosition(pos);
 				}
 
@@ -1755,6 +1767,7 @@ namespace basecross
 	//攻撃受けたとき
 	void TeleportEnemy::DamagePlayer()
 	{
+		auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
 		if (GetDrawActive())
 		{
 			//もしHPが1以下なら
@@ -1763,6 +1776,7 @@ namespace basecross
 				//タヒぬ
 				SetDrawActive(false);
 				m_Hp = 0;
+				pMultiSoundEffect->Start(L"Enemy_Die_SE", 0, 1.0f);
 				m_ActiveFlg = false;
 
 				//Abe20170605
@@ -1896,6 +1910,9 @@ namespace basecross
 		//オーディオリソース登録
 		auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
 		pMultiSoundEffect->AddAudioResource(L"Player_Look_SE");
+		pMultiSoundEffect->AddAudioResource(L"Enemy_Die_SE");
+		pMultiSoundEffect->AddAudioResource(L"Bomb_Die_SE");
+		pMultiSoundEffect->AddAudioResource(L"Bomb_Count_SE");
 	}
 
 	void BombEnemy::OnUpdate()
@@ -2098,8 +2115,10 @@ namespace basecross
 
 	void BombEnemy::Attack()
 	{
+		auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
 		if (!m_Tackleflg)
 		{
+			pMultiSoundEffect->Start(L"Bomb_Count_SE", 0, 1.0f);
 			m_time += App::GetApp()->GetElapsedTime();
 			if (m_time >= 2.0f)
 			{
@@ -2148,6 +2167,7 @@ namespace basecross
 			//突撃後、自爆の為消滅
 			SetDrawActive(false);
 			m_Hp = 0;
+			pMultiSoundEffect->Start(L"Bomb_Die_SE", 0, 1.0f);
 			m_ActiveFlg = false;
 			m_AttackFlg = false;
 
@@ -2257,11 +2277,13 @@ namespace basecross
 
 	void BombEnemy::DamagePlayer()
 	{
+		auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
 		if (GetDrawActive())
 		{
 			//タヒぬ
 			SetDrawActive(false);
 			m_Hp = 0;
+			pMultiSoundEffect->Start(L"Enemy_Die_SE", 0, 1.0f);
 			m_ActiveFlg = false;
 			//破片生成
 			//GetStage()->GetSharedGameObject<BakuSanSpawn>(L"BakuSanSpawn", false)->CreateBakusan(rand() % 20, GetComponent<Transform>()->GetPosition());
@@ -2598,15 +2620,21 @@ namespace basecross
 		m_time = 0;
 
 		m_Effect = GetStage()->AddGameObject<BombEffect>();
+	
+		//オーディオリソース登録
+		auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
+		pMultiSoundEffect->AddAudioResource(L"Teleport_Bomb_SE");
 	}
 
 	void Bomb::OnUpdate()
 	{
+		auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
 		if (m_Activeflg)
 		{
 			m_time += App::GetApp()->GetElapsedTime();
 			if (m_time > m_ExplosionTime)
 			{
+				pMultiSoundEffect->Start(L"Teleport_Bomb_SE", 0, 1.0f);
 				BombExplosion();
 			}
 		}
@@ -2615,6 +2643,7 @@ namespace basecross
 	//挟まれたら爆発
 	void Bomb::BombExplosion()
 	{
+		
 		//動かなく
 		m_Activeflg = false;
 		SetDrawActive(false);
