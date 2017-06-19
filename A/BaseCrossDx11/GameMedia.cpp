@@ -87,7 +87,16 @@ namespace basecross {
 		//ƒJ[ƒ\ƒ‹
 		strTexture = DataDir + L"StageSelect\\StageSelect_Logo.png";
 		App::GetApp()->RegisterTexture(L"SELECT_LOGO_TX", strTexture);
-
+		//GO
+		strTexture = DataDir + L"StageSelect\\Go.png";
+		App::GetApp()->RegisterTexture(L"Go_TX", strTexture);
+		//Back
+		strTexture = DataDir + L"StageSelect\\Back.png";
+		App::GetApp()->RegisterTexture(L"Back_TX", strTexture);
+		strTexture = DataDir + L"StageSelect\\SERECT_Background.png";
+		App::GetApp()->RegisterTexture(L"SERECT_Background_TX", strTexture);
+		strTexture = DataDir + L"StageSelect\\NORMAL_DO_DA_I.png";
+		App::GetApp()->RegisterTexture(L"flame_TX", strTexture);
 		//Abe20170525
 		//Abe20170526
 		//–îˆó
@@ -421,7 +430,7 @@ namespace basecross {
 	
 		//SE
 		
-		wstring  strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Decision_01.wav";
+		wstring strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Decision_01.wav";
 		App::GetApp()->RegisterWav(L"Decision_01_SE", strMusic);
 		
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Collision_01.wav";
