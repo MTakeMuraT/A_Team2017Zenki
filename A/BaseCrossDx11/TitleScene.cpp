@@ -79,6 +79,15 @@ namespace basecross {
 		auto KeylVec = App::GetApp()->GetInputDevice().GetKeyState();
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 
+		//**********************
+		//コマンド
+		if (CntlVec[0].wButtons & XINPUT_GAMEPAD_BACK && CntlVec[0].wButtons & XINPUT_GAMEPAD_START)
+		{
+			//シーンリロード
+			auto ScenePtr = App::GetApp()->GetScene<Scene>();
+			PostEvent(2.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToTitleScene");
+		}
+		//**********************
 		switch (m_state)
 		{
 		case 0:

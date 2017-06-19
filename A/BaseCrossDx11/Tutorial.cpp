@@ -397,6 +397,16 @@ namespace basecross
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		if (CntlVec[0].bConnected)
 		{
+			//**********************
+			//コマンド
+			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_BACK && CntlVec[0].wButtons & XINPUT_GAMEPAD_START)
+			{
+				//シーンタイトル
+				auto ScenePtr = App::GetApp()->GetScene<Scene>();
+				PostEvent(2.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToTitleScene");
+			}
+			//**********************
+
 			//移動------------------------------------------------------------
 			if (m_moveFlg)
 			{

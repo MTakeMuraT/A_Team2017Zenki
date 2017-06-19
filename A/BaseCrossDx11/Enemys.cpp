@@ -675,12 +675,12 @@ namespace basecross
 					//索敵サークル除去
 					m_SearchCircle->SetDrawActive(false);
 					//破片生成
-					GetStage()->GetSharedGameObject<BakuSanSpawn>(L"BakuSanSpawn", false)->CreateBakusan(rand() % 25 + 5, GetComponent<Transform>()->GetPosition());
+					GetStage()->GetSharedGameObject<BakuSanSpawn>(L"BakuSanSpawn", false)->CreateBakusan(rand() % 50 + 20, GetComponent<Transform>()->GetPosition());
 					//Abe20170605
 
 					//Abe20170606
 					//爆散エフェクト作成
-					for (int i = 0; i < 3; i++)
+					for (int i = 0; i < 10; i++)
 					{
 						auto BakusanGroup = GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->GetGroupVector();
 						bool bakuflg = false;
@@ -690,13 +690,13 @@ namespace basecross
 							if (!ptr->GetDrawActive())
 							{
 								bakuflg = true;
-								ptr->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+								ptr->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale() * 5);
 							}
 						}
 						if (!bakuflg)
 						{
 							auto obj = GetStage()->AddGameObject<BakusanEF>();
-							obj->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+							obj->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale() * 5);
 							GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->IntoGroup(obj);
 						}
 					}
@@ -1298,12 +1298,12 @@ namespace basecross
 					//索敵サークル除去
 					m_SearchCircle->SetDrawActive(false);
 					//破片生成
-					GetStage()->GetSharedGameObject<BakuSanSpawn>(L"BakuSanSpawn", false)->CreateBakusan(rand() % 25 + 5, GetComponent<Transform>()->GetPosition());
+					GetStage()->GetSharedGameObject<BakuSanSpawn>(L"BakuSanSpawn", false)->CreateBakusan(rand() % 50 + 20, GetComponent<Transform>()->GetPosition());
 					//Abe20170605
 
 					//Abe20170606
 					//爆散エフェクト作成
-					for (int i = 0; i < 3; i++)
+					for (int i = 0; i < 10; i++)
 					{
 						auto BakusanGroup = GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->GetGroupVector();
 						bool bakuflg = false;
@@ -1313,13 +1313,13 @@ namespace basecross
 							if (!ptr->GetDrawActive())
 							{
 								bakuflg = true;
-								ptr->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+								ptr->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale() * 5);
 							}
 						}
 						if (!bakuflg)
 						{
 							auto obj = GetStage()->AddGameObject<BakusanEF>();
-							obj->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+							obj->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale() * 5);
 							GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->IntoGroup(obj);
 						}
 					}
@@ -1782,8 +1782,6 @@ namespace basecross
 				//Abe20170605
 				//索敵サークル除去
 				m_SearchCircle->SetDrawActive(false);
-				//破片生成
-				GetStage()->GetSharedGameObject<BakuSanSpawn>(L"BakuSanSpawn", false)->CreateBakusan(rand() % 25 + 5, GetComponent<Transform>()->GetPosition());
 				//Abe20170605
 
 				//子機収納
@@ -1793,9 +1791,13 @@ namespace basecross
 
 				}
 
+				//破片生成
+				GetStage()->GetSharedGameObject<BakuSanSpawn>(L"BakuSanSpawn", false)->CreateBakusan(rand() % 50 + 20, GetComponent<Transform>()->GetPosition());
+				//Abe20170605
+
 				//Abe20170606
 				//爆散エフェクト作成
-				for (int i = 0; i < 3; i++)
+				for (int i = 0; i < 10; i++)
 				{
 					auto BakusanGroup = GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->GetGroupVector();
 					bool bakuflg = false;
@@ -1805,13 +1807,13 @@ namespace basecross
 						if (!ptr->GetDrawActive())
 						{
 							bakuflg = true;
-							ptr->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+							ptr->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale() * 5);
 						}
 					}
 					if (!bakuflg)
 					{
 						auto obj = GetStage()->AddGameObject<BakusanEF>();
-						obj->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+						obj->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale() * 5);
 						GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->IntoGroup(obj);
 					}
 				}
@@ -2294,7 +2296,7 @@ namespace basecross
 
 			//Abe20170606
 			//爆散エフェクト作成
-			for (int i = 0; i < 3; i++)
+			for (int i = 0; i < 10; i++)
 			{
 				auto BakusanGroup = GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->GetGroupVector();
 				bool bakuflg = false;
@@ -2304,13 +2306,13 @@ namespace basecross
 					if (!ptr->GetDrawActive())
 					{
 						bakuflg = true;
-						ptr->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+						ptr->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale()*5);
 					}
 				}
 				if (!bakuflg)
 				{
 					auto obj = GetStage()->AddGameObject<BakusanEF>();
-					obj->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale());
+					obj->SetPosScaActive(GetComponent<Transform>()->GetPosition(), GetComponent<Transform>()->GetScale()*5);
 					GetStage()->GetSharedObjectGroup(L"BakusanEFGroup")->IntoGroup(obj);
 				}
 			}
