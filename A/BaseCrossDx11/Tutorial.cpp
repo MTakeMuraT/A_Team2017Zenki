@@ -432,9 +432,21 @@ namespace basecross
 					GetComponent<Transform>()->SetPosition(pos);
 					//慣性更新
 					m_Kansei = InputXY;
+
+					//回転設定
+					m_MoveRotFlg = false;
+
+					float angle = atan2(InputXY.z, InputXY.x);
+					m_Player1->GetComponent<Transform>()->SetRotation(0, -angle, 0);
+					m_Player2->GetComponent<Transform>()->SetRotation(0, -angle, 0);
+
 				}
 				else
 				{
+
+					//回転
+					m_MoveRotFlg = true;
+
 					//入力なければ完成で流す
 					if (abs(m_Kansei.x) + abs(m_Kansei.z) >= 0.2f)
 					{
@@ -480,6 +492,9 @@ namespace basecross
 			//くっつく
 			else if(m_KuttukuFlg)
 			{
+				//回転も制限
+				m_MoveRotFlg = true;
+
 				//くっつける
 				m_PlayerSDistance += -m_KuttukuSpeed * App::GetApp()->GetElapsedTime();
 				//速度上げる
@@ -572,12 +587,16 @@ namespace basecross
 		Vector3 dis1 = pos2 - pos1;
 		Vector3 dis2 = pos1 - pos2;
 
-		//角度計算
-		float angle1 = atan2(dis1.z, dis1.x);
-		float angle2 = atan2(dis2.z, dis2.x);
+		//移動してなければ向かせる
+		if (m_MoveRotFlg)
+		{
+			//角度計算
+			float angle1 = atan2(dis1.z, dis1.x);
+			float angle2 = atan2(dis2.z, dis2.x);
 
-		m_Player1->GetComponent<Transform>()->SetRotation(0, -angle1, 0);
-		m_Player2->GetComponent<Transform>()->SetRotation(0, -angle2, 0);
+			m_Player1->GetComponent<Transform>()->SetRotation(0, -angle1, 0);
+			m_Player2->GetComponent<Transform>()->SetRotation(0, -angle2, 0);
+		}
 	}
 
 	//ステージの外に行こうとしたら戻す判定

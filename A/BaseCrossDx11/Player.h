@@ -64,6 +64,9 @@ namespace basecross {
 
 		//位置更新切るフラグ
 		bool m_DontMoveFlg2 = false;
+
+		//回転するかどうかの判定
+		bool m_MoveRotFlg = false;
 		//-----------------------
 		//パラメータ類
 		//-----------------------
