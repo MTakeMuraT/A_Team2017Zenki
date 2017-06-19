@@ -168,6 +168,20 @@ namespace basecross
 				SetSharedGameObject(L"Result",AddGameObject<ResultS>(true));
 			}
 		}
+
+
+		//**********************
+		//コマンド
+		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+
+		if (CntlVec[0].wButtons & XINPUT_GAMEPAD_BACK && CntlVec[0].wButtons & XINPUT_GAMEPAD_START)
+		{
+			//シーンリロード
+			auto ScenePtr = App::GetApp()->GetScene<Scene>();
+			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToTitleScene");
+		}
+		//**********************
+
 	}
 
 	//破棄

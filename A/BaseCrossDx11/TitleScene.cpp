@@ -85,9 +85,10 @@ namespace basecross {
 		{
 			//シーンリロード
 			auto ScenePtr = App::GetApp()->GetScene<Scene>();
-			PostEvent(2.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToTitleScene");
+			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToTitleScene");
 		}
 		//**********************
+
 		switch (m_state)
 		{
 		case 0:
@@ -119,35 +120,45 @@ namespace basecross {
 		case 2:
 			if (true)
 			{
-				//ゲームスタート作成
-				auto obj = AddGameObject<GameObject>();
-				auto Trans = obj->AddComponent<Transform>();
-				Trans->SetPosition(0, -260, 0);
-				Trans->SetScale(350, 150, 1);
-				Trans->SetRotation(0, 0, 0);
+				//上入ればもうできてるから一個だけ
+				if (!GetSharedGameObject<GameObject>(L"GameStart",false))
+				{
+					//ゲームスタート作成
+					auto obj = AddGameObject<GameObject>();
+					auto Trans = obj->AddComponent<Transform>();
+					Trans->SetPosition(0, -260, 0);
+					Trans->SetScale(350, 150, 1);
+					Trans->SetRotation(0, 0, 0);
 
-				auto Draw = obj->AddComponent<PCTSpriteDraw>();
-				Draw->SetTextureResource(L"TITLEGAMESTART_TX");
+					auto Draw = obj->AddComponent<PCTSpriteDraw>();
+					Draw->SetTextureResource(L"TITLEGAMESTART_TX");
 
-				obj->SetDrawLayer(3);
-				obj->SetAlphaActive(true);
+					obj->SetDrawLayer(3);
+					obj->SetAlphaActive(true);
 
-				SetSharedGameObject(L"GameStart", obj);
+					SetSharedGameObject(L"GameStart", obj);
 
-				//チュートリアル作成
-				obj = AddGameObject<GameObject>();
-				Trans = obj->AddComponent<Transform>();
-				Trans->SetPosition(0, -180, 0);
-				Trans->SetScale(350, 145, 1);
-				Trans->SetRotation(0, 0, 0);
+					//チュートリアル作成
+					obj = AddGameObject<GameObject>();
+					Trans = obj->AddComponent<Transform>();
+					Trans->SetPosition(0, -180, 0);
+					Trans->SetScale(350, 145, 1);
+					Trans->SetRotation(0, 0, 0);
 
-				Draw = obj->AddComponent<PCTSpriteDraw>();
-				Draw->SetTextureResource(L"TITLETUTORIAL_TX");
+					Draw = obj->AddComponent<PCTSpriteDraw>();
+					Draw->SetTextureResource(L"TITLETUTORIAL_TX");
 
-				obj->SetDrawLayer(3);
-				obj->SetAlphaActive(true);
+					obj->SetDrawLayer(3);
+					obj->SetAlphaActive(true);
 
-				SetSharedGameObject(L"Tutorial", obj);
+					SetSharedGameObject(L"Tutorial", obj);
+				}
+				else
+				{
+					GetSharedGameObject<GameObject>(L"GameStart", false)->SetDrawActive(true);
+					GetSharedGameObject<GameObject>(L"Tutorial", false)->SetDrawActive(true);
+
+				}
 
 				//状態変更
 				m_state = 3;
@@ -220,6 +231,17 @@ namespace basecross {
 						PostEvent(2.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToStageSelectScene");
 					}
 					return;
+				}
+
+				//戻る適当-----------------------------------------------
+				if (KeylVec.m_bPressedKeyTbl['B'] || CntlVec[0].wPressedButtons &XINPUT_GAMEPAD_B)
+				{
+					m_state = 0;
+					//プレススタートだす
+					GetSharedGameObject<GameObject>(L"PressStart", false)->SetDrawActive(true);
+					GetSharedGameObject<GameObject>(L"GameStart", false)->SetDrawActive(false);
+					GetSharedGameObject<GameObject>(L"Tutorial", false)->SetDrawActive(false);
+
 				}
 
 

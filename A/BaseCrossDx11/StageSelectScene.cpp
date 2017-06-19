@@ -231,7 +231,7 @@ namespace basecross {
 		{
 			//シーンタイトル
 			auto ScenePtr = App::GetApp()->GetScene<Scene>();
-			PostEvent(2.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToTitleScene");
+			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToTitleScene");
 		}
 		//**********************
 

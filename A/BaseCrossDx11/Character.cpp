@@ -77,6 +77,12 @@ namespace basecross {
 			auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
 			pMultiSoundEffect->Start(L"Decision_01_SE", 0, 1.0f);
 		}
+		if (CntlVec[0].wPressedButtons &XINPUT_GAMEPAD_B)
+		{
+			Max = 2.0f;
+			auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+			pMultiSoundEffect->Start(L"Decision_01_SE", 0, 1.0f);
+		}
 
 		if (m_alpha > Max) {
 			lighton = false;
