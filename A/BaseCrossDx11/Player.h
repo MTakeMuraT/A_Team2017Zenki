@@ -10,315 +10,100 @@
 
 
 namespace basecross {
-	//--------------------------------------------------------------------------------------
-	///	プレイヤー
-	//--------------------------------------------------------------------------------------
-	class Player : public GameObject {
-	private:
-		//コンストラクタメンバ
-		Vector3 m_StartPos;
-		wstring m_Player_Str;
-		shared_ptr<BombEffect> m_Effect;
-		int m_ChangeAnimaNumber = 0;
-		//アニメーションを変更できるかの判断用フラグ
-		bool ChangeAnimaFlg = false;
-
-		
-	public:
-
-		//構築と破棄
-		Player(const shared_ptr<Stage>& StagePtr, const Vector3& StartPos, const wstring& PlayerLorPlayerR);
-		virtual ~Player() {}
-		//初期化
-		virtual void OnCreate() override;
-		virtual void OnUpdate() override;
-		
-		bool UpdateAnyAnimation();
-		void PlayerDieEffect();
-		//アニメーション関数群
-		void ChangeAnima();
-		void AnimationWait();
-		void AnimationRotL();
-		void AnimationRotR();
-		void AnimationDamage();
-		///////////////////////
-		//アニメーションの変更セット関数
-		void SetChangeAnima(int Num) {
-			m_ChangeAnimaNumber = Num;
-		}
-	};
-
-
-	//センターの規定ボックス
-	//--------------------------------------------------------------------------------------
-	///	プレイヤーセンター
-	//--------------------------------------------------------------------------------------
-	class PlayerCenter : public GameObject {
-	public:
-
-		PlayerCenter(const shared_ptr<Stage>& StagePtr);
-		virtual ~PlayerCenter() {}
-		virtual void OnCreate() override;
-		virtual void OnUpdate() override;
-	};
-
-	//--------------------------------------------------------------------------------------
-	///	プレイヤーマネージャー
-	//--------------------------------------------------------------------------------------
-	class PlayerManager : public GameObject {
-	private:
-		//初期Pos戻るステートPlayerが戻る目安
-		Vector3 PlayerL_Initial_Vec3 = Vector3(0, 0, 0);
-		Vector3 PLayerR_Initial_Vec3 = Vector3(0, 0, 0);
-		Vector3 PlayerL_Distance_Vec3 = Vector3(0, 0, 0);
-		Vector3 PlayerR_Distance_Vec3 = Vector3(0, 0, 0);
-		//デバッグ文字表示オブジェ
-		shared_ptr<DebugTxt> m_Debugtxt;
-		Vector3 m_DebugL = Vector3(0, 0, 0);
-		Vector3 m_DebugR = Vector3(0, 0, 0);
-		//別のスピード
-		float Speed_F = 0.0f;
-		float AddSpeed = 0.0f;//加速時に使用
-		shared_ptr<StateMachine<PlayerManager>> m_StateManagerMachine;
-		//InputStick関数内の使用変数/////
-		//移動スピード
-		float Move_Speed = 0.0f;
-		Vector3 Vec_Vec3 = Vector3(0.0f, 0.0f, 0.0f);
-		Vector3 StickVec = Vector3(0.0f, 0.0f, 0.0f);
-		/////////////////////////////////
-		//Direction関数内の使用変数/////
-		Vector3 Direction_Vec3 = Vector3(0, 0, 0);
-		/////////////////////////////////
-
-		//ステートでの変数
-		Vector3 PlayerL_SavePos_Vec3 = Vector3(0, 0, 0);
-		Vector3 PlayerR_SavePos_Vec3 = Vector3(0, 0, 0);
-		Vector3 PlayerL_Direction_Vec3 = Vector3(0, 0, 0);
-		Vector3 PlayerR_Direction_Vec3 = Vector3(0, 0, 0);
-		//戻るステートでの変数
-		Vector3 PlayerL_Velocity_Vec3 = Vector3(0, 0, 0);
-		Vector3 PlayerR_Velocity_Vec3 = Vector3(0, 0, 0);
-
-		//プレイヤー同士の距離
-		Vector3 Distance = Vector3(0, 0, 0);
-		//回転フラグ
-		bool m_RotateFlg = false;
-		//ローテーション可能フラグ(離れている時
-		bool m_LeaveRotateFlg = false;
-		//ステージのスケール
-		Vector2 m_StageSize;
-		//ダメージ用
-		bool m_DamePower = false;
-		float m_LimitTime = 0;
-		//演出ブーストのflg
-		bool m_RotBoostflg = false;
-		bool Testflg = false;
-
-	public:
-
-		PlayerManager(const shared_ptr<Stage>& StagePtr);
-		virtual ~PlayerManager() {}
-		virtual void OnCreate() override;
-		virtual void OnUpdate() override;
-		virtual void OnLastUpdate() override;
-		void InputStick();//コントローラでの移動
-		void InputRotation();//プレイヤーの回転
-		void PlayerAngle();//プレイヤーのモデルの向き
-		void InitializationVelocity();//Velovituの初期化
-
-		Vector3 Direction(Vector3 MyPos, Vector3 PartnerPos);
-		Vector3 Move_Velo(Vector3 MyPos, Vector3 PartnerPos);
-		//コリジョンのアクティブ
-		void SetActiveCollision(bool flg);
-
-		//アクセサ ステートマシーン
-		shared_ptr<StateMachine<PlayerManager>>& GetStateMachine_Manager() {
-			return m_StateManagerMachine;
-		}
-		//ステートチェンジ関数
-		void StateChangeDoingInterpose();
-		void StateChangeDie();
-		//行動のスタート関数
-		void EnterGamePrepare();//ゲーム前の準備ステート
-		void EnterMoveBehavior();//移動ステート 
-		void EnterLeaveBehavior();//離れるステート
-		void EnterToAttractBehavior();//引き付けるステート
-		void EnterToAttractFailureBehavior();//攻撃失敗
-		void EnterReturnBehavior();//戻る
-		void EneterDoingInterpose();//挟んでいるとき
-		void EneterDieBehavior();
-
-									//行動の継続関数			
-		void ExecuteGamePrepare();//ゲーム前の準備
-		void ExecuteMoveBehavior();
-		void ExecuteLeaveBehavior();//離れる
-		void ExecuteToAttractBehavior();//引き付ける
-		void ExecuteToAttractFailureBehavior();//攻撃失敗
-		void ExecuteReturnBehavior();//戻る
-		void ExecuteDoingInterpose();//挟んでいるとき
-		void ExecuteDieBehavior();
-
-									 //行動の終了関数		
-		void ExitGamePrepare();//ゲーム前の準備
-		void ExitMoveBehabior();
-		void ExitLeaveBehavior();//離れる
-		void ExitToAttractBehavior();//引き付ける
-		void ExitToAttractFailureBehavior();//攻撃失敗
-		void ExitReturnBehavior();//戻る
-		void ExitDoingInterpose();//挟んでいるとき
-		void ExitDieBehavior();
-
-		//エリア外への進行を防ぐ関数
-		void StintArea();
-		//回転するかのフラグ
-		bool GetRotateFlg() {
-			return m_RotateFlg;
-		}
-		void SetRotateFlg(bool flg) {
-			m_RotateFlg = flg;
-		}
-		//ブーストエフェクト表示場所とタイミング
-		void PlayerbBooth();
-
-	};
-	//--------------------------------------------------------------------------------------
-	//	class GamePrepareState_Manager : public ObjState<PlayerManager>;
-	//	用途:　ゲーム準備
-	//--------------------------------------------------------------------------------------
-	class GamePrepareState_Manager : public ObjState<PlayerManager>
-	{
-		GamePrepareState_Manager() {}
-	public:
-		//ステートのインスタンス取得
-		static shared_ptr<GamePrepareState_Manager> Instance();
-		//ステートに入ったときに呼ばれる関数
-		virtual void Enter(const shared_ptr<PlayerManager>& Obj)override;
-		//ステート実行中に毎ターン呼ばれる関数
-		virtual void Execute(const shared_ptr<PlayerManager>& Obj)override;
-		//ステートにから抜けるときに呼ばれる関数
-		virtual void Exit(const shared_ptr<PlayerManager>& Obj)override;
-	};
-
-	//--------------------------------------------------------------------------------------
-	//	class MoveState_Manager : public ObjState<PlayerManager>;
-	//	用途:　移動
-	//--------------------------------------------------------------------------------------
-	class MoveState_Manager : public ObjState<PlayerManager>
-	{
-		MoveState_Manager() {}
-	public:
-		//ステートのインスタンス取得
-		static shared_ptr<MoveState_Manager> Instance();
-		//ステートに入ったときに呼ばれる関数
-		virtual void Enter(const shared_ptr<PlayerManager>& Obj)override;
-		//ステート実行中に毎ターン呼ばれる関数
-		virtual void Execute(const shared_ptr<PlayerManager>& Obj)override;
-		//ステートにから抜けるときに呼ばれる関数
-		virtual void Exit(const shared_ptr<PlayerManager>& Obj)override;
-	};
-	//--------------------------------------------------------------------------------------
-	//	class ToAttractState_Manager : public ObjState<PlayerManager>;
-	//	用途:　引き合う
-	//--------------------------------------------------------------------------------------
-	class ToAttractState_Manager : public ObjState<PlayerManager>
-	{
-		ToAttractState_Manager() {}
-	public:
-		//ステートのインスタンス取得
-		static shared_ptr<ToAttractState_Manager> Instance();
-		//ステートに入ったときに呼ばれる関数
-		virtual void Enter(const shared_ptr<PlayerManager>& Obj)override;
-		//ステート実行中に毎ターン呼ばれる関数
-		virtual void Execute(const shared_ptr<PlayerManager>& Obj)override;
-		//ステートにから抜けるときに呼ばれる関数
-		virtual void Exit(const shared_ptr<PlayerManager>& Obj)override;
-	};
-	//--------------------------------------------------------------------------------------
-	//	class ToAttractAttract_F_Manager : public ObjState<PlayerManager>;
-	//	用途:　攻撃失敗
-	//--------------------------------------------------------------------------------------
-	class ToAttractAttract_F_Manager : public ObjState<PlayerManager>
-	{
-		ToAttractAttract_F_Manager() {}
-	public:
-		//ステートのインスタンス取得
-		static shared_ptr<ToAttractAttract_F_Manager> Instance();
-		//ステートに入ったときに呼ばれる関数
-		virtual void Enter(const shared_ptr<PlayerManager>& Obj)override;
-		//ステート実行中に毎ターン呼ばれる関数
-		virtual void Execute(const shared_ptr<PlayerManager>& Obj)override;
-		//ステートにから抜けるときに呼ばれる関数
-		virtual void Exit(const shared_ptr<PlayerManager>& Obj)override;
-	};
-	//--------------------------------------------------------------------------------------
-	//	class LeaveState_Manager : public ObjState<PlayerManager>;
-	//	用途:　離れる
-	//--------------------------------------------------------------------------------------
-	class LeaveState_Manager : public ObjState<PlayerManager>
-	{
-		LeaveState_Manager() {}
-	public:
-		//ステートのインスタンス取得
-		static shared_ptr<LeaveState_Manager> Instance();
-		//ステートに入ったときに呼ばれる関数
-		virtual void Enter(const shared_ptr<PlayerManager>& Obj)override;
-		//ステート実行中に毎ターン呼ばれる関数
-		virtual void Execute(const shared_ptr<PlayerManager>& Obj)override;
-		//ステートにから抜けるときに呼ばれる関数
-		virtual void Exit(const shared_ptr<PlayerManager>& Obj)override;
-	};
-	//--------------------------------------------------------------------------------------
-	//	class ReturnState_Manager : public ObjState<PlayerManager>;
-	//	用途:　戻るステート
-	//--------------------------------------------------------------------------------------
-	class ReturnState_Manager : public ObjState<PlayerManager>
-	{
-		ReturnState_Manager() {}
-	public:
-		//ステートのインスタンス取得
-		static shared_ptr<ReturnState_Manager> Instance();
-		//ステートに入ったときに呼ばれる関数
-		virtual void Enter(const shared_ptr<PlayerManager>& Obj)override;
-		//ステート実行中に毎ターン呼ばれる関数
-		virtual void Execute(const shared_ptr<PlayerManager>& Obj)override;
-		//ステートにから抜けるときに呼ばれる関数
-		virtual void Exit(const shared_ptr<PlayerManager>& Obj)override;
-	};
-	//--------------------------------------------------------------------------------------
-	//	class DoingInterposeState_Manager : public ObjState<PlayerManager>;
-	//	用途:　挟んでいるときのステート
-	//--------------------------------------------------------------------------------------
-	class DoingInterposeState_Manager : public ObjState<PlayerManager>
-	{
-		DoingInterposeState_Manager() {}
-	public:
-		//ステートのインスタンス取得
-		static shared_ptr<DoingInterposeState_Manager> Instance();
-		//ステートに入ったときに呼ばれる関数
-		virtual void Enter(const shared_ptr<PlayerManager>& Obj)override;
-		//ステート実行中に毎ターン呼ばれる関数
-		virtual void Execute(const shared_ptr<PlayerManager>& Obj)override;
-		//ステートにから抜けるときに呼ばれる関数
-		virtual void Exit(const shared_ptr<PlayerManager>& Obj)override;
-	};
-	//--------------------------------------------------------------------------------------
-	//	class DieState_Manager : public ObjState<PlayerManager>;
-	//	用途:　死んだステート
-	//--------------------------------------------------------------------------------------
-	class DieState_Manager : public ObjState<PlayerManager>
-	{
-		DieState_Manager() {}
-	public:
-		//ステートのインスタンス取得
-		static shared_ptr<DieState_Manager> Instance();
-		//ステートに入ったときに呼ばれる関数
-		virtual void Enter(const shared_ptr<PlayerManager>& Obj)override;
-		//ステート実行中に毎ターン呼ばれる関数
-		virtual void Execute(const shared_ptr<PlayerManager>& Obj)override;
-		//ステートにから抜けるときに呼ばれる関数
-		virtual void Exit(const shared_ptr<PlayerManager>& Obj)override;
-	};
 	
+
+	//--------------------------------------------------------------------------------------
+	///	プレイヤーコントロール
+	//--------------------------------------------------------------------------------------
+	class PlayerControl : public GameObject
+	{
+	private:
+		//プレイヤー一体目
+		shared_ptr<GameObject> m_Player1;
+		//プレイヤー二体目
+		shared_ptr<GameObject> m_Player2;
+		//二体の距離
+		float m_PlayerSDistance;
+		//二体の距離初期値
+		float m_PlayerSDistanceInit;
+		//二体の距離最大
+		float m_PlayerSDistanceLimit;
+		//離れる速度
+		float m_DistanceSpeed;
+		//くっつく速度
+		float m_KuttukuSpeed;
+
+		//回転
+		float m_rot;
+		//回転速度
+		float m_rotSpeed;
+
+		//慣性
+		Vector3 m_Kansei;
+
+		//黒幕
+		shared_ptr<GameObject> m_BlackSprite;
+		//黒幕の透明度
+		float m_BlackAlpha;
+		//透明になるか
+		bool m_BlackAlphaFlg = false;
+
+		//アニメーションの名前
+		//更新前
+		string m_NowAnimName;
+		//更新後
+		string m_ChangeAnimName;
+
+		//全部動けなくするフラグ
+		bool m_DontMoveFlg = false;
+
+		//くっついてるフラグ
+		bool m_KuttukuFlg = false;
+		//くっついて戻るフラグ
+		bool m_KuttukuAfterFlg = false;
+
+		//位置更新切るフラグ
+		bool m_DontMoveFlg2 = false;
+		//-----------------------
+		//パラメータ類
+		//-----------------------
+		float m_Speed;
+
+
+		//-----------------------
+		//関数
+		//-----------------------
+		//プレイヤーたちの座標を更新
+		void PosRotUpdate();
+		//ステージの外に行こうとしたら戻す判定
+		void CheckStageEnd();
+		//暗転処理
+		void BlackUpdate();
+		//アニメーション更新
+		void UpdateAnimation();
+		//-----------------------
+		//制御系
+		//-----------------------
+		bool m_moveFlg;
+		bool m_rotFlg;
+		bool m_AButtonFlg;
+	public:
+		PlayerControl(const shared_ptr<Stage>& StagePtr) : GameObject(StagePtr) {}
+
+		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
+
+		//二体の座標を返す
+		vector<Vector3> GetPlayerSPos_RETURNvectorVec3();
+		//距離を返す
+		float GetDistance() { return m_PlayerSDistance; }
+		//位置更新オフ
+		void DontMove() { m_DontMoveFlg2 = true; }
+		//当たり判定
+		void SetActiveCollision(bool flg);
+		
+	};
+
 	
 	//--------------------------------------------------------------------------------------
 	//	class SkySphere : public GameObject;
@@ -425,6 +210,8 @@ namespace basecross {
 	};
 
 
+	
+
 	//--------------------------------------------------------------------------------------
 	//	class PlayerHP : public GameObject;
 	//	用途: プレイヤーHPの処理
@@ -466,6 +253,22 @@ namespace basecross {
 		void SetDamage_int(int Damage) {
 			m_Damage_int = Damage;
 		}
+	};
+	
+	//--------------------------------------------------------------------------------------
+	//	PlayerブーストSP スプライトスタジオ
+	//--------------------------------------------------------------------------------------
+	class PlayerBoostSP : public SS5ssae
+	{
+	private:
+		Vector3 m_Pos;
+		Vector3 m_Scale;
+		Vector3 m_Rotation;
+	public:
+		PlayerBoostSP(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, wstring txtdire, wstring txtname, Vector3 Rotation);
+		~PlayerBoostSP() {};
+		void OnCreate() override;
+		void OnUpdate() override;
 	};
 	
 }

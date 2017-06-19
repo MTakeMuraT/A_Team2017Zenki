@@ -72,20 +72,9 @@ namespace basecross
 
 	//プレイヤー関係
 	void GameStage::CreatePlayerLin() {
-		auto PtrPlayer_L = AddGameObject<Player>(
-			Vector3(0, 1, 0),
-			wstring(L"PlayerL")
-			);
-		SetSharedGameObject(L"GamePlayer_L", PtrPlayer_L);
-		auto PtrPlayer_R = AddGameObject<Player>(
-			Vector3(5, 1, 0),
-			wstring(L"PlayerR")
-			);
-		auto PtrPlayerManager = AddGameObject<PlayerManager>();
-		SetSharedGameObject(L"PtrPlayerManager",PtrPlayerManager);
-		SetSharedGameObject(L"GamePlayer_R", PtrPlayer_R);
-		auto PtrPlayerCenter = AddGameObject<PlayerCenter>();
-		SetSharedGameObject(L"PlayerCenter", PtrPlayerCenter);
+	
+		auto PtrPlayerControl = AddGameObject<PlayerControl>();
+		SetSharedGameObject(L"PlayerControl", PtrPlayerControl);
 		auto PtrPlayerHP = AddGameObject<PlayerHP>();
 		SetSharedGameObject(L"PlayerHP", PtrPlayerHP);
 		////HP関係
@@ -408,15 +397,15 @@ namespace basecross
 
 
 		//２体の座標もらう
-		Vector3 Player1Pos = GetSharedGameObject<Player>(L"GamePlayer_L", false)->GetComponent<Transform>()->GetPosition();
-		Vector3 Player2Pos = GetSharedGameObject<Player>(L"GamePlayer_R", false)->GetComponent<Transform>()->GetPosition();
-
+		auto  Player = GetSharedGameObject<PlayerControl>(L"PlayerControl", false);
+		
+		vector<Vector3> PlayerPos = Player->GetPlayerSPos_RETURNvectorVec3();
 		//見る点をプレイヤー間の中心
-		At = (Player1Pos + Player2Pos) / 2;
+		At = (PlayerPos[0] + PlayerPos[1]) / 2;
 		//座標をちょっと手前上
 		Pos = At;
 		//距離を測る
-		Vector3 def = Player2Pos - Player1Pos;
+		Vector3 def = PlayerPos[0] - PlayerPos[1];
 		def = def*def;
 		//上昇分
 		float Yup = sqrt(def.x + def.z) - 6;

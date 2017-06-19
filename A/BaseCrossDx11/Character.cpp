@@ -404,49 +404,7 @@ namespace basecross {
 
 	}
 	void FixdBox::OnUpdate() {
-		//プレイヤーL
-		auto PtrPlayer_L = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_L", false);
-		auto PtrPlayer_L_Trans = PtrPlayer_L->GetComponent<Transform>();
-		Vector3 PtrPlayer_L_Pos = PtrPlayer_L_Trans->GetPosition();
-		Vector3 PtrPlayer_L_Scale = PtrPlayer_L_Trans->GetScale();
-		Vector3 PtrPlayer_L_ScaleHalf_Vec = Vector3(PtrPlayer_L_Scale.x / 2, PtrPlayer_L_Scale.y / 2, PtrPlayer_L_Scale.z / 2);
-		//プレイヤーR
-		auto PtrPlayer_R = GetStage()->GetSharedGameObject<Player>(L"GamePlayer_R", false);
-		auto PtrPlayer_R_Trans = PtrPlayer_R->GetComponent<Transform>();
-		Vector3 PtrPlayer_R_Pos = PtrPlayer_R_Trans->GetPosition();
-		Vector3 PtrPlayer_R_Scale = PtrPlayer_R_Trans->GetScale();
-		Vector3 PtrPlayer_R_ScaleHalf_Vec = Vector3(PtrPlayer_R_Scale.x / 2, PtrPlayer_R_Scale.y / 2, PtrPlayer_R_Scale.z / 2);
-		//自分
-		auto Trans = GetComponent<Transform>();
-		Vector3 Pos = Trans->GetPosition();
-		Vector3 MyScale = Trans->GetScale();
-		Vector3 ScaleHalf = Vector3(MyScale.x / 2, MyScale.y / 2, MyScale.z / 2);
-
-		//
-		Vector3 TestScale = Vector3(MyScale.x + 0.5f, MyScale.y, MyScale.z + 0.5f);
-		Vector3 TestPos_p = Vector3((Pos.x + (TestScale.x / 2)), Pos.y, (Pos.z + (TestScale.z / 2)));
-		Vector3 TestPos_m = Vector3((Pos.x - (TestScale.x / 2)), Pos.y, (Pos.z - (TestScale.z / 2)));
-		if (PtrPlayer_L_Pos.x  < TestPos_p.x  && PtrPlayer_L_Pos.x > TestPos_m.x&&
-			PtrPlayer_L_Pos.z < TestPos_p.z  && PtrPlayer_L_Pos.z > TestPos_m.z &&
-			PtrPlayer_R_Pos.x  < TestPos_p.x  && PtrPlayer_R_Pos.x > TestPos_m.x&&
-			PtrPlayer_R_Pos.z < TestPos_p.z  && PtrPlayer_R_Pos.z > TestPos_m.z) {
-			Inserted = true;
-		}
-		else {
-			Inserted = false;
-		}
-
-		if (Inserted) {
-			auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
-			if (CntlVec[0].wButtons &XINPUT_GAMEPAD_A) {
-				InputStick();
-			}
-		}
-		else {
-			auto Rig = GetComponent<Rigidbody>();
-			Rig->SetVelocity(0, 0, 0);
-		}
-
+		
 
 	}
 	void FixdBox::OnLastUpdate() {
@@ -2222,7 +2180,7 @@ namespace basecross {
 		m_Player2->SetUpdateActive(false);
 
 		//プレイヤー管理してるやつ止める
-		GetStage()->GetSharedGameObject<PlayerManager>(L"PtrPlayerManager",false)->SetUpdateActive(false);
+		GetStage()->GetSharedGameObject<PlayerControl>(L"PlayerControl",false)->SetUpdateActive(false);
 
 		//移動目標設定
 		m_TargetPos1 = Vector3(-2, 10, 0);
@@ -2811,7 +2769,7 @@ namespace basecross {
 			m_Player2->SetUpdateActive(false);
 
 			//プレイヤー管理してるやつ止める
-			GetStage()->GetSharedGameObject<PlayerManager>(L"PtrPlayerManager", false)->SetUpdateActive(false);
+			GetStage()->GetSharedGameObject<PlayerControl>(L"PlayerControl", false)->SetUpdateActive(false);
 
 			//プレイヤーの目標座標、中心座標を取得
 			m_centerPos = (m_Player1->GetComponent<Transform>()->GetPosition() + m_Player2->GetComponent<Transform>()->GetPosition()) / 2;
@@ -4289,7 +4247,7 @@ namespace basecross {
 		GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_R")->SetUpdateActive(false);
 
 		//プレイヤー管理してるやつ止める
-		GetStage()->GetSharedGameObject<PlayerManager>(L"PtrPlayerManager", false)->SetUpdateActive(false);
+		GetStage()->GetSharedGameObject<PlayerControl>(L"PlayerControl", false)->SetUpdateActive(false);
 
 		//全部止める
 		for (auto obj : ColGroup)
@@ -4429,7 +4387,7 @@ namespace basecross {
 		GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_R")->SetUpdateActive(true);
 
 		//プレイヤー管理してるやつ動かす
-		GetStage()->GetSharedGameObject<PlayerManager>(L"PtrPlayerManager", false)->SetUpdateActive(true);
+		GetStage()->GetSharedGameObject<PlayerControl>(L"PlayerControl", false)->SetUpdateActive(true);
 
 		//全部動かす
 		for (auto obj : ColGroup)
@@ -4634,7 +4592,7 @@ namespace basecross {
 			GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_R")->SetUpdateActive(false);
 
 			//プレイヤー管理してるやつ止める
-			GetStage()->GetSharedGameObject<PlayerManager>(L"PtrPlayerManager", false)->SetUpdateActive(false);
+			GetStage()->GetSharedGameObject<PlayerControl>(L"PlayerControl", false)->SetUpdateActive(false);
 
 			//全部止める
 			for (auto obj : ColGroup)
@@ -4760,7 +4718,7 @@ namespace basecross {
 					GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_R")->SetUpdateActive(true);
 
 					//プレイヤー管理してるやつ動かす
-					GetStage()->GetSharedGameObject<PlayerManager>(L"PtrPlayerManager", true)->SetUpdateActive(true);
+					GetStage()->GetSharedGameObject<PlayerControl>(L"PlayerControl", true)->SetUpdateActive(true);
 
 					//全部動かす
 					for (auto obj : ColGroup)
