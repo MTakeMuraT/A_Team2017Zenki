@@ -1273,11 +1273,11 @@ void StageModeControl::OnUpdate() {
 		auto Trans = AddComponent<Transform>();
 		Trans->SetPosition(m_InitPos);
 		Trans->SetScale(m_InitScale);
-		Trans->SetRotation(0, 0, 0);
+		Trans->SetRotation(90*3.14159265f/180, 0, 0);
 
 		//•`‰æİ’è
 		auto PtrDraw = AddComponent<PNTStaticDraw>();
-		PtrDraw->SetMeshResource(L"DEFAULT_CUBE");
+		PtrDraw->SetMeshResource(L"DEFAULT_SQUARE");
 		//PtrDraw->SetDrawActive(false);
 		wstring stageString = L"STAGEBOX_" + Util::IntToWStr(m_stagenumber) + L"_TX";
 		PtrDraw->SetTextureResource(stageString);
@@ -1289,7 +1289,6 @@ void StageModeControl::OnUpdate() {
 		PtrCol->SetFixed(true);
 
 		PtrCol->SetDrawActive(false);
-
 
 	}
 
