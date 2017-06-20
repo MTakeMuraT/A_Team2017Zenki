@@ -34,6 +34,12 @@ namespace basecross
 
 		//エネミーの数数えるフラグ
 		bool m_EnemyFlg = false;
+
+		//Abe20170620
+		//ブースト作成
+		void CreateBoost();
+		//Abe20170620
+
 	public:
 		//構築と破棄
 		TutorialScene() :Stage() {}
