@@ -481,6 +481,19 @@ namespace basecross {
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\TackleEnemy\\Conflict.wav";
 		App::GetApp()->RegisterWav(L"Tackle_SE", strMusic);
 		
+		
+		//チュートリアルプレイヤー被ダメ
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Player\\Shield Break.wav";
+		App::GetApp()->RegisterWav(L"Player_Break_SE", strMusic);
+		//チュートリアルプレイヤー移動
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Player\\Boost.wav";
+		App::GetApp()->RegisterWav(L"Player_Boost_SE", strMusic);
+		//チュートリアルエネミー死亡
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Player\\Player Exposure.wav";
+		App::GetApp()->RegisterWav(L"Player_Die_SE", strMusic);
+
+		
+		
 		//子機投げる(未実装)
 		//子機落下（未実装）
 		//ミサイル発射音(未実装)

@@ -1475,6 +1475,7 @@ namespace basecross
 		pMultiSoundEffect->AddAudioResource(L"Player_Look_SE");
 		pMultiSoundEffect->AddAudioResource(L"Enemy_Damage_SE");
 		pMultiSoundEffect->AddAudioResource(L"Enemy_Die_SE");
+		pMultiSoundEffect->AddAudioResource(L"Teleport_SE");
 
 	}
 
