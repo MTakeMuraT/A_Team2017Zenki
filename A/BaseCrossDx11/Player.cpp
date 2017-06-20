@@ -133,7 +133,13 @@ namespace basecross {
 
 		m_BlackSprite = blackobj;
 
-
+		//しーるど生成
+		GetStage()->AddGameObject<PlayerShield>(Vector3(0, 0, 0),
+		Vector3(2,2,2),
+		GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_L", false));
+		GetStage()->AddGameObject<PlayerShield>(Vector3(0, 0, 0),
+			Vector3(2,2,2),
+			GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_R", false));
 	}
 
 	void PlayerControl::OnUpdate()
@@ -344,8 +350,8 @@ namespace basecross {
 
 					//Abe20170620
 					//向き変更
-					m_MoveRotFlg = false;		
-					
+					m_MoveRotFlg = false;
+
 					//座標取得
 					Vector3 pos1 = m_Player1->GetComponent<Transform>()->GetPosition();
 					Vector3 pos2 = m_Player2->GetComponent<Transform>()->GetPosition();
@@ -404,6 +410,7 @@ namespace basecross {
 				}
 			}
 		}
+		
 		//ステージ外の制御
 		StintArea();
 		//プレイヤーの位置と回転更新
@@ -605,6 +612,7 @@ namespace basecross {
 		if (!GetInvincible() && GetHit()) {
 			GetStage()->GetSharedGameObject<Player_Life>(L"Life")->LifeDown(GetDamage_int());
 			SetInvincible(true);
+			
 
 			if (GetDamage_int() > 0) {
 
@@ -649,7 +657,7 @@ namespace basecross {
 		auto PlayerLifePtr = GetStage()->GetSharedGameObject<Player_Life>(L"Life", false);
 		auto Pos = m_Player->GetComponent<Transform>()->GetPosition();
 		auto PtrDraw = GetComponent<PNTStaticDraw>();
-		GetComponent<Transform>()->SetPosition(Pos);
+		GetComponent<Transform>()->SetPosition(Pos.x,Pos.y+ 0.5 ,Pos.z);
 		//最初のHPの保存
 		if (InitHpSaveflg) {
 			m_HPSave = PlayerLifePtr->GetLife();
