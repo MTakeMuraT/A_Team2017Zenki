@@ -556,6 +556,9 @@ namespace basecross
 		m_Debugtxt->SetColor(Vector3(0,0,0));
 		//‘å‚«‚³•ÏX
 		m_Debugtxt->SetScaleTxt(40);
+
+		//‰Šú‚Í’â~
+		m_ActiveFlg = false;
 	}
 
 	void CollisionSand::OnUpdate()

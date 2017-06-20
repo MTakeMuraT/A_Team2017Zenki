@@ -19,6 +19,15 @@ namespace basecross {
 		//-----------------------------
 		//初期化
 
+		//デバッグ文字生成
+		m_Debugtxt = GetStage()->AddGameObject<DebugTxt>();
+		m_Debugtxt->SetLayer(10);
+		//色黒に変更
+		m_Debugtxt->SetColor(Vector3(0, 0, 0));
+		//大きさ変更
+		m_Debugtxt->SetScaleTxt(40);
+
+
 		//-----------------------
 		//パラメータ類
 		//-----------------------
@@ -48,11 +57,17 @@ namespace basecross {
 		m_DontMoveFlg2 = false;
 		//-----------------------------
 
+		//座標設定
+		auto trans = AddComponent<Transform>();
+		trans->SetPosition(0, 1.0f, 0);
+		trans->SetScale(0, 0, 0);
+		trans->SetRotation(0, 0, 0);
+
 		for (int i = 0; i < 2; i++)
 		{
 			auto obj = GetStage()->AddGameObject<GameObject>();
 			auto Trans = obj->AddComponent<Transform>();
-			Trans->SetPosition(0, 0.5f, 0);
+			Trans->SetPosition(0, 1.0f, 0);
 			Trans->SetScale(1, 1, 1);
 			Trans->SetRotation(0, 3.14159265f / 180 * 180 * (1 - i), 0);
 
@@ -195,7 +210,6 @@ namespace basecross {
 			{
 				if (CntlVec[0].wButtons & XINPUT_GAMEPAD_A)
 				{
-
 					m_PlayerSDistance += App::GetApp()->GetElapsedTime() * m_DistanceSpeed;
 					if (m_PlayerSDistance > m_PlayerSDistanceLimit)
 					{
@@ -232,6 +246,9 @@ namespace basecross {
 				}
 				else if (CntlVec[0].wReleasedButtons & XINPUT_GAMEPAD_A)
 				{
+					//はさむ判定有効
+					GetStage()->GetSharedGameObject<CollisionSand>(L"CollisionSand", false)->SetActive(true);
+
 					//移動制限
 					m_moveFlg = false;
 					//離れる制限
@@ -297,6 +314,10 @@ namespace basecross {
 					m_rotFlg = true;
 					//戻る解除
 					m_KuttukuAfterFlg = false;
+
+					//はさむ判定無効
+					GetStage()->GetSharedGameObject<CollisionSand>(L"CollisionSand", false)->SetActive(false);
+
 
 					//ステージ外の制御
 				}
@@ -399,6 +420,8 @@ namespace basecross {
 		Vector3 posright = GetComponent<Transform>()->GetPosition();
 		posright += Vector3(cos(-m_rot*3.14159265f / 180), 0, sin(-m_rot*3.14159265f / 180)) * (m_PlayerSDistance / 2);
 		m_Player1->GetComponent<Transform>()->SetPosition(posright);
+
+		m_Debugtxt->SetText(Util::FloatToWStr(GetComponent<Transform>()->GetPosition().y));
 
 		//左位置決定
 		Vector3 porleft = GetComponent<Transform>()->GetPosition();

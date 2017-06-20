@@ -88,6 +88,10 @@ namespace basecross {
 		bool m_AButtonFlg;
 		//ステージ大きさ取得
 		Vector2 m_StageSize = Vector2(0, 0);
+
+		//デバッグ文字表示オブジェ
+		shared_ptr<DebugTxt> m_Debugtxt;
+
 	public:
 		PlayerControl(const shared_ptr<Stage>& StagePtr) : GameObject(StagePtr) {}
 
