@@ -1121,4 +1121,70 @@ namespace basecross{
 	};
 	//Abe20170609
 
+	//Abe20170620
+	//**************************************************************************************
+	//	噴射
+	//　勝手にプレイヤーを見てケツに噴射する
+	//	プログラムの仕様的にはvector配列に入れて
+	//	消すときは配列からErase
+	//**************************************************************************************
+	class KetsuHunsya : public GameObject
+	{
+	private:
+		//状態
+		//Stop 出ない
+		//Normal 普通
+		//Boost deるでるっ！
+		string m_states = "Stop";
+
+		//出すとこ決める
+		wstring m_SharedName = L"None";
+
+		//パラメータ----
+		//生成量
+		int m_Amount;
+		//生成感覚
+		float m_intervaltime;
+		//計算用
+		float m_time;
+		//スピード
+		float m_Speed;
+		//大きさ
+		float m_Size;
+		//--------------
+
+		//スクエア
+		vector<shared_ptr<GameObject>> m_SquareS;
+		//移動速度
+		vector<Vector3> m_Velocity;
+
+		//関数----------
+		//動かす
+		void UpdateSquareS();
+		//--------------
+
+		//デバック用
+		//shared_ptr<DebugTxt> m_Debugtxt;
+	public:
+		KetsuHunsya(const shared_ptr<Stage>& StagePtr) : GameObject(StagePtr) {}
+
+		void OnCreate() override;
+		void OnUpdate() override;
+
+		//その他
+		void SetTargetSharedName(wstring txt) { m_SharedName = txt; }
+
+		//状態操作
+		void Stop();
+		void Normal();
+		void Boost();
+
+		//パラメータ操作
+		void SetAmount(int amo) { m_Amount = amo; }
+		void SetInterval(float ti) { m_intervaltime = ti; }
+		void SetSpeed(float sp) { m_Speed = sp; }
+		void SetSize(float size) { m_Size = size; }
+	};
+	//Abe20170620
+
 }

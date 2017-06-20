@@ -4774,5 +4774,235 @@ namespace basecross {
 
 	}
 	//Abe20170609
+
+
+	//Abe20170620
+	//**************************************************************************************
+	//	噴射
+	//　勝手にプレイヤーを見てケツに噴射する
+	//**************************************************************************************
+	void KetsuHunsya::OnCreate()
+	{
+		//一応初期化
+		m_states = "Stop";
+
+		//パラメータ----
+		//生成量
+		m_Amount = 1;
+		//生成感覚
+		m_intervaltime = 0.05f;
+		//計算用
+		m_time = 0;
+		//スピード
+		m_Speed = 3;
+		//大きさ
+		m_Size = 0.5f;
+		//--------------
+
+		//スクエア
+		m_SquareS.clear();
+		//移動速度
+		m_Velocity.clear();
+
+		//一応
+		AddComponent<Transform>();
+
+		////デバッグ文字生成
+		//m_Debugtxt = GetStage()->AddGameObject<DebugTxt>();
+		//m_Debugtxt->SetLayer(10);
+		////色黒に変更
+		//m_Debugtxt->SetColor(Vector3(0, 0, 0));
+		////大きさ変更
+		//m_Debugtxt->SetScaleTxt(40);
+
+	}
+
+	void KetsuHunsya::OnUpdate()
+	{
+		//移動
+		UpdateSquareS();
+
+		//止める状態
+		if (m_states == "Stop")
+		{
+
+		}
+		else
+		{
+			//時間計測
+			m_time += App::GetApp()->GetElapsedTime();
+
+			//生成するか
+			bool CreFlg = false;
+			//生成量
+			float CreAmount = 0;
+
+			//通常
+			if (m_states == "Normal")
+			{
+				if (m_time > m_intervaltime)
+				{
+					//時間リセット
+					m_time = 0;
+					//生成するフラグオン
+					CreFlg = true;
+					//生成数設定
+					CreAmount = m_Amount;
+					m_Size = 0.5f;
+				}
+			}
+
+			//ブースト
+			if (m_states == "Boost")
+			{
+				//時間半分
+				if (m_time > m_intervaltime / 2)
+				{
+					//時間リセット
+					m_time = 0;
+					//生成するフラグオン
+					CreFlg = true;
+					//生成数設定
+					CreAmount = m_Amount * 4;
+					m_Size = 0.8f;
+				}
+			}
+
+			//生成
+			if (CreFlg)
+			{
+				Vector3 pos = GetStage()->GetSharedGameObject<GameObject>(m_SharedName, false)->GetComponent<Transform>()->GetPosition();
+				//ちょい上
+				pos.y += 0.3f;
+				for (int i = 0; i < CreAmount; i)
+				{
+					int count = 0;
+					for (auto obj : m_SquareS)
+					{
+						if (!obj->GetDrawActive())
+						{
+							i++;
+
+							//速度設定
+							float angle = GetStage()->GetSharedGameObject<GameObject>(m_SharedName, false)->GetComponent<Transform>()->GetRotation().y;
+							if (angle == 0 || angle == 90 || angle == 180 || angle == 270)
+							{
+								angle += 1 * 3.14159265f / 180;
+							}
+							//ケツに出すので角度反転しないとだけど元から逆になってるのでそのまま使う
+							//と思ったけどなんだこれ
+							angle += 180 * 3.14159265f / 180;
+							angle *= -1;
+							Vector3 vel = Vector3(cos(angle), 0, sin(angle)) * m_Speed;
+
+							//ちょいランダムに
+							//ブレ幅は -1.0～-1.0
+							Vector3 randvec3 = Vector3((rand() % 20) - 10, (rand() % 10) - 5, (rand() % 20) - 10) / 10;
+							//増やす
+							if (m_states == "Boost")
+							{
+								randvec3 = Vector3((rand() % 20) - 10, (rand() % 10) - 5, (rand() % 20) - 10) / 5;
+							}
+							vel += randvec3 * m_Speed;
+
+							m_Velocity[count] = vel;
+
+							//出して大きさと位置設定
+							m_SquareS[count]->SetDrawActive(true);
+							Vector3 pos2 = Vector3(cos(angle), 0, sin(angle));
+							m_SquareS[count]->GetComponent<Transform>()->SetPosition(pos + pos2);
+							m_SquareS[count]->GetComponent<Transform>()->SetScale(m_Size, m_Size, m_Size);
+
+							continue;
+						}
+						count++;
+					}
+
+
+					//速度設定
+					float angle = GetStage()->GetSharedGameObject<GameObject>(m_SharedName, false)->GetComponent<Transform>()->GetRotation().y;
+					if (angle == 0 || angle == 90 || angle == 180 || angle == 270)
+					{
+						angle += 1 * 3.14159265f / 180;
+					}
+					//ケツに出すので角度反転しないとだけど元から逆になってるのでそのまま使う
+					//と思ったけどなんだこれ
+					angle += 180 * 3.14159265f / 180;
+					angle *= -1;
+					Vector3 vel = Vector3(cos(angle), 0, sin(angle)) * m_Speed;
+
+					//ちょいランダムに
+					//ブレ幅は -1.0～-1.0
+					Vector3 randvec3 = Vector3((rand() % 20) - 10, (rand() % 10) - 5, (rand() % 20) - 10) / 10;
+					vel += randvec3 * m_Speed;
+
+					m_Velocity.push_back(vel);
+
+
+					//生成
+					auto obj = GetStage()->AddGameObject<GameObject>();
+					auto Trans = obj->AddComponent<Transform>();
+					Vector3 pos2 = Vector3(cos(angle), 0, sin(angle));
+					Trans->SetPosition(pos + pos2);
+					Trans->SetScale(m_Size, m_Size, m_Size);
+					Trans->SetRotation(30 * 3.14159265f / 180, 0, 0);
+
+					auto Draw = obj->AddComponent<PNTStaticDraw>();
+					Draw->SetTextureResource(L"BOOST_TX");
+					Draw->SetMeshResource(L"DEFAULT_SQUARE");
+
+					obj->SetDrawLayer(5);
+					obj->SetAlphaActive(true);
+
+					m_SquareS.push_back(obj);
+
+					i++;
+
+				}
+			}
+		}
+	}
+
+	void KetsuHunsya::UpdateSquareS()
+	{
+		for (int i = 0; i < m_SquareS.size(); i++)
+		{
+			if (m_SquareS[i]->GetDrawActive())
+			{
+				//位置移動
+				Vector3 pos = m_SquareS[i]->GetComponent<Transform>()->GetPosition();
+				pos += m_Velocity[i] * App::GetApp()->GetElapsedTime();
+				m_SquareS[i]->GetComponent<Transform>()->SetPosition(pos);
+
+				//大きさ変更
+				Vector3 sca = m_SquareS[i]->GetComponent<Transform>()->GetScale();
+				sca *= 0.93f;
+				m_SquareS[i]->GetComponent<Transform>()->SetScale(sca);
+				if (sca.x < 0.2f)
+				{
+					m_SquareS[i]->SetDrawActive(false);
+					m_Velocity[i] = Vector3(0, 0, 0);
+				}
+			}
+		}
+	}
+
+	void KetsuHunsya::Stop()
+	{
+		m_states = "Stop";
+	}
+
+	void KetsuHunsya::Normal()
+	{
+		m_states = "Normal";
+	}
+
+	void KetsuHunsya::Boost()
+	{
+		m_states = "Boost";
+	}
+
+	//Abe20170620
+
 }
 	//end basecross

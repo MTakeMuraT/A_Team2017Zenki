@@ -75,6 +75,11 @@ namespace basecross
 		void DamageCamera();
 		//Abe20170612
 
+		//Abe20170620
+		//ブースト作成
+		void CreateBoost();
+		//Abe20170620
+
 	public:
 		//構築と破棄
 		GameStage() :Stage() {}

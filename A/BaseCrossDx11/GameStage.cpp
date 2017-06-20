@@ -163,6 +163,25 @@ namespace basecross
 	//ポーズ作成--------------------------------------------
 	//Abe20170605
 
+	//Abe20170620
+	//ブースト作成--------------------------------------------
+	void GameStage::CreateBoost()
+	{
+		auto obj = AddGameObject<KetsuHunsya>();
+		obj->SetTargetSharedName(L"GamePlayer_L");
+		obj->Normal();
+		SetSharedGameObject(L"Ketu_L", obj);
+
+		
+		auto obj2 = AddGameObject<KetsuHunsya>();
+		obj2->SetTargetSharedName(L"GamePlayer_R");
+		obj2->Normal();
+		SetSharedGameObject(L"Ketu_R", obj2);
+
+	}
+	//ブースト作成--------------------------------------------
+	//Abe20170620
+
 	void GameStage::OnCreate()
 	{
 		try {
@@ -225,6 +244,11 @@ namespace basecross
 			//ポーズ作成
 			CreatePause();
 			//Abe20170605
+
+			//Abe20170620
+			//ブースト作成
+			CreateBoost();
+			//Abe20170620
 
 			//2017/05/17今泉CSV//
 			AddGameObject<InputCSV>();
