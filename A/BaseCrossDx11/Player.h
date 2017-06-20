@@ -78,10 +78,6 @@ namespace basecross {
 		//-----------------------
 		//プレイヤーたちの座標を更新
 		void PosRotUpdate();
-		//ステージの外に行こうとしたら戻す判定
-		void CheckStageEnd();
-		//暗転処理
-		void BlackUpdate();
 		//アニメーション更新
 		void UpdateAnimation();
 		//-----------------------
@@ -90,6 +86,8 @@ namespace basecross {
 		bool m_moveFlg;
 		bool m_rotFlg;
 		bool m_AButtonFlg;
+		//ステージ大きさ取得
+		Vector2 m_StageSize = Vector2(0, 0);
 	public:
 		PlayerControl(const shared_ptr<Stage>& StagePtr) : GameObject(StagePtr) {}
 
@@ -104,6 +102,8 @@ namespace basecross {
 		void DontMove() { m_DontMoveFlg2 = true; }
 		//当たり判定
 		void SetActiveCollision(bool flg);
+		//外に出ない用の関数
+		void StintArea();
 		
 	};
 

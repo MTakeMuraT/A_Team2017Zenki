@@ -97,6 +97,9 @@ namespace basecross {
 
 				m_Player2 = obj;
 			}
+			//ステージの大きさ
+			auto ScenePtr = App::GetApp()->GetScene<Scene>();
+			m_StageSize = ScenePtr->GetStageSize() / 2;
 		}
 
 		//黒幕作成-----------------------------------------
@@ -127,12 +130,12 @@ namespace basecross {
 		{
 			return;
 		}
-		//暗転中は動かせない
-		if (m_DontMoveFlg)
-		{
-			BlackUpdate();
-			return;
-		}
+		////暗転中は動かせない
+		//if (m_DontMoveFlg)
+		//{
+		//	BlackUpdate();
+		//	return;
+		//}
 		//コントローラ取得
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		if (CntlVec[0].bConnected)
@@ -156,7 +159,7 @@ namespace basecross {
 					float angle = atan2(InputXY.z, InputXY.x);
 					m_Player1->GetComponent<Transform>()->SetRotation(0, -angle, 0);
 					m_Player2->GetComponent<Transform>()->SetRotation(0, -angle, 0);
-
+					//ステージ外の制御
 				}
 				else
 				{
@@ -243,7 +246,9 @@ namespace basecross {
 					m_rotFlg = true;
 					//戻る解除
 					m_KuttukuAfterFlg = false;
+					//ステージ外の制御
 				}
+				//ステージ外の制御
 			}
 			//回転--------------------------------------------------
 			if (m_rotFlg)
@@ -270,12 +275,10 @@ namespace basecross {
 				}
 			}
 		}
-
+		//ステージ外の制御
+		StintArea();
 		//プレイヤーの位置と回転更新
 		PosRotUpdate();
-		//ステージの外に行こうとしたら戻す
-		CheckStageEnd();
-
 	}
 
 	//----------------------------------------------
@@ -316,50 +319,6 @@ namespace basecross {
 		}
 	}
 
-	//ステージの外に行こうとしたら戻す判定
-	void PlayerControl::CheckStageEnd()
-	{
-		Vector3 pos = GetComponent<Transform>()->GetPosition();
-		if (abs(pos.x) > 30 || abs(pos.z) > 30)
-		{
-			m_DontMoveFlg = true;
-			m_BlackAlpha = 0;
-			m_BlackAlphaFlg = false;
-		}
-	}
-
-	void PlayerControl::BlackUpdate()
-	{
-		if (!m_BlackAlphaFlg)
-		{
-			m_BlackAlpha += App::GetApp()->GetElapsedTime();
-			m_BlackSprite->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_BlackAlpha));
-			if (m_BlackAlpha > 1.0f)
-			{
-				m_BlackAlphaFlg = true;
-
-				//座標更新
-				Vector3 pos = GetComponent<Transform>()->GetPosition();
-				pos = Vector3(0, 0, 0);
-				GetComponent<Transform>()->SetPosition(pos);
-				m_rot = 0;
-				m_Kansei = Vector3(0, 0, 0);
-				//プレイヤーの位置と回転更新
-				PosRotUpdate();
-
-			}
-		}
-		else
-		{
-			m_BlackAlpha += -App::GetApp()->GetElapsedTime();
-			m_BlackSprite->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_BlackAlpha));
-			if (m_BlackAlpha < 0)
-			{
-				m_BlackAlphaFlg = false;
-				m_DontMoveFlg = false;
-			}
-		}
-	}
 
 	//アニメーション更新
 	void PlayerControl::UpdateAnimation()
@@ -415,6 +374,74 @@ namespace basecross {
 				L"スタート関数の中「SetActiveCollision」",
 				L"PtrCollisionSandが存在していません"
 			);
+		}
+	}
+	//エリア制限関数
+	void PlayerControl::StintArea() {
+	
+		auto PlayerControlTrans = GetComponent<Transform>();
+		Vector3 PlayerControlPos = PlayerControlTrans->GetPosition();
+		Vector3 PlayerL_Pos = m_Player1->GetComponent<Transform>()->GetPosition();
+		Vector3 PlayerR_Pos = m_Player2->GetComponent<Transform>()->GetPosition();
+		Vector3 PlayerL_Scale = m_Player1->GetComponent<Transform>()->GetScale();
+		Vector3 PlayerR_Scale = m_Player2->GetComponent<Transform>()->GetScale();
+		auto Elap = App::GetApp()->GetElapsedTime();
+		//右　PLayerR
+		if (m_StageSize.x < PlayerR_Pos.x) {
+			float n2 = m_StageSize.x - PlayerR_Pos.x;
+			PlayerControlPos.x += n2;
+			PlayerControlTrans->SetPosition(PlayerControlPos.x, PlayerControlPos.y, PlayerControlPos.z);
+		}
+		//PLayerL
+		if (m_StageSize.x < PlayerL_Pos.x) {
+			float n2 = m_StageSize.x - PlayerL_Pos.x;
+			PlayerControlPos.x += n2;
+			PlayerControlTrans->SetPosition(PlayerControlPos.x, PlayerControlPos.y, PlayerControlPos.z);
+
+		}
+		//左　PLayerL
+		if (-m_StageSize.x > PlayerL_Pos.x)
+		{
+			float n = -m_StageSize.x + (-PlayerL_Pos.x);
+			PlayerControlPos.x += n;
+
+			PlayerControlTrans->SetPosition(PlayerControlPos.x, PlayerControlPos.y, PlayerControlPos.z);
+
+		}
+		//PlayerR
+		if (-m_StageSize.x > PlayerR_Pos.x) {
+			float n = -m_StageSize.x + (-PlayerR_Pos.x);
+			PlayerControlPos.x += n;
+			PlayerControlTrans->SetPosition(PlayerControlPos.x, PlayerControlPos.y, PlayerControlPos.z);
+
+		}
+		//上　PlayerL
+		if (m_StageSize.y - 1.5 < PlayerL_Pos.z) {
+			float n3 = (m_StageSize.y - 1.5) - PlayerL_Pos.z;
+			PlayerControlPos.z += n3;
+			PlayerControlTrans->SetPosition(PlayerControlPos.x, PlayerControlPos.y, PlayerControlPos.z);
+
+		}
+		//PLayerR
+		if (m_StageSize.y - 1.5 < PlayerR_Pos.z) {
+			float n3 = (m_StageSize.y - 1.5) - PlayerR_Pos.z;
+			PlayerControlPos.z += n3;
+			PlayerControlTrans->SetPosition(PlayerControlPos.x, PlayerControlPos.y, PlayerControlPos.z);
+
+		}
+		//下　PlayerL
+		if (-m_StageSize.y > PlayerL_Pos.z) {
+			float n3 = -m_StageSize.y + (-PlayerL_Pos.z);
+			PlayerControlPos.z += n3;
+			PlayerControlTrans->SetPosition(PlayerControlPos.x, PlayerControlPos.y, PlayerControlPos.z);
+
+		}
+		//PLayerR
+		if (-m_StageSize.y > PlayerR_Pos.z) {
+			float n3 = -m_StageSize.y + (-PlayerR_Pos.z);
+			PlayerControlPos.z += n3;
+			PlayerControlTrans->SetPosition(PlayerControlPos.x, PlayerControlPos.y, PlayerControlPos.z);
+
 		}
 	}
 	//--------------------------------------------------------------------------------------
