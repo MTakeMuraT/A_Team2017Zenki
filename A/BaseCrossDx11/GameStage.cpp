@@ -464,6 +464,10 @@ namespace basecross
 		if (!ptr && !ptr2)
 		{
 			SetSharedGameObject(L"GameOverS",AddGameObject<GameOverS>());
+
+			GetSharedGameObject<KetsuHunsya>(L"Ketu_R", false)->Stop();
+			GetSharedGameObject<KetsuHunsya>(L"Ketu_L", false)->Stop();
+
 		}
 	}
 	//Abe20170529
@@ -511,6 +515,9 @@ namespace basecross
 		if (!ptr && !ptr2)
 		{
 			SetSharedGameObject(L"ResultS", AddGameObject<ResultS>());
+
+			GetSharedGameObject<KetsuHunsya>(L"Ketu_R", false)->Stop();
+			GetSharedGameObject<KetsuHunsya>(L"Ketu_L", false)->Stop();
 		}
 	}
 	

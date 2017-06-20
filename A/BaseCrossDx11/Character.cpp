@@ -2901,7 +2901,7 @@ namespace basecross {
 					{
 						//回転固定
 						rot1.y = 90 * 3.14159265f / 180;
-						rot2.y = -90 * 3.14159265f / 180;
+						rot2.y = 90 * 3.14159265f / 180;
 
 						//状態変更
 						m_State = 3;
@@ -4580,6 +4580,13 @@ namespace basecross {
 		//初期起動
 		if (m_Init)
 		{
+			//Abe20170620
+			//ブースト切る
+			GetStage()->GetSharedGameObject<KetsuHunsya>(L"Ketu_R", false)->Stop();
+			GetStage()->GetSharedGameObject<KetsuHunsya>(L"Ketu_L", false)->Stop();
+			//Abe20170620
+
+
 			m_Init = false;
 			//全部の動くオブジェクトを止める
 			auto ColGroup = GetStage()->GetSharedObjectGroup(L"CollisionGroup")->GetGroupVector();
