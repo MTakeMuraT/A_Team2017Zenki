@@ -836,7 +836,7 @@ namespace basecross
 		pMultiSoundEffect->AddAudioResource(L"Player_Look_SE");
 		pMultiSoundEffect->AddAudioResource(L"Enemy_Damage_SE");
 		pMultiSoundEffect->AddAudioResource(L"Enemy_Die_SE");
-		pMultiSoundEffect->AddAudioResource(L"Shot_SE");
+		//pMultiSoundEffect->AddAudioResource(L"Shot_SE");
 
 	}
 
@@ -2595,7 +2595,7 @@ namespace basecross
 		m_ExplosionTime = 3.0f;
 	}
 
-	void Bomb::OnCreate()
+	void Bomb::OnCreate() 
 	{
 		//À•WA‘å‚«‚³A‰ñ“]
 		auto Trans = AddComponent<Transform>();
