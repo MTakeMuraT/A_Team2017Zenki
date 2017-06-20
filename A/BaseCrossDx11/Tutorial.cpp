@@ -89,6 +89,25 @@ namespace basecross
 		SetSharedGameObject(L"BakuSanSpawn",AddGameObject<BakuSanSpawn>());
 	}
 
+	//Abe20170620
+	//ブースト作成--------------------------------------------
+	void TutorialScene::CreateBoost()
+	{
+		auto obj = AddGameObject<KetsuHunsya>();
+		obj->SetTargetSharedName(L"GamePlayer_L");
+		obj->Normal();
+		SetSharedGameObject(L"Ketu_L", obj);
+
+
+		auto obj2 = AddGameObject<KetsuHunsya>();
+		obj2->SetTargetSharedName(L"GamePlayer_R");
+		obj2->Normal();
+		SetSharedGameObject(L"Ketu_R", obj2);
+
+	}
+	//ブースト作成--------------------------------------------
+	//Abe20170620
+
 	void TutorialScene::OnCreate()
 	{
 		try 
@@ -115,6 +134,11 @@ namespace basecross
 			
 			//エネミー作成
 			CreateEnemy();
+			
+			//Abe20170620
+			//ブースト作成
+			CreateBoost();
+			//Abe20170620
 
 			//カメラ更新
 			m_CameraMoveFlg = true;
@@ -176,7 +200,7 @@ namespace basecross
 
 		if (CntlVec[0].wButtons & XINPUT_GAMEPAD_BACK && CntlVec[0].wButtons & XINPUT_GAMEPAD_START)
 		{
-			//シーンリロード
+			//シーンタイトルへ
 			auto ScenePtr = App::GetApp()->GetScene<Scene>();
 			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToTitleScene");
 		}
@@ -321,6 +345,13 @@ namespace basecross
 		m_DontMoveFlg2 = false;
 		//-----------------------------
 
+		//座標設定
+		auto trans = AddComponent<Transform>();
+		trans->SetPosition(0, 1.0f, 0);
+		trans->SetScale(0, 0, 0);
+		trans->SetRotation(0, 0, 0);
+
+
 		for (int i = 0; i < 2; i++)
 		{
 			auto obj = GetStage()->AddGameObject<GameObject>();
@@ -411,21 +442,18 @@ namespace basecross
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		if (CntlVec[0].bConnected)
 		{
-			//**********************
-			//コマンド
-			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_BACK && CntlVec[0].wButtons & XINPUT_GAMEPAD_START)
-			{
-				//シーンタイトル
-				auto ScenePtr = App::GetApp()->GetScene<Scene>();
-				PostEvent(2.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToTitleScene");
-			}
-			//**********************
 
 			//移動------------------------------------------------------------
 			if (m_moveFlg)
 			{
 				if (abs(CntlVec[0].fThumbLX) + abs(CntlVec[0].fThumbLY) >= 0.2f)
 				{
+					//Abe20170620
+					//ブースト起動
+					GetStage()->GetSharedGameObject<KetsuHunsya>(L"Ketu_R", false)->Normal();
+					GetStage()->GetSharedGameObject<KetsuHunsya>(L"Ketu_L", false)->Normal();
+					//Abe20170620
+
 					Vector3 InputXY = Vector3(CntlVec[0].fThumbLX, 0, CntlVec[0].fThumbLY);
 					Vector3 pos = GetComponent<Transform>()->GetPosition();
 					pos += InputXY * App::GetApp()->GetElapsedTime() * m_Speed;
@@ -439,13 +467,15 @@ namespace basecross
 					float angle = atan2(InputXY.z, InputXY.x);
 					m_Player1->GetComponent<Transform>()->SetRotation(0, -angle, 0);
 					m_Player2->GetComponent<Transform>()->SetRotation(0, -angle, 0);
-
+					//ステージ外の制御
 				}
 				else
 				{
-
-					//回転
-					m_MoveRotFlg = true;
+					//Abe20170620
+					//ブースト切る
+					GetStage()->GetSharedGameObject<KetsuHunsya>(L"Ketu_R", false)->Stop();
+					GetStage()->GetSharedGameObject<KetsuHunsya>(L"Ketu_L", false)->Stop();
+					//Abe20170620
 
 					//入力なければ完成で流す
 					if (abs(m_Kansei.x) + abs(m_Kansei.z) >= 0.2f)
@@ -472,9 +502,38 @@ namespace basecross
 					{
 						m_PlayerSDistance = m_PlayerSDistanceLimit;
 					}
+					else
+					{
+						//Abe20170620
+						//ブースト強め
+						GetStage()->GetSharedGameObject<KetsuHunsya>(L"Ketu_R", false)->Boost();
+						GetStage()->GetSharedGameObject<KetsuHunsya>(L"Ketu_L", false)->Boost();
+
+
+						//回転
+						m_MoveRotFlg = false;
+						//座標取得
+						Vector3 pos1 = m_Player1->GetComponent<Transform>()->GetPosition();
+						Vector3 pos2 = m_Player2->GetComponent<Transform>()->GetPosition();
+
+						//差計算
+						Vector3 dis1 = pos1 - pos2;
+						Vector3 dis2 = pos2 - pos1;
+
+
+						//角度計算
+						float angle1 = atan2(dis1.z, dis1.x);
+						float angle2 = atan2(dis2.z, dis2.x);
+
+						m_Player1->GetComponent<Transform>()->SetRotation(0, -angle1, 0);
+						m_Player2->GetComponent<Transform>()->SetRotation(0, -angle2, 0);
+						//Abe20170620
+
+					}
 				}
 				else if (CntlVec[0].wReleasedButtons & XINPUT_GAMEPAD_A)
 				{
+
 					//移動制限
 					m_moveFlg = false;
 					//離れる制限
@@ -487,10 +546,17 @@ namespace basecross
 					m_KuttukuAfterFlg = false;
 					//くっつく速度初期化
 					m_KuttukuSpeed = 20.0f;
+
+					//Abe20170620
+					//ブースト強め
+					GetStage()->GetSharedGameObject<KetsuHunsya>(L"Ketu_R", false)->Boost();
+					GetStage()->GetSharedGameObject<KetsuHunsya>(L"Ketu_L", false)->Boost();
+					//Abe20170620
+
 				}
 			}
 			//くっつく
-			else if(m_KuttukuFlg)
+			else if (m_KuttukuFlg)
 			{
 				//回転も制限
 				m_MoveRotFlg = true;
@@ -499,7 +565,6 @@ namespace basecross
 				m_PlayerSDistance += -m_KuttukuSpeed * App::GetApp()->GetElapsedTime();
 				//速度上げる
 				m_KuttukuSpeed *= 1.1f;
-
 				//くっついたら
 				if (m_PlayerSDistance < 1.0f)
 				{
@@ -507,6 +572,12 @@ namespace basecross
 					m_KuttukuFlg = false;
 					//戻るON
 					m_KuttukuAfterFlg = true;
+
+					//Abe20170620
+					//ブースト起動
+					GetStage()->GetSharedGameObject<KetsuHunsya>(L"Ketu_R", false)->Normal();
+					GetStage()->GetSharedGameObject<KetsuHunsya>(L"Ketu_L", false)->Normal();
+					//Abe20170620
 				}
 			}
 			//離す処理
@@ -526,7 +597,12 @@ namespace basecross
 					m_rotFlg = true;
 					//戻る解除
 					m_KuttukuAfterFlg = false;
+
+
+
+					//ステージ外の制御
 				}
+				//ステージ外の制御
 			}
 			//回転--------------------------------------------------
 			if (m_rotFlg)
@@ -534,26 +610,82 @@ namespace basecross
 				//左回転
 				if (CntlVec[0].wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
 				{
+					//Abe20170620
+					//ブースト起動
+					GetStage()->GetSharedGameObject<KetsuHunsya>(L"Ketu_R", false)->Normal();
+					GetStage()->GetSharedGameObject<KetsuHunsya>(L"Ketu_L", false)->Normal();
+					//Abe20170620
+
 					m_rot += -m_rotSpeed * App::GetApp()->GetElapsedTime();
 					//一応ループさせとく
 					if (m_rot < 0)
 					{
 						m_rot = 360;
 					}
+
+					//Abe20170620
+					//向き変更
+					m_MoveRotFlg = false;
+
+					//座標取得
+					Vector3 pos1 = m_Player1->GetComponent<Transform>()->GetPosition();
+					Vector3 pos2 = m_Player2->GetComponent<Transform>()->GetPosition();
+
+					//差計算
+					Vector3 dis1 = pos2 - pos1;
+					Vector3 dis2 = pos1 - pos2;
+
+					//角度計算
+					float angle1 = atan2(dis1.z, dis1.x) + -90 * 3.14159265f / 180;
+					float angle2 = atan2(dis2.z, dis2.x) + -90 * 3.14159265f / 180;
+
+					m_Player1->GetComponent<Transform>()->SetRotation(0, -angle1, 0);
+					m_Player2->GetComponent<Transform>()->SetRotation(0, -angle2, 0);
+
+					//Abe20170620
+
 				}
 				//右回転
 				if (CntlVec[0].wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
 				{
+					//Abe20170620
+					//ブースト起動
+					GetStage()->GetSharedGameObject<KetsuHunsya>(L"Ketu_R", false)->Normal();
+					GetStage()->GetSharedGameObject<KetsuHunsya>(L"Ketu_L", false)->Normal();
+					//Abe20170620
+
 					m_rot += m_rotSpeed * App::GetApp()->GetElapsedTime();
 					//一応ループさせとく
 					if (m_rot > 360)
 					{
 						m_rot = 0;
 					}
+
+					//Abe20170620
+					//向き変更
+					m_MoveRotFlg = false;
+
+					//座標取得
+					Vector3 pos1 = m_Player1->GetComponent<Transform>()->GetPosition();
+					Vector3 pos2 = m_Player2->GetComponent<Transform>()->GetPosition();
+
+					//差計算
+					Vector3 dis1 = pos2 - pos1;
+					Vector3 dis2 = pos1 - pos2;
+
+					//角度計算
+					float angle1 = atan2(dis1.z, dis1.x) + 90 * 3.14159265f / 180;
+					float angle2 = atan2(dis2.z, dis2.x) + 90 * 3.14159265f / 180;
+
+					m_Player1->GetComponent<Transform>()->SetRotation(0, -angle1, 0);
+					m_Player2->GetComponent<Transform>()->SetRotation(0, -angle2, 0);
+
+					//Abe20170620
+
 				}
 			}
 		}
-		
+
 
 		//プレイヤーの位置と回転更新
 		PosRotUpdate();
