@@ -4788,7 +4788,7 @@ namespace basecross {
 
 		//パラメータ----
 		//生成量
-		m_Amount = 1;
+		m_Amount = 2;
 		//生成感覚
 		m_intervaltime = 0.05f;
 		//計算用
@@ -4822,6 +4822,7 @@ namespace basecross {
 		//移動
 		UpdateSquareS();
 
+		
 		//止める状態
 		if (m_states == "Stop")
 		{
@@ -4836,7 +4837,10 @@ namespace basecross {
 			bool CreFlg = false;
 			//生成量
 			float CreAmount = 0;
-
+			//サイズ
+			float size = m_Size;
+			//スピード
+			float speed = m_Speed;
 			//通常
 			if (m_states == "Normal")
 			{
@@ -4848,7 +4852,7 @@ namespace basecross {
 					CreFlg = true;
 					//生成数設定
 					CreAmount = m_Amount;
-					m_Size = 0.5f;
+					
 				}
 			}
 
@@ -4856,15 +4860,16 @@ namespace basecross {
 			if (m_states == "Boost")
 			{
 				//時間半分
-				if (m_time > m_intervaltime / 2)
+				if (m_time > m_intervaltime * 0.2f)
 				{
 					//時間リセット
 					m_time = 0;
 					//生成するフラグオン
 					CreFlg = true;
 					//生成数設定
-					CreAmount = m_Amount * 4;
-					m_Size = 0.8f;
+					CreAmount = m_Amount * 2;
+					size *= 2.0f;
+					speed *= 3.0f;
 				}
 			}
 
@@ -4893,7 +4898,7 @@ namespace basecross {
 							//と思ったけどなんだこれ
 							angle += 180 * 3.14159265f / 180;
 							angle *= -1;
-							Vector3 vel = Vector3(cos(angle), 0, sin(angle)) * m_Speed;
+							Vector3 vel = Vector3(cos(angle), 0, sin(angle)) * speed;
 
 							//ちょいランダムに
 							//ブレ幅は -1.0～-1.0
@@ -4901,17 +4906,17 @@ namespace basecross {
 							//増やす
 							if (m_states == "Boost")
 							{
-								randvec3 = Vector3((rand() % 20) - 10, (rand() % 10) - 5, (rand() % 20) - 10) / 5;
+								randvec3 = Vector3((rand() % 10) - 5, (rand() % 10) - 5, (rand() % 10) - 5) / 10;
 							}
-							vel += randvec3 * m_Speed;
+							vel += randvec3 * speed;
 
 							m_Velocity[count] = vel;
 
 							//出して大きさと位置設定
 							m_SquareS[count]->SetDrawActive(true);
-							Vector3 pos2 = Vector3(cos(angle), 0, sin(angle));
+							Vector3 pos2 = Vector3(cos(angle) + ((rand() % 100) - 50) / 100, 0, sin(angle) + ((rand() % 100) - 50) / 100);
 							m_SquareS[count]->GetComponent<Transform>()->SetPosition(pos + pos2);
-							m_SquareS[count]->GetComponent<Transform>()->SetScale(m_Size, m_Size, m_Size);
+							m_SquareS[count]->GetComponent<Transform>()->SetScale(size, size, size);
 
 							continue;
 						}
@@ -4929,12 +4934,12 @@ namespace basecross {
 					//と思ったけどなんだこれ
 					angle += 180 * 3.14159265f / 180;
 					angle *= -1;
-					Vector3 vel = Vector3(cos(angle), 0, sin(angle)) * m_Speed;
+					Vector3 vel = Vector3(cos(angle), 0, sin(angle)) * speed;
 
 					//ちょいランダムに
 					//ブレ幅は -1.0～-1.0
 					Vector3 randvec3 = Vector3((rand() % 20) - 10, (rand() % 10) - 5, (rand() % 20) - 10) / 10;
-					vel += randvec3 * m_Speed;
+					vel += randvec3 * speed;
 
 					m_Velocity.push_back(vel);
 
@@ -4942,9 +4947,9 @@ namespace basecross {
 					//生成
 					auto obj = GetStage()->AddGameObject<GameObject>();
 					auto Trans = obj->AddComponent<Transform>();
-					Vector3 pos2 = Vector3(cos(angle), 0, sin(angle));
+					Vector3 pos2 = Vector3(cos(angle) + ((rand() % 100) - 50) / 100, 0, sin(angle) + ((rand() % 100) - 50) / 100);
 					Trans->SetPosition(pos + pos2);
-					Trans->SetScale(m_Size, m_Size, m_Size);
+					Trans->SetScale(size, size, size);
 					Trans->SetRotation(30 * 3.14159265f / 180, 0, 0);
 
 					auto Draw = obj->AddComponent<PNTStaticDraw>();
