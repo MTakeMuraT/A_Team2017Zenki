@@ -291,24 +291,28 @@ namespace basecross
 		{
 			pos.x = m_StageSize.x - scale.x;
 			m_Velocity.x *= -1;
+			GetComponent<Transform>()->SetPosition(pos);
 		}
 		//è„
 		if (m_StageSize.y < PositionPXYMXY.y)
 		{
 			pos.z = m_StageSize.y - scale.z;
 			m_Velocity.z *= -1;
+			GetComponent<Transform>()->SetPosition(pos);
 		}
 		//ç∂
 		if (-m_StageSize.x > PositionPXYMXY.z)
 		{
 			pos.x = -m_StageSize.x + scale.x;
 			m_Velocity.x *= -1;
+			GetComponent<Transform>()->SetPosition(pos);
 		}
 		//â∫
 		if (-m_StageSize.y > PositionPXYMXY.w)
 		{
 			pos.z = -m_StageSize.y + scale.z;
 			m_Velocity.z *= -1;
+			GetComponent<Transform>()->SetPosition(pos);
 		}
 
 	}
