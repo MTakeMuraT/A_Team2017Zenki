@@ -310,6 +310,12 @@ namespace basecross
 		void DamagePlayer();
 		//ミサイルとか爆弾とか
 		void Damage(int power);
+
+		//Abe20170622
+		//デバッグ用
+		float GetCoolTime() { return m_CoolTime; }
+		//Abe20170622
+
 	};
 
 	//************************************

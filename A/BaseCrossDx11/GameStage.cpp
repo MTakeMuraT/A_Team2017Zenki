@@ -286,6 +286,18 @@ namespace basecross
 			//SetSharedGameObject(L"Shield",AddGameObject<EnemyShield>(3, Vector3(0, 1, 0), Vector3(1, 1, 1), 1));
 			//Abe20170612
 
+
+			//Abe20170622
+			//デバッグ文字生成
+			auto obj = AddGameObject<DebugTxt>();
+			obj->SetLayer(10);
+			//色黒に変更
+			obj->SetColor(Vector3(0, 0, 0));
+			//大きさ変更
+			obj->SetScaleTxt(40);
+			SetSharedGameObject(L"DebugTxt", obj);
+			//Abe20170622
+
 		}
 		catch (...) {
 
@@ -301,6 +313,23 @@ namespace basecross
 	// シーン遷移
 	void GameStage::OnUpdate()
 	{
+
+		//Abe20170622
+		//ショットエネミーのクールタイム一覧
+		/*
+		wstring txtes;
+		for (auto obj : GetSharedObjectGroup(L"EnemyGroup", false)->GetGroupVector())
+		{
+			auto ptr = dynamic_pointer_cast<ShotEnemy>(obj.lock());
+			if (ptr)
+			{
+				txtes += L"CT:" + Util::FloatToWStr(ptr->GetCoolTime()) + L"\n";
+			}
+		}
+		GetSharedGameObject<DebugTxt>(L"DebugTxt", false)->SetText(txtes);
+		*/
+		//Abe20170622
+
 		//Abe20170609
 		//始まり演出
 		if (!GetSharedGameObject<StartState>(L"StartState", false))

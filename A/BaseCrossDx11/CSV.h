@@ -85,7 +85,7 @@ namespace basecross {
 		//クールタイム
 		int BranchCoolTime(vector<wstring> Tokens,vector<wstring> Tokens2);
 		//ショットクールタイム
-		int BranchShotCoolTime(vector<wstring> Tokens,vector<wstring> Tokens2);
+		float BranchShotCoolTime(vector<wstring> Tokens,vector<wstring> Tokens2);
 		//スピード
 		int BranchSpeed(vector<wstring> Tokens,vector<wstring> Tokens2);
 		//攻撃力

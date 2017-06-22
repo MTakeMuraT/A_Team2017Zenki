@@ -173,9 +173,14 @@ namespace basecross {
 	}
 	//ショットクールタイム
 	int InputCSV::MultiShotCoolTime( vector<wstring> Tokens2) {
-		int m_Min = (float)_wtof(Tokens2[0].c_str());
-		int m_Max = (float)_wtof(Tokens2[1].c_str());
-		m_ShotCoolTime = Random((int)m_Min, (int)m_Max);
+		//int m_Min = (float)_wtof(Tokens2[0].c_str());
+		//int m_Max = (float)_wtof(Tokens2[1].c_str());
+		float m_Min = (float)_wtof(Tokens2[0].c_str());
+		float m_Max = (float)_wtof(Tokens2[1].c_str());
+
+		//m_ShotCoolTime = Random((int)m_Min, (int)m_Max);
+		m_ShotCoolTime = rand() % (int)(m_Min * 100), rand() % (int)(m_Max * 100);
+		m_ShotCoolTime /= 100;
 		Tokens2.clear();
 		return m_ShotCoolTime;
 	}
@@ -283,7 +288,7 @@ namespace basecross {
 		}
 	}
 	//ショットクールタイム
-	int InputCSV::BranchShotCoolTime(vector<wstring> Tokens, vector<wstring> Tokens2) {
+	float InputCSV::BranchShotCoolTime(vector<wstring> Tokens, vector<wstring> Tokens2) {
 		auto TowValue_Str = Tokens[7].c_str();
 		Util::WStrToTokenVector(Tokens2, TowValue_Str, L':');
 		if (Tokens2.size() == 2) {
