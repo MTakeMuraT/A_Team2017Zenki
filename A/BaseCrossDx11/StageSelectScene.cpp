@@ -204,6 +204,12 @@ namespace basecross {
 
 			//遷移アニメーション
 			AddGameObject<SceneChangeSSOut>()->OnAnim();
+
+			//Abe20170622
+			//スコア保存テスト
+			SetSharedGameObject(L"ScoreDisplay", AddGameObject<ScoreDisplay>());
+			//Abe20170622
+
 		}
 
 		catch (...) {
@@ -223,6 +229,13 @@ namespace basecross {
 			ScenePtr->SetCsvStageNum(L"1");
 			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToGameStage");
 		}
+
+		//Abe20170622
+		if (KeylVec.m_bPressedKeyTbl['B'])
+		{
+			GetSharedGameObject<ScoreDisplay>(L"ScoreDisplay", false)->Disp(1);
+		}
+		//Abe20170622
 
 		//**********************
 		//コマンド

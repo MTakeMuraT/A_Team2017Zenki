@@ -26,6 +26,10 @@ namespace basecross{
 		//ステージCSV番号
 		wstring m_CsvStageNum;
 
+		//Abe20170515
+		//int m_stagescorearr[16][5] = { 0 };
+		//Abe20170515
+
 	public:
 
 		//--------------------------------------------------------------------------------------
@@ -61,8 +65,17 @@ namespace basecross{
 		//CSVのステージナンバーアクセサ
 		void SetCsvStageNum(wstring StageNumCSV) { m_CsvStageNum = StageNumCSV; }
 		wstring GetCsvStageNum() { return m_CsvStageNum; }
-	};
 
+
+		//Abe20170622
+		//スコア登録
+		void SetStageScore(int score);
+
+		//スコア取得
+		int GetStageScore(int stage, int num);
+		//Abe20170622
+
+	};
 }
 
 //end basecross

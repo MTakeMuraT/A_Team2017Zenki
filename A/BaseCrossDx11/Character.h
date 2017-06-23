@@ -1187,4 +1187,30 @@ namespace basecross{
 	};
 	//Abe20170620
 
+
+	//Abe20170622
+	//**************************************************************************************
+	//	スコア出す
+	//	とりあえず開いたときに読む、保存はしないめんどい
+	//**************************************************************************************
+	class ScoreDisplay : public GameObject
+	{
+	private :
+
+		//デバッグ文字表示オブジェ
+		shared_ptr<DebugTxt> m_Debugtxt;
+
+	public :
+		ScoreDisplay(const shared_ptr<Stage>& StagePtr) : GameObject(StagePtr) {}
+
+		void OnCreate() override;
+
+		//表示(引数はステージ番号)
+		void Disp(int stagenum);
+
+		//消し
+		void Delete();
+	};
+	//Abe20170622
+
 }

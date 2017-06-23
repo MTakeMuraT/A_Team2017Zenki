@@ -3319,6 +3319,14 @@ namespace basecross {
 						//透明度設定
 						m_BlackAlpha = 1;
 						m_RankAlpha = 1;
+
+
+						//Abe20170622
+						//得点シーンに登録
+						auto ScenePtr = App::GetApp()->GetScene<Scene>();
+						ScenePtr->SetStageScore(m_TotalScore);
+						//Abe20170622
+
 					}
 					m_RankSp->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_RankAlpha));
 
@@ -5015,6 +5023,50 @@ namespace basecross {
 	}
 
 	//Abe20170620
+
+
+	//Abe20170622
+	//**************************************************************************************
+	//	スコア出す
+	//	とりあえず開いたときに読む、保存はしないめんどい
+	//**************************************************************************************
+	void ScoreDisplay::OnCreate()
+	{
+		//デバッグ文字生成
+		m_Debugtxt = GetStage()->AddGameObject<DebugTxt>();
+		m_Debugtxt->SetLayer(10);
+		//色黒に変更
+		m_Debugtxt->SetColor(Vector3(1, 1, 1));
+		//大きさ変更
+		m_Debugtxt->SetScaleTxt(40);
+
+	}
+
+	//表示(引数はステージ番号)
+	void ScoreDisplay::Disp(int stagenum)
+	{
+		auto SceneP = App::GetApp()->GetScene<Scene>();
+
+		//配列
+		int arr[5] = { 0 };
+
+		wstring txt;
+		for (int i = 0; i < 5; i++)
+		{
+			arr[i] = SceneP->GetStageScore(stagenum,i);
+			txt += Util::IntToWStr(arr[i]) + L"\n";
+		}
+
+		m_Debugtxt->SetText(txt);
+	}
+
+	//消し
+	void ScoreDisplay::Delete()
+	{
+
+	}
+
+	//Abe20170622
 
 }
 	//end basecross

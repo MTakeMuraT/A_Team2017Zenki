@@ -1022,7 +1022,7 @@ namespace basecross
 		//座標、大きさ、回転
 		auto Trans = AddComponent<Transform>();
 		Trans->SetPosition(0, 0.5f, 10);
-		Trans->SetScale(Vector3(1, 1, 1));
+		Trans->SetScale(2,2,2);
 		Trans->SetRotation(0, 90*3.14159265f/180, 0);
 
 		//モデルとトランスフォームの間の差分
@@ -1085,7 +1085,7 @@ namespace basecross
 			float pdistance = GetStage()->GetSharedGameObject<TutorialPlayerS>(L"TutorialPlayerS", false)->GetDistance();
 
 			//中心点の距離が自分とある程度近い　かつ　プレイヤー同士の距離が近いで判定
-			if (abs(dis.x) + abs(dis.z) <= 1.0f && pdistance < 2.0f)
+			if (abs(dis.x) + abs(dis.z) <= GetComponent<Transform>()->GetScale().x && pdistance < 2.0f)
 			{
 				//描画消して判定けして位置を下にずらす
 				SetDrawActive(false);
