@@ -494,6 +494,12 @@ namespace basecross
 			GetStage()->GetSharedGameObject<GoStageCheck>(L"GoStageCheck", false)->OpenCheck();
 			GetStage()->GetSharedGameObject<GoStageCheck>(L"GoStageCheck", false)->SetStageNumber(m_CenterStageNum);
 			GetStage()->GetSharedGameObject<EnemyCount>(L"Count", false)->Count();
+
+			//Abe20170623
+			//スコア表示
+			GetStage()->GetSharedGameObject<ScoreDisplay>(L"ScoreDisplay", false)->Disp(GetStage()->GetSharedGameObject<GoStageCheck>(L"GoStageCheck", false)->GetStageNumber());
+			//Abe20170623
+
 			SetUpdateActive(false);
 		}
 
@@ -1738,6 +1744,8 @@ namespace basecross
 		m_KeepApudh = true;
 		m_APush = false;
 
+		//スコア非表示
+		GetStage()->GetSharedGameObject<ScoreDisplay>(L"ScoreDisplay", false)->Delete();
 
 
 		//次起動するとき用に初期化

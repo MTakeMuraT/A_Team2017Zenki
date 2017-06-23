@@ -5041,7 +5041,7 @@ namespace basecross {
 		//数字作成x5
 		for (int i = 0; i < 5; i++)
 		{
-			auto numSp = GetStage()->AddGameObject<NumberSprite>(0, Vector2(300,200 + (i*-100)), Vector2(50,50), layer+1);
+			auto numSp = GetStage()->AddGameObject<NumberSprite>(0, Vector2(430,110 + (i*-75)), Vector2(50,50), layer+1);
 			m_NumSps.push_back(numSp);
 		}
 
@@ -5050,7 +5050,7 @@ namespace basecross {
 		{
 			auto objRank = GetStage()->AddGameObject<GameObject>();
 			auto objTransRank = objRank->AddComponent<Transform>();
-			objTransRank->SetPosition(300, 200 + (i*-100),0);
+			objTransRank->SetPosition(520, 110 + (i*-75),0);
 			objTransRank->SetScale(50, 50, 1);
 			objTransRank->SetRotation(0, 0, 0);
 
@@ -5068,8 +5068,8 @@ namespace basecross {
 		{
 			auto objYoko = GetStage()->AddGameObject<GameObject>();
 			auto objTransYoko = objYoko->AddComponent<Transform>();
-			objTransYoko->SetPosition(300, 200 + (i*-100), 0);
-			objTransYoko->SetScale(50, 50, 1);
+			objTransYoko->SetPosition(400, 110 + (i*-75), 0);
+			objTransYoko->SetScale(300, 150, 1);
 			objTransYoko->SetRotation(0, 0, 0);
 
 			auto objDrawYoko = objYoko->AddComponent<PCTSpriteDraw>();
@@ -5081,8 +5081,6 @@ namespace basecross {
 			m_Yokosen.push_back(objYoko);
 		}
 
-
-
 		//デバッグ文字生成
 		m_Debugtxt = GetStage()->AddGameObject<DebugTxt>();
 		m_Debugtxt->SetLayer(10);
@@ -5091,7 +5089,8 @@ namespace basecross {
 		//大きさ変更
 		m_Debugtxt->SetScaleTxt(40);
 
-
+		//消す、めんどいから関数呼ぶ
+		Delete();
 		
 	}
 
@@ -5171,7 +5170,6 @@ namespace basecross {
 	void ScoreDisplay::Delete()
 	{
 		//いろいろ表示消す
-		//下地
 		//数字
 		for (auto obj : m_NumSps)
 		{
