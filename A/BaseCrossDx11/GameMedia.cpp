@@ -366,6 +366,13 @@ namespace basecross {
 		//Abe20170620
 
 
+		//ABe20170623
+		//スコア表示周り
+		//横線
+		strTexture = DataDir + L"score\\SitaBar.png";
+		App::GetApp()->RegisterTexture(L"SCORE_BAR_TX", strTexture);
+		//ABe20170623
+
 		////モデル（ボーンあり
 		auto MadelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Player\\PlayerModel\\Player_animation.bmf");
 		App::GetApp()->RegisterResource(L"Player_Model", MadelMesh);
