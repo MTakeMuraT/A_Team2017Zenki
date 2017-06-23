@@ -1197,8 +1197,6 @@ namespace basecross{
 	{
 	private :
 
-		//‰º’n
-		shared_ptr<GameObject> m_Sitazi;
 		//”š
 		vector<shared_ptr<GameObject>> m_NumSps;
 		//ƒ‰ƒ“ƒN

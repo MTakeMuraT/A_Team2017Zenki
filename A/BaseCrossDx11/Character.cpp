@@ -5038,21 +5038,6 @@ namespace basecross {
 	{
 		int layer = 10;
 
-		//下地作成
-		auto objSita = GetStage()->AddGameObject<GameObject>();
-		auto objTransSita = objSita->AddComponent<Transform>();
-		objTransSita->SetPosition(300,0,0);
-		objTransSita->SetScale(400, 400, 1);
-		objTransSita->SetRotation(0, 0, 0);
-
-		auto objDrawSita = objSita->AddComponent<PCTSpriteDraw>();
-		objDrawSita->SetTextureResource(L"SCORE_SITAZI_TX");
-
-		objSita->SetDrawLayer(layer);
-		objSita->SetAlphaActive(true);
-
-		m_Sitazi = objSita;
-
 		//数字作成x5
 		for (int i = 0; i < 5; i++)
 		{
@@ -5130,8 +5115,6 @@ namespace basecross {
 		*/
 
 		//表示
-		//下地
-		m_Sitazi->SetDrawActive(true);
 
 		//数字変更と表示判断
 		for (int i = 0; i < 5; i++)
