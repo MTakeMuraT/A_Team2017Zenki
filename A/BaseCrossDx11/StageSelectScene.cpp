@@ -206,6 +206,12 @@ namespace basecross {
 
 			//遷移アニメーション
 			AddGameObject<SceneChangeSSOut>()->OnAnim();
+
+			//Abe20170623
+			//スコア作成
+			SetSharedGameObject(L"ScoreDisplay",AddGameObject<ScoreDisplay>());
+			//Abe20170623
+
 		}
 
 		catch (...) {
