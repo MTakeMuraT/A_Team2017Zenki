@@ -1197,9 +1197,17 @@ namespace basecross{
 	{
 	private :
 
+		//下地
+		shared_ptr<GameObject> m_Sitazi;
+		//数字
+		vector<shared_ptr<GameObject>> m_NumSps;
+		//ランク
+		vector<shared_ptr<GameObject>> m_RankSps;
+		//数字の代わりの横線
+		vector<shared_ptr<GameObject>> m_Yokosen;
+
 		//デバッグ文字表示オブジェ
 		shared_ptr<DebugTxt> m_Debugtxt;
-
 	public :
 		ScoreDisplay(const shared_ptr<Stage>& StagePtr) : GameObject(StagePtr) {}
 

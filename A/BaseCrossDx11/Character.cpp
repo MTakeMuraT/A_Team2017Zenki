@@ -826,12 +826,16 @@ namespace basecross {
 			//計算結果入れておく用の箱
 			vector<int> OutNums;
 
+			//なんかバグってるので初期化
+			OutNums.clear();
+
 			//桁分ループ、数字作成
 			for (int j = 0; j < digit; j++)
 			{
 				//上位の桁から数字入れてく
-				int num = masternum / pow(10, (digit - 1) - j);
-				OutNums.push_back(num);
+				int powpow = pow(10, (digit - 1) - j);
+				int numm = masternum / powpow;
+				OutNums.push_back(numm);
 				//計算用の桁の最上位の桁を排除
 				masternum = masternum % (int)(pow(10, (digit - 1) - j));
 			}
@@ -843,9 +847,6 @@ namespace basecross {
 				//追加する分だけループ
 				for (int j = 0; j < (digit - m_Constdigit); j++)
 				{
-					//左側に桁追加だけ、数字は後で入れる
-					m_Constdigit++;
-
 					auto NumP = GetStage()->AddGameObject<GameObject>();
 
 					float distance = m_scale.x / 1.8f;
@@ -863,6 +864,8 @@ namespace basecross {
 					NumP->SetDrawLayer(m_layer);
 					m_Numbers.push_back(NumP);
 				}
+				//左側に桁追加だけ、数字は後で入れる
+				m_Constdigit = digit;
 
 				for (int i = 0; i < m_Constdigit; i++)
 				{
@@ -5029,9 +5032,72 @@ namespace basecross {
 	//**************************************************************************************
 	//	スコア出す
 	//	とりあえず開いたときに読む、保存はしないめんどい
+	//とりあえずレイヤーは10から設定
 	//**************************************************************************************
 	void ScoreDisplay::OnCreate()
 	{
+		int layer = 10;
+
+		//下地作成
+		auto objSita = GetStage()->AddGameObject<GameObject>();
+		auto objTransSita = objSita->AddComponent<Transform>();
+		objTransSita->SetPosition(300,0,0);
+		objTransSita->SetScale(400, 400, 1);
+		objTransSita->SetRotation(0, 0, 0);
+
+		auto objDrawSita = objSita->AddComponent<PCTSpriteDraw>();
+		objDrawSita->SetTextureResource(L"SCORE_SITAZI_TX");
+
+		objSita->SetDrawLayer(layer);
+		objSita->SetAlphaActive(true);
+
+		m_Sitazi = objSita;
+
+		//数字作成x5
+		for (int i = 0; i < 5; i++)
+		{
+			auto numSp = GetStage()->AddGameObject<NumberSprite>(0, Vector2(300,200 + (i*-100)), Vector2(50,50), layer+1);
+			m_NumSps.push_back(numSp);
+		}
+
+		//ランク作成
+		for (int i = 0; i < 5; i++)
+		{
+			auto objRank = GetStage()->AddGameObject<GameObject>();
+			auto objTransRank = objRank->AddComponent<Transform>();
+			objTransRank->SetPosition(300, 200 + (i*-100),0);
+			objTransRank->SetScale(50, 50, 1);
+			objTransRank->SetRotation(0, 0, 0);
+
+			auto objDrawRannk = objRank->AddComponent<PCTSpriteDraw>();
+			objDrawRannk->SetTextureResource(L"RANK_S_TX");
+
+			objRank->SetDrawLayer(layer + 1);
+			objRank->SetAlphaActive(true);
+
+			m_RankSps.push_back(objRank);
+		}
+
+		//横棒作成
+		for (int i = 0; i < 5; i++)
+		{
+			auto objYoko = GetStage()->AddGameObject<GameObject>();
+			auto objTransYoko = objYoko->AddComponent<Transform>();
+			objTransYoko->SetPosition(300, 200 + (i*-100), 0);
+			objTransYoko->SetScale(50, 50, 1);
+			objTransYoko->SetRotation(0, 0, 0);
+
+			auto objDrawYoko = objYoko->AddComponent<PCTSpriteDraw>();
+			objDrawYoko->SetTextureResource(L"SCORE_BAR_TX");
+
+			objYoko->SetDrawLayer(layer + 1);
+			objYoko->SetAlphaActive(true);
+
+			m_Yokosen.push_back(objYoko);
+		}
+
+
+
 		//デバッグ文字生成
 		m_Debugtxt = GetStage()->AddGameObject<DebugTxt>();
 		m_Debugtxt->SetLayer(10);
@@ -5040,6 +5106,8 @@ namespace basecross {
 		//大きさ変更
 		m_Debugtxt->SetScaleTxt(40);
 
+
+		
 	}
 
 	//表示(引数はステージ番号)
@@ -5047,6 +5115,7 @@ namespace basecross {
 	{
 		auto SceneP = App::GetApp()->GetScene<Scene>();
 
+		/* デバッグ表示用
 		//配列
 		int arr[5] = { 0 };
 
@@ -5058,12 +5127,84 @@ namespace basecross {
 		}
 
 		m_Debugtxt->SetText(txt);
+		*/
+
+		//表示
+		//下地
+		m_Sitazi->SetDrawActive(true);
+
+		//数字変更と表示判断
+		for (int i = 0; i < 5; i++)
+		{
+			int innum = SceneP->GetStageScore(stagenum, i);
+
+			//スコアに入ってる数字が0じゃなければ入れて表示
+			if (innum != 0)
+			{
+				auto numP = dynamic_pointer_cast<NumberSprite>(m_NumSps[i]);
+				//数字更新
+				numP->SetNum(innum);
+				//表示
+				numP->SetNumDraw(true);
+
+				//あとランクも計算して出す
+				//************************
+				//TotalMax:10000
+				//S:10000 ~7000
+				//A:7000 ~5000
+				//B:5000 ~3000
+				//C:3000 ~0
+				//************************* 
+				//まず表示
+				m_RankSps[i]->SetDrawActive(true);
+
+				if (innum >= 7000)
+				{
+					m_RankSps[i]->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"RANK_S_TX");
+				}
+				else if (7000 > innum && innum >= 5000)
+				{
+					m_RankSps[i]->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"RANK_A_TX");
+				}
+				else if (5000 > innum && innum >= 3000)
+				{
+					m_RankSps[i]->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"RANK_B_TX");
+				}
+				else
+				{
+					m_RankSps[i]->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"RANK_C_TX");
+				}
+
+			}
+			//0入ってれば横線出す
+			else
+			{
+				m_Yokosen[i]->SetDrawActive(true);
+			}
+		}
 	}
 
 	//消し
 	void ScoreDisplay::Delete()
 	{
-
+		//いろいろ表示消す
+		//下地
+		m_Sitazi->SetDrawActive(false);
+		//数字
+		for (auto obj : m_NumSps)
+		{
+			dynamic_pointer_cast<NumberSprite>(obj)->SetNumDraw(false);
+		}
+		//ランク
+		for (auto obj : m_RankSps)
+		{
+			obj->SetDrawActive(false);
+		}
+		//横線
+		for (auto obj : m_Yokosen)
+		{
+			obj->SetDrawActive(false);
+		}
 	}
 
 	//Abe20170622
