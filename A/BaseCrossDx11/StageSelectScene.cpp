@@ -29,24 +29,25 @@ namespace basecross {
 
 	//テスト表示
 	void StageSelectScene::CreatTestLin() {
-		AddGameObject<StageSelectSprite>(
-			Vector2(1280, 720),
-			Vector2(0, 0),
-			0
-			);
+		/*AddGameObject<StageSelectSprite>(
+		Vector2(1280, 720),
+		Vector2(0, 0),
+		0
+		);*/
 	}
 
 	//Abe20170421
 	//フレーム作成
 	void StageSelectScene::CreateFlame()
 	{
-		AddGameObject<SelectFlame>(Vector2(0, 0), Vector2(1280, 720), 1);
+		//AddGameObject<SelectFlame>(Vector2(0, 0), Vector2(1280, 720), 1);
+		AddGameObject<SERECT_Background>(Vector3(1280, 720, 0), Vector3(0, 0, 0));
 	}
 
 	//プレイヤー作成
 	void StageSelectScene::CreatePlayer()
 	{
-		SetSharedGameObject(L"SelectPlayer", AddGameObject<SelectPlayer>(Vector3(0, 0.6f, 0), Vector3(1, 1, 1),20.0f));
+		//	SetSharedGameObject(L"SelectPlayer", AddGameObject<SelectPlayer>(Vector3(0, 0.6f, 0), Vector3(1, 1, 1),20.0f));
 	}
 
 	//ステージボックス作成
@@ -78,7 +79,7 @@ namespace basecross {
 		//AddGameObject<StageBox>(Vector3(56, 0.5f, 5), Vector3(2, 2, 2), 14);
 		//AddGameObject<StageBox>(Vector3(36, 0.5f, -5), Vector3(2, 2, 2), 15);
 		//AddGameObject<StageBox>(Vector3(56, 0.5f, -5), Vector3(2, 2, 2), 16);
-		
+
 	}
 
 	//ステージの床作成
@@ -107,13 +108,14 @@ namespace basecross {
 	//ステージロゴ作成
 	void StageSelectScene::CreateStageLogo()
 	{
-		AddGameObject<SelectLogo>(Vector2(0,300),Vector2(800,120),3);
+		//AddGameObject<SelectLogo>(Vector2(0,300),Vector2(800,120),3);
 	}
 	//Abe20170525
 
 	//Abe20170526
 	void StageSelectScene::CreateGroundSquareS()
 	{
+
 		//矢印
 		////左上
 		//AddGameObject<SelectGroundSquare>(Vector3(0, 0.5f, -10), Vector3(5, 5, 5), L"YAZIRUSHI_TX", 270);
@@ -129,22 +131,22 @@ namespace basecross {
 		//AddGameObject<SelectGroundSquare>(Vector3(28, 0.5f, 0), Vector3(5, 5, 5), L"YAZIRUSHI_TX", 180);
 
 		//Easy
-		//AddGameObject<SelectGroundSquare>(Vector3(0, 0.5f, 0), Vector3(15, 10, 11), L"EASY_TX", 0);
+		//AddGameObject<SelectGroundSquare>(Vector3(0, 0.5f, 0), Vector3(15, 10, 11), L"EASY_TX", 10);
 		//Abe20170529
 		//SS版
-		//AddGameObject<SelectGroundSquareSS>(Vector3(0, 0.5f, 0), Vector3(1,1,1), L"SS\\EASY_animation\\", L"EASY.ssae", 0);
+		AddGameObject<SelectGroundSquareSS>(Vector3(0, 1.5f, 0), Vector3(1.1, 1.1, 1), L"SS\\StageSelect\\", L"STAGE_SELECT.ssae", 0);
 
 		//Abe20170529
 
 		//Normal
 		//AddGameObject<SelectGroundSquare>(Vector3(0, 0.5, -26), Vector3(15, 10, 11), L"NORMAL_TX", 0);
-	//	AddGameObject<SelectGroundSquare>(Vector3(46, 0.5f, -26), Vector3(15, 10, 11), L"NORMAL_TX", 0);
-		AddGameObject<SelectGroundSquareSS>(Vector3(0, 0.5f, -27), Vector3(1, 1, 1), L"SS\\NORMAL_animation\\", L"NORMAL.ssae", 0);
-		AddGameObject<SelectGroundSquareSS>(Vector3(46, 0.5f, -27), Vector3(1, 1, 1), L"SS\\NORMAL_animation\\", L"NORMAL.ssae", 0);
+		//	AddGameObject<SelectGroundSquare>(Vector3(46, 0.5f, -26), Vector3(15, 10, 11), L"NORMAL_TX", 0);
+		//	AddGameObject<SelectGroundSquareSS>(Vector3(0, 0.5f, -27), Vector3(1, 1, 1), L"SS\\NORMAL_animation\\", L"NORMAL.ssae", 0);
+		//	AddGameObject<SelectGroundSquareSS>(Vector3(46, 0.5f, -27), Vector3(1, 1, 1), L"SS\\NORMAL_animation\\", L"NORMAL.ssae", 0);
 
 		//Hard
-	//	AddGameObject<SelectGroundSquare>(Vector3(46, 0.5f, 0), Vector3(15, 10, 11), L"HARD_TX", 0);
-    	AddGameObject<SelectGroundSquareSS>(Vector3(46, 0.5f, 0), Vector3(1, 1, 1), L"SS\\HARD_animation\\", L"HARD.ssae", 0);
+		//	AddGameObject<SelectGroundSquare>(Vector3(46, 0.5f, 0), Vector3(15, 10, 11), L"HARD_TX", 0);
+		//	AddGameObject<SelectGroundSquareSS>(Vector3(46, 0.5f, 0), Vector3(1, 1, 1), L"SS\\HARD_animation\\", L"HARD.ssae", 0);
 
 	}
 	//Abe20170526
@@ -157,7 +159,7 @@ namespace basecross {
 			/*m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
 			m_AudioObjectPtr->AddAudioResource(L"StageSelect_01_BGM");
 			m_AudioObjectPtr->Start(L"StageSelect_01_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);*/
-			
+
 			CreateViewLight();
 			//CreatTestLin();
 			//Abe20170421
@@ -204,12 +206,6 @@ namespace basecross {
 
 			//遷移アニメーション
 			AddGameObject<SceneChangeSSOut>()->OnAnim();
-
-			//Abe20170622
-			//スコア保存テスト
-			SetSharedGameObject(L"ScoreDisplay", AddGameObject<ScoreDisplay>());
-			//Abe20170622
-
 		}
 
 		catch (...) {
@@ -230,13 +226,6 @@ namespace basecross {
 			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToGameStage");
 		}
 
-		//Abe20170622
-		if (KeylVec.m_bPressedKeyTbl['B'])
-		{
-			GetSharedGameObject<ScoreDisplay>(L"ScoreDisplay", false)->Disp(1);
-		}
-		//Abe20170622
-
 		//**********************
 		//コマンド
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
@@ -253,19 +242,19 @@ namespace basecross {
 		/*
 		if (KeylVec.m_bPressedKeyTbl[VK_DOWN] && m_CameraNum != 1)
 		{
-			MoveCamera(1);
+		MoveCamera(1);
 		}
 		if (KeylVec.m_bPressedKeyTbl[VK_UP] && m_CameraNum != 0)
 		{
-			MoveCamera(0);
+		MoveCamera(0);
 		}
 		if (KeylVec.m_bPressedKeyTbl[VK_RIGHT] && m_CameraNum != 2)
 		{
-			MoveCamera(2);
+		MoveCamera(2);
 		}
 		if (KeylVec.m_bPressedKeyTbl[VK_LEFT] && m_CameraNum != 3)
 		{
-			MoveCamera(3);
+		MoveCamera(3);
 		}
 		*/
 		//Abe20170427
@@ -328,11 +317,11 @@ namespace basecross {
 		//CameraP->SetEye(m_CameraPos);
 		//CameraP->SetAt(m_CameraAt);
 		//Abe20170524
-		
+
 		//wstring txt;
 		//txt += L"X:" + Util::FloatToWStr(m_CameraPos.x) + L"Z:" + Util::FloatToWStr(m_CameraPos.z);
 		//dynamic_pointer_cast<DebugTxt>(m_Debugtxt)->SetText(txt);
-		
+
 		//Abe20170427
 	}
 
@@ -418,7 +407,7 @@ namespace basecross {
 			m_CameraMoveTarget = Vector3(46, 30, -0.1f);
 			m_CameraMovePlayerTargetPos = Vector3(46, 0, 0);
 			break;
-		case 3:		
+		case 3:
 			m_CameraMoveTarget = Vector3(46, 30, -27.1f);
 			m_CameraMovePlayerTargetPos = Vector3(46, 0, -27);
 			break;
@@ -429,7 +418,7 @@ namespace basecross {
 	}
 	//Abe20170427
 
-	 StageSelectScene::~StageSelectScene() {
+	StageSelectScene::~StageSelectScene() {
 		//m_AudioObjectPtr->Stop(L"StageSelect_01_BGM");
 	}
 }

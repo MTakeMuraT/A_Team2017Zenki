@@ -5172,7 +5172,6 @@ namespace basecross {
 	{
 		//‚¢‚ë‚¢‚ë•\¦Á‚·
 		//‰º’n
-		m_Sitazi->SetDrawActive(false);
 		//”š
 		for (auto obj : m_NumSps)
 		{
