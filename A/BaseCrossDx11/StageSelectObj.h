@@ -1,7 +1,7 @@
 #pragma once
 #include "stdafx.h"
 
-namespace basecross 
+namespace basecross
 {
 	//Abe20170421
 	//--------------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ namespace basecross
 	//--------------------------------------------------------------------------------------
 	class SelectFlame : public GameObject
 	{
-	private :
+	private:
 		//座標（引数でVec2入れるけどSetPositionでVec3入れるし）
 		Vector3 m_InitPos;
 		//大きさ
@@ -22,7 +22,7 @@ namespace basecross
 		//レイヤー
 		int m_layer;
 	public:
-		SelectFlame(const shared_ptr<Stage>& StagePtr, Vector2 pos, Vector2 scale,int layer);
+		SelectFlame(const shared_ptr<Stage>& StagePtr, Vector2 pos, Vector2 scale, int layer);
 
 		void OnCreate() override;
 	};
@@ -52,7 +52,7 @@ namespace basecross
 	//--------------------------------------------------------------------------------------
 	class SelectPlayer : public GameObject
 	{
-	private :
+	private:
 		//初期座標
 		Vector3 m_InitPos;
 		//初期サイズ
@@ -64,7 +64,7 @@ namespace basecross
 		float m_DifLength = 2;
 		//距離
 		float m_dist = 2;
-		
+
 		//プレイヤーの実態
 		vector<shared_ptr<GameObject>> m_Player;
 		//初期プレヤー位置
@@ -100,8 +100,8 @@ namespace basecross
 		Vector3 m_leftInitPos = Vector3(0, 0, 0);
 		int StateNam = 0;
 		int selecflg = true;
-		
-	public :
+
+	public:
 		SelectPlayer(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, float speed);
 
 		void OnCreate() override;
@@ -130,7 +130,7 @@ namespace basecross
 		bool UpdateAnyAnimation2();
 		//ステージ選択時にキャンセルが押されたときにスイッチの内容を書き換えるセッター
 		void SetChangeNum(int ChangNum) { StateNam = ChangNum; };
-	
+
 	};
 	//--------------------------------------------------------------------------------------
 	//	ステージ難易度とステージ選択
@@ -222,16 +222,16 @@ namespace basecross
 		void EasySelect();
 		void NormalSelect();
 		void HardSelect();
-		
+
 		//難易度の移動ができるかを返すゲッタ
-		bool GetModeMove(){ return m_ModeMove; };
+		bool GetModeMove() { return m_ModeMove; };
 
 		//位置の設定
 		void  StandardEasyPos();
 		void StandardNormalPos();
 		void StandardHardPos();
 		//最大と最小値を超えていないかを見る関数
-		int ExceedNum(int MIni,int Max,int Num);
+		int ExceedNum(int MIni, int Max, int Num);
 		//センターから他の場所の要素を検出
 		void ElementNum(int Mini, int Max, int CenterNum);
 		//移動処理
@@ -267,6 +267,8 @@ namespace basecross
 		Vector3 m_Pos = Vector3(0, 0, 0);
 		Vector3 m_Scale = Vector3(0, 0, 0);
 		bool m_Centerflg = false;
+		bool m_Liftflg = false;
+		bool m_Rightflg = false;
 		int m_ModeNum = 0;
 		int m_NowModeNum = 0;
 		int m_MoveNum = 0;
@@ -288,7 +290,8 @@ namespace basecross
 		bool m_EndMove = true;
 		//コントローラの連続入力の防止
 		bool m_StickDown = false;
-		
+		bool m_StickLift = false;
+
 	public:
 		ModeSelect(const shared_ptr<Stage>& StagePtr, const Vector3& Pos, const Vector3& Scale, const int& ModeNum, const bool& Centerflg, const int& MoveNum);
 		~ModeSelect() {};
@@ -303,6 +306,8 @@ namespace basecross
 		int GetMoveNum() { return m_MoveNum; };
 		//センターフラグ　センターならtrue それ以外ならfalse
 		bool GetCenter() { return m_Centerflg; };
+		bool GetLiftf() { return m_Liftflg; };
+		bool GetRight() { return m_Rightflg; };
 		//難易度の移動
 		void ModeSelectMove();
 		//センターに移動
@@ -312,8 +317,8 @@ namespace basecross
 		//右に移動
 		void RightMove();
 		//移動が終わったか？ゲッター 終わってたらtrue 終わってなかったらfalse
-		bool EndMove() {return m_EndMove;};
-		
+		bool EndMove() { return m_EndMove; };
+
 	};
 
 	//--------------------------------------------------------------------------------------
@@ -321,7 +326,7 @@ namespace basecross
 	//--------------------------------------------------------------------------------------
 	class StageBox : public GameObject
 	{
-	private :
+	private:
 		//初期座標
 		Vector3 m_InitPos;
 		//初期サイズ
@@ -332,7 +337,7 @@ namespace basecross
 		int m_PlayerHitNum = 0;
 		//判定するフラグ
 		bool m_PlayerHitFlg = false;
-	public :
+	public:
 		StageBox(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, int num);
 
 		void OnCreate()override;
@@ -340,7 +345,7 @@ namespace basecross
 
 		//アタリ判定(リブ)
 		virtual void OnCollisionExcute(vector<shared_ptr<GameObject>>& OtherVec) override;
-	
+
 		//ステージに行くか確認する処理
 		void CheckGo();
 	};
@@ -350,7 +355,7 @@ namespace basecross
 	//--------------------------------------------------------------------------------------
 	class GoStageCheck : public GameObject
 	{
-	private :
+	private:
 		//位置は固定するので書かない
 		//大きさ(大きさ変えるアニメーション使うなら)
 		Vector3 m_InitScale;
@@ -361,6 +366,10 @@ namespace basecross
 		shared_ptr<GameObject> m_CheckBoxIn;
 		//カーソル
 		shared_ptr<GameObject> m_Cursor;
+		//Goスプライト
+		shared_ptr<GameObject> m_GoSprite;
+		//Backスプライト
+		shared_ptr<GameObject> m_BackSprite;
 
 		//選択してる番号 0でNo、1でYes
 		int m_selectnum = 0;
@@ -390,7 +399,7 @@ namespace basecross
 		bool m_KeepApudh = false;
 		//Aが押し続けてなければfalseになり押し続けている検証をしない
 		bool m_KeepPushing = true;
-	public :
+	public:
 		GoStageCheck(const shared_ptr<Stage>& StagePtr, Vector2 scale);
 
 		void OnCreate()override;
@@ -425,10 +434,10 @@ namespace basecross
 	//--------------------------------------------------------------------------------------
 	class SelectGroud : public GameObject
 	{
-	private :
+	private:
 		Vector3 m_Pos;
 		Vector3 m_Scale;
-	public :
+	public:
 		SelectGroud(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale);
 
 		void OnCreate() override;
@@ -449,7 +458,7 @@ namespace basecross
 		float m_rot;
 	public:
 		SelectGroundSquare(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, wstring txt, float rot);
-		
+
 		void OnCreate() override;
 	};
 
@@ -467,10 +476,46 @@ namespace basecross
 		float m_rot;
 	public:
 		SelectGroundSquareSS(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, wstring txtdire, wstring txtname, float rot);
-
+		~SelectGroundSquareSS() {};
 		void OnCreate() override;
 		void OnUpdate() override;
 	};
 	//Abe20170529
 
+	class ModeSeledctNameSprite :public GameObject {
+	private:
+		Vector3 m_Scale;
+		int m_Type;
+
+	public:
+		ModeSeledctNameSprite(const shared_ptr<Stage>& StagePtr, const Vector3& Scale, const int& Type);
+		~ModeSeledctNameSprite() {};
+		void OnCreate() override;
+		void OnUpdate() override;
+	};
+	//--------------------------------------------------------------------------------------
+	//	地面に貼るやつ
+	//--------------------------------------------------------------------------------------
+	class SelectModeSquare : public GameObject
+	{
+	private:
+		int m_ModeNum = 0;
+	public:
+		SelectModeSquare(const shared_ptr<Stage>& StagePtr, const int& ModeNum);
+		~SelectModeSquare() {};
+
+		void OnCreate() override;
+		void OnUpdate() override;
+	};
+
+	class SERECT_Background :public GameObject
+	{
+	private:
+		Vector3 m_Scale = Vector3(0, 0, 0);
+		Vector3 m_Pos = Vector3(0, 0, 0);
+	public:
+		SERECT_Background(const shared_ptr<Stage>& StagePtr, const Vector3& m_Scale, const Vector3& m_Pos);
+		~SERECT_Background() {};
+		void OnCreate() override;
+	};
 }

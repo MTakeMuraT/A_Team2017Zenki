@@ -116,7 +116,9 @@ namespace basecross {
 		strTexture = DataDir + L"StageSelect\\StageSelect_Cursor.png";
 		App::GetApp()->RegisterTexture(L"SELECT_CURSOR_TX", strTexture);
 		//Abe20170421
-
+		//セレクト画面のやつ
+		strTexture = DataDir + L"StageSelect\\SERECT.png";
+		App::GetApp()->RegisterTexture(L"SERECT_TX", strTexture);
 		//Abe20170505
 		//エネミー
 		//索敵サークル
@@ -436,7 +438,7 @@ namespace basecross {
 	
 		//SE
 		
-		wstring strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Decision_01.wav";
+		wstring  strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Decision_01.wav";
 		App::GetApp()->RegisterWav(L"Decision_01_SE", strMusic);
 		
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Collision_01.wav";
