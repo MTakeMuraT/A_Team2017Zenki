@@ -372,7 +372,7 @@ namespace basecross
 		shared_ptr<GameObject> m_BackSprite;
 
 		//選択してる番号 0でNo、1でYes
-		int m_selectnum = 0;
+		int m_selectnum = 1;
 
 		//Abe20170523
 		//ステージ
@@ -517,5 +517,17 @@ namespace basecross
 		SERECT_Background(const shared_ptr<Stage>& StagePtr, const Vector3& m_Scale, const Vector3& m_Pos);
 		~SERECT_Background() {};
 		void OnCreate() override;
+	};
+
+	class GoBackSprite: public GameObject{
+	private:
+		Vector2 m_Scale;
+		Vector2 m_Pos;
+		int m_Num;
+	public:
+		GoBackSprite(const shared_ptr<Stage>& StagePtr, const Vector2& Scale, const Vector2& Pos,const int& Num);
+		~GoBackSprite() {};
+		void OnCreate() override;
+		void OnDisp(bool flg);
 	};
 }

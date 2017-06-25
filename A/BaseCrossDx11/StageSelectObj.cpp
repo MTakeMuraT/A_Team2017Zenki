@@ -368,9 +368,9 @@ namespace basecross
 		GetStage()->SetSharedGameObject(L"Normal", GetStage()->AddGameObject<ModeSelect>(Vector3(320, -60, -4), Vector3(305, 615, 1), 2, false, 3));
 		GetStage()->SetSharedGameObject(L"Hard", GetStage()->AddGameObject<ModeSelect>(Vector3(-320, -60, -4), Vector3(305, 615, 1), 3, false, 2));
 		//難易度スプライトの配置 1イージー　２ノーマル　３ハード
-		//GetStage()->AddGameObject<SelectModeSquare>(1);
-		//GetStage()->AddGameObject<SelectModeSquare>(2);
-		//GetStage()->AddGameObject<SelectModeSquare>(3);
+		GetStage()->AddGameObject<SelectModeSquare>(1);
+		GetStage()->AddGameObject<SelectModeSquare>(2);
+		GetStage()->AddGameObject<SelectModeSquare>(3);
 
 
 		//ステージの追加
@@ -1462,6 +1462,8 @@ namespace basecross
 
 	void GoStageCheck::OnCreate()
 	{
+		GetStage()->SetSharedGameObject(L"Go", GetStage()->AddGameObject<GoBackSprite>(Vector2(150, 75), Vector2(-320,-190), 1));
+		GetStage()->SetSharedGameObject(L"Back", GetStage()->AddGameObject<GoBackSprite>(Vector2(150,75), Vector2(0,-190), 2));
 
 		//背景作成------------------------------------
 		auto CheckBack = GetStage()->AddGameObject<GameObject>();
@@ -1515,8 +1517,8 @@ namespace basecross
 		auto CursorSprite = GetStage()->AddGameObject<GameObject>();
 		//座標
 		auto CTrans = CursorSprite->AddComponent<Transform>();
-		CTrans->SetPosition(135, -310, 0);
-		CTrans->SetScale(200, 50, 1);
+		CTrans->SetPosition(-320, -230, 0);
+		CTrans->SetScale(100, 50, 1);
 		CTrans->SetRotation(0, 0, 0);
 
 		//描画
@@ -1538,19 +1540,19 @@ namespace basecross
 		//Abe20170525
 		//それぞれの数字作成
 		//突撃
-		auto tacklenum = GetStage()->AddGameObject<NumberSprite>(0, Vector2(-125, 140), Vector2(100, 100), 7);
+		auto tacklenum = GetStage()->AddGameObject<NumberSprite>(0, Vector2(-240, 60), Vector2(100, 100), 7);
 		tacklenum->SetNumDraw(false);
 		m_TackleNumSpr = tacklenum;
 		//玉
-		auto shotnum = GetStage()->AddGameObject<NumberSprite>(0, Vector2(160, 140), Vector2(100, 100), 7);
+		auto shotnum = GetStage()->AddGameObject<NumberSprite>(0, Vector2(100, 60), Vector2(100, 100), 7);
 		shotnum->SetNumDraw(false);
 		m_ShotNumSpr = shotnum;
 		//てれ
-		auto terenum = GetStage()->AddGameObject<NumberSprite>(0, Vector2(-125, -115), Vector2(100, 100), 7);
+		auto terenum = GetStage()->AddGameObject<NumberSprite>(0, Vector2(-240, -115), Vector2(100, 100), 7);
 		terenum->SetNumDraw(false);
 		m_TerepoNumSpr = terenum;
 		//爆
-		auto bombnum = GetStage()->AddGameObject<NumberSprite>(0, Vector2(160, -115), Vector2(100, 100), 7);
+		auto bombnum = GetStage()->AddGameObject<NumberSprite>(0, Vector2(100, -115), Vector2(100, 100), 7);
 		bombnum->SetNumDraw(false);
 		m_BombNumSpr = bombnum;
 		//Abe20170525
@@ -1598,14 +1600,14 @@ namespace basecross
 				{
 					//選択項目Yes
 					m_selectnum = 1;
-					m_Cursor->GetComponent<Transform>()->SetPosition(Vector3(-185, -310, 0));
+					m_Cursor->GetComponent<Transform>()->SetPosition(Vector3(-320, -230, 0));
 					m_Cursor->GetComponent<Transform>()->SetScale(Vector3(100, 50, 1));
 				}
 				//右
 				else if (CntlVec[0].fThumbLX > 0.5f)
 				{
 					m_selectnum = 0;
-					m_Cursor->GetComponent<Transform>()->SetPosition(Vector3(135, -310, 0));
+					m_Cursor->GetComponent<Transform>()->SetPosition(Vector3(0, -230, 0));
 					m_Cursor->GetComponent<Transform>()->SetScale(Vector3(200, 50, 1));
 				}
 
@@ -1655,14 +1657,14 @@ namespace basecross
 				{
 					//選択項目Yes
 					m_selectnum = 1;
-					m_Cursor->GetComponent<Transform>()->SetPosition(Vector3(-185, -310, 0));
+					m_Cursor->GetComponent<Transform>()->SetPosition(Vector3(-320, -230, 0));
 					m_Cursor->GetComponent<Transform>()->SetScale(Vector3(100, 50, 1));
 				}
 				//右
 				else if (KeylVec.m_bPressedKeyTbl[VK_RIGHT])
 				{
 					m_selectnum = 0;
-					m_Cursor->GetComponent<Transform>()->SetPosition(Vector3(135, -310, 0));
+					m_Cursor->GetComponent<Transform>()->SetPosition(Vector3(0, -230,0 ));
 					m_Cursor->GetComponent<Transform>()->SetScale(Vector3(200, 50, 1));
 				}
 
@@ -1722,6 +1724,9 @@ namespace basecross
 		m_KeepPushing = true;
 		m_KeepApudh = true;
 		m_APush = false;
+		GetStage()->GetSharedGameObject<GoBackSprite>(L"Go", false)->OnDisp(true);
+		GetStage()->GetSharedGameObject<GoBackSprite>(L"Back", false)->OnDisp(true);
+
 
 	}
 
@@ -1743,15 +1748,19 @@ namespace basecross
 		m_KeepPushing = true;
 		m_KeepApudh = true;
 		m_APush = false;
+		GetStage()->GetSharedGameObject<GoBackSprite>(L"Go", false)->OnDisp(false);
+		GetStage()->GetSharedGameObject<GoBackSprite>(L"Back", false)->OnDisp(false);
+
 
 		//スコア非表示
 		GetStage()->GetSharedGameObject<ScoreDisplay>(L"ScoreDisplay", false)->Delete();
 
 
 		//次起動するとき用に初期化
-		//Noに初期化
-		m_Cursor->GetComponent<Transform>()->SetPosition(Vector3(150, -300, 0));
-		m_selectnum = 0;
+		//Yesに初期化
+		m_Cursor->GetComponent<Transform>()->SetPosition(Vector3(-320, -230, 0));
+		m_Cursor->GetComponent<Transform>()->SetScale(Vector3(100, 50, 1));
+		m_selectnum = 1;
 
 		//プレイヤーのアップデート再開
 		//GetStage()->GetSharedGameObject<SelectPlayer>(L"SelectPlayer", false)->SetUpdateActive(true);
@@ -1906,31 +1915,30 @@ namespace basecross
 	{}
 	void SelectModeSquare::OnCreate() {
 		auto Trans = AddComponent<Transform>();
-		auto PtrDraw = AddComponent<PNTStaticDraw>();
-		PtrDraw->SetMeshResource(L"DEFAULT_SQUARE");
+		auto Draw = AddComponent<PCTSpriteDraw>();
 
 		if (m_ModeNum == 1) {
 			auto EasyPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Easy", false);
 			auto Pos = EasyPtr->GetComponent<Transform>()->GetPosition();
-			Trans->SetPosition(Pos.x, Pos.y + 2, Pos.z + 10);
-			PtrDraw->SetTextureResource(L"EASY_TX");
+			Trans->SetPosition(Pos.x, Pos.y + 250, Pos.z + 10);
+			Draw->SetTextureResource(L"EASY_TX");
 		}
 		else if (m_ModeNum == 2) {
 			auto NormalPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Normal", false);
 			auto Pos = NormalPtr->GetComponent<Transform>()->GetPosition();
-			Trans->SetPosition(Pos.x, Pos.y + 2, Pos.z + 10);
-			PtrDraw->SetTextureResource(L"NORMAL_TX");
+			Trans->SetPosition(Pos.x, Pos.y + 250, Pos.z + 10);
+			Draw->SetTextureResource(L"NORMAL_TX");
 		}
 		else if (m_ModeNum == 3) {
 			auto HardPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Hard", false);
 			auto Pos = HardPtr->GetComponent<Transform>()->GetPosition();
-			Trans->SetPosition(Pos.x, Pos.y + 2, Pos.z + 10);
-			PtrDraw->SetTextureResource(L"HARD_TX");
+			Trans->SetPosition(Pos.x, Pos.y + 250, Pos.z + 10);
+			Draw->SetTextureResource(L"HARD_TX");
 		}
 		SetDrawActive(true);
 		SetAlphaActive(true);
-		SetDrawLayer(1);
-		Trans->SetScale(40, 20, 1);
+		SetDrawLayer(5);
+		Trans->SetScale(260, 130, 1);
 		Trans->SetRotation(90 * 3.14159265f / 180, 0, 0);
 	}
 	void SelectModeSquare::OnUpdate() {
@@ -1941,15 +1949,15 @@ namespace basecross
 
 		if (m_ModeNum == 1) {
 			auto Pos = EasyPtr->GetComponent<Transform>()->GetPosition();
-			Trans->SetPosition(Pos.x, Pos.y + 2, Pos.z + 10);
+			Trans->SetPosition(Pos.x, Pos.y + 250, Pos.z + 10);
 		}
 		else if (m_ModeNum == 2) {
 			auto Pos = NormalPtr->GetComponent<Transform>()->GetPosition();
-			Trans->SetPosition(Pos.x, Pos.y + 2, Pos.z + 10);
+			Trans->SetPosition(Pos.x, Pos.y + 250, Pos.z + 10);
 		}
 		else if (m_ModeNum == 3) {
 			auto Pos = HardPtr->GetComponent<Transform>()->GetPosition();
-			Trans->SetPosition(Pos.x, Pos.y + 2, Pos.z + 10);
+			Trans->SetPosition(Pos.x, Pos.y + 250, Pos.z + 10);
 		}
 	}
 
@@ -1971,4 +1979,39 @@ namespace basecross
 		SetDrawLayer(0);
 
 	}
+
+	GoBackSprite::GoBackSprite(const shared_ptr<Stage>& StagePtr, const Vector2& Scale, const Vector2& Pos, const int& Num) :
+		GameObject(StagePtr),
+		m_Scale(Scale),
+		m_Pos(Pos),
+		m_Num(Num)
+	{};
+	void GoBackSprite::OnCreate() {
+		auto Trans = AddComponent<Transform>();
+		auto Draw = AddComponent<PCTSpriteDraw>();
+		if (m_Num == 1) {
+			Trans->SetPosition(Vector3(m_Pos.x,m_Pos.y, 0));
+			Trans->SetScale(m_Scale.x,m_Scale.y,0);
+			Draw->SetTextureResource(L"Go_TX");
+		}
+		if (m_Num == 2) {
+			Trans->SetPosition(Vector3(m_Pos.x,m_Pos.y,0));
+			Trans->SetScale(Vector3(m_Scale.x,m_Scale.y,0));
+			Draw->SetTextureResource(L"Back_TX");
+		}
+		SetDrawActive(false);
+		SetDrawLayer(7);
+		SetAlphaActive(true);
+	}
+	void GoBackSprite::OnDisp(bool flg) {
+		auto Draw = AddComponent<PCTSpriteDraw>();
+		if (m_Num == 1) {
+			Draw->SetTextureResource(L"Go_TX");
+		}
+		if (m_Num == 2) {
+			Draw->SetTextureResource(L"Back_TX");
+		}
+		SetDrawActive(flg);
+	}
+
 }
