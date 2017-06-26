@@ -115,6 +115,27 @@ namespace basecross {
 			//ステージの大きさ
 			auto ScenePtr = App::GetApp()->GetScene<Scene>();
 			m_StageSize = ScenePtr->GetStageSize() / 2;
+
+
+			//Abe20170626
+			//ターゲットリング作成
+			auto tarobj = GetStage()->AddGameObject<GameObject>();
+			auto tarTra = tarobj->AddComponent<Transform>();
+			tarTra->SetPosition(0, 0.5f, 0);
+			tarTra->SetRotation(0, 0, 0);
+			tarTra->SetScale(1.5f, 1.5f, 1.5f);
+
+			auto tarDra = tarobj->AddComponent<PNTStaticDraw>();
+			tarDra->SetTextureResource(L"TARGETRING_TX");
+			tarDra->SetMeshResource(L"DEFAULT_SQUARE");
+
+			tarobj->SetAlphaActive(true);
+			tarobj->SetDrawLayer(false);
+			tarobj->SetDrawActive(false);
+
+			m_TargetRing = tarobj;
+			//Abe20170626
+
 		}
 
 		//黒幕作成-----------------------------------------
@@ -146,6 +167,9 @@ namespace basecross {
 	{
 		//アニメーション更新
 		UpdateAnimation();
+
+		//ターゲットリング位置更新
+		UpdateTargetRing();
 
 		if (m_DontMoveFlg2)
 		{
@@ -216,6 +240,12 @@ namespace basecross {
 			{
 				if (CntlVec[0].wButtons & XINPUT_GAMEPAD_A)
 				{
+					//ターゲット表示
+					if (!m_TargetRing->GetDrawActive())
+					{
+						m_TargetRing->SetDrawActive(true);
+					}
+
 					m_PlayerSDistance += App::GetApp()->GetElapsedTime() * m_DistanceSpeed;
 					if (m_PlayerSDistance > m_PlayerSDistanceLimit)
 					{
@@ -290,6 +320,12 @@ namespace basecross {
 				//くっついたら
 				if (m_PlayerSDistance < 1.0f)
 				{
+					//ターゲット非表示
+					if (m_TargetRing->GetDrawActive())
+					{
+						m_TargetRing->SetDrawActive(false);
+					}
+
 					//くっつくOFF
 					m_KuttukuFlg = false;
 					//戻るON
@@ -492,6 +528,13 @@ namespace basecross {
 		}
 	}
 
+	//ターゲットリング位置更新
+	void PlayerControl::UpdateTargetRing()
+	{
+		Vector3 pos = GetComponent<Transform>()->GetPosition();
+		pos.y = m_TargetRing->GetComponent<Transform>()->GetPosition().y;
+		m_TargetRing->GetComponent<Transform>()->SetPosition(pos);
+	}
 	//----------------------------------------------
 	//その他(アクセサーとか)
 	//----------------------------------------------

@@ -377,6 +377,12 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"SCORE_BAR_TX", strTexture);
 		//ABe20170623
 
+		//Abe20170626
+		//ターゲットリング
+		strTexture = DataDir + L"TargetRing.png";
+		App::GetApp()->RegisterTexture(L"TARGETRING_TX", strTexture);
+		//Abe20170626
+
 		////モデル（ボーンあり
 		auto MadelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Player\\PlayerModel\\Player_animation.bmf");
 		App::GetApp()->RegisterResource(L"Player_Model", MadelMesh);

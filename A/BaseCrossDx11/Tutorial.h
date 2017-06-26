@@ -126,6 +126,12 @@ namespace basecross
 
 		//回転するかどうかの判定
 		bool m_MoveRotFlg = false;
+
+		//Abe20170626
+		//ターゲットリング
+		shared_ptr<GameObject> m_TargetRing;
+		//Abe20170626
+
 		//-----------------------
 		//パラメータ類
 		//-----------------------
@@ -143,6 +149,12 @@ namespace basecross
 		void BlackUpdate();
 		//アニメーション更新
 		void UpdateAnimation();
+
+		//Abe20170626
+		//ターゲットリング位置更新
+		void UpdateTargetRing();
+		//Abe20170626
+
 		//-----------------------
 		//制御系
 		//-----------------------
