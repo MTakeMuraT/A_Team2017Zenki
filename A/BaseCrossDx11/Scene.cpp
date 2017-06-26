@@ -22,7 +22,9 @@ namespace basecross{
 			srand((unsigned)time(NULL));
 
 			//最初のアクティブステージの設定
-			ResetActiveStage<TitleScene>();
+			ResetActiveStage<LogoScene>();
+			//ResetActiveStage<TitleScene>();
+			//ResetActiveStage<StageSelectScene>();
 			//ResetActiveStage<TutorialScene>();
 
 		}
@@ -32,6 +34,13 @@ namespace basecross{
 	}
 	void Scene::OnEvent(const shared_ptr<Event>& event) {
 		
+		if (event->m_MsgStr == L"ToLogoScene") {
+			auto TitleScenePtr = dynamic_pointer_cast<LogoScene>(GetActiveStage());
+			if (!TitleScenePtr) {
+				ResetActiveStage<LogoScene>();
+			}
+		}
+
 		if (event->m_MsgStr == L"ToTitleScene") {
 			auto TitleScenePtr = dynamic_pointer_cast<TitleScene>(GetActiveStage());
 			if (!TitleScenePtr) {
