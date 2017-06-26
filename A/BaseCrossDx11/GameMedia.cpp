@@ -308,6 +308,10 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"STARTSTAGELOGO_TX", strTexture);
 		//Abe20170609
 
+		//クレジット
+		strTexture = DataDir + L"credit.png";
+		App::GetApp()->RegisterTexture(L"Credit_TX", strTexture);
+
 		//Abe20170614
 		//タイトル土台
 		strTexture = DataDir + L"Title_Lin\\DODAI.png";

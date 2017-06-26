@@ -5189,5 +5189,17 @@ namespace basecross {
 
 	//Abe20170622
 
+	credit::credit(const shared_ptr<Stage>& StagePtr) :
+		GameObject(StagePtr)
+	{}
+	void credit::OnCreate() {
+		auto Trans = AddComponent<Transform>();
+		Trans->SetPosition(0, 0, 0);
+		Trans->SetScale(1280, 800, 0);
+		Trans->SetRotation(0, 0, 0);
+		auto Draw = AddComponent<PCTSpriteDraw>();
+		Draw->SetTextureResource(L"Credit_TX");
+		SetDrawLayer(20);
+	}
 }
 	//end basecross

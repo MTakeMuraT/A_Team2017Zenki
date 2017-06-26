@@ -1218,5 +1218,18 @@ namespace basecross{
 		void Delete();
 	};
 	//Abe20170622
+	/////////////////////////////////////////////////////////
+	//クレジット
+	////////////////////////////////////////////////////////
+	class credit :public GameObject {
 
+	private:
+
+	public:
+		credit(const shared_ptr<Stage>& StagePtr);
+		~credit() {};
+		void OnCreate() override;
+
+
+	};
 }
