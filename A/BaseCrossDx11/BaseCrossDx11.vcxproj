@@ -31,6 +31,7 @@
     <ClInclude Include="Enemys.h" />
     <ClInclude Include="GameMedia.h" />
     <ClInclude Include="GameStage.h" />
+    <ClInclude Include="LogoScene.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Project.h" />
     <ClInclude Include="ProjectShader.h" />
@@ -63,6 +64,7 @@
     <ClCompile Include="Enemys.cpp" />
     <ClCompile Include="GameMedia.cpp" />
     <ClCompile Include="GameStage.cpp" />
+    <ClCompile Include="LogoScene.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="ProjectShader.cpp" />
     <ClCompile Include="Scene.cpp" />

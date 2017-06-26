@@ -75,6 +75,17 @@ namespace basecross {
 		}
 	}
 	void TitleScene::OnUpdate() {
+		//ロゴシーンに戻るカウント
+		m_logocounttime += App::GetApp()->GetElapsedTime();
+		if (m_logocounttime > 30)
+		{
+			//シーン切り替え
+			auto ScenePtr = App::GetApp()->GetScene<Scene>();
+			//ロゴシーン
+			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToLogoScene");
+
+			m_logocounttime = 0;
+		}
 		//コントローラ
 		auto KeylVec = App::GetApp()->GetInputDevice().GetKeyState();
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
@@ -97,6 +108,8 @@ namespace basecross {
 				if (KeylVec.m_bPressedKeyTbl['A'] || CntlVec[0].wPressedButtons &XINPUT_GAMEPAD_A)
 				{
 					m_state = 1;
+					//ロゴカウントリセット
+					m_logocounttime = 0;
 				}
 
 			}
@@ -182,6 +195,9 @@ namespace basecross {
 
 					//透明度再設定
 					m_Alpha = 1.0f;
+
+					//ロゴカウントリセット
+					m_logocounttime = 0;
 				}
 				//下選択
 				if (CntlVec[0].fThumbLY < -0.5f || KeylVec.m_bPressedKeyTbl[VK_DOWN])
@@ -198,11 +214,17 @@ namespace basecross {
 					//透明度再設定
 					m_Alpha = 1.0f;
 
+					//ロゴカウントリセット
+					m_logocounttime = 0;
+
 				}
 
 				//ボタン押された
 				if (KeylVec.m_bPressedKeyTbl['A'] || CntlVec[0].wPressedButtons &XINPUT_GAMEPAD_A)
 				{
+					//ロゴカウントリセット
+					m_logocounttime = 0;
+
 					m_state = 4;
 					GetSharedGameObject<GameObject>(L"GameStart", false)->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, 1));
 					GetSharedGameObject<GameObject>(L"Tutorial", false)->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, 1));
@@ -241,6 +263,9 @@ namespace basecross {
 					GetSharedGameObject<GameObject>(L"PressStart", false)->SetDrawActive(true);
 					GetSharedGameObject<GameObject>(L"GameStart", false)->SetDrawActive(false);
 					GetSharedGameObject<GameObject>(L"Tutorial", false)->SetDrawActive(false);
+
+					//ロゴカウントリセット
+					m_logocounttime = 0;
 
 				}
 

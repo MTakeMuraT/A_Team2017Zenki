@@ -32,6 +32,9 @@ namespace basecross {
 
 		//“§–¾
 		bool m_AlphaFlg = false;
+
+		//ƒƒS‚Ü‚ÅØ‚è‘Ö‚¦‚éŠÔ
+		float m_logocounttime = 0;
 	public:
 		//\’z‚Æ”jŠü
 		TitleScene() :Stage() {}
