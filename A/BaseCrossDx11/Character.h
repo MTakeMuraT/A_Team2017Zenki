@@ -782,6 +782,8 @@ namespace basecross{
 	class GameOverS : public GameObject
 	{
 	private:
+		shared_ptr<MultiAudioObject> m_AudioObjectPtr;
+
 		//èÛë‘
 		int m_State = 0;
 
@@ -857,6 +859,7 @@ namespace basecross{
 		shared_ptr<GameObject> m_Player1;
 		shared_ptr<GameObject> m_Player2;
 
+		bool OnBgmflg = false;
 	public :
 		GameOverS(const shared_ptr<Stage>& StagePtr) :GameObject(StagePtr) {};
 

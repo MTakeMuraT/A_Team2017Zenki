@@ -162,7 +162,7 @@ namespace basecross {
 		//•`‰æ
 		SetDrawActive(true);
 		//•\Ž¦ƒŒƒCƒ„[
-		SetDrawLayer(2);
+		SetDrawLayer(7);
 
 	}
 
@@ -2220,7 +2220,8 @@ namespace basecross {
 		White->SetAlphaActive(true);
 
 		m_White = White;
-
+		/*m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
+		m_AudioObjectPtr->AddAudioResource(L"Loss_BGM");*/
 	}
 
 	void GameOverS::OnUpdate()
@@ -2473,6 +2474,10 @@ namespace basecross {
 		case 6:
 			if (true)
 			{
+				if (OnBgmflg == false) {
+					//m_AudioObjectPtr->Start(L"Loss_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);
+					OnBgmflg = true;
+				}
 				m_BlackAlpha += App::GetApp()->GetElapsedTime();
 				if (m_BlackAlpha < 1.0f)
 				{
@@ -2680,6 +2685,7 @@ namespace basecross {
 						if (true)
 						{
 							auto ScenePtr = App::GetApp()->GetScene<Scene>();
+						//	m_AudioObjectPtr->Stop(L"Loss_BGM");
 							PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToGameStage");
 						}
 						break;
@@ -2688,6 +2694,7 @@ namespace basecross {
 						if (true)
 						{
 							auto ScenePtr = App::GetApp()->GetScene<Scene>();
+						//	m_AudioObjectPtr->Stop(L"Loss_BGM");
 							PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToStageSelectScene");
 						}
 						break;
@@ -2696,6 +2703,7 @@ namespace basecross {
 						if (true)
 						{
 							auto ScenePtr = App::GetApp()->GetScene<Scene>();
+						//	m_AudioObjectPtr->Stop(L"Loss_BGM");
 							PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToTitleScene");
 						}
 						break;
