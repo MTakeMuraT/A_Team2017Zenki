@@ -7,6 +7,7 @@ namespace basecross
 	//	ゲームステージクラス
 	//--------------------------------------------------------------------------------------
 	class TutorialScene : public Stage {
+		shared_ptr<MultiAudioObject> m_AudioObjectPtr;
 
 		//ビューの作成
 		void CreateViewLight();

@@ -2808,9 +2808,9 @@ namespace basecross {
 		//大きさ変更
 		m_Debugtxt->SetScaleTxt(40);
 		//Abe20170601
-
+	
 	}
-
+	
 	void ResultS::OnUpdate()
 	{
 		if (!m_TutorialFlg)
@@ -3902,6 +3902,7 @@ namespace basecross {
 				if (true)
 				{
 					auto ScenePtr = App::GetApp()->GetScene<Scene>();
+					App::GetApp()->GetScene<Scene>()->SetBgmflg(false);
 					PostEvent(2.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToStageSelectScene");
 
 				}
@@ -3952,7 +3953,7 @@ namespace basecross {
 		}
 	}
 	//Abe20170531
-
+	
 	//Abe20170605
 	//--------------------------------------------------------------------------------------
 	//	ポーズ

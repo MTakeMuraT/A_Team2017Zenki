@@ -110,6 +110,9 @@ namespace basecross
 
 	void TutorialScene::OnCreate()
 	{
+		/*m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
+		m_AudioObjectPtr->AddAudioResource(L"Tutorial_BGM");
+		m_AudioObjectPtr->Start(L"Tutorial_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);*/
 		try 
 		{
 			//ビューとライトの作成
@@ -144,6 +147,8 @@ namespace basecross
 			m_CameraMoveFlg = true;
 
 			m_EnemyFlg = false;
+
+			
 		}
 
 		catch (...) {
@@ -205,7 +210,10 @@ namespace basecross
 			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToTitleScene");
 		}
 		//**********************
-
+		////BGM
+		if (App::GetApp()->GetScene<Scene>()->GetBGMFlg() == false) {
+			//m_AudioObjectPtr->Stop(L"Tutorial_BGM");
+		}
 	}
 
 	//破棄
@@ -1055,10 +1063,13 @@ namespace basecross
 		m_UpFlg = false;
 		//挟まれる判定切っとく
 		m_SandJudgeFlg = false;
+		auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
+		pMultiSoundEffect->AddAudioResource(L"Enemy_Die_SE");
 	}
 
 	void TutorialEnemy::OnUpdate()
 	{
+		auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
 		if (m_UpFlg)
 		{
 			Vector3 pos = GetComponent<Transform>()->GetPosition();
@@ -1087,6 +1098,7 @@ namespace basecross
 			//中心点の距離が自分とある程度近い　かつ　プレイヤー同士の距離が近いで判定
 			if (abs(dis.x) + abs(dis.z) <= GetComponent<Transform>()->GetScale().x && pdistance < 2.0f)
 			{
+				pMultiSoundEffect->Start(L"Enemy_Die_SE", 0, 1.0f);
 				//描画消して判定けして位置を下にずらす
 				SetDrawActive(false);
 				m_SandJudgeFlg = false;

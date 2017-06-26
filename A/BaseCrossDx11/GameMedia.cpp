@@ -504,7 +504,9 @@ namespace basecross {
 		//チュートリアルエネミー死亡
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Player\\Player Exposure.wav";
 		App::GetApp()->RegisterWav(L"Player_Die_SE", strMusic);
-
+		//チュートリアルBGM　
+		 strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Tutorial\\TutorialBGM.wav";
+		App::GetApp()->RegisterWav(L"Tutorial_BGM", strMusic);
 		
 		
 		//子機投げる(未実装)

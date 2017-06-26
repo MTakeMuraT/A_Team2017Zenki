@@ -975,7 +975,6 @@ namespace basecross{
 		//動かせるか
 		bool m_MoveFlg = true;
 
-
 		//チュートリアル流用フラグ
 		bool m_TutorialFlg = false;
 	public :
@@ -984,7 +983,6 @@ namespace basecross{
 
 		void OnCreate() override;
 		void OnUpdate() override;
-
 	};
 	//Abe20170530
 #pragma endregion

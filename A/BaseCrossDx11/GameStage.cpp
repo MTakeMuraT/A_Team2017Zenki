@@ -657,6 +657,7 @@ namespace basecross
 		PtrDraw->SetMeshResource(L"DEFAULT_SQUARE");
 		if (m_TX_Name == L"Background_TX") {
 			PtrDraw->SetTextureResource(m_TX_Name);
+			PtrDraw->SetDiffuse(Color4(1, 1, 1, 0.7));
 		}
 		else if(m_TX_Name == L"Glass_TX"){
 			PtrDraw->SetTextureResource(m_TX_Name);

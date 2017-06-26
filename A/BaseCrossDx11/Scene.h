@@ -29,7 +29,7 @@ namespace basecross{
 		//Abe20170515
 		//int m_stagescorearr[16][5] = { 0 };
 		//Abe20170515
-
+		bool m_BGM = true;
 	public:
 
 		//--------------------------------------------------------------------------------------
@@ -74,7 +74,8 @@ namespace basecross{
 		//ƒXƒRƒAŽæ“¾
 		int GetStageScore(int stage, int num);
 		//Abe20170622
-
+		bool GetBGMFlg() { return m_BGM; }
+		void SetBgmflg(bool OnBgmTrue) { m_BGM = OnBgmTrue; }
 	};
 }
 

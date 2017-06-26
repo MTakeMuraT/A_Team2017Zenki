@@ -428,7 +428,7 @@ namespace basecross {
 		posright += Vector3(cos(-m_rot*3.14159265f / 180), 0, sin(-m_rot*3.14159265f / 180)) * (m_PlayerSDistance / 2);
 		m_Player1->GetComponent<Transform>()->SetPosition(posright);
 
-		m_Debugtxt->SetText(Util::FloatToWStr(GetComponent<Transform>()->GetPosition().y));
+		//m_Debugtxt->SetText(Util::FloatToWStr(GetComponent<Transform>()->GetPosition().y));
 
 		//¶ˆÊ’uŒˆ’è
 		Vector3 porleft = GetComponent<Transform>()->GetPosition();
