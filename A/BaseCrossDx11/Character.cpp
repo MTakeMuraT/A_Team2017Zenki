@@ -2132,6 +2132,7 @@ namespace basecross {
 		//全部の動くオブジェクトを止める
 		auto ColGroup = GetStage()->GetSharedObjectGroup(L"CollisionGroup")->GetGroupVector();
 		auto EnemyGroup = GetStage()->GetSharedObjectGroup(L"EnemyGroup")->GetGroupVector();
+		auto BombGroup = GetStage()->GetSharedObjectGroup(L"BombGroup")->GetGroupVector();
 		auto SearchChildGroup = GetStage()->GetSharedObjectGroup(L"SearchChildGroup")->GetGroupVector();
 		auto UgokuGroup = GetStage()->GetSharedObjectGroup(L"UgokuGroup")->GetGroupVector();
 		//アタリ判定止める
@@ -2150,6 +2151,14 @@ namespace basecross {
 			}
 		}
 		for (auto obj : EnemyGroup)
+		{
+			auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+			if (ptr)
+			{
+				ptr->SetUpdateActive(false);
+			}
+		}
+		for (auto obj : BombGroup)
 		{
 			auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
 			if (ptr)
@@ -2735,6 +2744,7 @@ namespace basecross {
 			//全部の動くオブジェクトを止める
 			auto ColGroup = GetStage()->GetSharedObjectGroup(L"CollisionGroup")->GetGroupVector();
 			auto EnemyGroup = GetStage()->GetSharedObjectGroup(L"EnemyGroup")->GetGroupVector();
+			auto BombGroup = GetStage()->GetSharedObjectGroup(L"BombGroup")->GetGroupVector();
 			auto SearchChildGroup = GetStage()->GetSharedObjectGroup(L"SearchChildGroup")->GetGroupVector();
 			auto UgokuGroup = GetStage()->GetSharedObjectGroup(L"UgokuGroup")->GetGroupVector();
 			//アタリ判定止める
@@ -2753,6 +2763,14 @@ namespace basecross {
 				}
 			}
 			for (auto obj : EnemyGroup)
+			{
+				auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+				if (ptr)
+				{
+					ptr->SetUpdateActive(false);
+				}
+			}
+			for (auto obj : BombGroup)
 			{
 				auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
 				if (ptr)
@@ -4453,6 +4471,7 @@ namespace basecross {
 		//全部の動くオブジェクトを止める
 		auto ColGroup = GetStage()->GetSharedObjectGroup(L"CollisionGroup")->GetGroupVector();
 		auto EnemyGroup = GetStage()->GetSharedObjectGroup(L"EnemyGroup")->GetGroupVector();
+		auto BombGroup = GetStage()->GetSharedObjectGroup(L"BombGroup")->GetGroupVector();
 		auto SearchChildGroup = GetStage()->GetSharedObjectGroup(L"SearchChildGroup")->GetGroupVector();
 		auto UgokuGroup = GetStage()->GetSharedObjectGroup(L"UgokuGroup")->GetGroupVector();
 		//アタリ判定止める
@@ -4489,6 +4508,14 @@ namespace basecross {
 				{
 					ptr->SetUpdateActive(false);
 				}
+			}
+		}
+		for (auto obj : BombGroup)
+		{
+			auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+			if (ptr)
+			{
+				ptr->SetUpdateActive(false);
 			}
 		}
 		for (auto obj : SearchChildGroup)
@@ -4599,6 +4626,7 @@ namespace basecross {
 		//全部の動くオブジェクトを動かす
 		auto ColGroup = GetStage()->GetSharedObjectGroup(L"CollisionGroup")->GetGroupVector();
 		auto EnemyGroup = GetStage()->GetSharedObjectGroup(L"EnemyGroup")->GetGroupVector();
+		auto BombGroup = GetStage()->GetSharedObjectGroup(L"BombGroup")->GetGroupVector();
 		auto SearchChildGroup = GetStage()->GetSharedObjectGroup(L"SearchChildGroup")->GetGroupVector();
 		auto UgokuGroup = GetStage()->GetSharedObjectGroup(L"UgokuGroup")->GetGroupVector();
 		//アタリ判定動かす
@@ -4630,6 +4658,14 @@ namespace basecross {
 			if (ptr)
 			{
 				ptr->SetUpdateActive(true);
+			}
+		}
+		for (auto obj : BombGroup)
+		{
+			auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+			if (ptr)
+			{
+				ptr->SetUpdateActive(false);
 			}
 		}
 		for (auto obj : SearchChildGroup)
@@ -4817,6 +4853,7 @@ namespace basecross {
 			//全部の動くオブジェクトを止める
 			auto ColGroup = GetStage()->GetSharedObjectGroup(L"CollisionGroup")->GetGroupVector();
 			auto EnemyGroup = GetStage()->GetSharedObjectGroup(L"EnemyGroup")->GetGroupVector();
+			auto BombGroup = GetStage()->GetSharedObjectGroup(L"BombGroup")->GetGroupVector();
 			auto SearchChildGroup = GetStage()->GetSharedObjectGroup(L"SearchChildGroup")->GetGroupVector();
 			auto UgokuGroup = GetStage()->GetSharedObjectGroup(L"UgokuGroup")->GetGroupVector();
 			//アタリ判定止める
@@ -4853,6 +4890,14 @@ namespace basecross {
 					{
 						ptr->SetUpdateActive(false);
 					}
+				}
+			}
+			for (auto obj : BombGroup)
+			{
+				auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+				if (ptr)
+				{
+					ptr->SetUpdateActive(false);
 				}
 			}
 			for (auto obj : SearchChildGroup)
@@ -4948,6 +4993,7 @@ namespace basecross {
 					//全部の動くオブジェクトを動かす
 					auto ColGroup = GetStage()->GetSharedObjectGroup(L"CollisionGroup")->GetGroupVector();
 					auto EnemyGroup = GetStage()->GetSharedObjectGroup(L"EnemyGroup")->GetGroupVector();
+					auto BombGroup = GetStage()->GetSharedObjectGroup(L"BombGroup")->GetGroupVector();
 					auto SearchChildGroup = GetStage()->GetSharedObjectGroup(L"SearchChildGroup")->GetGroupVector();
 					auto UgokuGroup = GetStage()->GetSharedObjectGroup(L"UgokuGroup")->GetGroupVector();
 					//アタリ判定動かす
@@ -4985,6 +5031,14 @@ namespace basecross {
 							{
 								ptr->SetUpdateActive(true);
 							}
+						}
+					}
+					for (auto obj : BombGroup)
+					{
+						auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+						if (ptr)
+						{
+							ptr->SetUpdateActive(false);
 						}
 					}
 					for (auto obj : SearchChildGroup)

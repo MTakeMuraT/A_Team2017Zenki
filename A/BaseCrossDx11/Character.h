@@ -1226,7 +1226,23 @@ namespace basecross{
 	//	大体最後に倒したときから３秒以内に倒せば加点
 	//	連続すればするほど得点が伸びる
 	//**************************************************************************************
+	class ComboBonus : public GameObject
+	{
+	private :
+		//倒したカウント
+		int m_DestroyCount;
+		//スコア増加率
+		float m_ScoreAmount;
+		//計算用時間
+		float m_time;
+		//計測時間
+		float m_IntervalTime;
+	public :
+		ComboBonus(const shared_ptr<Stage>& StagePtr) : GameObject(StagePtr) {}
 
+		void OnCreate() override;
+		void OnUpdate() override;
+	};
 	//Abe20170627
 
 }

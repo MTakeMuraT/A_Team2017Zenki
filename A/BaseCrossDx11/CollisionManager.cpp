@@ -640,6 +640,7 @@ namespace basecross
 			//全部の動くオブジェクトを止める
 			auto ColGroup = GetStage()->GetSharedObjectGroup(L"CollisionGroup")->GetGroupVector();
 			auto EnemyGroup = GetStage()->GetSharedObjectGroup(L"EnemyGroup")->GetGroupVector();
+			auto BombGroup = GetStage()->GetSharedObjectGroup(L"BombGroup")->GetGroupVector();
 			auto SearchChildGroup = GetStage()->GetSharedObjectGroup(L"SearchChildGroup")->GetGroupVector();
 			auto UgokuGroup = GetStage()->GetSharedObjectGroup(L"UgokuGroup")->GetGroupVector();
 			//全部止める
