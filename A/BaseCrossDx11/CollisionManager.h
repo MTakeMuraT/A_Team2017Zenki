@@ -45,6 +45,18 @@ namespace basecross
 
 		//当たる判定
 		bool HitTest(Vector3 pos1, float half1, Vector3 pos2, float half2);
+
+		//Abe20170627
+		//当たる直前にスローになる処理
+		void SlowMotion();
+		//アップデート状態フラグ
+		bool m_SlowUpdateFlg = true;
+		//アップデート止めたりする処理
+		void OnOffUpdate();
+		//何秒ごとに切り替えるか
+		float m_TimeCount = 0;
+		float m_TimeInterval = 0.02f;
+		//Abe20170627
 	public :
 		CollisionManager(const shared_ptr<Stage>& StagePtr);
 

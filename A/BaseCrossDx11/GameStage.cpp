@@ -141,7 +141,8 @@ namespace basecross
 		SetSharedGameObject(L"CollisionSand", ColSandPtr);
 
 		//“®‚­ƒOƒ‹[ƒv‚É’Ç‰Á
-		GetSharedObjectGroup(L"UgokuGroup")->IntoGroup(ColMan);
+		//GetSharedObjectGroup(L"UgokuGroup")->IntoGroup(ColMan);
+		SetSharedGameObject(L"CollisionManager", false);
 		GetSharedObjectGroup(L"UgokuGroup")->IntoGroup(ColSandPtr);
 
 	}

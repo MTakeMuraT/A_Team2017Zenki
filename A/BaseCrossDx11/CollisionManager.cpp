@@ -37,6 +37,9 @@ namespace basecross
 
 			//アタリとるグループに入ってるもの全部
 			AllCollision();
+
+			//当たる直前にスローにする
+			//SlowMotion();
 		}
 	}
 
@@ -533,6 +536,150 @@ namespace basecross
 		//共通する部分---------------------------------------------------------
 	}
 	//Abe20170504
+
+	//Abe20170627
+	//当たる直前にスローになる処理
+	void CollisionManager::SlowMotion()
+	{
+		//まず座標持ってくる
+		Vector3 ppos1 = m_Player1->GetComponent<Transform>()->GetPosition();
+		Vector3 ppos2 = m_Player2->GetComponent<Transform>()->GetPosition();
+
+		//直前に判定したいからちょっと大きめ
+		float phalf1 = m_Player1->GetComponent<Transform>()->GetScale().x * 3;
+		float phalf2 = m_Player2->GetComponent<Transform>()->GetScale().x * 3;
+
+		//当たるかどうかフラグ
+		bool IsHitFlg = false;
+
+		//エネミーとのアタリ判定を取る
+		auto EGroupVec = GetStage()->GetSharedObjectGroup(L"CollisionGroup", false)->GetGroupVector();
+		for (auto obj : EGroupVec)
+		{
+			//突撃エネミー
+			auto Tptr = dynamic_pointer_cast<TackleEnemy>(obj.lock());
+			if (Tptr)
+			{
+				//描画されてる場合のみ
+				if (Tptr->GetDrawActive())
+				{
+					//攻撃状態のみ
+					if (Tptr->GetDamageFlg())
+					{
+						//近いか判定
+						if (HitTest(ppos1, phalf1, Tptr->GetComponent<Transform>()->GetPosition(), Tptr->GetComponent<Transform>()->GetScale().x / 2) ||
+							HitTest(ppos2, phalf2, Tptr->GetComponent<Transform>()->GetPosition(), Tptr->GetComponent<Transform>()->GetScale().x / 2))
+						{
+							//近いフラグオン、あと回す必要ないから止める
+							IsHitFlg = true;
+							break;
+						}
+					}
+				}
+			}
+
+			//自爆エネミー
+			auto Bptr = dynamic_pointer_cast<BombEnemy>(obj.lock());
+			if (Bptr)
+			{
+				//描画されてる場合のみ
+				if (Bptr->GetDrawActive())
+				{
+					//近いか判定
+					if (HitTest(ppos1, phalf1, Bptr->GetComponent<Transform>()->GetPosition(), Bptr->GetComponent<Transform>()->GetScale().x / 2) ||
+						HitTest(ppos2, phalf2, Bptr->GetComponent<Transform>()->GetPosition(), Bptr->GetComponent<Transform>()->GetScale().x / 2))
+					{
+						//近いフラグオン、あと回す必要ないから止める
+						IsHitFlg = true;
+						break;
+					}
+				}
+			}
+
+			//ミサイル
+			auto Mptr = dynamic_pointer_cast<Missile>(obj.lock());
+			if (Mptr)
+			{
+				//描画されてる場合のみ
+				if (Mptr->GetDrawActive())
+				{
+					//近いか判定
+					if (HitTest(ppos1, phalf1, Mptr->GetComponent<Transform>()->GetPosition(), Mptr->GetComponent<Transform>()->GetScale().x / 2) ||
+						HitTest(ppos2, phalf2, Mptr->GetComponent<Transform>()->GetPosition(), Mptr->GetComponent<Transform>()->GetScale().x / 2))
+					{
+						//近いフラグオン、あと回す必要ないから止める
+						IsHitFlg = true;
+						break;
+					}
+				}
+			}
+		}
+
+		//当たってたらアップデート止める関数を呼ぶ
+		if (IsHitFlg)
+		{
+			OnOffUpdate();
+		}
+		//当たってなくてアップデート止まってる状態ならアップデート再開
+		else if (!m_SlowUpdateFlg)
+		{
+			OnOffUpdate();
+		}
+		
+	}
+
+	void CollisionManager::OnOffUpdate()
+	{
+		m_TimeCount += App::GetApp()->GetElapsedTime();
+		if (m_TimeCount > m_TimeInterval)
+		{
+			m_TimeCount = 0;
+			//反転
+			m_SlowUpdateFlg = !m_SlowUpdateFlg;
+
+			//全部の動くオブジェクトを止める
+			auto ColGroup = GetStage()->GetSharedObjectGroup(L"CollisionGroup")->GetGroupVector();
+			auto EnemyGroup = GetStage()->GetSharedObjectGroup(L"EnemyGroup")->GetGroupVector();
+			auto SearchChildGroup = GetStage()->GetSharedObjectGroup(L"SearchChildGroup")->GetGroupVector();
+			auto UgokuGroup = GetStage()->GetSharedObjectGroup(L"UgokuGroup")->GetGroupVector();
+			//全部止める
+			for (auto obj : ColGroup)
+			{
+				auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+				if (ptr)
+				{
+					ptr->SetUpdateActive(m_SlowUpdateFlg);
+				}
+			}
+			for (auto obj : EnemyGroup)
+			{
+				auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+				if (ptr)
+				{
+					ptr->SetUpdateActive(m_SlowUpdateFlg);
+				}
+			}
+			for (auto obj : SearchChildGroup)
+			{
+				auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+				if (ptr)
+				{
+					ptr->SetUpdateActive(m_SlowUpdateFlg);
+				}
+			}
+			for (auto obj : UgokuGroup)
+			{
+				auto ptr = dynamic_pointer_cast<GameObject>(obj.lock());
+				if (ptr)
+				{
+					ptr->SetUpdateActive(m_SlowUpdateFlg);
+				}
+			}
+			//プレイヤーも止める
+			GetStage()->GetSharedGameObject<PlayerControl>(L"PlayerControl", false)->SetUpdateActive(m_SlowUpdateFlg);
+		}
+	}
+	//Abe20170627
 
 	//************************************
 	//	はさむ時の判定

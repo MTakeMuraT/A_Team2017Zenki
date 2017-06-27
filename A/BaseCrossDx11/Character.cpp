@@ -2134,6 +2134,12 @@ namespace basecross {
 		auto EnemyGroup = GetStage()->GetSharedObjectGroup(L"EnemyGroup")->GetGroupVector();
 		auto SearchChildGroup = GetStage()->GetSharedObjectGroup(L"SearchChildGroup")->GetGroupVector();
 		auto UgokuGroup = GetStage()->GetSharedObjectGroup(L"UgokuGroup")->GetGroupVector();
+		//アタリ判定止める
+		auto colmanptr = GetStage()->GetSharedGameObject<CollisionManager>(L"CollisionManager", false);
+		if (colmanptr)
+		{
+			colmanptr->SetUpdateActive(false);
+		}
 		//全部止める
 		for (auto obj : ColGroup)
 		{
@@ -2731,6 +2737,12 @@ namespace basecross {
 			auto EnemyGroup = GetStage()->GetSharedObjectGroup(L"EnemyGroup")->GetGroupVector();
 			auto SearchChildGroup = GetStage()->GetSharedObjectGroup(L"SearchChildGroup")->GetGroupVector();
 			auto UgokuGroup = GetStage()->GetSharedObjectGroup(L"UgokuGroup")->GetGroupVector();
+			//アタリ判定止める
+			auto colmanptr = GetStage()->GetSharedGameObject<CollisionManager>(L"CollisionManager", false);
+			if (colmanptr)
+			{
+				colmanptr->SetUpdateActive(false);
+			}
 			//全部止める
 			for (auto obj : ColGroup)
 			{
@@ -4443,7 +4455,12 @@ namespace basecross {
 		auto EnemyGroup = GetStage()->GetSharedObjectGroup(L"EnemyGroup")->GetGroupVector();
 		auto SearchChildGroup = GetStage()->GetSharedObjectGroup(L"SearchChildGroup")->GetGroupVector();
 		auto UgokuGroup = GetStage()->GetSharedObjectGroup(L"UgokuGroup")->GetGroupVector();
-
+		//アタリ判定止める
+		auto colmanptr = GetStage()->GetSharedGameObject<CollisionManager>(L"CollisionManager", false);
+		if (colmanptr)
+		{
+			colmanptr->SetUpdateActive(false);
+		}
 		//プレイヤーを止める
 		GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_L")->SetUpdateActive(false);
 		GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_R")->SetUpdateActive(false);
@@ -4584,6 +4601,13 @@ namespace basecross {
 		auto EnemyGroup = GetStage()->GetSharedObjectGroup(L"EnemyGroup")->GetGroupVector();
 		auto SearchChildGroup = GetStage()->GetSharedObjectGroup(L"SearchChildGroup")->GetGroupVector();
 		auto UgokuGroup = GetStage()->GetSharedObjectGroup(L"UgokuGroup")->GetGroupVector();
+		//アタリ判定動かす
+		auto colmanptr = GetStage()->GetSharedGameObject<CollisionManager>(L"CollisionManager", false);
+		if (colmanptr)
+		{
+			colmanptr->SetUpdateActive(true);
+		}
+
 		//プレイヤーを動かす
 		GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_L")->SetUpdateActive(true);
 		GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_R")->SetUpdateActive(true);
@@ -4795,7 +4819,12 @@ namespace basecross {
 			auto EnemyGroup = GetStage()->GetSharedObjectGroup(L"EnemyGroup")->GetGroupVector();
 			auto SearchChildGroup = GetStage()->GetSharedObjectGroup(L"SearchChildGroup")->GetGroupVector();
 			auto UgokuGroup = GetStage()->GetSharedObjectGroup(L"UgokuGroup")->GetGroupVector();
-
+			//アタリ判定止める
+			auto colmanptr = GetStage()->GetSharedGameObject<CollisionManager>(L"CollisionManager", false);
+			if (colmanptr)
+			{
+				colmanptr->SetUpdateActive(false);
+			}
 			//プレイヤーを止める
 			GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_L")->SetUpdateActive(false);
 			GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_R")->SetUpdateActive(false);
@@ -4921,6 +4950,12 @@ namespace basecross {
 					auto EnemyGroup = GetStage()->GetSharedObjectGroup(L"EnemyGroup")->GetGroupVector();
 					auto SearchChildGroup = GetStage()->GetSharedObjectGroup(L"SearchChildGroup")->GetGroupVector();
 					auto UgokuGroup = GetStage()->GetSharedObjectGroup(L"UgokuGroup")->GetGroupVector();
+					//アタリ判定動かす
+					auto colmanptr = GetStage()->GetSharedGameObject<CollisionManager>(L"CollisionManager", false);
+					if (colmanptr)
+					{
+						colmanptr->SetUpdateActive(true);
+					}
 
 					//プレイヤーを動かす
 					GetStage()->GetSharedGameObject<GameObject>(L"GamePlayer_L")->SetUpdateActive(true);
@@ -5380,17 +5415,6 @@ namespace basecross {
 
 	//Abe20170622
 
-	credit::credit(const shared_ptr<Stage>& StagePtr) :
-		GameObject(StagePtr)
-	{}
-	void credit::OnCreate() {
-		auto Trans = AddComponent<Transform>();
-		Trans->SetPosition(0, 0, 0);
-		Trans->SetScale(1280, 800, 0);
-		Trans->SetRotation(0, 0, 0);
-		auto Draw = AddComponent<PCTSpriteDraw>();
-		Draw->SetTextureResource(L"Credit_TX");
-		SetDrawLayer(20);
-	}
+
 }
 	//end basecross
