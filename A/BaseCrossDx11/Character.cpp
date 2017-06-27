@@ -2823,6 +2823,10 @@ namespace basecross {
 	{
 		if (!m_TutorialFlg)
 		{
+			//コントローラ
+			auto KeylVec = App::GetApp()->GetInputDevice().GetKeyState();
+			auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+
 			switch (m_State)
 			{
 				//しばらく待つ
@@ -2962,35 +2966,50 @@ namespace basecross {
 					pos.x += 1000 * App::GetApp()->GetElapsedTime();
 
 					//中心まで来たら
-					if (pos.x > 0)
+					if (pos.x > 0 || CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeylVec.m_bPressedKeyTbl['B'])
 					{
-						//暗転幕作成
-						auto obj = GetStage()->AddGameObject<GameObject>();
-						auto Trans = obj->AddComponent<Transform>();
-						Trans->SetPosition(0, 0, 0);
-						Trans->SetScale(1280, 720, 1);
-						Trans->SetRotation(0, 0, 0);
-
-						auto Draw = obj->AddComponent<PCTSpriteDraw>();
-						Draw->SetTextureResource(L"RESULTBLACK_TX");
-						Draw->SetDiffuse(Color4(1, 1, 1, 0));
-
-						obj->SetDrawLayer(10);
-						obj->SetAlphaActive(true);
-
-						m_Black = obj;
-
-						m_BlackAlpha = 0;
-
-						//座標固定
-						pos.x = 0;
-
-						//状態変更
-						m_State = 5;
+						m_State = 41;
 					}
 
 					//座標移動
 					m_MissCompLogo->GetComponent<Transform>()->SetPosition(pos);
+				}
+				break;
+				//ここからスキップ機能追加スキップ機能全般の実装は20170627Abe
+			case 41:
+				if (true)
+				{
+					//ミッションコンプリートの座標持ってくる
+					Vector3 pos = m_MissCompLogo->GetComponent<Transform>()->GetPosition();
+
+					//暗転幕作成
+					auto obj = GetStage()->AddGameObject<GameObject>();
+					auto Trans = obj->AddComponent<Transform>();
+					Trans->SetPosition(0, 0, 0);
+					Trans->SetScale(1280, 720, 1);
+					Trans->SetRotation(0, 0, 0);
+
+					auto Draw = obj->AddComponent<PCTSpriteDraw>();
+					Draw->SetTextureResource(L"RESULTBLACK_TX");
+					Draw->SetDiffuse(Color4(1, 1, 1, 0));
+
+					obj->SetDrawLayer(10);
+					obj->SetAlphaActive(true);
+
+					m_Black = obj;
+
+					m_BlackAlpha = 0;
+
+					
+					//座標固定
+					pos.x = 0;
+
+					//状態変更
+					m_State = 5;
+
+					//座標移動
+					m_MissCompLogo->GetComponent<Transform>()->SetPosition(pos);
+
 				}
 				break;
 				//ちょっと暗くする
@@ -3003,13 +3022,30 @@ namespace basecross {
 					}
 					else
 					{
+						//状態変更
+						m_State = 51;
+					}
+
+					if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeylVec.m_bPressedKeyTbl['B'])
+					{
 						//透明度固定
 						m_BlackAlpha = 0.5f;
 						//状態変更
-						m_State = 6;
+						m_State = 51;
 					}
 					m_Black->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_BlackAlpha));
 
+				}
+				break;
+			case 51:
+				if (true)
+				{
+					//透明度固定
+					m_BlackAlpha = 0.5f;
+					//透明度設定
+					m_Black->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_BlackAlpha));
+
+					m_State = 6;
 				}
 				break;
 				//ミッションコンプリート小さくして上に移動
@@ -3030,26 +3066,59 @@ namespace basecross {
 						sca.x *= 0.95f;
 						sca.y *= 0.95f;
 					}
+					else
+					{
+						sca.x = 1200;
+						sca.y = 420;
+					}
 
 					if (pos.y > 200 && sca.x <= 1200)
 					{
-						//状態変更
-						m_State = 7;
-
-						//タイマー持ってくる
-						auto timeptr = GetStage()->GetSharedGameObject<Timer>(L"Timer", false);
-						//HPスプライト持ってくる
-						auto hpptr = GetStage()->GetSharedGameObject<Player_Life>(L"Life", false);
-
-						//レイヤー変える
-						timeptr->SetLayer(11);
-						hpptr->SetLayer(11);
-
-						//constで宣言しても更新されないunkなので
-						//HPスプライトとTimeの目的座標を再設定
-						m_HpTargetPos = Vector3(30, -250, 0);
-						m_TimeTargetPos = Vector3(-400, -400, 0);
+						m_State = 61;
 					}
+
+					//スキップ
+					if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeylVec.m_bPressedKeyTbl['B'])
+					{
+						m_State = 61;
+					}
+
+					//座標と大きさ更新
+					m_MissCompLogo->GetComponent<Transform>()->SetPosition(pos);
+					m_MissCompLogo->GetComponent<Transform>()->SetScale(sca);
+
+				}
+				break;
+			case 61:
+				if (true)
+				{
+
+					//状態変更
+					m_State = 7;
+
+					//タイマー持ってくる
+					auto timeptr = GetStage()->GetSharedGameObject<Timer>(L"Timer", false);
+					//HPスプライト持ってくる
+					auto hpptr = GetStage()->GetSharedGameObject<Player_Life>(L"Life", false);
+
+					//レイヤー変える
+					timeptr->SetLayer(11);
+					hpptr->SetLayer(11);
+
+					//constで宣言しても更新されないunkなので
+					//HPスプライトとTimeの目的座標を再設定
+					m_HpTargetPos = Vector3(30, -250, 0);
+					m_TimeTargetPos = Vector3(-400, -400, 0);
+
+
+					//ミッションコンプリートの座標持ってくる
+					Vector3 pos = m_MissCompLogo->GetComponent<Transform>()->GetPosition();
+					//大きさ持ってくる
+					Vector3 sca = m_MissCompLogo->GetComponent<Transform>()->GetScale();
+
+					pos.y = 200;
+					sca.x = 1200;
+					sca.y = 420;
 
 					//座標と大きさ更新
 					m_MissCompLogo->GetComponent<Transform>()->SetPosition(pos);
@@ -3096,6 +3165,13 @@ namespace basecross {
 						//状態変更
 						m_State = 8;
 					}
+
+					//スキップ
+					if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeylVec.m_bPressedKeyTbl['B'])
+					{
+						m_State = 71;
+					}
+
 					//デバッグ-----------------------
 					//wstring txt = Util::FloatToWStr(m_TimePos.x) + L":"
 					//	+ Util::FloatToWStr(m_TimePos.y) + L":";
@@ -3105,6 +3181,28 @@ namespace basecross {
 					//m_Debugtxt->SetText(txt);
 					//デバッグ-----------------------
 
+				}
+				break;
+			case 71:
+				if (true)
+				{
+					//タイマー持ってくる
+					auto timeptr = GetStage()->GetSharedGameObject<Timer>(L"Timer", false);
+					//HPスプライト持ってくる
+					auto hpptr = GetStage()->GetSharedGameObject<Player_Life>(L"Life", false);
+
+					//移動量計算
+					float HpPosMoveX = m_HpTargetPos.x - m_HpPos.x;
+					float HpPosMoveY = m_HpTargetPos.y - m_HpPos.y;
+
+					float TimePosMoveX = m_TimeTargetPos.x - m_TimePos.x;
+					float TimePosMoveY = m_TimeTargetPos.y - m_TimePos.y;
+
+					//移動
+					hpptr->MoveSprtieS(Vector3(HpPosMoveX, HpPosMoveY, 0));
+					timeptr->MovePos(Vector3(TimePosMoveX, TimePosMoveY, 0));
+
+					m_State = 8;
 				}
 				break;
 				//項目出す
@@ -3199,26 +3297,49 @@ namespace basecross {
 					//HPとTIMEのスコアが設定値に届いたら
 					if (flg1 && flg2)
 					{
-						//状態更新
-						m_State = 10;
-
-						//Totalスコア
-						auto numTo = GetStage()->AddGameObject<NumberSprite>(500, Vector2(450, -250), Vector2(100, 100), 11);
-						m_TotalScoreSp = numTo;
-
-						//TotalScoreロゴ作成
-						auto obj = GetStage()->AddGameObject<GameObject>();
-						auto Trans = obj->AddComponent<Transform>();
-						Trans->SetPosition(-200, -250, 0);
-						Trans->SetScale(600, 100, 1);
-						Trans->SetRotation(0, 0, 0);
-
-						auto Draw = obj->AddComponent<PCTSpriteDraw>();
-						Draw->SetTextureResource(L"TOTALSCORE_TX");
-
-						obj->SetDrawLayer(11);
-						obj->SetAlphaActive(true);
+						m_State = 91;
 					}
+
+					//スキップ
+					if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeylVec.m_bPressedKeyTbl['B'])
+					{
+						m_State = 91;
+					}
+
+				}
+				break;
+			case 91:
+				if (true)
+				{
+					//スコア変更
+					m_HpAmount = m_HpScoreTotal;
+					m_TimeAmount = m_TimeScoreTotal;
+
+					//HPスコア更新
+					dynamic_pointer_cast<NumberSprite>(m_HpScore)->SetNum(m_HpAmount);
+					//TIMEスコア更新
+					dynamic_pointer_cast<NumberSprite>(m_TimeScore)->SetNum(m_TimeAmount);
+
+					//状態更新
+					m_State = 10;
+
+					//Totalスコア
+					auto numTo = GetStage()->AddGameObject<NumberSprite>(500, Vector2(450, -250), Vector2(100, 100), 11);
+					m_TotalScoreSp = numTo;
+
+					//TotalScoreロゴ作成
+					auto obj = GetStage()->AddGameObject<GameObject>();
+					auto Trans = obj->AddComponent<Transform>();
+					Trans->SetPosition(-200, -250, 0);
+					Trans->SetScale(600, 100, 1);
+					Trans->SetRotation(0, 0, 0);
+
+					auto Draw = obj->AddComponent<PCTSpriteDraw>();
+					Draw->SetTextureResource(L"TOTALSCORE_TX");
+
+					obj->SetDrawLayer(11);
+					obj->SetAlphaActive(true);
+
 				}
 				break;
 				//トータルスコア加算
@@ -3232,46 +3353,66 @@ namespace basecross {
 					{
 						m_TotalAmount = m_TotalScore;
 						//状態変更
-						m_State = 11;
+						m_State = 101;
 
-						//ランク作成
-						auto obj = GetStage()->AddGameObject<GameObject>();
-						auto Trans = obj->AddComponent<Transform>();
-						Trans->SetPosition(0, 0, 0);
-						Trans->SetScale(1000, 1000, 1);
-						Trans->SetRotation(0, 0, 0);
+					}
 
-						auto Draw = obj->AddComponent<PCTSpriteDraw>();
-						Draw->SetDiffuse(Color4(1, 1, 1, 0));
-						if (m_TotalScore >= 7000)
-						{
-							Draw->SetTextureResource(L"RANK_S_TX");
-						}
-						else if (m_TotalScore >= 5000)
-						{
-							Draw->SetTextureResource(L"RANK_A_TX");
-						}
-						else if (m_TotalScore >= 3000)
-						{
-							Draw->SetTextureResource(L"RANK_B_TX");
-						}
-						else
-						{
-							Draw->SetTextureResource(L"RANK_C_TX");
-						}
-
-						obj->SetDrawLayer(14);
-						obj->SetAlphaActive(true);
-
-						m_RankSp = obj;
-
-						//透明度リセット
-						m_RankAlpha = 0;
+					//スキップ
+					if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeylVec.m_bPressedKeyTbl['B'])
+					{
+						m_State = 101;
 					}
 
 					//Totalスコア更新
 					dynamic_pointer_cast<NumberSprite>(m_TotalScoreSp)->SetNum(m_TotalAmount);
 
+				}
+				break;
+			case 101:
+				if (true)
+				{
+					//スコア変更
+					m_TotalAmount = m_TotalScore;
+
+					//ランク作成
+					auto obj = GetStage()->AddGameObject<GameObject>();
+					auto Trans = obj->AddComponent<Transform>();
+					Trans->SetPosition(0, 0, 0);
+					Trans->SetScale(1000, 1000, 1);
+					Trans->SetRotation(0, 0, 0);
+
+					auto Draw = obj->AddComponent<PCTSpriteDraw>();
+					Draw->SetDiffuse(Color4(1, 1, 1, 0));
+					if (m_TotalScore >= 7000)
+					{
+						Draw->SetTextureResource(L"RANK_S_TX");
+					}
+					else if (m_TotalScore >= 5000)
+					{
+						Draw->SetTextureResource(L"RANK_A_TX");
+					}
+					else if (m_TotalScore >= 3000)
+					{
+						Draw->SetTextureResource(L"RANK_B_TX");
+					}
+					else
+					{
+						Draw->SetTextureResource(L"RANK_C_TX");
+					}
+
+					obj->SetDrawLayer(14);
+					obj->SetAlphaActive(true);
+
+					m_RankSp = obj;
+
+					//透明度リセット
+					m_RankAlpha = 0;
+
+					//Totalスコア更新
+					dynamic_pointer_cast<NumberSprite>(m_TotalScoreSp)->SetNum(m_TotalAmount);
+
+					//状態更新
+					m_State = 11;
 				}
 				break;
 				//ランク表示
@@ -3281,7 +3422,7 @@ namespace basecross {
 					//実体化してく
 					m_RankAlpha += App::GetApp()->GetElapsedTime();
 
-
+					//ランクの大きさ
 					Vector3 sca = m_RankSp->GetComponent<Transform>()->GetScale();
 					if (m_TotalScore >= 7000)
 					{
@@ -3299,49 +3440,74 @@ namespace basecross {
 					{
 						sca *= 0.90f;
 					}
+
+					//ある程度小さくなったら
 					if (sca.x < 300)
 					{
-						//大きさ固定
-						sca.x = 300;
-						sca.y = 300;
-						sca.z = 1;
-						//状態変更
-						m_State = 12;
-
-						//時間リセット
-						m_time = 0;
-
-						//白い画像出す
-						auto obj2 = GetStage()->AddGameObject<GameObject>();
-						auto Trans2 = obj2->AddComponent<Transform>();
-						Trans2->SetPosition(0, 0, 0);
-						Trans2->SetScale(1280, 720, 1);
-						Trans2->SetRotation(0, 0, 0);
-
-						auto Draw2 = obj2->AddComponent<PCTSpriteDraw>();
-						Draw2->SetTextureResource(L"RESULTWHITE_TX");
-						Draw2->SetDiffuse(Color4(1, 1, 1, 1));
-
-						obj2->SetDrawLayer(13);
-						obj2->SetAlphaActive(true);
-
-						m_White12 = obj2;
-
-						//透明度設定
-						m_BlackAlpha = 1;
-						m_RankAlpha = 1;
-
-
-						//Abe20170622
-						//得点シーンに登録
-						auto ScenePtr = App::GetApp()->GetScene<Scene>();
-						ScenePtr->SetStageScore(m_TotalScore);
-						//Abe20170622
-
+						m_State = 111;
 					}
-					m_RankSp->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_RankAlpha));
 
+					//スキップ
+					if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeylVec.m_bPressedKeyTbl['B'])
+					{
+						m_State = 111;
+					}
+
+					//透明度更新
+					m_RankSp->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_RankAlpha));
+					//大きさ更新
 					m_RankSp->GetComponent<Transform>()->SetScale(sca);
+				}
+				break;
+			case 111:
+				if (true)
+				{
+
+					//ランクの大きさ
+					Vector3 sca = m_RankSp->GetComponent<Transform>()->GetScale();
+
+					//大きさ固定
+					sca.x = 300;
+					sca.y = 300;
+					sca.z = 1;
+					//状態変更
+					m_State = 12;
+
+					//時間リセット
+					m_time = 0;
+
+					//白い画像出す
+					auto obj2 = GetStage()->AddGameObject<GameObject>();
+					auto Trans2 = obj2->AddComponent<Transform>();
+					Trans2->SetPosition(0, 0, 0);
+					Trans2->SetScale(1280, 720, 1);
+					Trans2->SetRotation(0, 0, 0);
+
+					auto Draw2 = obj2->AddComponent<PCTSpriteDraw>();
+					Draw2->SetTextureResource(L"RESULTWHITE_TX");
+					Draw2->SetDiffuse(Color4(1, 1, 1, 1));
+
+					obj2->SetDrawLayer(13);
+					obj2->SetAlphaActive(true);
+
+					m_White12 = obj2;
+
+					//透明度設定
+					m_BlackAlpha = 1;
+					m_RankAlpha = 1;
+
+
+					//Abe20170622
+					//得点シーンに登録
+					auto ScenePtr = App::GetApp()->GetScene<Scene>();
+					ScenePtr->SetStageScore(m_TotalScore);
+					//Abe20170622
+
+					//透明度更新
+					m_RankSp->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_RankAlpha));
+					//大きさ更新
+					m_RankSp->GetComponent<Transform>()->SetScale(sca);
+
 				}
 				break;
 				//しばらく待つ
@@ -3356,34 +3522,51 @@ namespace basecross {
 					m_time += App::GetApp()->GetElapsedTime();
 					if (m_time > m_Wait12Time)
 					{
-						//状態変更
-						m_State = 13;
-
-						//黒幕ランクの下に出す
-						//暗転幕作成
-						auto obj = GetStage()->AddGameObject<GameObject>();
-						auto Trans = obj->AddComponent<Transform>();
-						Trans->SetPosition(0, 0, 0);
-						Trans->SetScale(1280, 720, 1);
-						Trans->SetRotation(0, 0, 0);
-
-						auto Draw = obj->AddComponent<PCTSpriteDraw>();
-						Draw->SetTextureResource(L"RESULTBLACK_TX");
-						Draw->SetDiffuse(Color4(1, 1, 1, 0));
-
-						obj->SetDrawLayer(13);
-						obj->SetAlphaActive(true);
-
-						m_Black = obj;
-
-						m_BlackAlpha = 0;
-
-						m_Black12 = obj;
-
-						m_White12->SetDrawActive(false);
+						m_State = 121;
+						m_time = 0;
 					}
 
+					//スキップ
+					if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeylVec.m_bPressedKeyTbl['B'])
+					{
+						m_State = 121;
+					}
+
+
 					m_White12->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_BlackAlpha));
+				}
+				break;
+			case 121:
+				if (true)
+				{
+					//状態変更
+					m_State = 13;
+
+					//黒幕ランクの下に出す
+					//暗転幕作成
+					auto obj = GetStage()->AddGameObject<GameObject>();
+					auto Trans = obj->AddComponent<Transform>();
+					Trans->SetPosition(0, 0, 0);
+					Trans->SetScale(1280, 720, 1);
+					Trans->SetRotation(0, 0, 0);
+
+					auto Draw = obj->AddComponent<PCTSpriteDraw>();
+					Draw->SetTextureResource(L"RESULTBLACK_TX");
+					Draw->SetDiffuse(Color4(1, 1, 1, 0));
+
+					obj->SetDrawLayer(13);
+					obj->SetAlphaActive(true);
+
+					m_Black = obj;
+
+					m_BlackAlpha = 0;
+
+					m_Black12 = obj;
+
+					m_White12->SetDrawActive(false);
+
+					m_White12->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_BlackAlpha));
+
 				}
 				break;
 				//黒幕半透明にしてランクを上に移動
@@ -3507,7 +3690,6 @@ namespace basecross {
 				if (true)
 				{
 					//コントローラ取得
-					auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 					if (CntlVec[0].bConnected)
 					{
 						//カーソル動かす処理
