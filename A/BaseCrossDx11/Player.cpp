@@ -121,9 +121,9 @@ namespace basecross {
 			//ターゲットリング作成
 			auto tarobj = GetStage()->AddGameObject<GameObject>();
 			auto tarTra = tarobj->AddComponent<Transform>();
-			tarTra->SetPosition(0, 0.5f, 0);
-			tarTra->SetRotation(0, 0, 0);
-			tarTra->SetScale(1.5f, 1.5f, 1.5f);
+			tarTra->SetPosition(0, 0.9f, 0);
+			tarTra->SetRotation(45*3.14159265f/180, 0, 0);
+			tarTra->SetScale(3.0f, 3.0f, 3.0f);
 
 			auto tarDra = tarobj->AddComponent<PNTStaticDraw>();
 			tarDra->SetTextureResource(L"TARGETRING_TX");
@@ -532,7 +532,7 @@ namespace basecross {
 	void PlayerControl::UpdateTargetRing()
 	{
 		Vector3 pos = GetComponent<Transform>()->GetPosition();
-		pos.y = m_TargetRing->GetComponent<Transform>()->GetPosition().y;
+		pos.y = GetComponent<Transform>()->GetPosition().y + 0.5f;
 		m_TargetRing->GetComponent<Transform>()->SetPosition(pos);
 	}
 	//----------------------------------------------
