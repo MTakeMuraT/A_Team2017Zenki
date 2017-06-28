@@ -1265,6 +1265,13 @@ namespace basecross{
 
 		//右上スコア作成
 		void CreateMigiueScore();
+
+		//スコア加算処理
+		void ScoreSum();
+		//スコア加算フラグ
+		bool m_ScoreSumFlg = false;
+		//計算用スコア
+		int m_KeisanYouScore;
 	public :
 		ComboBonus(const shared_ptr<Stage>& StagePtr) : GameObject(StagePtr) {}
 
@@ -1277,8 +1284,8 @@ namespace basecross{
 		//スコア取得
 		int GetComboScore() {return m_ComboNowScore;}
 
-		//強制スコア設定
-		void SetScore();
+		//強制スコア設定 引数trueで演出なし
+		void SetScore(bool);
 
 		//数字座標移動
 		void SetComboScoreMove(Vector3);

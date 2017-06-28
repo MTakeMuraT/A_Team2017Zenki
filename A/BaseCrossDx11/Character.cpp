@@ -2827,7 +2827,7 @@ namespace basecross {
 
 			//Abe20170627
 			//コンボスコア設定
-			GetStage()->GetSharedGameObject<ComboBonus>(L"ComboBonus", false)->SetScore();
+			GetStage()->GetSharedGameObject<ComboBonus>(L"ComboBonus", false)->SetScore(true);
 			//Abe20170627
 
 			//Abe20170628
@@ -3261,6 +3261,8 @@ namespace basecross {
 					auto timeptr = GetStage()->GetSharedGameObject<Timer>(L"Timer", false);
 					//HPスプライト持ってくる
 					auto hpptr = GetStage()->GetSharedGameObject<Player_Life>(L"Life", false);
+					//コンボスコア持ってくる
+					auto comboptr = GetStage()->GetSharedGameObject<ComboBonus>(L"ComboBonus", false);
 
 					//移動量計算
 					float HpPosMoveX = m_HpTargetPos.x - m_HpPos.x;
@@ -3269,9 +3271,13 @@ namespace basecross {
 					float TimePosMoveX = m_TimeTargetPos.x - m_TimePos.x;
 					float TimePosMoveY = m_TimeTargetPos.y - m_TimePos.y;
 
+					float ComboPosMoveX = m_ScoreTargetPos.x - m_ScorePos.x;
+					float ComboPosMoveY = m_ScoreTargetPos.y - m_ScorePos.y;
+
 					//移動
 					hpptr->MoveSprtieS(Vector3(HpPosMoveX, HpPosMoveY, 0));
 					timeptr->MovePos(Vector3(TimePosMoveX, TimePosMoveY, 0));
+					comboptr->SetComboScoreMove(Vector3(ComboPosMoveX, ComboPosMoveY, 0));
 
 					m_State = 8;
 				}
@@ -3469,15 +3475,15 @@ namespace basecross {
 
 					auto Draw = obj->AddComponent<PCTSpriteDraw>();
 					Draw->SetDiffuse(Color4(1, 1, 1, 0));
-					if (m_TotalScore >= 7000)
+					if (m_TotalScore >= 9000)
 					{
 						Draw->SetTextureResource(L"RANK_S_TX");
 					}
-					else if (m_TotalScore >= 5000)
+					else if (m_TotalScore >= 7000)
 					{
 						Draw->SetTextureResource(L"RANK_A_TX");
 					}
-					else if (m_TotalScore >= 3000)
+					else if (m_TotalScore >= 4000)
 					{
 						Draw->SetTextureResource(L"RANK_B_TX");
 					}
@@ -3510,15 +3516,15 @@ namespace basecross {
 
 					//ランクの大きさ
 					Vector3 sca = m_RankSp->GetComponent<Transform>()->GetScale();
-					if (m_TotalScore >= 7000)
+					if (m_TotalScore >= 9000)
 					{
 						sca *= 0.98f;
 					}
-					else if (m_TotalScore >= 5000)
+					else if (m_TotalScore >= 7000)
 					{
 						sca *= 0.96f;
 					}
-					else if (m_TotalScore >= 3000)
+					else if (m_TotalScore >= 4000)
 					{
 						sca *= 0.94f;
 					}
@@ -5476,15 +5482,15 @@ namespace basecross {
 				//まず表示
 				m_RankSps[i]->SetDrawActive(true);
 
-				if (innum >= 7000)
+				if (innum >= 9000)
 				{
 					m_RankSps[i]->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"RANK_S_TX");
 				}
-				else if (7000 > innum && innum >= 5000)
+				else if (innum >= 7000)
 				{
 					m_RankSps[i]->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"RANK_A_TX");
 				}
-				else if (5000 > innum && innum >= 3000)
+				else if (innum >= 4000)
 				{
 					m_RankSps[i]->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"RANK_B_TX");
 				}
@@ -5641,7 +5647,7 @@ namespace basecross {
 			m_time += App::GetApp()->GetElapsedTime();
 			if (m_time > m_IntervalTime)
 			{
-				SetScore();
+				SetScore(false);
 			}
 			else
 			{
@@ -5681,6 +5687,10 @@ namespace basecross {
 				m_BarSp->GetComponent<PCTSpriteDraw>()->SetMeshResource(MeshResource::CreateMeshResource<VertexPositionColorTexture>(new_vertices, indices, true));
 
 			}
+		}
+		else if(m_ScoreSumFlg)
+		{
+			ScoreSum();
 		}
 	}
 
@@ -5729,7 +5739,7 @@ namespace basecross {
 		m_BarSp->GetComponent<PCTSpriteDraw>()->SetMeshResource(MeshResource::CreateMeshResource<VertexPositionColorTexture>(new_vertices, indices, true));
 	}
 
-	void ComboBonus::SetScore()
+	void ComboBonus::SetScore(bool flg)
 	{
 		//加点
 		float point = 0;
@@ -5737,11 +5747,21 @@ namespace basecross {
 		{
 			point += 50 * m_ScoreAmount * pow(m_ScoreAmount, i);
 		}
+		//計算用スコアに入れる
+		m_KeisanYouScore = m_ComboNowScore;
+		//スコア更新
 		m_ComboNowScore += (int)point;
 
-		//数字更新
-		dynamic_pointer_cast<NumberSprite>(m_NowScoreNumber)->SetNum(m_ComboNowScore);
-
+		if (flg)
+		{
+			//数字更新
+			dynamic_pointer_cast<NumberSprite>(m_NowScoreNumber)->SetNum(m_ComboNowScore);
+		}
+		else
+		{
+			//加算演出起動
+			m_ScoreSumFlg = true;
+		}
 		m_time = 0;
 		m_DestroyCount = 0;
 		dynamic_pointer_cast<NumberSprite>(m_NumberSp)->SetNumDraw(false);
@@ -5750,7 +5770,6 @@ namespace basecross {
 		m_BarSp->SetDrawActive(false);
 		m_BarFrameSp->SetDrawActive(false);
 		m_ComboLogo->SetDrawActive(false);
-
 
 		//オフ
 		m_ActiveFlg = false;
@@ -5762,7 +5781,7 @@ namespace basecross {
 		//スコア文字作成
 		auto obj = GetStage()->AddGameObject<GameObject>();
 		auto objTrans = obj->AddComponent<Transform>();
-		objTrans->SetPosition(300, 300, 0);
+		objTrans->SetPosition(240, 280, 0);
 		objTrans->SetRotation(0, 0, 0);
 		objTrans->SetScale(200, 200, 1);
 
@@ -5775,7 +5794,7 @@ namespace basecross {
 		m_NowScoreLogo = obj;
 
 		//数字
-		auto num = GetStage()->AddGameObject<NumberSprite>(0,Vector2(600,300),Vector2(100,100),4);
+		auto num = GetStage()->AddGameObject<NumberSprite>(0,Vector2(580,280),Vector2(100,100),4);
 		m_NowScoreNumber = num;
 	}
 
@@ -5785,5 +5804,39 @@ namespace basecross {
 	}
 	//Abe20170627
 
+	//Abe20170628
+	//スコア加算処理
+	void ComboBonus::ScoreSum()
+	{
+		//上昇量。一秒で５００上がる計算だけど小数点切り捨てだしもうちょいかかると予想
+		int UpAmount = 500 * App::GetApp()->GetElapsedTime();
+		//ちょい速度調整
+		if (m_ComboNowScore - m_KeisanYouScore > 2000)
+		{
+			UpAmount *= 2;
+		}
+		if (m_ComboNowScore - m_KeisanYouScore > 5000)
+		{
+			UpAmount *= 2;
+		}
+		if (m_ComboNowScore - m_KeisanYouScore > 10000)
+		{
+			UpAmount *= 2;
+		}
+		m_KeisanYouScore += UpAmount;
+
+		if (m_KeisanYouScore > m_ComboNowScore)
+		{
+			//スコア更新
+			m_KeisanYouScore = m_ComboNowScore;
+			//上昇処理止め
+			m_ScoreSumFlg = false;
+		}
+
+		//数字更新
+		dynamic_pointer_cast<NumberSprite>(m_NowScoreNumber)->SetNum(m_KeisanYouScore);
+
+	}
+	//Abe20170628
 }
 	//end basecross
