@@ -2096,7 +2096,8 @@ namespace basecross {
 		auto PtrDraw = AddComponent<PNTStaticModelDraw>();
 		//描画するメッシュを設定
 		PtrDraw->SetMeshResource(L"Background_Model");
-		
+		PtrDraw->SetDepthStencilState(DepthStencilState::Read);
+
 		if (m_LayerNum == 1) {
 			Trans->SetPosition(m_Pos);
 			Trans->SetRotation(0, 50, 0);
@@ -3162,7 +3163,7 @@ namespace basecross {
 					m_HpTargetPos = Vector3(30, -220, 0);
 					m_TimeTargetPos = Vector3(-400, -320, 0);
 					//Abe20170627
-					m_ScoreTargetPos = Vector3(-40, -430, 0);
+					m_ScoreTargetPos = Vector3(-20, -410, 0);
 					//Abe20170627
 
 
@@ -3196,7 +3197,7 @@ namespace basecross {
 
 					m_HpPos += Vector3(0.3f, -2.2f, 0) * 3;
 					m_TimePos += Vector3(-4, -3.2f, 0) * 3;
-					m_ScorePos += Vector3(-0.4f, -4.3f, 0) * 3;
+					m_ScorePos += Vector3(-0.2f, -4.1f, 0) * 3;
 
 					//判定フラグ
 					bool flg1 = false;
@@ -3228,7 +3229,7 @@ namespace basecross {
 					}
 					else
 					{
-						comboptr->SetComboScoreMove(Vector3(-0.4f, -4.3f, 0) * 3);
+						comboptr->SetComboScoreMove(Vector3(-0.2f, -4.1f, 0) * 3);
 					}
 
 					if (flg1 && flg2 && flg3)
@@ -5313,6 +5314,7 @@ namespace basecross {
 					Trans->SetRotation(30 * 3.14159265f / 180, 0, 0);
 
 					auto Draw = obj->AddComponent<PNTStaticDraw>();
+					Draw->SetDepthStencilState(DepthStencilState::Read);
 					Draw->SetTextureResource(L"BOOST_TX");
 					Draw->SetMeshResource(L"DEFAULT_SQUARE");
 

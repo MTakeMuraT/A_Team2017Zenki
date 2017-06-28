@@ -126,6 +126,7 @@ namespace basecross {
 			tarTra->SetScale(3.0f, 3.0f, 3.0f);
 
 			auto tarDra = tarobj->AddComponent<PNTStaticDraw>();
+			tarDra->SetDepthStencilState(DepthStencilState::Read);
 			tarDra->SetTextureResource(L"TARGETRING_TX");
 			tarDra->SetMeshResource(L"DEFAULT_SQUARE");
 			tarDra->SetDiffuse(Color4(1, 1, 1, 0.5f));
@@ -773,6 +774,7 @@ namespace basecross {
 		Trans->SetRotation(0, 0, 0);
 			//ï`âÊê›íË
 			auto Draw = AddComponent<PNTStaticDraw>();
+			Draw->SetDepthStencilState(DepthStencilState::Read);
 			Draw->SetMeshResource(L"DEFAULT_SQUARE");
 			Draw->SetTextureResource(m_TextureName);
 			SetAlphaActive(true);
@@ -901,6 +903,7 @@ namespace basecross {
 		ShadowPtr->SetMeshResource(L"DEFAULT_SPHERE");
 
 		auto PtrDraw = AddComponent<PNTStaticDraw>();
+		PtrDraw->SetDepthStencilState(DepthStencilState::Read);
 		PtrDraw->SetMeshResource(L"DEFAULT_SPHERE");
 		PtrDraw->SetTextureResource(L"Background_TX");
 		SetAlphaActive(true);

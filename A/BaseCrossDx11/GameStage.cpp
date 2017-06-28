@@ -672,6 +672,7 @@ namespace basecross
 	{}
 	void Ground_GameStage::OnCreate() {
 		auto PtrDraw = AddComponent<PNTStaticDraw>();
+		PtrDraw->SetDepthStencilState(DepthStencilState::Read);
 		PtrDraw->SetMeshResource(L"DEFAULT_SQUARE");
 		if (m_TX_Name == L"Background_TX") {
 			PtrDraw->SetTextureResource(m_TX_Name);
