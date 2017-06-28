@@ -74,15 +74,19 @@ namespace basecross {
 
 		if (CntlVec[0].wPressedButtons &XINPUT_GAMEPAD_A) {
 			Max = 0.5f;
+			//ここSE
 			auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
-			pMultiSoundEffect->Start(L"Decision_01_SE", 0, 1.0f);
+			if (OnSEflg == false) {
+				pMultiSoundEffect->Start(L"Decision_01_SE", 0, 1.0f);
+				OnSEflg = true;
+			}
 		}
-		if (CntlVec[0].wPressedButtons &XINPUT_GAMEPAD_B)
+		/*if (CntlVec[0].wPressedButtons &XINPUT_GAMEPAD_B)
 		{
 			Max = 2.0f;
 			auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
 			pMultiSoundEffect->Start(L"Decision_01_SE", 0, 1.0f);
-		}
+		}*/
 
 		if (m_alpha > Max) {
 			lighton = false;
@@ -4378,6 +4382,7 @@ namespace basecross {
 
 		//アップデート停止
 		SetUpdateActive(false);
+		OneSeFlg = false;
 	}
 
 	void PauseMenu::OnUpdate()
@@ -4392,6 +4397,12 @@ namespace basecross {
 				//下
 				if (CntlVec[0].fThumbLY < -0.5f)
 				{
+					//ここSE
+					if (OneSeFlg == false) {
+						GetStage()->GetSharedGameObject<SE>(L"TitleSE", false)->SetSeFlg_CURSORMOVE(false);
+						GetStage()->GetSharedGameObject<SE>(L"TitleSE", false)->StickSe();
+						OneSeFlg = true;
+					}
 					m_SelectNum++;
 					if (m_SelectNum > 3)
 					{
@@ -4404,6 +4415,12 @@ namespace basecross {
 				//上
 				if (CntlVec[0].fThumbLY > 0.5f)
 				{
+					//ここSE
+					if (OneSeFlg == false) {
+						GetStage()->GetSharedGameObject<SE>(L"TitleSE", false)->SetSeFlg_CURSORMOVE(false);
+						GetStage()->GetSharedGameObject<SE>(L"TitleSE", false)->StickSe();
+						OneSeFlg = true;
+					}
 					m_SelectNum--;
 					if (m_SelectNum < 0)
 					{
@@ -4453,6 +4470,8 @@ namespace basecross {
 			//ずっと動けないように
 			else
 			{
+				OneSeFlg = false;
+
 				if (abs(CntlVec[0].fThumbLY) < 0.5f && abs(CntlVec[0].fThumbLY) > -0.5f)
 				{
 					m_MoveFlg = true;

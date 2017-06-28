@@ -496,6 +496,11 @@ namespace basecross {
 		//strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\PrayerExposure.wav";
 		//App::GetApp()->RegisterWav(L"PrayerDie_SE", strMusic); 
 		
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\StageSelect\\SaidSelectSe.wav";
+		App::GetApp()->RegisterWav(L"SaidSelectSe_SE", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\StageSelect\\StageSe.wav";
+		App::GetApp()->RegisterWav(L"StageSe_SE", strMusic);
+
 		//敵エネミー発見時
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Enemy\\Computer Launch.wav";
 		App::GetApp()->RegisterWav(L"Player_Look_SE", strMusic);
@@ -545,7 +550,9 @@ namespace basecross {
 		//ミサイル発射音(未実装)
 		//着弾時（未実装）
 		
-
+		//ポーズSE
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Pause\\Pause.wav";
+		App::GetApp()->RegisterWav(L"Pause_SE", strMusic);
 	
 
 

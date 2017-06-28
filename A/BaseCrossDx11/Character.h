@@ -60,6 +60,7 @@ namespace basecross{
 
 		bool lighton = true;
 
+		bool OnSEflg = false;
 
 	public:
 		float m_alpha = 0.05;
@@ -1044,6 +1045,8 @@ namespace basecross{
 		//スタートBUTTON押せるようにするフラグ
 		bool m_StartPushFlg = true;
 		//-----関数-----
+		bool OneSeFlg = false;
+
 	public:
 		PauseMenu(const shared_ptr<Stage>& StagePtr) :GameObject(StagePtr) {};
 

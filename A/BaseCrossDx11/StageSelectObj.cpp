@@ -143,7 +143,7 @@ namespace basecross
 
 		m_InitMoveFlg = true;
 
-
+		
 	}
 
 	void SelectPlayer::OnUpdate()
@@ -420,6 +420,8 @@ namespace basecross
 		m_ElementNumTopFlg = true;
 		m_EasyStageCenter = 0;
 		SetUpdateActive(true);
+		auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
+		pMultiSoundEffect->AddAudioResource(L"StageSe_SE");
 
 	}
 	void StageModeControl::OnUpdate() {
@@ -447,6 +449,11 @@ namespace basecross
 				CntlVec[0].fThumbLY > 0.5 && m_ModeMoveEnd && m_StageMoveEnd &&
 				m_StickDown || CntlVec[0].fThumbLY < -0.5 && m_ModeMoveEnd && m_StageMoveEnd &&
 				m_StickDown && m_ModeMoveEnd) {
+				if (m_OneSE == false) {
+					auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+					pMultiSoundEffect->Start(L"StageSe_SE", 0, 1.0f);
+					m_OneSE = true;
+				}
 				m_ElementCenter = 0;
 				m_ElementUp = 0;
 				m_ElementDown = 0;
@@ -456,6 +463,9 @@ namespace basecross
 				m_Down = Vector3(0, 0, 0);
 				m_Top = Vector3(0, 0, 0);
 
+			}
+			else {
+				m_OneSE = false;
 			}
 		}
 		//各ステージの移動
@@ -1223,7 +1233,9 @@ namespace basecross
 		m_LeftPos = Vector3(-320, -60, -4);
 		// Draw->SetDrawActive(false);
 		SetDrawLayer(2);
-
+		auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
+		pMultiSoundEffect->AddAudioResource(L"SaidSelectSe_SE");
+		m_OneSE = false;
 	}
 	void ModeSelect::OnUpdate() {
 		ModeSelectMove();
@@ -1241,6 +1253,11 @@ namespace basecross
 
 		if (PtrStageModeControl->ModeMoveEnd()) {
 			if (KeylVec.m_bPressedKeyTbl['W'] || CntlVec[0].fThumbLX < -0.5f && PtrStageModeControl->ModeMoveEnd() && PtrStageModeControl->StageEndMove() && m_StickDown) {
+				if (m_OneSE == false) {
+					auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+					pMultiSoundEffect->Start(L"SaidSelectSe_SE", 0, 0.5f);
+					m_OneSE = true;
+				}
 				m_EndMove = false;
 				m_Speed = 10.0f;
 				m_MoveNum++;
@@ -1248,6 +1265,11 @@ namespace basecross
 				m_StickLift = true;
 			}
 			if (KeylVec.m_bPressedKeyTbl['E'] || CntlVec[0].fThumbLX > 0.5f && PtrStageModeControl->ModeMoveEnd() && PtrStageModeControl->StageEndMove() && m_StickDown) {
+				if (m_OneSE == false) {
+					auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+					pMultiSoundEffect->Start(L"SaidSelectSe_SE", 0, 0.5f);
+					m_OneSE = true;
+				}
 				m_EndMove = false;
 				m_Speed = 10.0f;
 				m_MoveNum--;
@@ -1260,6 +1282,9 @@ namespace basecross
 			if (m_MoveNum <= 0) {
 				m_MoveNum = 3;
 			}
+		}
+		else {
+			m_OneSE = false;
 		}
 
 		switch (m_MoveNum)

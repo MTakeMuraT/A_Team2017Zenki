@@ -46,6 +46,7 @@ namespace basecross {
 		obj->SetAlphaActive(true);
 
 		SetSharedGameObject(L"Dodai", obj);
+		SetSharedGameObject(L"TitleSE", AddGameObject<SE>());
 
 
 		//AddGameObject<InputCSV>();
@@ -184,6 +185,11 @@ namespace basecross {
 				//上選択
 				if (CntlVec[0].fThumbLY > 0.5f || KeylVec.m_bPressedKeyTbl[VK_UP])
 				{
+					if (OneSeFlg == true) {
+						GetSharedGameObject<SE>(L"TitleSE", false)->SetSeFlg_CURSORMOVE(false);
+						GetSharedGameObject<SE>(L"TitleSE", false)->StickSe();
+						OneSeFlg = false;
+					}
 					m_selectNum = 0;
 					GetSharedGameObject<GameObject>(L"Dodai", false)->GetComponent<Transform>()->SetPosition(Vector3(0, -190, 0));
 
@@ -202,6 +208,12 @@ namespace basecross {
 				//下選択
 				if (CntlVec[0].fThumbLY < -0.5f || KeylVec.m_bPressedKeyTbl[VK_DOWN])
 				{
+					//ここSE
+					if (OneSeFlg == false) {
+						GetSharedGameObject<SE>(L"TitleSE", false)->SetSeFlg_CURSORMOVE(false);
+						GetSharedGameObject<SE>(L"TitleSE", false)->StickSe();
+						OneSeFlg = true;
+					}
 					m_selectNum = 1;
 					GetSharedGameObject<GameObject>(L"Dodai", false)->GetComponent<Transform>()->SetPosition(Vector3(0, -270, 0));
 
@@ -222,6 +234,8 @@ namespace basecross {
 				//ボタン押された
 				if (KeylVec.m_bPressedKeyTbl['A'] || CntlVec[0].wPressedButtons &XINPUT_GAMEPAD_A)
 				{
+					GetSharedGameObject<SE>(L"TitleSE", false)->ASe();
+
 					//ロゴカウントリセット
 					m_logocounttime = 0;
 
@@ -422,6 +436,42 @@ namespace basecross {
 	 TitleScene::~TitleScene() {
 		// m_AudioObjectPtr->Stop(L"Title_01_BGM");
 	}
+	 SE::SE(const shared_ptr<Stage>& StagePtr) :
+		 GameObject(StagePtr)
+	 {}
+	 void SE::OnCreate() {
+		 //SE//オーディオリソース登録
+		 auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
+		 pMultiSoundEffect->AddAudioResource(L"Decision_01_SE");
+		 pMultiSoundEffect->AddAudioResource(L"CURSORMOVE_SE");
+		 pMultiSoundEffect->AddAudioResource(L"Pause_SE");
+
+	 }
+	 void SE::ASe() {
+		 if (SeFlg_Decision_01 == false) {
+			 auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+			 pMultiSoundEffect->Start(L"Decision_01_SE", 0, 1.0f);
+			 SeFlg_Decision_01 = true;
+		 }
+	 }
+	 void SE::StickSe() {
+
+		 if (SeFlg_CURSORMOVE == false) {
+			 auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+			 pMultiSoundEffect->Start(L"CURSORMOVE_SE", 0, 1.0f);
+			 SeFlg_CURSORMOVE = true;
+		 }
+	 }
+	 void SE::PauseSe() {
+		 auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+		 pMultiSoundEffect->Start(L"Pause_SE", 0, 1.0f);
+		 SeFlg_Pause = true;
+	 }
+	 void SE::PauseCloseSe() {
+		 auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+		 pMultiSoundEffect->Start(L"Pause_SE", 0, 1.0f);
+		 SePauseCloseSe = true;
+	 }
 
 }
 //end basecross

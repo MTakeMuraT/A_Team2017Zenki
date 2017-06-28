@@ -160,6 +160,8 @@ namespace basecross
 	void GameStage::CreatePause()
 	{
 		SetSharedGameObject(L"PauseMenu",AddGameObject<PauseMenu>());
+		SetSharedGameObject(L"TitleSE", AddGameObject<SE>());
+
 	}
 	//ポーズ作成--------------------------------------------
 	//Abe20170605
@@ -380,6 +382,8 @@ namespace basecross
 			{
 				if (GetSharedGameObject<PauseMenu>(L"PauseMenu", false)->GetPushFlg())
 				{
+					GetSharedGameObject<SE>(L"TitleSE", false)->PauseSe();
+
 					//ポーズ表示
 					GetSharedGameObject<PauseMenu>(L"PauseMenu", false)->Open();
 
@@ -388,6 +392,8 @@ namespace basecross
 				}
 				else
 				{
+					GetSharedGameObject<SE>(L"TitleSE", false)->PauseSe();
+
 					//ポーズ表示
 					GetSharedGameObject<PauseMenu>(L"PauseMenu", false)->Close();
 
