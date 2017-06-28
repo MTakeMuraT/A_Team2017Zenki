@@ -128,6 +128,7 @@ namespace basecross {
 			auto tarDra = tarobj->AddComponent<PNTStaticDraw>();
 			tarDra->SetTextureResource(L"TARGETRING_TX");
 			tarDra->SetMeshResource(L"DEFAULT_SQUARE");
+			tarDra->SetDiffuse(Color4(1, 1, 1, 0.5f));
 
 			tarobj->SetAlphaActive(true);
 			tarobj->SetDrawLayer(false);

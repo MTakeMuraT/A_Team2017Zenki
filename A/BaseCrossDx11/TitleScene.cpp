@@ -264,6 +264,11 @@ namespace basecross {
 					GetSharedGameObject<GameObject>(L"GameStart", false)->SetDrawActive(false);
 					GetSharedGameObject<GameObject>(L"Tutorial", false)->SetDrawActive(false);
 
+					//カーソル位置調整
+					m_selectNum = 0;
+					GetSharedGameObject<GameObject>(L"Dodai", false)->GetComponent<Transform>()->SetPosition(Vector3(0, -190, 0));
+
+
 					//ロゴカウントリセット
 					m_logocounttime = 0;
 
