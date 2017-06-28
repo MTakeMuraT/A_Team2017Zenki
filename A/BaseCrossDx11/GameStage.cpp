@@ -189,10 +189,10 @@ namespace basecross
 	{
 		try {
 			////検証するのに重いので一時的に消します Abe20170505
-			//m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
-			//m_AudioObjectPtr->AddAudioResource(L"GameStage_01_BGM");
-			//m_AudioObjectPtr->Start(L"GameStage_01_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);
-			//m_AudioObjectPtr->AddAudioResource(L"Win_SE");
+			m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
+			m_AudioObjectPtr->AddAudioResource(L"GameStage_01_BGM");
+			m_AudioObjectPtr->Start(L"GameStage_01_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);
+			m_AudioObjectPtr->AddAudioResource(L"Win_SE");
 
 
 			//グループ類作成
@@ -355,7 +355,7 @@ namespace basecross
 		if (PlayerLifePtr) {
 			if (PlayerLifePtr->GetDieFlg() == false) {
 				if (StopBGM == true) {
-					//m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
+					m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
 					StopBGM = false;
 				}
 			}
@@ -431,8 +431,8 @@ namespace basecross
 		//仮でリザルト表示**********デバッグ*********
 		if (KeylVec.m_bPressedKeyTbl['B'])
 		{
-			//m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
-			//m_AudioObjectPtr->Start(L"Win_SE", 0, 0.5f);
+			m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
+			m_AudioObjectPtr->Start(L"Win_SE", 0, 0.5f);
 
 
 			Result();
@@ -504,7 +504,7 @@ namespace basecross
 
 	GameStage::~GameStage() {
 		if (StopBGM == true) {
-			//m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
+			m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
 		}
 	}
 

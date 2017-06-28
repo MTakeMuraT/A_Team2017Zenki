@@ -1587,6 +1587,10 @@ namespace basecross
 		PtrString->SetText(L"");
 		PtrString->SetTextRect(Rect2D<float>(16.0f, 16.0f, 640.0f, 480.0f));
 		SetCloseflg(false);
+		//ここSE
+		auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
+		pMultiSoundEffect->AddAudioResource(L"Pause_SE");
+		m_OneSE = false;
 	}
 
 	void GoStageCheck::OnUpdate()
@@ -1600,21 +1604,33 @@ namespace basecross
 
 			if (m_KeepPushing) {
 				if (CntlVec[0].wButtons& XINPUT_GAMEPAD_A) {
+					if (m_OneSE == false) {
+						auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+						pMultiSoundEffect->Start(L"Pause_SE", 0, 1.0f);
+						m_OneSE = true;
+					}
 					m_KeepApudh = true;
 				}
 				else if (!(CntlVec[0].wButtons& XINPUT_GAMEPAD_A)) {
 					m_KeepApudh = false;
 					m_KeepPushing = false;
+					m_OneSE = true;
 				}
 			}
 
 			if (m_KeepPushing == false && m_KeepApudh == false) {
 				//selectのメニューからAボタンが押されて
 				if (CntlVec[0].wPressedButtons& XINPUT_GAMEPAD_A) {
+					if (m_OneSE2 == false) {
+						auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+						pMultiSoundEffect->Start(L"Pause_SE", 0, 1.0f);
+						m_OneSE2 = true;
+					}
 					m_APush = true;
 				}
 				else {
 					m_APush = false;
+					m_OneSE2 = false;
 				}
 			}
 

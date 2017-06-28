@@ -466,17 +466,17 @@ namespace basecross {
 
 		//検証するのに重いので一時的に消します Abe20170505
 		//BGM
-		/*
+		
 		wstring strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Title\\Title_01.wav";
 		App::GetApp()->RegisterWav(L"Title_01_BGM", strMusic);
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\StageSelect\\StageSelect_01.wav";
 		App::GetApp()->RegisterWav(L"StageSelect_01_BGM", strMusic);
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\GameStage\\GameStage_01.wav";
 		App::GetApp()->RegisterWav(L"GameStage_01_BGM", strMusic);
-	*/
+	
 		//SE
 		
-		wstring strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Decision_01.wav";
+		 strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Decision_01.wav";
 		App::GetApp()->RegisterWav(L"Decision_01_SE", strMusic);
 		
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Collision_01.wav";
@@ -537,13 +537,13 @@ namespace basecross {
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Player\\Player Exposure.wav";
 		App::GetApp()->RegisterWav(L"Player_Die_SE", strMusic);
 		//チュートリアルBGM　
-		// strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Tutorial\\TutorialBGM.wav";
-		//App::GetApp()->RegisterWav(L"Tutorial_BGM", strMusic);
+		 strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Tutorial\\TutorialBGM.wav";
+		App::GetApp()->RegisterWav(L"Tutorial_BGM", strMusic);
 		
 		//負けBGM
-		//strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Loss\\Loss.wav";
-		//App::GetApp()->RegisterWav(L"Loss_BGM", strMusic);
-		//strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Loss\\Loss2.wav";
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Loss\\Loss.wav";
+		App::GetApp()->RegisterWav(L"Loss_BGM", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Loss\\Loss2.wav";
 		//App::GetApp()->RegisterWav(L"Loss2_BGM", strMusic);
 		//子機投げる(未実装)
 		//子機落下（未実装）
