@@ -790,7 +790,7 @@ namespace basecross
 		//==============================================
 		if (dynamic_pointer_cast<TackleEnemy>(obj))
 		{
-			if (dynamic_pointer_cast<TackleEnemy>(obj)->GetDrawActive())
+			if (dynamic_pointer_cast<TackleEnemy>(obj)->GetDrawActive() && dynamic_pointer_cast<TackleEnemy>(obj)->GetState() != MutekiS)
 			{
 				dynamic_pointer_cast<TackleEnemy>(obj)->DamagePlayer();
 				//コンボ加算
@@ -816,7 +816,7 @@ namespace basecross
 		//テレポートエネミー
 		if (dynamic_pointer_cast<TeleportEnemy>(obj))
 		{
-			if (dynamic_pointer_cast<TeleportEnemy>(obj)->GetDrawActive())
+			if (dynamic_pointer_cast<TeleportEnemy>(obj)->GetDrawActive() && dynamic_pointer_cast<TeleportEnemy>(obj)->GetState() != MutekiS)
 			{
 				//ShotEnemyChildへのフラグ
 				dynamic_pointer_cast<TeleportEnemy>(obj)->DamagePlayer();
@@ -828,7 +828,7 @@ namespace basecross
 		//ミサイルうつエネミー
 		if (dynamic_pointer_cast<ShotEnemy>(obj))
 		{
-			if (dynamic_pointer_cast<ShotEnemy>(obj)->GetDrawActive())
+			if (dynamic_pointer_cast<ShotEnemy>(obj)->GetDrawActive() && dynamic_pointer_cast<ShotEnemy>(obj)->GetState() != MutekiS)
 			{
 				//ShotEnemyChildへのフラグ
 				dynamic_pointer_cast<ShotEnemy>(obj)->DamagePlayer();

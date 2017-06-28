@@ -2237,6 +2237,12 @@ namespace basecross {
 		m_White = White;
 		/*m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
 		m_AudioObjectPtr->AddAudioResource(L"Loss_BGM");*/
+
+		//Abe20170628
+		//ターゲットカーソル消し
+		GetStage()->GetSharedGameObject<PlayerControl>(L"PlayerControl", false)->DeleteMarker();
+		//Abe20170628
+
 	}
 
 	void GameOverS::OnUpdate()
@@ -2823,6 +2829,11 @@ namespace basecross {
 			//コンボスコア設定
 			GetStage()->GetSharedGameObject<ComboBonus>(L"ComboBonus", false)->SetScore();
 			//Abe20170627
+
+			//Abe20170628
+			//ターゲットカーソル消し
+			GetStage()->GetSharedGameObject<PlayerControl>(L"PlayerControl", false)->DeleteMarker();
+			//Abe20170628
 
 		}
 		//チュートリアルの時
