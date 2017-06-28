@@ -775,6 +775,30 @@ namespace basecross{
 		virtual void OnUpdate() override;
 	};
 
+	//--------------------------------------------------------------------------------------
+	//	SS引数ディレクトリ入れるやつ
+	//--------------------------------------------------------------------------------------
+	class SpriteStudioParent : public SS5ssae
+	{
+	private:
+		//動くか
+		bool m_ActiveFlg = false;
+
+		//制限時間
+		float m_LimitTime = 2.0f;
+		float m_time = 0;
+	public:
+		//構築と破棄
+		SpriteStudioParent(const shared_ptr<Stage>& StagePtr,wstring dire,wstring name);
+		//初期化
+		void OnCreate() override;
+		void OnUpdate() override;
+
+		void OnAnim();
+
+		void SetLayer(int num) { SetDrawLayer(num); };
+	};
+
 #pragma region ***オーバー:リザルト***
 	//Abe20170529
 	//--------------------------------------------------------------------------------------
@@ -815,6 +839,7 @@ namespace basecross{
 		//4
 		//ノイズ画像
 		shared_ptr<GameObject> m_Noise;
+		//shared_ptr<SpriteStudioParent> m_Noise;
 		//ノイズの音
 		shared_ptr<MultiAudioObject> m_NoiseSe;
 		//なったか

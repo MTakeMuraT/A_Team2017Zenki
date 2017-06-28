@@ -22,8 +22,8 @@ namespace basecross{
 			srand((unsigned)time(NULL));
 
 			//最初のアクティブステージの設定
-			ResetActiveStage<LogoScene>();
-			//ResetActiveStage<TitleScene>();
+			//ResetActiveStage<LogoScene>();
+			ResetActiveStage<TitleScene>();
 			//ResetActiveStage<StageSelectScene>();
 			//ResetActiveStage<TutorialScene>();
 

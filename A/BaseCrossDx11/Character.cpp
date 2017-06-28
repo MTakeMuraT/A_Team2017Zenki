@@ -2128,6 +2128,70 @@ namespace basecross {
 		}
 		
 	}
+	//--------------------------------------------------------------------------------------
+	//	SS引数ディレクトリ入れるやつ
+	//--------------------------------------------------------------------------------------
+	SpriteStudioParent::SpriteStudioParent(const shared_ptr<Stage>& StagePtr,wstring dire, wstring name) :
+		SS5ssae(StagePtr, App::GetApp()->m_wstrDataPath + dire, name, L"anime_1",true)
+	{
+	}
+
+	void SpriteStudioParent::OnCreate()
+	{
+		//初期化---------------------
+		m_LimitTime = 2.0f;
+		m_time = 0;
+		//---------------------------
+
+		auto Trans = AddComponent<Transform>();
+		Trans->SetPosition(0, 0, 0);
+		Trans->SetScale(5, 5, 5);
+		Trans->SetRotation(0, 0, 0);
+
+		//アニメーション関連
+		Matrix4X4 mat;
+		mat.DefTransformation(
+			Vector3(6.5f, 6.5f, 6.5f),
+			Vector3(0, 0, 0),
+			Vector3(0, 7.5, 0)
+			);
+		SetToAnimeMatrix(mat);
+
+		//親クラスのCreate
+		SS5ssae::OnCreate();
+		//秒あたりのフレーム数
+		SetFps(60.0f);
+		//ループ無効
+		SetLooped(false);
+
+
+		//透明度有効化
+		SetAlphaActive(true);
+		//描画
+		SetDrawActive(true);
+		//表示レイヤー
+		SetDrawLayer(10);
+
+	}
+
+	void SpriteStudioParent::OnUpdate()
+	{
+		if (m_time < m_LimitTime)
+		{
+			m_time += App::GetApp()->GetElapsedTime();
+			//アニメ―ション更新
+			UpdateAnimeTime(App::GetApp()->GetElapsedTime());
+		}
+	}
+
+	void SpriteStudioParent::OnAnim()
+	{
+		m_ActiveFlg = true;
+		ChangeAnimation(L"anime_1");
+		m_time = 0;
+	}
+
+
 	//Abe20170529
 	//--------------------------------------------------------------------------------------
 	//	ゲームオーバー処理
@@ -2401,6 +2465,7 @@ namespace basecross {
 					m_State = 4;
 
 					//ノイズ作成
+					
 					auto obj = GetStage()->AddGameObject<GameObject>();
 					auto Trans = obj->AddComponent<Transform>();
 					Trans->SetPosition(0, 0, 0);
@@ -2415,6 +2480,10 @@ namespace basecross {
 					obj->SetAlphaActive(true);
 
 					m_Noise = obj;
+					
+					//m_Noise = GetStage()->AddGameObject<SpriteStudioParent>(L"SS\\Noise\\", L"Noise1.ssae");
+					//m_Noise->OnAnim();
+					//m_Noise->SetLayer(12);
 
 					//暗転幕
 					auto obj2 = GetStage()->AddGameObject<GameObject>();
@@ -2461,6 +2530,8 @@ namespace basecross {
 					m_BlackAlpha = 0;
 
 					m_NoiseSe->Stop(L"OverNoiseSE");
+
+					//m_Noise->SetDrawActive(false);
 				}
 			}
 			break;

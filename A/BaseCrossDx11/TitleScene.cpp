@@ -68,6 +68,8 @@ namespace basecross {
 			//	Vector2(1280, 720),
 			//	Vector2(0, 0));
 
+			//AddGameObject<SpriteStudioParent>(L"SS\\Noise\\", L"Noise1.ssae");
+
 			m_time = 0;
 		}
 		
@@ -80,10 +82,11 @@ namespace basecross {
 		m_logocounttime += App::GetApp()->GetElapsedTime();
 		if (m_logocounttime > 30)
 		{
+			//ここ弄るとロゴシーンいかない
 			//シーン切り替え
-			auto ScenePtr = App::GetApp()->GetScene<Scene>();
+			//auto ScenePtr = App::GetApp()->GetScene<Scene>();
 			//ロゴシーン
-			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToLogoScene");
+			//PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToLogoScene");
 
 			m_logocounttime = 0;
 		}
