@@ -698,7 +698,7 @@ namespace basecross
 		PtrTrans->SetPosition(m_Positon);
 		//PtrDraw->SetDrawActive(false);
 		SetAlphaActive(true);
-		SetDrawLayer(10);
+		//SetDrawLayer(10);
 	}
 }
 
