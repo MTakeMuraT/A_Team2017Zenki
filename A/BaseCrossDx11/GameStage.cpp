@@ -299,6 +299,14 @@ namespace basecross
 			SetSharedGameObject(L"DebugTxt", obj);
 			//Abe20170622
 
+
+			//Abe20170627
+			//コンボ
+			auto combop = AddGameObject<ComboBonus>();
+			GetSharedObjectGroup(L"UgokuGroup")->IntoGroup(combop);
+			SetSharedGameObject(L"ComboBonus",combop);
+			//Abe20170627
+
 		}
 		catch (...) {
 
@@ -424,6 +432,15 @@ namespace basecross
 			Result();
 		}
 		//仮でリザルト表示**********デバッグ*********
+
+		//Abe20170627
+		if (KeylVec.m_bPressedKeyTbl[VK_UP])
+		{
+			GetSharedGameObject<ComboBonus>(L"ComboBonus", false)->CountUp();
+		}
+		//Abe20170627
+
+
 		//Abe20170531
 
 		if (m_CameraMoveFlg)

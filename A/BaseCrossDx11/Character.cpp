@@ -898,9 +898,9 @@ namespace basecross {
 
 	void NumberSprite::SetNumDraw(bool flg)
 	{
-		for (auto v : m_Numbers)
+		for (int i = 0; i < m_digit; i++)
 		{
-			v->SetDrawActive(flg);
+			m_Numbers[i]->SetDrawActive(flg);
 		}
 
 	}
@@ -2818,6 +2818,12 @@ namespace basecross {
 			m_Player1TargetPos.x += -2;
 			m_Player2TargetPos = m_centerPos;
 			m_Player2TargetPos.x += 2;
+
+			//Abe20170627
+			//コンボスコア設定
+			GetStage()->GetSharedGameObject<ComboBonus>(L"ComboBonus", false)->SetScore();
+			//Abe20170627
+
 		}
 		//チュートリアルの時
 		else
@@ -3130,15 +3136,23 @@ namespace basecross {
 					auto timeptr = GetStage()->GetSharedGameObject<Timer>(L"Timer", false);
 					//HPスプライト持ってくる
 					auto hpptr = GetStage()->GetSharedGameObject<Player_Life>(L"Life", false);
+					//Abe20170627
+					//コンボスコア持ってくる
+					auto comboptr = GetStage()->GetSharedGameObject<ComboBonus>(L"ComboBonus", false);
+					//Abe20170627
 
 					//レイヤー変える
 					timeptr->SetLayer(11);
 					hpptr->SetLayer(11);
+					comboptr->SetComboScoreLayer(11);
 
 					//constで宣言しても更新されないunkなので
 					//HPスプライトとTimeの目的座標を再設定
-					m_HpTargetPos = Vector3(30, -250, 0);
-					m_TimeTargetPos = Vector3(-400, -400, 0);
+					m_HpTargetPos = Vector3(30, -220, 0);
+					m_TimeTargetPos = Vector3(-400, -320, 0);
+					//Abe20170627
+					m_ScoreTargetPos = Vector3(-40, -430, 0);
+					//Abe20170627
 
 
 					//ミッションコンプリートの座標持ってくる
@@ -3164,13 +3178,19 @@ namespace basecross {
 					auto timeptr = GetStage()->GetSharedGameObject<Timer>(L"Timer", false);
 					//HPスプライト持ってくる
 					auto hpptr = GetStage()->GetSharedGameObject<Player_Life>(L"Life", false);
+					//Abe20170627
+					//コンボスコア持ってくる
+					auto comboptr = GetStage()->GetSharedGameObject<ComboBonus>(L"ComboBonus", false);
+					//Abe20170627
 
-					m_HpPos += Vector3(0.3f, -2.5f, 0) * 3;
-					m_TimePos += Vector3(-4, -4, 0) * 3;
+					m_HpPos += Vector3(0.3f, -2.2f, 0) * 3;
+					m_TimePos += Vector3(-4, -3.2f, 0) * 3;
+					m_ScorePos += Vector3(-0.4f, -4.3f, 0) * 3;
 
 					//判定フラグ
 					bool flg1 = false;
 					bool flg2 = false;
+					bool flg3 = false;
 
 					if (m_HpTargetPos.x < m_HpPos.x && m_HpTargetPos.y > m_HpPos.y)
 					{
@@ -3178,7 +3198,7 @@ namespace basecross {
 					}
 					else
 					{
-						hpptr->MoveSprtieS(Vector3(0.3f, -2.5f, 0) * 3);
+						hpptr->MoveSprtieS(Vector3(0.3f, -2.2f, 0) * 3);
 					}
 
 					if (m_TimeTargetPos.x > m_TimePos.x && m_TimeTargetPos.y > m_TimePos.y)
@@ -3187,10 +3207,20 @@ namespace basecross {
 					}
 					else
 					{
-						timeptr->MovePos(Vector3(-4, -4, 0) * 3);
+						timeptr->MovePos(Vector3(-4, -3.2f, 0) * 3);
 					}
 
-					if (flg1 && flg2)
+
+					if (m_ScoreTargetPos.x > m_ScorePos.x && m_ScoreTargetPos.y > m_ScorePos.y)
+					{
+						flg3 = true;
+					}
+					else
+					{
+						comboptr->SetComboScoreMove(Vector3(-0.4f, -4.3f, 0) * 3);
+					}
+
+					if (flg1 && flg2 && flg3)
 					{
 						//状態変更
 						m_State = 8;
@@ -3242,7 +3272,7 @@ namespace basecross {
 					//HPのほうの×作成
 					auto batu = GetStage()->AddGameObject<GameObject>();
 					auto Transba = batu->AddComponent<Transform>();
-					Transba->SetPosition(-5, 50, 0);
+					Transba->SetPosition(-5, 80, 0);
 					Transba->SetScale(100, 100, 1);
 					Transba->SetRotation(0, 0, 0);
 
@@ -3252,15 +3282,30 @@ namespace basecross {
 					batu->SetDrawLayer(11);
 					batu->SetAlphaActive(true);
 
+					//Abe20170628
+					//コンボスコア作成
+					auto comsco = GetStage()->AddGameObject<GameObject>();
+					auto Transco = comsco->AddComponent<Transform>();
+					Transco->SetPosition(-360, -130, 0);
+					Transco->SetScale(270, 270, 1);
+					Transco->SetRotation(0, 0, 0);
+
+					auto Drawco = comsco->AddComponent<PCTSpriteDraw>();
+					Drawco->SetTextureResource(L"COMBOSCORERESULT_TX");
+
+					comsco->SetDrawLayer(11);
+					comsco->SetAlphaActive(true);
+					//Abe20170628
+
 					//HPの倍率スコア
-					auto numhp = GetStage()->AddGameObject<NumberSprite>(500, Vector2(260, 50), Vector2(100, 100), 11);
+					auto numhp = GetStage()->AddGameObject<NumberSprite>(500, Vector2(260, 80), Vector2(100, 100), 11);
 
 					//HPのスコア
-					auto numhpscore = GetStage()->AddGameObject<NumberSprite>(0, Vector2(560, 50), Vector2(100, 100), 11);
+					auto numhpscore = GetStage()->AddGameObject<NumberSprite>(0, Vector2(560, 80), Vector2(100, 100), 11);
 					m_HpScore = numhpscore;
 
 					//TIMEのスコア
-					auto numtimescore = GetStage()->AddGameObject<NumberSprite>(0, Vector2(560, -100), Vector2(100, 100), 11);
+					auto numtimescore = GetStage()->AddGameObject<NumberSprite>(0, Vector2(560, -20), Vector2(100, 100), 11);
 					m_TimeScore = numtimescore;
 
 					//状態変更
@@ -3291,7 +3336,7 @@ namespace basecross {
 
 					//トータルスコア計算
 					m_TotalAmount = 0;
-					m_TotalScore = m_HpScoreTotal + m_TimeScoreTotal;
+					m_TotalScore = m_HpScoreTotal + m_TimeScoreTotal + GetStage()->GetSharedGameObject<ComboBonus>(L"ComboBonus", false)->GetComboScore();
 				}
 				break;
 				//スコア加算
@@ -3354,7 +3399,7 @@ namespace basecross {
 					m_State = 10;
 
 					//Totalスコア
-					auto numTo = GetStage()->AddGameObject<NumberSprite>(500, Vector2(450, -250), Vector2(100, 100), 11);
+					auto numTo = GetStage()->AddGameObject<NumberSprite>(500, Vector2(560, -250), Vector2(100, 100), 11);
 					m_TotalScoreSp = numTo;
 
 					//TotalScoreロゴ作成
@@ -5469,6 +5514,265 @@ namespace basecross {
 
 	//Abe20170622
 
+	//Abe20170627
+	//**************************************************************************************
+	//	連続撃破ボーナス
+	//	大体最後に倒したときから３秒以内に倒せば加点
+	//	連続すればするほど得点が伸びる
+	//**************************************************************************************
+	void ComboBonus::OnCreate()
+	{
+		//初期化-----------------
+		//倒したカウント
+		m_DestroyCount = 0;
+		//スコア増加率
+		m_ScoreAmount = 1.2f;
+		//計算用時間
+		m_time = 0;
+		//計測時間
+		m_IntervalTime = 3.0f;
+		//加点スコア
+		m_ComboNowScore = 0;
+		//動くふらぐオフ
+		m_ActiveFlg = false;
+		//初期化-----------------
+
+		//数字作成
+		m_NumberSp = GetStage()->AddGameObject<NumberSprite>(0, Vector2(-520,120), Vector2(100,100), 5);
+		dynamic_pointer_cast<NumberSprite>(m_NumberSp)->SetNumDraw(false);
+
+		//バー作成
+		auto barobj = GetStage()->AddGameObject<GameObject>();
+		auto barTrans = barobj->AddComponent<Transform>();
+		barTrans->SetPosition(-425,40,0);
+		barTrans->SetRotation(0, 0, 0);
+		barTrans->SetScale(330,80,1);
+
+
+		//頂点配列
+		vector<VertexPositionNormalTexture> vertices;
+		//インデックスを作成するための配列
+		vector<uint16_t> indices;
+		//Squareの作成(ヘルパー関数を利用)
+		MeshUtill::CreateSquare(1.0f, vertices, indices);
+		//UV値の変更
+		//左上頂点
+		vertices[0].textureCoordinate = Vector2(0, 0);
+		//右上頂点
+		vertices[1].textureCoordinate = Vector2(0.5f, 0);
+		//左下頂点
+		vertices[2].textureCoordinate = Vector2(0, 1.0f);
+		//右下頂点
+		vertices[3].textureCoordinate = Vector2(0.5f, 1.0f);
+		//頂点の型を変えた新しい頂点を作成
+		vector<VertexPositionColorTexture> new_vertices;
+		for (auto& v : vertices)
+		{
+			VertexPositionColorTexture nv;
+			nv.position = v.position;
+			nv.color = Color4(1.0f, 1.0f, 1.0f, 1.0f);
+			nv.textureCoordinate = v.textureCoordinate;
+			new_vertices.push_back(nv);
+		}
+
+		auto barDraw = barobj->AddComponent<PCTSpriteDraw>();
+		barDraw->SetTextureResource(L"COMBOBAR_TX");
+		barDraw->SetMeshResource(MeshResource::CreateMeshResource<VertexPositionColorTexture>(new_vertices, indices, true));
+		
+		barobj->SetDrawLayer(4);
+		barobj->SetAlphaActive(true);
+		barobj->SetDrawActive(false);
+
+		m_BarSp = barobj;
+
+
+		//バーフレーム作成
+		auto barfobj = GetStage()->AddGameObject<GameObject>();
+		auto barfTrans = barfobj->AddComponent<Transform>();
+		barfTrans->SetPosition(-440, 40, 0);
+		barfTrans->SetRotation(0, 0, 0);
+		barfTrans->SetScale(350, 80, 1);
+
+		auto barfDraw = barfobj->AddComponent<PCTSpriteDraw>();
+		barfDraw->SetTextureResource(L"COMBOBARFRAME_TX");
+
+		barfobj->SetDrawLayer(5);
+		barfobj->SetAlphaActive(true);
+		barfobj->SetDrawActive(false);
+
+		m_BarFrameSp = barfobj;
+
+		//コンボロゴ
+		auto comobj = GetStage()->AddGameObject<GameObject>();
+		auto comTrans = comobj->AddComponent<Transform>();
+		comTrans->SetPosition(-390, 120, 0);
+		comTrans->SetRotation(0, 0, 0);
+		comTrans->SetScale(200, 200, 1);
+
+		auto comDraw = comobj->AddComponent<PCTSpriteDraw>();
+		comDraw->SetTextureResource(L"COMBOLOGO_TX");
+
+		comobj->SetDrawLayer(4);
+		comobj->SetAlphaActive(true);
+		comobj->SetDrawActive(false);
+
+		m_ComboLogo = comobj;
+
+
+		//右上スコア作成
+		CreateMigiueScore();
+	}
+
+	void ComboBonus::OnUpdate()
+	{
+		if (m_ActiveFlg)
+		{
+			m_time += App::GetApp()->GetElapsedTime();
+			if (m_time > m_IntervalTime)
+			{
+				SetScore();
+			}
+			else
+			{
+				//バーを減らす
+
+				//割合計算
+				float partime = m_time / m_IntervalTime;
+				partime /= 2;
+
+				//頂点配列
+				vector<VertexPositionNormalTexture> vertices;
+				//インデックスを作成するための配列
+				vector<uint16_t> indices;
+				//Squareの作成(ヘルパー関数を利用)
+				MeshUtill::CreateSquare(1.0f, vertices, indices);
+				//UV値の変更
+				//左上頂点
+				vertices[0].textureCoordinate = Vector2(0 + partime, 0);
+				//右上頂点
+				vertices[1].textureCoordinate = Vector2(0.5f + partime, 0);
+				//左下頂点
+				vertices[2].textureCoordinate = Vector2(0 + partime, 1.0f);
+				//右下頂点
+				vertices[3].textureCoordinate = Vector2(0.5f + partime, 1.0f);
+				//頂点の型を変えた新しい頂点を作成
+				vector<VertexPositionColorTexture> new_vertices;
+				for (auto& v : vertices)
+				{
+					VertexPositionColorTexture nv;
+					nv.position = v.position;
+					nv.color = Color4(1.0f, 1.0f, 1.0f, 1.0f);
+					nv.textureCoordinate = v.textureCoordinate;
+					new_vertices.push_back(nv);
+				}
+
+				//反映
+				m_BarSp->GetComponent<PCTSpriteDraw>()->SetMeshResource(MeshResource::CreateMeshResource<VertexPositionColorTexture>(new_vertices, indices, true));
+
+			}
+		}
+	}
+
+	void ComboBonus::CountUp()
+	{
+		//起動
+		m_ActiveFlg = true;
+
+		m_time = 0;
+		m_DestroyCount++;
+
+		dynamic_pointer_cast<NumberSprite>(m_NumberSp)->SetNumDraw(true);
+		dynamic_pointer_cast<NumberSprite>(m_NumberSp)->SetNum(m_DestroyCount);
+
+		m_BarSp->SetDrawActive(true);
+		m_BarFrameSp->SetDrawActive(true);
+		m_ComboLogo->SetDrawActive(true);
+
+		//バー最大に
+		//頂点配列
+		vector<VertexPositionNormalTexture> vertices;
+		//インデックスを作成するための配列
+		vector<uint16_t> indices;
+		//Squareの作成(ヘルパー関数を利用)
+		MeshUtill::CreateSquare(1.0f, vertices, indices);
+		//UV値の変更
+		//左上頂点
+		vertices[0].textureCoordinate = Vector2(0, 0);
+		//右上頂点
+		vertices[1].textureCoordinate = Vector2(0.5f, 0);
+		//左下頂点
+		vertices[2].textureCoordinate = Vector2(0, 1.0f);
+		//右下頂点
+		vertices[3].textureCoordinate = Vector2(0.5f, 1.0f);
+		//頂点の型を変えた新しい頂点を作成
+		vector<VertexPositionColorTexture> new_vertices;
+		for (auto& v : vertices)
+		{
+			VertexPositionColorTexture nv;
+			nv.position = v.position;
+			nv.color = Color4(1.0f, 1.0f, 1.0f, 1.0f);
+			nv.textureCoordinate = v.textureCoordinate;
+			new_vertices.push_back(nv);
+		}
+
+		m_BarSp->GetComponent<PCTSpriteDraw>()->SetMeshResource(MeshResource::CreateMeshResource<VertexPositionColorTexture>(new_vertices, indices, true));
+	}
+
+	void ComboBonus::SetScore()
+	{
+		//加点
+		float point = 0;
+		for (int i = 0; i < m_DestroyCount; i++)
+		{
+			point += 50 * m_ScoreAmount * pow(m_ScoreAmount, i);
+		}
+		m_ComboNowScore += (int)point;
+
+		//数字更新
+		dynamic_pointer_cast<NumberSprite>(m_NowScoreNumber)->SetNum(m_ComboNowScore);
+
+		m_time = 0;
+		m_DestroyCount = 0;
+		dynamic_pointer_cast<NumberSprite>(m_NumberSp)->SetNumDraw(false);
+		dynamic_pointer_cast<NumberSprite>(m_NumberSp)->SetNum(m_DestroyCount);
+
+		m_BarSp->SetDrawActive(false);
+		m_BarFrameSp->SetDrawActive(false);
+		m_ComboLogo->SetDrawActive(false);
+
+
+		//オフ
+		m_ActiveFlg = false;
+
+	}
+
+	void ComboBonus::CreateMigiueScore()
+	{
+		//スコア文字作成
+		auto obj = GetStage()->AddGameObject<GameObject>();
+		auto objTrans = obj->AddComponent<Transform>();
+		objTrans->SetPosition(300, 300, 0);
+		objTrans->SetRotation(0, 0, 0);
+		objTrans->SetScale(200, 200, 1);
+
+		auto objDraw = obj->AddComponent<PCTSpriteDraw>();
+		objDraw->SetTextureResource(L"COMBOSCORE_TX");
+
+		obj->SetDrawLayer(4);
+		obj->SetAlphaActive(true);
+		
+		m_NowScoreLogo = obj;
+
+		//数字
+		auto num = GetStage()->AddGameObject<NumberSprite>(0,Vector2(600,300),Vector2(100,100),4);
+		m_NowScoreNumber = num;
+	}
+
+	void ComboBonus::SetComboScoreMove(Vector3 pos)
+	{
+		dynamic_pointer_cast<NumberSprite>(m_NowScoreNumber)->MoveNums(pos);
+	}
+	//Abe20170627
 
 }
 	//end basecross

@@ -383,6 +383,26 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"TARGETRING_TX", strTexture);
 		//Abe20170626
 
+		//Abe20170627
+		//コンボバー
+		strTexture = DataDir + L"ComboBar.png";
+		App::GetApp()->RegisterTexture(L"COMBOBAR_TX", strTexture);
+		//コンボフレーム
+		strTexture = DataDir + L"ComboBarFrame.png";
+		App::GetApp()->RegisterTexture(L"COMBOBARFRAME_TX", strTexture);	
+		//コンボ文字
+		strTexture = DataDir + L"ComboLogo.png";
+		App::GetApp()->RegisterTexture(L"COMBOLOGO_TX", strTexture);
+		//スコア文字
+		strTexture = DataDir + L"Score.png";
+		App::GetApp()->RegisterTexture(L"COMBOSCORE_TX", strTexture);
+		//Abe20170627
+		//Abe20170628
+		//コンボスコア文字(リザルト)
+		strTexture = DataDir + L"ComboScore.png";
+		App::GetApp()->RegisterTexture(L"COMBOSCORERESULT_TX", strTexture);
+		//Abe20170628
+
 		////モデル（ボーンあり
 		auto MadelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Player\\PlayerModel\\Player_animation.bmf");
 		App::GetApp()->RegisterResource(L"Player_Model", MadelMesh);

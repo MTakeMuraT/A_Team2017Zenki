@@ -933,6 +933,10 @@ namespace basecross{
 		Vector3 m_TimePos = Vector3(0, 0, 0);
 		//タイム目標座標
 		Vector3 m_TimeTargetPos = Vector3(-400, -400, 0);
+		//スコア座標
+		Vector3 m_ScorePos = Vector3(0, 0, 0);
+		//スコア目標座標
+		Vector3 m_ScoreTargetPos;
 
 		//8 項目を出す
 
@@ -1231,17 +1235,55 @@ namespace basecross{
 	private :
 		//倒したカウント
 		int m_DestroyCount;
+		//スコア
+		int m_AddScore;
 		//スコア増加率
 		float m_ScoreAmount;
 		//計算用時間
 		float m_time;
 		//計測時間
 		float m_IntervalTime;
+		//動くフラグ
+		bool m_ActiveFlg;
+
+
+		//コンボ数数字
+		shared_ptr<GameObject> m_NumberSp;
+		//バー
+		shared_ptr<GameObject> m_BarSp;
+		//バーフレーム
+		shared_ptr<GameObject> m_BarFrameSp;
+		//コンボ文字
+		shared_ptr<GameObject> m_ComboLogo;
+
+		//右上のスコア表示関連
+		shared_ptr<GameObject> m_NowScoreLogo;
+		//数字
+		shared_ptr<GameObject> m_NowScoreNumber;
+		//スコア
+		int m_ComboNowScore;
+
+		//右上スコア作成
+		void CreateMigiueScore();
 	public :
 		ComboBonus(const shared_ptr<Stage>& StagePtr) : GameObject(StagePtr) {}
 
 		void OnCreate() override;
 		void OnUpdate() override;
+
+		//スコアアップ
+		void CountUp();
+
+		//スコア取得
+		int GetComboScore() {return m_ComboNowScore;}
+
+		//強制スコア設定
+		void SetScore();
+
+		//数字座標移動
+		void SetComboScoreMove(Vector3);
+		//数字レイヤー設定
+		void SetComboScoreLayer(int num) { dynamic_pointer_cast<NumberSprite>(m_NowScoreNumber)->SetLayer(num); }
 	};
 	//Abe20170627
 
