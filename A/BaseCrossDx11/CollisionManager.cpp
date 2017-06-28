@@ -790,11 +790,9 @@ namespace basecross
 		//==============================================
 		if (dynamic_pointer_cast<TackleEnemy>(obj))
 		{
-			if (dynamic_pointer_cast<TackleEnemy>(obj)->GetDrawActive() && dynamic_pointer_cast<TackleEnemy>(obj)->GetState() != MutekiS)
+			if (dynamic_pointer_cast<TackleEnemy>(obj)->GetDrawActive())
 			{
 				dynamic_pointer_cast<TackleEnemy>(obj)->DamagePlayer();
-				//コンボ加算
-				GetStage()->GetSharedGameObject<ComboBonus>(L"ComboBonus", false)->CountUp();
 			}
 		}
 		//==============================================
@@ -816,24 +814,20 @@ namespace basecross
 		//テレポートエネミー
 		if (dynamic_pointer_cast<TeleportEnemy>(obj))
 		{
-			if (dynamic_pointer_cast<TeleportEnemy>(obj)->GetDrawActive() && dynamic_pointer_cast<TeleportEnemy>(obj)->GetState() != MutekiS)
+			if (dynamic_pointer_cast<TeleportEnemy>(obj)->GetDrawActive())
 			{
 				//ShotEnemyChildへのフラグ
 				dynamic_pointer_cast<TeleportEnemy>(obj)->DamagePlayer();
-				//コンボ加算
-				GetStage()->GetSharedGameObject<ComboBonus>(L"ComboBonus", false)->CountUp();
 			}
 		}
 		//==============================================
 		//ミサイルうつエネミー
 		if (dynamic_pointer_cast<ShotEnemy>(obj))
 		{
-			if (dynamic_pointer_cast<ShotEnemy>(obj)->GetDrawActive() && dynamic_pointer_cast<ShotEnemy>(obj)->GetState() != MutekiS)
+			if (dynamic_pointer_cast<ShotEnemy>(obj)->GetDrawActive())
 			{
 				//ShotEnemyChildへのフラグ
 				dynamic_pointer_cast<ShotEnemy>(obj)->DamagePlayer();
-				//コンボ加算
-				GetStage()->GetSharedGameObject<ComboBonus>(L"ComboBonus", false)->CountUp();
 			}
 		}
 		//==============================================
