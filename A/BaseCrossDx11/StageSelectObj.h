@@ -401,6 +401,9 @@ namespace basecross
 		bool m_KeepApudh = false;
 		//A‚ª‰Ÿ‚µ‘±‚¯‚Ä‚È‚¯‚ê‚Îfalse‚É‚È‚è‰Ÿ‚µ‘±‚¯‚Ä‚¢‚éŒŸØ‚ğ‚µ‚È‚¢
 		bool m_KeepPushing = true;
+		bool m_OneSE = false;
+		bool m_OneSE2 = false;
+		bool m_OneSE3 = false;
 	public:
 		GoStageCheck(const shared_ptr<Stage>& StagePtr, Vector2 scale);
 

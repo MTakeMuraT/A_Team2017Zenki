@@ -110,9 +110,9 @@ namespace basecross
 
 	void TutorialScene::OnCreate()
 	{
-		/*m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
+		m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
 		m_AudioObjectPtr->AddAudioResource(L"Tutorial_BGM");
-		m_AudioObjectPtr->Start(L"Tutorial_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);*/
+		m_AudioObjectPtr->Start(L"Tutorial_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);
 		try 
 		{
 			//ビューとライトの作成
@@ -212,7 +212,7 @@ namespace basecross
 		//**********************
 		////BGM
 		if (App::GetApp()->GetScene<Scene>()->GetBGMFlg() == false) {
-			//m_AudioObjectPtr->Stop(L"Tutorial_BGM");
+			m_AudioObjectPtr->Stop(L"Tutorial_BGM");
 		}
 	}
 

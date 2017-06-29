@@ -2304,8 +2304,8 @@ namespace basecross {
 		White->SetAlphaActive(true);
 
 		m_White = White;
-		/*m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
-		m_AudioObjectPtr->AddAudioResource(L"Loss_BGM");*/
+		m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
+		m_AudioObjectPtr->AddAudioResource(L"Loss_BGM");
 
 		//Abe20170628
 		//ターゲットカーソル消し
@@ -2572,7 +2572,7 @@ namespace basecross {
 			if (true)
 			{
 				if (OnBgmflg == false) {
-					//m_AudioObjectPtr->Start(L"Loss_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);
+					m_AudioObjectPtr->Start(L"Loss_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);
 					OnBgmflg = true;
 				}
 				m_BlackAlpha += App::GetApp()->GetElapsedTime();
@@ -2782,7 +2782,7 @@ namespace basecross {
 						if (true)
 						{
 							auto ScenePtr = App::GetApp()->GetScene<Scene>();
-						//	m_AudioObjectPtr->Stop(L"Loss_BGM");
+							m_AudioObjectPtr->Stop(L"Loss_BGM");
 							PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToGameStage");
 						}
 						break;
@@ -2791,7 +2791,7 @@ namespace basecross {
 						if (true)
 						{
 							auto ScenePtr = App::GetApp()->GetScene<Scene>();
-						//	m_AudioObjectPtr->Stop(L"Loss_BGM");
+							m_AudioObjectPtr->Stop(L"Loss_BGM");
 							PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToStageSelectScene");
 						}
 						break;
@@ -2800,7 +2800,7 @@ namespace basecross {
 						if (true)
 						{
 							auto ScenePtr = App::GetApp()->GetScene<Scene>();
-						//	m_AudioObjectPtr->Stop(L"Loss_BGM");
+							m_AudioObjectPtr->Stop(L"Loss_BGM");
 							PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToTitleScene");
 						}
 						break;
