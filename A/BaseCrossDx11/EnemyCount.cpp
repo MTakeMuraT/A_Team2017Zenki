@@ -64,4 +64,43 @@ namespace basecross {
 		m_TeleportEnemyCount = 0;
 		m_BombEnemyCount = 0;
 	}
+
+	//--------------------------------------------------------------------------------------
+	//	展示用ほっとくとタイトルに戻るやつ
+	//--------------------------------------------------------------------------------------
+	void TenziTitle::OnCreate()
+	{
+		//初期化-----------------
+		m_time = 0;
+		m_BackTitleTime = 20.0f;
+		//-----------------------
+	}
+
+	void TenziTitle::OnUpdate()
+	{
+		m_time += App::GetApp()->GetElapsedTime();
+		if (m_time > m_BackTitleTime)
+		{
+
+			m_time = 0;
+		}
+
+		//コントローラ取得
+		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		if (CntlVec[0].wButtons & XINPUT_GAMEPAD_A ||
+			CntlVec[0].wButtons & XINPUT_GAMEPAD_B ||
+			CntlVec[0].wButtons & XINPUT_GAMEPAD_X ||
+			CntlVec[0].wButtons & XINPUT_GAMEPAD_Y ||
+			CntlVec[0].wButtons & XINPUT_GAMEPAD_BACK ||
+			CntlVec[0].wButtons & XINPUT_GAMEPAD_START ||
+			CntlVec[0].wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER ||
+			CntlVec[0].wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER ||
+			abs(CntlVec[0].fThumbLX) > 0.1f ||
+			abs(CntlVec[0].fThumbLY) > 0.1f)
+		{
+			m_time = 0;
+		}
+
+	}
+
 }

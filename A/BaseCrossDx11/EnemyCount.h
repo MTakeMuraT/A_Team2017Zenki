@@ -18,5 +18,21 @@ namespace basecross {
 		void ResetCount();
 		void Count();
 	};
+
+	//--------------------------------------------------------------------------------------
+	//	展示用ほっとくとタイトルに戻るやつ
+	//--------------------------------------------------------------------------------------
+	class TenziTitle : public GameObject
+	{
+	private :
+		//計算用時間
+		float m_time;
+		//タイトル戻る時間
+		float m_BackTitleTime;
+	public :
+		TenziTitle(const shared_ptr<Stage>& StagePtr) : GameObject(StagePtr) {}
+		void OnCreate() override;
+		void OnUpdate() override;
+	};
 }
 #pragma once

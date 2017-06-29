@@ -32,7 +32,7 @@ namespace basecross
 	//ínñ çÏê¨
 	void TutorialScene::CreateGround()
 	{
-		auto obj = AddGameObject<Ground_GameStage>(Vector3(75,75, 1),Vector3(0, 0, 0),wstring(L"Glass_TX"));
+		auto obj = AddGameObject<Ground_GameStage>(Vector3(75,75, 1),Vector3(0, -1, 0),wstring(L"Glass_TX"));
 		obj->SetDrawLayer(0);
 	}
 
