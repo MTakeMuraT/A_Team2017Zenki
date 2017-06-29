@@ -3236,7 +3236,7 @@ namespace basecross {
 					//constで宣言しても更新されないunkなので
 					//HPスプライトとTimeの目的座標を再設定
 					m_HpTargetPos = Vector3(30, -220, 0);
-					m_TimeTargetPos = Vector3(-400, -320, 0);
+					m_TimeTargetPos = Vector3(-400, -340, 0);
 					//Abe20170627
 					m_ScoreTargetPos = Vector3(-20, -410, 0);
 					//Abe20170627
@@ -3271,7 +3271,7 @@ namespace basecross {
 					//Abe20170627
 
 					m_HpPos += Vector3(0.3f, -2.2f, 0) * 3;
-					m_TimePos += Vector3(-4, -3.2f, 0) * 3;
+					m_TimePos += Vector3(-4, -3.4f, 0) * 3;
 					m_ScorePos += Vector3(-0.2f, -4.1f, 0) * 3;
 
 					//判定フラグ
@@ -3294,7 +3294,7 @@ namespace basecross {
 					}
 					else
 					{
-						timeptr->MovePos(Vector3(-4, -3.2f, 0) * 3);
+						timeptr->MovePos(Vector3(-4, -3.4f, 0) * 3);
 					}
 
 

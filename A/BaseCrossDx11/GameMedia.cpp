@@ -486,8 +486,7 @@ namespace basecross {
 		//App::GetApp()->RegisterWav(L"Decision_02_SE", strMusic);
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\PlayerDie.wav";
 		App::GetApp()->RegisterWav(L"PlayerDie_SE", strMusic);
-		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\CursorMove.wav";
-		App::GetApp()->RegisterWav(L"PlayerDie_SE", strMusic);
+		
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Win.wav";
 		App::GetApp()->RegisterWav(L"Win_SE", strMusic);
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Win.wav";

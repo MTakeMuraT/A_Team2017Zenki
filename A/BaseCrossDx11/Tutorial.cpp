@@ -321,6 +321,8 @@ namespace basecross
 	//**************************************************************************************
 	void TutorialPlayerS::OnCreate()
 	{
+		auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
+		pMultiSoundEffect->AddAudioResource(L"Collision_01_SE");
 		//-----------------------------
 		//初期化
 
@@ -603,6 +605,8 @@ namespace basecross
 				//くっついたら
 				if (m_PlayerSDistance < 1.0f)
 				{
+					auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+					pMultiSoundEffect->Start(L"Collision_01_SE", 0, 0.4f);
 					//ターゲット非表示
 					if (m_TargetRing->GetDrawActive())
 					{

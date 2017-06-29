@@ -431,10 +431,6 @@ namespace basecross
 		//仮でリザルト表示**********デバッグ*********
 		if (KeylVec.m_bPressedKeyTbl['B'])
 		{
-			m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
-			m_AudioObjectPtr->Start(L"Win_SE", 0, 0.5f);
-
-
 			Result();
 		}
 		//仮でリザルト表示**********デバッグ*********
@@ -520,7 +516,8 @@ namespace basecross
 
 			GetSharedGameObject<KetsuHunsya>(L"Ketu_R", false)->Stop();
 			GetSharedGameObject<KetsuHunsya>(L"Ketu_L", false)->Stop();
-
+		
+			
 		}
 	}
 	//Abe20170529
@@ -571,7 +568,10 @@ namespace basecross
 
 			GetSharedGameObject<KetsuHunsya>(L"Ketu_R", false)->Stop();
 			GetSharedGameObject<KetsuHunsya>(L"Ketu_L", false)->Stop();
+			m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
+			m_AudioObjectPtr->Start(L"Win_SE", 0, 0.5f);
 		}
+		
 	}
 	
 	//リザルトカメラ制御
