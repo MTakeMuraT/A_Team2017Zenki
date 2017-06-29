@@ -191,6 +191,7 @@ namespace basecross
 		int m_ElementUp = 0;
 		int m_ElementDown = 0;
 		int m_ElementTop = 0;
+		int m_ElementTop2 = 0;
 		//移動スピード
 		float m_MoveSpeed = 0;
 		//配列から取る位置の保存
@@ -213,6 +214,8 @@ namespace basecross
 		bool m_KeepApudh = false;
 		//Aが押し続けてなければfalseになり押し続けている検証をしない
 		bool m_KeepPushing = true;
+		//入力されたスティックが下なのか上なのか
+		bool m_StickUpUnder = true;
 
 		bool m_OneSE = false;
 	public:

@@ -143,7 +143,7 @@ namespace basecross
 
 		m_InitMoveFlg = true;
 
-		
+
 	}
 
 	void SelectPlayer::OnUpdate()
@@ -412,7 +412,7 @@ namespace basecross
 
 		m_CenterScalse = Vector3(256, 256, 5);
 		m_NoCenterScalse = Vector3(156, 156, 2);
-		m_MoveSpeed = 20.0;
+		m_MoveSpeed = 20.0f;
 		m_Center = Vector3(0, 0, 0);
 		m_Up = Vector3(0, 0, 0);
 		m_Down = Vector3(0, 0, 0);
@@ -422,6 +422,7 @@ namespace basecross
 		SetUpdateActive(true);
 		auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
 		pMultiSoundEffect->AddAudioResource(L"StageSe_SE");
+		m_StickUpUnder = true;
 
 	}
 	void StageModeControl::OnUpdate() {
@@ -538,44 +539,24 @@ namespace basecross
 		auto NormalPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Normal", false);
 		auto NormalTrans = NormalPtr->GetComponent<Transform>();
 		auto NormalPos = NormalTrans->GetPosition();
-		/*Vector3 Pos = Vector3(2, 0, 0);
 
-		if (NormalPos.x >= 320) {
-		Pos = Vector3(10, 1, 0);
-		}
-		else if (NormalPos.x <= -320) {
-		Pos = Vector3(-10, 1, 0);
-		}
-		else {
-		Pos = Vector3(0, 1, 0);
-		}
-		*/
 		//基準位置の取得
 		m_NormalPosCenter = Vector3(NormalPos.x, NormalPos.y, NormalPos.z);
-		m_NormalPosUP = Vector3(NormalPos.x, NormalPos.y + 460, NormalPos.z + 15);
-		m_NormalPosDown = Vector3(NormalPos.x, NormalPos.y - 460, NormalPos.z - 15);
+		m_NormalPosUP = Vector3(m_NormalPosCenter.x, m_NormalPosCenter.y + 460, m_NormalPosCenter.z + 15);
+		m_NormalPosDown = Vector3(m_NormalPosCenter.x, m_NormalPosCenter.y - 460, m_NormalPosCenter.z - 15);
 		m_NormalOtherPos = Vector3(m_NormalPosDown.x, m_NormalPosDown.y - 100, m_NormalPosDown.z - 15);
-		m_NormalTopPos = Vector3(NormalPos.x, NormalPos.y + 100, m_NormalPosUP.z + 15);
+		m_NormalTopPos = Vector3(m_NormalPosUP.x, m_NormalPosUP.y + 100, m_NormalPosUP.z + 15);
 	}
 	void StageModeControl::StandardHardPos() {
 		auto HardPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Hard", false);
 		auto HardTrans = HardPtr->GetComponent<Transform>();
 		auto HardPos = HardTrans->GetPosition();
-		/*Vector3 Pos = Vector3(0, 0, 0);
-		if (HardPos.x >= 0) {
-		Pos = Vector3(10, 1, 0);
-		}
-		else if (HardPos.x <= -320) {
-		Pos = Vector3(-10, 1, 0);
-		}
-		else {
-		Pos = Vector3(0, 1, 0);
-		}*/
+
 
 		//基準位置の取得
 		m_HardPosCenter = Vector3(HardPos.x, HardPos.y + 1, HardPos.z);
-		m_HardPosUP = Vector3(HardPos.x, HardPos.y + 460, HardPos.z + 15);
-		m_HardPosDown = Vector3(HardPos.x, HardPos.y - 460, HardPos.z - 15);
+		m_HardPosUP = Vector3(m_HardPosCenter.x, m_HardPosCenter.y + 460, m_HardPosCenter.z + 15);
+		m_HardPosDown = Vector3(m_HardPosCenter.x, m_HardPosCenter.y - 460, m_HardPosCenter.z - 15);
 		m_HardOtherPos = Vector3(m_HardPosDown.x, m_HardPosDown.y - 100, m_HardPosDown.z - 15);
 		m_HardTopPos = Vector3(HardPos.x, HardPos.y + 100, m_HardPosUP.z + 15);
 	}
@@ -639,14 +620,16 @@ namespace basecross
 				m_ElementNumTopFlg = true;
 				m_StageMoveEnd = false;
 				m_StickDown = false;
-
+				m_StickUpUnder = true;
 			}
-			if (KeylVec.m_bPressedKeyTbl['T'] || CntlVec[0].fThumbLY < -0.5 &&CntlVec[0].fThumbLX > 0.0 && m_ModeMoveEnd && m_StageMoveEnd && m_StickDown) {
-				//	m_EasyStageCenter--;
-				//	m_Flg = true;
-				//	m_ElementNumTopFlg = true;
-				//m_StageMoveEnd = false;
-				//m_StickDown = false;
+			if (KeylVec.m_bPressedKeyTbl['T'] || CntlVec[0].fThumbLY < -0.5 &&CntlVec[0].fThumbLX < 0.1 && CntlVec[0].fThumbLX > -0.1
+				&& m_ModeMoveEnd && m_StageMoveEnd && m_StickDown) {
+				m_EasyStageCenter--;
+				m_Flg = true;
+				m_ElementNumTopFlg = true;
+				m_StageMoveEnd = false;
+				m_StickDown = false;
+				m_StickUpUnder = false;
 			}
 			if (m_EasyStageCenter > 3) {
 				m_EasyStageCenter = 0;
@@ -654,6 +637,7 @@ namespace basecross
 			if (m_EasyStageCenter < 0) {
 				m_EasyStageCenter = 3;
 			}
+
 
 			switch (m_EasyStageCenter)
 			{
@@ -702,14 +686,16 @@ namespace basecross
 				m_ElementNumTopFlg = true;
 				m_StageMoveEnd = false;
 				m_StickDown = false;
-
+				m_StickUpUnder = true;
 			}
-			if (KeylVec.m_bPressedKeyTbl['T'] || CntlVec[0].fThumbLY < -0.5 && m_ModeMoveEnd && CntlVec[0].fThumbLX > 0.0 && m_StageMoveEnd && m_StickDown) {
-				//	m_NormalStageCenter--;
-				//	m_Flg = true;
-				//m_ElementNumTopFlg = true;
-				//	m_StageMoveEnd = false;
-				//m_StickDown = false;
+			if (KeylVec.m_bPressedKeyTbl['T'] || CntlVec[0].fThumbLY < -0.5 &&CntlVec[0].fThumbLX < 0.1 && CntlVec[0].fThumbLX > -0.1
+				&& m_ModeMoveEnd && m_StageMoveEnd && m_StickDown) {
+				m_NormalStageCenter--;
+				m_Flg = true;
+				m_ElementNumTopFlg = true;
+				m_StageMoveEnd = false;
+				m_StickDown = false;
+				m_StickUpUnder = false;
 
 			}
 			if (m_NormalStageCenter > 7) {
@@ -793,12 +779,16 @@ namespace basecross
 				m_ElementNumTopFlg = true;
 				m_StageMoveEnd = false;
 				m_StickDown = false;
+				m_StickUpUnder = true;
 			}
-			if (KeylVec.m_bPressedKeyTbl['T'] || CntlVec[0].fThumbLY < -0.5 && m_ModeMoveEnd &&CntlVec[0].fThumbLX > 0.0 && m_StageMoveEnd && m_StickDown) {
-				//	m_HardStageCenter--;
-				//	m_Flg = true;
-				//	m_ElementNumTopFlg = true;
-				//m_StageMoveEnd = false;
+			if (KeylVec.m_bPressedKeyTbl['T'] || CntlVec[0].fThumbLY < -0.5 &&CntlVec[0].fThumbLX < 0.1 && CntlVec[0].fThumbLX > -0.1
+				&& m_ModeMoveEnd && m_StageMoveEnd && m_StickDown) {
+				m_HardStageCenter--;
+				m_Flg = true;
+				m_ElementNumTopFlg = true;
+				m_StageMoveEnd = false;
+				m_StickDown = false;
+				m_StickUpUnder = false;
 			}
 		}
 		if (m_HardStageCenter > 3) {
@@ -838,79 +828,140 @@ namespace basecross
 	//移動処理 Center＝下からセンターに UP＝センターから上に移動　Down＝下からセンターに移動
 	//各難易度のステージ移動
 	void StageModeControl::EasyMove() {
+		//移動する要素番号
 		m_Center = m_Easy[m_ElementCenter]->GetComponent<Transform>()->GetPosition();
 		m_Up = m_Easy[m_ElementUp]->GetComponent<Transform>()->GetPosition();
 		m_Down = m_Easy[m_ElementDown]->GetComponent<Transform>()->GetPosition();
-		m_Top = m_Easy[m_ElementTop]->GetComponent<Transform>()->GetPosition();
+		//	m_Top = m_Easy[m_ElementTop]->GetComponent<Transform>()->GetPosition();
+		//向かう移動方向を変更
+		if (m_StickUpUnder == false) {
+			m_MoveSpeed = -20.0f;
+			m_EasyOtherPos = m_EasyPosUP;
+		}
+		else if (m_StickUpUnder == true) {
+			m_MoveSpeed = 20.0f;
+			m_EasyOtherPos = m_EasyPosDown;
+
+		}
+		//上記に当てはまらない物の検出と移動
+		for (int i = 0; i < 4; i++) {
+			if (m_ElementUp != i && m_ElementCenter != i && m_ElementDown != i /*&& m_ElementTop != i*/) {
+				m_Easy[i]->GetComponent<Transform>()->SetPosition(m_EasyOtherPos);
+				m_Easy[i]->GetComponent<PCTSpriteDraw>()->SetDrawActive(false);
+
+			}
+		}
+
 		//移動処理 センター移動してなかったら
 		if (m_Center.y != m_EasyPosCenter.y) {
 			m_Center.y += m_MoveSpeed;
 			m_Easy[m_ElementCenter]->GetComponent<PCTSpriteDraw>()->SetDrawActive(true);
 			m_Easy[m_ElementCenter]->GetComponent<Transform>()->SetPosition(m_Center);
-			if (m_Center.y >= m_EasyPosCenter.y) {
+
+			if (m_Center.y >= m_EasyPosCenter.y - 20.0f &&m_Center.y <= m_EasyPosCenter.y + 20.0f) {
 				m_Easy[m_ElementCenter]->GetComponent<Transform>()->SetPosition(m_EasyPosCenter);
-				m_StageMoveEnd = true;
 			}
+
+			/*if (m_Center.y >= m_EasyPosCenter.y && m_StickUpUnder == true) {
+			m_Easy[m_ElementCenter]->GetComponent<Transform>()->SetPosition(m_EasyPosCenter);
+			m_StageMoveEnd = true;
+			}
+			else if (m_Center.y <= m_EasyPosCenter.y && m_StickUpUnder == false) {
+			m_Easy[m_ElementCenter]->GetComponent<Transform>()->SetPosition(m_EasyPosCenter);
+			m_StageMoveEnd = true;
+			}*/
+
 		}
-		else {
-			//m_StageMoveEnd = true;
-		}
+
 
 		//上に移動してなかったら
 		if (m_Up.y != m_EasyPosUP.y) {
 			m_Up.y += m_MoveSpeed;
 			m_Easy[m_ElementUp]->GetComponent<PCTSpriteDraw>()->SetDrawActive(true);
 			m_Easy[m_ElementUp]->GetComponent<Transform>()->SetPosition(m_Up);
+		}
+		//限界値の処理
+		if (m_Up.y >= m_EasyPosUP.y) {
+			m_Easy[m_ElementUp]->GetComponent<PCTSpriteDraw>()->SetDrawActive(false);
+			m_Easy[m_ElementUp]->GetComponent<Transform>()->SetPosition(m_EasyPosUP);
+			if (m_StickUpUnder == true) {
+				m_StageMoveEnd = true;
+			}
 
-		}//下に移動してなかったら
+		}
+		if (m_Up.y <= m_EasyPosDown.y) {
+			m_Easy[m_ElementUp]->GetComponent<PCTSpriteDraw>()->SetDrawActive(false);
+			m_Easy[m_ElementUp]->GetComponent<Transform>()->SetPosition(m_EasyPosUP);
+		}
+		//下に移動してなかったら
 		if (m_Down.y != m_EasyPosDown.y) {
 			m_Down.y += m_MoveSpeed;
 			m_Easy[m_ElementDown]->GetComponent<PCTSpriteDraw>()->SetDrawActive(true);
 			m_Easy[m_ElementDown]->GetComponent<Transform>()->SetPosition(m_Down);
+		}
+		//限界値の処理
+		if (m_Down.y <= m_EasyPosDown.y) {
+			m_Easy[m_ElementDown]->GetComponent<PCTSpriteDraw>()->SetDrawActive(false);
+			m_Easy[m_ElementDown]->GetComponent<Transform>()->SetPosition(m_EasyPosDown);
+			if (m_StickUpUnder == false) {
+				m_StageMoveEnd = true;
+			}
 
 		}
-		//見えてない上の部分に移動してなかったら
-		if (m_Flg == true) {
-			if (m_Top.y != m_EasyTopPos.y) {
-				//上にあげて消す
-				m_Top.y += m_MoveSpeed;
-				m_Easy[m_ElementTop]->GetComponent<PCTSpriteDraw>()->SetDrawActive(true);
-				m_Easy[m_ElementTop]->GetComponent<Transform>()->SetPosition(m_Top);
-			}
-			if (m_Top.y >= m_EasyTopPos.y) {
-				m_Flg = false;
-				m_Easy[m_ElementTop]->GetComponent<PCTSpriteDraw>()->SetDrawActive(false);
-				m_Easy[m_ElementTop]->GetComponent<Transform>()->SetPosition(m_EasyOtherPos);
-			}
+		if (m_Down.y >= m_EasyPosUP.y) {
+			m_Easy[m_ElementDown]->GetComponent<Transform>()->SetPosition(m_EasyPosDown);
 		}
-		//上記に当てはまらない物の検出と移動
-		for (int i = 0; i < 4; i++) {
-			if (m_ElementUp != i && m_ElementCenter != i && m_ElementDown != i && m_ElementTop != i) {
-				m_Easy[i]->GetComponent<Transform>()->SetPosition(m_EasyOtherPos);
-				m_Easy[i]->GetComponent<PCTSpriteDraw>()->SetDrawActive(false);
 
-			}
-		}
+
+		////見えてない上の部分に移動してなかったら
+		//if (m_Flg == true) {
+		//	if (m_Top.y != m_EasyTopPos.y) {
+		//		//上にあげて消す
+		//		m_Top.y += m_MoveSpeed;
+		//		m_Easy[m_ElementTop]->GetComponent<PCTSpriteDraw>()->SetDrawActive(true);
+		//		m_Easy[m_ElementTop]->GetComponent<Transform>()->SetPosition(m_Top);
+		//	}
+		//	if (m_Top.y >= m_EasyTopPos.y) {
+		//		m_Flg = false;
+		//		m_Easy[m_ElementTop]->GetComponent<PCTSpriteDraw>()->SetDrawActive(false);
+		//		m_Easy[m_ElementTop]->GetComponent<Transform>()->SetPosition(m_EasyOtherPos);
+		//	}
+		//}
+
 	}
 	void StageModeControl::NormalMove() {
-		auto NormalPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Normal", false);
+		//auto NormalPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Normal", false);
 		m_Center = m_Normal[m_ElementCenter]->GetComponent<Transform>()->GetPosition();
 		m_Up = m_Normal[m_ElementUp]->GetComponent<Transform>()->GetPosition();
 		m_Down = m_Normal[m_ElementDown]->GetComponent<Transform>()->GetPosition();
-		m_Top = m_Normal[m_ElementTop]->GetComponent<Transform>()->GetPosition();
+		//m_Top = m_Normal[m_ElementTop]->GetComponent<Transform>()->GetPosition();
+		if (m_StickUpUnder == false) {
+			m_MoveSpeed = -20.0f;
+			m_NormalOtherPos = m_NormalPosUP;
+		}
+		else if (m_StickUpUnder == true) {
+			m_MoveSpeed = 20.0f;
+			m_NormalOtherPos = m_NormalPosDown;
+		}
+		//上記に当てはまらない物の検出と移動
+		for (int i = 0; i < 8; i++) {
+			if (m_ElementUp != i && m_ElementCenter != i && m_ElementDown != i /*&& m_ElementTop != i*/) {
+				m_Normal[i]->GetComponent<Transform>()->SetPosition(m_NormalOtherPos);
+				m_Normal[i]->GetComponent<PCTSpriteDraw>()->SetDrawActive(false);
+
+			}
+		}
+
 		//移動処理 センター移動してなかったら
 		if (m_Center.y != m_NormalPosCenter.y) {
 			m_Center.y += m_MoveSpeed;
 			m_Normal[m_ElementCenter]->GetComponent<PCTSpriteDraw>()->SetDrawActive(true);
 			m_Normal[m_ElementCenter]->GetComponent<Transform>()->SetPosition(m_Center);
-			if (m_Center.y >= m_NormalPosCenter.y) {
+			if (m_Center.y >= m_NormalPosCenter.y - 20.0f &&m_Center.y <= m_NormalPosCenter.y + 20.0f) {
 				m_Normal[m_ElementCenter]->GetComponent<Transform>()->SetPosition(m_NormalPosCenter);
-				m_StageMoveEnd = true;
 			}
 		}
-		else {
-			//m_StageMoveEnd = true;
-		}
+
 
 
 		//上に移動してなかったら
@@ -919,56 +970,86 @@ namespace basecross
 			m_Normal[m_ElementUp]->GetComponent<PCTSpriteDraw>()->SetDrawActive(true);
 			m_Normal[m_ElementUp]->GetComponent<Transform>()->SetPosition(m_Up);
 		}
+		if (m_Up.y >= m_NormalPosUP.y) {
+			m_Normal[m_ElementUp]->GetComponent<PCTSpriteDraw>()->SetDrawActive(false);
+			m_Normal[m_ElementUp]->GetComponent<Transform>()->SetPosition(m_NormalPosUP);
+			if (m_StickUpUnder == true) {
+				m_StageMoveEnd = true;
+			}
+		}
+		if (m_Up.y <= m_NormalPosDown.y) {
+			m_Normal[m_ElementUp]->GetComponent<PCTSpriteDraw>()->SetDrawActive(false);
+			m_Normal[m_ElementUp]->GetComponent<Transform>()->SetPosition(m_NormalPosUP);
+		}
 
 		//下に移動してなかったら
 		if (m_Down.y != m_NormalPosDown.y) {
 			m_Down.y += m_MoveSpeed;
 			m_Normal[m_ElementDown]->GetComponent<PCTSpriteDraw>()->SetDrawActive(true);
 			m_Normal[m_ElementDown]->GetComponent<Transform>()->SetPosition(m_Down);
-
 		}
-
-		//見えてない上の部分に移動してなかったら
-		if (m_Flg == true) {
-			if (m_Top.y != m_NormalTopPos.y) {
-				//上にあげて消す
-				m_Top.y += m_MoveSpeed;
-				m_Normal[m_ElementTop]->GetComponent<PCTSpriteDraw>()->SetDrawActive(true);
-				m_Normal[m_ElementTop]->GetComponent<Transform>()->SetPosition(m_Top);
-			}
-			if (m_Top.y >= m_NormalTopPos.y) {
-				m_Flg = false;
-				m_Normal[m_ElementTop]->GetComponent<PCTSpriteDraw>()->SetDrawActive(false);
-				m_Normal[m_ElementTop]->GetComponent<Transform>()->SetPosition(m_NormalOtherPos);
+		if (m_Down.y <= m_NormalPosDown.y) {
+			m_Normal[m_ElementDown]->GetComponent<PCTSpriteDraw>()->SetDrawActive(false);
+			m_Normal[m_ElementDown]->GetComponent<Transform>()->SetPosition(m_NormalPosDown);
+			if (m_StickUpUnder == false) {
+				m_StageMoveEnd = true;
 			}
 		}
-		//上記に当てはまらない物の検出と移動
-		for (int i = 0; i < 8; i++) {
-			if (m_ElementUp != i && m_ElementCenter != i && m_ElementDown != i && m_ElementTop != i) {
-				m_Normal[i]->GetComponent<Transform>()->SetPosition(m_NormalOtherPos);
-				m_Normal[i]->GetComponent<PCTSpriteDraw>()->SetDrawActive(false);
-
-			}
+		if (m_Down.y >= m_NormalPosUP.y) {
+			m_Normal[m_ElementDown]->GetComponent<PCTSpriteDraw>()->SetDrawActive(false);
+			m_Normal[m_ElementDown]->GetComponent<Transform>()->SetPosition(m_NormalPosDown);
 		}
+
+		////見えてない上の部分に移動してなかったら
+		//if (m_Flg == true) {
+		//	if (m_Top.y != m_NormalTopPos.y) {
+		//		//上にあげて消す
+		//		m_Top.y += m_MoveSpeed;
+		//		m_Normal[m_ElementTop]->GetComponent<PCTSpriteDraw>()->SetDrawActive(true);
+		//		m_Normal[m_ElementTop]->GetComponent<Transform>()->SetPosition(m_Top);
+		//	}
+		//	if (m_Top.y >= m_NormalTopPos.y) {
+		//		m_Flg = false;
+		//		m_Normal[m_ElementTop]->GetComponent<PCTSpriteDraw>()->SetDrawActive(false);
+		//		m_Normal[m_ElementTop]->GetComponent<Transform>()->SetPosition(m_NormalOtherPos);
+		//	}
+		//}
+
 	}
 	void StageModeControl::HardMove() {
 		m_Center = m_Hard[m_ElementCenter]->GetComponent<Transform>()->GetPosition();
 		m_Up = m_Hard[m_ElementUp]->GetComponent<Transform>()->GetPosition();
 		m_Down = m_Hard[m_ElementDown]->GetComponent<Transform>()->GetPosition();
-		m_Top = m_Hard[m_ElementTop]->GetComponent<Transform>()->GetPosition();
+		//	m_Top = m_Hard[m_ElementTop]->GetComponent<Transform>()->GetPosition();
+		if (m_StickUpUnder == false) {
+			m_MoveSpeed = -20.0f;
+			m_HardOtherPos = m_HardPosUP;
+		}
+		else if (m_StickUpUnder == true) {
+			m_MoveSpeed = 20.0f;
+			m_HardOtherPos = m_HardPosDown;
+		}
+
+		//上記に当てはまらない物の検出と移動
+		for (int i = 0; i < 4; i++) {
+			if (m_ElementUp != i && m_ElementCenter != i && m_ElementDown != i/* && m_ElementTop != i*/) {
+				m_Hard[i]->GetComponent<Transform>()->SetPosition(m_HardOtherPos);
+				m_Hard[i]->GetComponent<PCTSpriteDraw>()->SetDrawActive(false);
+
+			}
+		}
+
 		//移動処理 センター移動してなかったら
 		if (m_Center.y != m_HardPosCenter.y) {
 			m_Center.y += m_MoveSpeed;
 			m_Hard[m_ElementCenter]->GetComponent<PCTSpriteDraw>()->SetDrawActive(true);
 			m_Hard[m_ElementCenter]->GetComponent<Transform>()->SetPosition(m_Center);
-			if (m_Center.y >= m_HardPosCenter.y) {
+			if (m_Center.y >= m_HardPosCenter.y - 20.0f &&m_Center.y <= m_HardPosCenter.y + 20.0f) {
 				m_Hard[m_ElementCenter]->GetComponent<Transform>()->SetPosition(m_HardPosCenter);
-				m_StageMoveEnd = true;
+				//m_StageMoveEnd = true;
 			}
 		}
-		else {
-			//m_StageMoveEnd = true;
-		}
+
 
 		//上に移動してなかったら
 		if (m_Up.y != m_HardPosUP.y) {
@@ -976,35 +1057,52 @@ namespace basecross
 			m_Hard[m_ElementUp]->GetComponent<PCTSpriteDraw>()->SetDrawActive(true);
 			m_Hard[m_ElementUp]->GetComponent<Transform>()->SetPosition(m_Up);
 
-		}//下に移動してなかったら
+		}
+		//限界値の処理
+		if (m_Up.y >= m_HardPosUP.y) {
+			m_Hard[m_ElementUp]->GetComponent<PCTSpriteDraw>()->SetDrawActive(false);
+			m_Hard[m_ElementUp]->GetComponent<Transform>()->SetPosition(m_HardPosUP);
+			if (m_StickUpUnder == true) {
+				m_StageMoveEnd = true;
+			}
+		}
+		if (m_Up.y <= m_HardPosDown.y) {
+			m_Hard[m_ElementUp]->GetComponent<PCTSpriteDraw>()->SetDrawActive(false);
+			m_Hard[m_ElementUp]->GetComponent<Transform>()->SetPosition(m_HardPosUP);
+		}
+		//下に移動してなかったら
 		if (m_Down.y != m_HardPosDown.y) {
 			m_Down.y += m_MoveSpeed;
 			m_Hard[m_ElementDown]->GetComponent<PCTSpriteDraw>()->SetDrawActive(true);
 			m_Hard[m_ElementDown]->GetComponent<Transform>()->SetPosition(m_Down);
 
 		}
-		//見えてない上の部分に移動してなかったら
-		if (m_Flg == true) {
-			if (m_Top.y != m_HardTopPos.y) {
-				//上にあげて消す
-				m_Top.y += m_MoveSpeed;
-				m_Hard[m_ElementTop]->GetComponent<PCTSpriteDraw>()->SetDrawActive(true);
-				m_Hard[m_ElementTop]->GetComponent<Transform>()->SetPosition(m_Top);
-			}
-			if (m_Top.y >= m_HardTopPos.y) {
-				m_Flg = false;
-				m_Hard[m_ElementTop]->GetComponent<PCTSpriteDraw>()->SetDrawActive(false);
-				m_Hard[m_ElementTop]->GetComponent<Transform>()->SetPosition(m_HardOtherPos);
+		//限界値の処理
+		if (m_Down.y <= m_HardPosDown.y) {
+			m_Hard[m_ElementDown]->GetComponent<PCTSpriteDraw>()->SetDrawActive(false);
+			m_Hard[m_ElementDown]->GetComponent<Transform>()->SetPosition(m_HardPosDown);
+			if (m_StickUpUnder == false) {
+				m_StageMoveEnd = true;
 			}
 		}
-		//上記に当てはまらない物の検出と移動
-		for (int i = 0; i < 4; i++) {
-			if (m_ElementUp != i && m_ElementCenter != i && m_ElementDown != i && m_ElementTop != i) {
-				m_Hard[i]->GetComponent<Transform>()->SetPosition(m_HardOtherPos);
-				m_Hard[i]->GetComponent<PCTSpriteDraw>()->SetDrawActive(false);
+		if (m_Down.y >= m_HardPosUP.y) {
+			m_Hard[m_ElementDown]->GetComponent<Transform>()->SetPosition(m_HardPosDown);
+		}
+		////見えてない上の部分に移動してなかったら
+		//if (m_Flg == true) {
+		//	if (m_Top.y != m_HardTopPos.y) {
+		//		//上にあげて消す
+		//		m_Top.y += m_MoveSpeed;
+		//		m_Hard[m_ElementTop]->GetComponent<PCTSpriteDraw>()->SetDrawActive(true);
+		//		m_Hard[m_ElementTop]->GetComponent<Transform>()->SetPosition(m_Top);
+		//	}
+		//	if (m_Top.y >= m_HardTopPos.y) {
+		//		m_Flg = false;
+		//		m_Hard[m_ElementTop]->GetComponent<PCTSpriteDraw>()->SetDrawActive(false);
+		//		m_Hard[m_ElementTop]->GetComponent<Transform>()->SetPosition(m_HardOtherPos);
+		//	}
+		//}
 
-			}
-		}
 	}
 	//拡大縮小
 	void StageModeControl::EasyScale() {
@@ -1087,6 +1185,7 @@ namespace basecross
 		}
 
 		if (m_ElementNumTopFlg == true) {
+			//Upの上に移動させる要素数
 			if (m_ElementTop < Mini) {
 				if (m_ElementTop <= -2) {
 					m_ElementTop = Max - 1;
@@ -1252,7 +1351,7 @@ namespace basecross
 		}
 
 		if (PtrStageModeControl->ModeMoveEnd()) {
-			if (KeylVec.m_bPressedKeyTbl['W'] || CntlVec[0].fThumbLX < -0.5f && PtrStageModeControl->ModeMoveEnd() && PtrStageModeControl->StageEndMove() && m_StickDown) {
+			if (KeylVec.m_bPressedKeyTbl['W'] || CntlVec[0].fThumbLX < -0.5f&&CntlVec[0].fThumbLY < 0.1 && CntlVec[0].fThumbLY > -0.1f && PtrStageModeControl->ModeMoveEnd() && PtrStageModeControl->StageEndMove() && m_StickDown) {
 				if (m_OneSE == false) {
 					auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
 					pMultiSoundEffect->Start(L"SaidSelectSe_SE", 0, 0.5f);
@@ -1264,7 +1363,7 @@ namespace basecross
 				m_StickDown = false;
 				m_StickLift = true;
 			}
-			if (KeylVec.m_bPressedKeyTbl['E'] || CntlVec[0].fThumbLX > 0.5f && PtrStageModeControl->ModeMoveEnd() && PtrStageModeControl->StageEndMove() && m_StickDown) {
+			if (KeylVec.m_bPressedKeyTbl['E'] || CntlVec[0].fThumbLX > 0.5f &&CntlVec[0].fThumbLY < 0.1 && CntlVec[0].fThumbLY > -0.1f&& PtrStageModeControl->ModeMoveEnd() && PtrStageModeControl->StageEndMove() && m_StickDown) {
 				if (m_OneSE == false) {
 					auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
 					pMultiSoundEffect->Start(L"SaidSelectSe_SE", 0, 0.5f);
@@ -1487,8 +1586,8 @@ namespace basecross
 
 	void GoStageCheck::OnCreate()
 	{
-		GetStage()->SetSharedGameObject(L"Go", GetStage()->AddGameObject<GoBackSprite>(Vector2(150, 75), Vector2(-320,-190), 1));
-		GetStage()->SetSharedGameObject(L"Back", GetStage()->AddGameObject<GoBackSprite>(Vector2(150,75), Vector2(0,-190), 2));
+		GetStage()->SetSharedGameObject(L"Go", GetStage()->AddGameObject<GoBackSprite>(Vector2(150, 75), Vector2(-320, -190), 1));
+		GetStage()->SetSharedGameObject(L"Back", GetStage()->AddGameObject<GoBackSprite>(Vector2(150, 75), Vector2(0, -190), 2));
 
 		//背景作成------------------------------------
 		auto CheckBack = GetStage()->AddGameObject<GameObject>();
@@ -1705,7 +1804,7 @@ namespace basecross
 				else if (KeylVec.m_bPressedKeyTbl[VK_RIGHT])
 				{
 					m_selectnum = 0;
-					m_Cursor->GetComponent<Transform>()->SetPosition(Vector3(0, -230,0 ));
+					m_Cursor->GetComponent<Transform>()->SetPosition(Vector3(0, -230, 0));
 					m_Cursor->GetComponent<Transform>()->SetScale(Vector3(200, 50, 1));
 				}
 
@@ -2031,13 +2130,13 @@ namespace basecross
 		auto Trans = AddComponent<Transform>();
 		auto Draw = AddComponent<PCTSpriteDraw>();
 		if (m_Num == 1) {
-			Trans->SetPosition(Vector3(m_Pos.x,m_Pos.y, 0));
-			Trans->SetScale(m_Scale.x,m_Scale.y,0);
+			Trans->SetPosition(Vector3(m_Pos.x, m_Pos.y, 0));
+			Trans->SetScale(m_Scale.x, m_Scale.y, 0);
 			Draw->SetTextureResource(L"Go_TX");
 		}
 		if (m_Num == 2) {
-			Trans->SetPosition(Vector3(m_Pos.x,m_Pos.y,0));
-			Trans->SetScale(Vector3(m_Scale.x,m_Scale.y,0));
+			Trans->SetPosition(Vector3(m_Pos.x, m_Pos.y, 0));
+			Trans->SetScale(Vector3(m_Scale.x, m_Scale.y, 0));
 			Draw->SetTextureResource(L"Back_TX");
 		}
 		SetDrawActive(false);
@@ -2054,5 +2153,4 @@ namespace basecross
 		}
 		SetDrawActive(flg);
 	}
-
 }
