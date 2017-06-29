@@ -81,6 +81,9 @@ namespace basecross {
 		m_time += App::GetApp()->GetElapsedTime();
 		if (m_time > m_BackTitleTime)
 		{
+			//ƒ^ƒCƒgƒ‹‚É–ß‚·
+			auto ScenePtr = App::GetApp()->GetScene<Scene>();
+			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToTitleScene");
 
 			m_time = 0;
 		}

@@ -309,6 +309,9 @@ namespace basecross
 			SetSharedGameObject(L"ComboBonus",combop);
 			//Abe20170627
 
+
+			//展示用、放置するとタイトルに戻るやつ
+			AddGameObject<TenziTitle>();
 		}
 		catch (...) {
 

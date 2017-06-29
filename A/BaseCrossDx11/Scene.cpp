@@ -26,7 +26,6 @@ namespace basecross{
 			//ResetActiveStage<TitleScene>();
 			//ResetActiveStage<StageSelectScene>();
 			//ResetActiveStage<TutorialScene>();
-
 		}
 		catch (...) {
 			throw;

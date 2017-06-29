@@ -148,7 +148,9 @@ namespace basecross
 
 			m_EnemyFlg = false;
 
-			
+			//展示用、放置するとタイトルに戻るやつ
+			AddGameObject<TenziTitle>();
+
 		}
 
 		catch (...) {

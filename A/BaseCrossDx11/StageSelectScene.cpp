@@ -213,6 +213,9 @@ namespace basecross {
 			SetSharedGameObject(L"ScoreDisplay",AddGameObject<ScoreDisplay>());
 			//Abe20170623
 
+			//展示用、放置するとタイトルに戻るやつ
+			AddGameObject<TenziTitle>();
+
 		}
 
 		catch (...) {
