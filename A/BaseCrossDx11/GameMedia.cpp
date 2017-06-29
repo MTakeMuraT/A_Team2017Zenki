@@ -17,8 +17,15 @@ namespace basecross {
 		wstring DataDir;
 		App::GetApp()->GetDataDirectory(DataDir);
 
-		wstring strTexture = DataDir + L"TestTexture\\trace.png";
-		App::GetApp()->RegisterTexture(L"TRACE_TX", strTexture);
+		//ロゴ
+		wstring strTexture = DataDir + L"TeamLogo3.png";
+		App::GetApp()->RegisterTexture(L"LOGO1", strTexture);
+		//ロゴ2
+		strTexture = DataDir + L"TeamLogo2.png";
+		App::GetApp()->RegisterTexture(L"LOGO2", strTexture);
+
+		//wstring strTexture = DataDir + L"TestTexture\\trace.png";
+		//App::GetApp()->RegisterTexture(L"TRACE_TX", strTexture);
 
 		strTexture = DataDir + L"TestTexture\\sky.jpg";
 		App::GetApp()->RegisterTexture(L"SKY_TX", strTexture);
@@ -466,17 +473,17 @@ namespace basecross {
 
 		//検証するのに重いので一時的に消します Abe20170505
 		//BGM
-		/*
+		
 		wstring strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Title\\Title_01.wav";
 		App::GetApp()->RegisterWav(L"Title_01_BGM", strMusic);
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\StageSelect\\StageSelect_01.wav";
 		App::GetApp()->RegisterWav(L"StageSelect_01_BGM", strMusic);
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\GameStage\\GameStage_01.wav";
 		App::GetApp()->RegisterWav(L"GameStage_01_BGM", strMusic);
-	*/
+	
 		//SE
 		
-		wstring strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Decision_01.wav";
+		 strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Decision_01.wav";
 		App::GetApp()->RegisterWav(L"Decision_01_SE", strMusic);
 		
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Collision_01.wav";
@@ -486,8 +493,7 @@ namespace basecross {
 		//App::GetApp()->RegisterWav(L"Decision_02_SE", strMusic);
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\PlayerDie.wav";
 		App::GetApp()->RegisterWav(L"PlayerDie_SE", strMusic);
-		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\CursorMove.wav";
-		App::GetApp()->RegisterWav(L"PlayerDie_SE", strMusic);
+		
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Win.wav";
 		App::GetApp()->RegisterWav(L"Win_SE", strMusic);
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\Win.wav";
@@ -496,6 +502,11 @@ namespace basecross {
 		//strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\SE\\PrayerExposure.wav";
 		//App::GetApp()->RegisterWav(L"PrayerDie_SE", strMusic); 
 		
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\StageSelect\\SaidSelectSe.wav";
+		App::GetApp()->RegisterWav(L"SaidSelectSe_SE", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\StageSelect\\StageSe.wav";
+		App::GetApp()->RegisterWav(L"StageSe_SE", strMusic);
+
 		//敵エネミー発見時
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Enemy\\Computer Launch.wav";
 		App::GetApp()->RegisterWav(L"Player_Look_SE", strMusic);
@@ -532,20 +543,22 @@ namespace basecross {
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Player\\Player Exposure.wav";
 		App::GetApp()->RegisterWav(L"Player_Die_SE", strMusic);
 		//チュートリアルBGM　
-		// strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Tutorial\\TutorialBGM.wav";
-		//App::GetApp()->RegisterWav(L"Tutorial_BGM", strMusic);
+		 strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Tutorial\\TutorialBGM.wav";
+		App::GetApp()->RegisterWav(L"Tutorial_BGM", strMusic);
 		
 		//負けBGM
-		//strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Loss\\Loss.wav";
-		//App::GetApp()->RegisterWav(L"Loss_BGM", strMusic);
-		//strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Loss\\Loss2.wav";
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Loss\\Loss.wav";
+		App::GetApp()->RegisterWav(L"Loss_BGM", strMusic);
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Loss\\Loss2.wav";
 		//App::GetApp()->RegisterWav(L"Loss2_BGM", strMusic);
 		//子機投げる(未実装)
 		//子機落下（未実装）
 		//ミサイル発射音(未実装)
 		//着弾時（未実装）
 		
-
+		//ポーズSE
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Pause\\Pause.wav";
+		App::GetApp()->RegisterWav(L"Pause_SE", strMusic);
 	
 
 

@@ -213,6 +213,8 @@ namespace basecross
 		bool m_KeepApudh = false;
 		//Aが押し続けてなければfalseになり押し続けている検証をしない
 		bool m_KeepPushing = true;
+
+		bool m_OneSE = false;
 	public:
 		StageModeControl(const shared_ptr<Stage>& StagePtr);
 		~StageModeControl() {};
@@ -291,7 +293,7 @@ namespace basecross
 		//コントローラの連続入力の防止
 		bool m_StickDown = false;
 		bool m_StickLift = false;
-
+		bool m_OneSE = true; 
 	public:
 		ModeSelect(const shared_ptr<Stage>& StagePtr, const Vector3& Pos, const Vector3& Scale, const int& ModeNum, const bool& Centerflg, const int& MoveNum);
 		~ModeSelect() {};
@@ -399,6 +401,9 @@ namespace basecross
 		bool m_KeepApudh = false;
 		//Aが押し続けてなければfalseになり押し続けている検証をしない
 		bool m_KeepPushing = true;
+		bool m_OneSE = false;
+		bool m_OneSE2 = false;
+		bool m_OneSE3 = false;
 	public:
 		GoStageCheck(const shared_ptr<Stage>& StagePtr, Vector2 scale);
 

@@ -670,6 +670,9 @@ namespace basecross
 				//‚à‚µHP‚ª1ˆÈ‰º‚È‚ç
 				if (m_Hp <= 1)
 				{
+					//ƒRƒ“ƒ{‰ÁŽZ
+					GetStage()->GetSharedGameObject<ComboBonus>(L"ComboBonus", false)->CountUp();
+
 					//ƒ^ƒq‚Ê
 					SetDrawActive(false);
 					m_Hp = 0;
@@ -1292,6 +1295,9 @@ namespace basecross
 				//‚à‚µHP‚ª1ˆÈ‰º‚È‚ç
 				if (m_Hp <= 1)
 				{
+					//ƒRƒ“ƒ{‰ÁŽZ
+					GetStage()->GetSharedGameObject<ComboBonus>(L"ComboBonus", false)->CountUp();
+
 					//ƒ^ƒq‚Ê
 					SetDrawActive(false);
 					m_Hp = 0;
@@ -1778,6 +1784,9 @@ namespace basecross
 			//‚à‚µHP‚ª1ˆÈ‰º‚È‚ç
 			if (m_Hp <= 1)
 			{
+				//ƒRƒ“ƒ{‰ÁŽZ
+				GetStage()->GetSharedGameObject<ComboBonus>(L"ComboBonus", false)->CountUp();
+
 				//ƒ^ƒq‚Ê
 				SetDrawActive(false);
 				m_Hp = 0;

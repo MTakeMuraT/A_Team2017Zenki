@@ -160,6 +160,8 @@ namespace basecross
 	void GameStage::CreatePause()
 	{
 		SetSharedGameObject(L"PauseMenu",AddGameObject<PauseMenu>());
+		SetSharedGameObject(L"TitleSE", AddGameObject<SE>());
+
 	}
 	//ポーズ作成--------------------------------------------
 	//Abe20170605
@@ -187,10 +189,10 @@ namespace basecross
 	{
 		try {
 			////検証するのに重いので一時的に消します Abe20170505
-			//m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
-			//m_AudioObjectPtr->AddAudioResource(L"GameStage_01_BGM");
-			//m_AudioObjectPtr->Start(L"GameStage_01_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);
-			//m_AudioObjectPtr->AddAudioResource(L"Win_SE");
+			m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
+			m_AudioObjectPtr->AddAudioResource(L"GameStage_01_BGM");
+			m_AudioObjectPtr->Start(L"GameStage_01_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);
+			m_AudioObjectPtr->AddAudioResource(L"Win_SE");
 
 
 			//グループ類作成
@@ -353,7 +355,7 @@ namespace basecross
 		if (PlayerLifePtr) {
 			if (PlayerLifePtr->GetDieFlg() == false) {
 				if (StopBGM == true) {
-					//m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
+					m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
 					StopBGM = false;
 				}
 			}
@@ -380,6 +382,8 @@ namespace basecross
 			{
 				if (GetSharedGameObject<PauseMenu>(L"PauseMenu", false)->GetPushFlg())
 				{
+					GetSharedGameObject<SE>(L"TitleSE", false)->PauseSe();
+
 					//ポーズ表示
 					GetSharedGameObject<PauseMenu>(L"PauseMenu", false)->Open();
 
@@ -388,6 +392,8 @@ namespace basecross
 				}
 				else
 				{
+					GetSharedGameObject<SE>(L"TitleSE", false)->PauseSe();
+
 					//ポーズ表示
 					GetSharedGameObject<PauseMenu>(L"PauseMenu", false)->Close();
 
@@ -425,10 +431,6 @@ namespace basecross
 		//仮でリザルト表示**********デバッグ*********
 		if (KeylVec.m_bPressedKeyTbl['B'])
 		{
-			//m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
-			//m_AudioObjectPtr->Start(L"Win_SE", 0, 0.5f);
-
-
 			Result();
 		}
 		//仮でリザルト表示**********デバッグ*********
@@ -498,7 +500,7 @@ namespace basecross
 
 	GameStage::~GameStage() {
 		if (StopBGM == true) {
-			//m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
+			m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
 		}
 	}
 
@@ -514,7 +516,8 @@ namespace basecross
 
 			GetSharedGameObject<KetsuHunsya>(L"Ketu_R", false)->Stop();
 			GetSharedGameObject<KetsuHunsya>(L"Ketu_L", false)->Stop();
-
+		
+			
 		}
 	}
 	//Abe20170529
@@ -565,7 +568,10 @@ namespace basecross
 
 			GetSharedGameObject<KetsuHunsya>(L"Ketu_R", false)->Stop();
 			GetSharedGameObject<KetsuHunsya>(L"Ketu_L", false)->Stop();
+			m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
+			m_AudioObjectPtr->Start(L"Win_SE", 0, 0.5f);
 		}
+		
 	}
 	
 	//リザルトカメラ制御
@@ -672,6 +678,7 @@ namespace basecross
 	{}
 	void Ground_GameStage::OnCreate() {
 		auto PtrDraw = AddComponent<PNTStaticDraw>();
+		PtrDraw->SetDepthStencilState(DepthStencilState::Read);
 		PtrDraw->SetMeshResource(L"DEFAULT_SQUARE");
 		if (m_TX_Name == L"Background_TX") {
 			PtrDraw->SetTextureResource(m_TX_Name);
@@ -698,6 +705,7 @@ namespace basecross
 		PtrTrans->SetPosition(m_Positon);
 		//PtrDraw->SetDrawActive(false);
 		SetAlphaActive(true);
+		//SetDrawLayer(10);
 	}
 }
 

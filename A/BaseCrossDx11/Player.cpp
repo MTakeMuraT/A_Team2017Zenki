@@ -16,6 +16,11 @@ namespace basecross {
 	//構築と破棄
 	void PlayerControl::OnCreate()
 	{
+		//オーディオリソース登録
+		auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
+		pMultiSoundEffect->AddAudioResource(L"Collision_01_SE");
+		pMultiSoundEffect->AddAudioResource(L"PlayerDie_SE");
+
 		//-----------------------------
 		//初期化
 
@@ -126,8 +131,10 @@ namespace basecross {
 			tarTra->SetScale(3.0f, 3.0f, 3.0f);
 
 			auto tarDra = tarobj->AddComponent<PNTStaticDraw>();
+			tarDra->SetDepthStencilState(DepthStencilState::Read);
 			tarDra->SetTextureResource(L"TARGETRING_TX");
 			tarDra->SetMeshResource(L"DEFAULT_SQUARE");
+			tarDra->SetDiffuse(Color4(1, 1, 1, 0.5f));
 
 			tarobj->SetAlphaActive(true);
 			tarobj->SetDrawLayer(false);
@@ -320,6 +327,8 @@ namespace basecross {
 				//くっついたら
 				if (m_PlayerSDistance < 1.0f)
 				{
+					auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+					pMultiSoundEffect->Start(L"Collision_01_SE", 0, 0.4f);
 					//ターゲット非表示
 					if (m_TargetRing->GetDrawActive())
 					{
@@ -643,6 +652,7 @@ namespace basecross {
 
 	//初期化
 	void PlayerHP::OnCreate() {
+		
 		auto PtrTransform = GetComponent<Transform>();
 
 		PtrTransform->SetScale(0, 0, 0);
@@ -655,7 +665,7 @@ namespace basecross {
 		if (!GetInvincible() && GetHit()) {
 			GetStage()->GetSharedGameObject<Player_Life>(L"Life")->LifeDown(GetDamage_int());
 			SetInvincible(true);
-			
+		
 
 			if (GetDamage_int() > 0) {
 
@@ -695,6 +705,7 @@ namespace basecross {
 		m_OpacityColor = 1.0f;
 		SetDrawActive(false);
 		SetDrawLayer(10);
+
 	}
 	void PlayerShield::OnUpdate() {
 		auto PlayerLifePtr = GetStage()->GetSharedGameObject<Player_Life>(L"Life", false);
@@ -709,6 +720,7 @@ namespace basecross {
 		}
 		//前回のHPと違う場合
 		if (PlayerLifePtr->GetLife() != m_HPSave) {
+			
 			//保存HPの更新
 			m_HPSave = PlayerLifePtr->GetLife();
 			//演出フラグをON
@@ -772,6 +784,7 @@ namespace basecross {
 		Trans->SetRotation(0, 0, 0);
 			//描画設定
 			auto Draw = AddComponent<PNTStaticDraw>();
+			Draw->SetDepthStencilState(DepthStencilState::Read);
 			Draw->SetMeshResource(L"DEFAULT_SQUARE");
 			Draw->SetTextureResource(m_TextureName);
 			SetAlphaActive(true);
@@ -900,6 +913,7 @@ namespace basecross {
 		ShadowPtr->SetMeshResource(L"DEFAULT_SPHERE");
 
 		auto PtrDraw = AddComponent<PNTStaticDraw>();
+		PtrDraw->SetDepthStencilState(DepthStencilState::Read);
 		PtrDraw->SetMeshResource(L"DEFAULT_SPHERE");
 		PtrDraw->SetTextureResource(L"Background_TX");
 		SetAlphaActive(true);

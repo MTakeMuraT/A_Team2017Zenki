@@ -77,9 +77,56 @@ namespace basecross
 		//透明度使わないけど一応
 		objc->SetAlphaActive(true);
 		objc->SetDrawLayer(1);
+		objc->SetDrawActive(false);
 
 		SetSharedGameObject(L"Credit", objc);
 		//-------------------------------------------
+		//ロゴ１
+
+		auto logo1 = AddGameObject<GameObject>();
+		auto logoTrans = logo1->AddComponent<Transform>();
+		logoTrans->SetPosition(0, 0, 0);
+		logoTrans->SetRotation(0, 0, 0);
+		logoTrans->SetScale(1280, 720, 1);
+
+		auto logoDraw = logo1->AddComponent<PCTSpriteDraw>();
+		logoDraw->SetTextureResource(L"LOGO1");
+
+		logo1->SetAlphaActive(true);
+		logo1->SetDrawLayer(1);
+		logo1->SetDrawActive(false);
+
+		SetSharedGameObject(L"Logo1", logo1);
+
+		//-------------------------------------------
+		//ロゴ２
+		auto logo2 = AddGameObject<GameObject>();
+		auto logo2Trans = logo2->AddComponent<Transform>();
+		logo2Trans->SetPosition(0, 0, 0);
+		logo2Trans->SetRotation(0, 0, 0);
+		logo2Trans->SetScale(1280, 720, 1);
+
+		auto logo2Draw = logo2->AddComponent<PCTSpriteDraw>();
+		logo2Draw->SetTextureResource(L"LOGO2");
+
+		logo2->SetAlphaActive(true);
+		logo2->SetDrawLayer(1);
+		logo2->SetDrawActive(false);
+
+		SetSharedGameObject(L"Logo2", logo2);
+
+		//-------------------------------------------
+
+		//最初に移すやつ決める
+		int ram = rand() % 100;
+		if (ram  < 30)
+		{
+			GetSharedGameObject<GameObject>(L"Logo1", false)->SetDrawActive(true);
+		}
+		else
+		{
+			GetSharedGameObject<GameObject>(L"Logo2", false)->SetDrawActive(true);
+		}
 	}
 
 	void LogoScene::OnUpdate()
@@ -155,15 +202,43 @@ namespace basecross
 				switch (m_stateTex)
 				{
 				case 0:
-					GetSharedGameObject<GameObject>(L"Credit", false)->SetDrawActive(false);
-					//状態を100にすればシーン遷移
-					m_state = 100;
+					if (true)
+					{
+						//ロゴ消し
+						auto ptr = GetSharedGameObject<GameObject>(L"Logo1", false);
+						auto ptr2 = GetSharedGameObject<GameObject>(L"Logo2", false);
+
+						if (ptr->GetDrawActive())
+						{
+							ptr->SetDrawActive(false);
+						}
+						if (ptr2->GetDrawActive())
+						{
+							ptr2->SetDrawActive(false);
+						}
+
+						//提出用
+						m_state = 100;
+
+						//クレジット
+						GetSharedGameObject<GameObject>(L"Credit", false)->SetDrawActive(true);
+					}
+					break;
+				case 1:
+					if (true)
+					{
+						//クレジット
+						GetSharedGameObject<GameObject>(L"Credit", false)->SetDrawActive(false);
+						
+						//展示用
+						//m_state = 100;
+					}
 					break;
 				}
 				//画像進める
 				m_stateTex++;
+				break;
 			}
-			break;
 			//シーン替え
 		case 100:
 			if (true)

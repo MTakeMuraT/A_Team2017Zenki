@@ -60,6 +60,7 @@ namespace basecross{
 
 		bool lighton = true;
 
+		bool OnSEflg = false;
 
 	public:
 		float m_alpha = 0.05;
@@ -774,6 +775,30 @@ namespace basecross{
 		virtual void OnUpdate() override;
 	};
 
+	//--------------------------------------------------------------------------------------
+	//	SS引数ディレクトリ入れるやつ
+	//--------------------------------------------------------------------------------------
+	class SpriteStudioParent : public SS5ssae
+	{
+	private:
+		//動くか
+		bool m_ActiveFlg = false;
+
+		//制限時間
+		float m_LimitTime = 2.0f;
+		float m_time = 0;
+	public:
+		//構築と破棄
+		SpriteStudioParent(const shared_ptr<Stage>& StagePtr,wstring dire,wstring name);
+		//初期化
+		void OnCreate() override;
+		void OnUpdate() override;
+
+		void OnAnim();
+
+		void SetLayer(int num) { SetDrawLayer(num); };
+	};
+
 #pragma region ***オーバー:リザルト***
 	//Abe20170529
 	//--------------------------------------------------------------------------------------
@@ -814,6 +839,7 @@ namespace basecross{
 		//4
 		//ノイズ画像
 		shared_ptr<GameObject> m_Noise;
+		//shared_ptr<SpriteStudioParent> m_Noise;
 		//ノイズの音
 		shared_ptr<MultiAudioObject> m_NoiseSe;
 		//なったか
@@ -1044,6 +1070,8 @@ namespace basecross{
 		//スタートBUTTON押せるようにするフラグ
 		bool m_StartPushFlg = true;
 		//-----関数-----
+		bool OneSeFlg = false;
+
 	public:
 		PauseMenu(const shared_ptr<Stage>& StagePtr) :GameObject(StagePtr) {};
 
@@ -1265,6 +1293,13 @@ namespace basecross{
 
 		//右上スコア作成
 		void CreateMigiueScore();
+
+		//スコア加算処理
+		void ScoreSum();
+		//スコア加算フラグ
+		bool m_ScoreSumFlg = false;
+		//計算用スコア
+		int m_KeisanYouScore;
 	public :
 		ComboBonus(const shared_ptr<Stage>& StagePtr) : GameObject(StagePtr) {}
 
@@ -1277,8 +1312,8 @@ namespace basecross{
 		//スコア取得
 		int GetComboScore() {return m_ComboNowScore;}
 
-		//強制スコア設定
-		void SetScore();
+		//強制スコア設定 引数trueで演出なし
+		void SetScore(bool);
 
 		//数字座標移動
 		void SetComboScoreMove(Vector3);

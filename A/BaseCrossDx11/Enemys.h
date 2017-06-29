@@ -200,6 +200,8 @@ namespace basecross
 		//ミサイルとか爆弾とかプレイヤー以外
 		void Damage(int num);
 		int GetPower() { return m_Power; }
+
+		EnemyState GetState() { return m_State; }
 	};
 
 	//************************************
@@ -316,6 +318,8 @@ namespace basecross
 		float GetCoolTime() { return m_CoolTime; }
 		//Abe20170622
 
+		EnemyState GetState() { return m_State; }
+
 	};
 
 	//************************************
@@ -413,6 +417,9 @@ namespace basecross
 
 		//番号取得
 		int GetNumber() {return m_number; }
+
+		EnemyState GetState() { return m_State; }
+
 	};
 
 	//************************************

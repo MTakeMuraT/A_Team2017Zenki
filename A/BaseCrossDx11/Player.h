@@ -121,6 +121,8 @@ namespace basecross {
 		//外に出ない用の関数
 		void StintArea();
 		
+		//マーカー消し
+		void DeleteMarker() { m_TargetRing->SetDrawActive(false); };
 	};
 
 	

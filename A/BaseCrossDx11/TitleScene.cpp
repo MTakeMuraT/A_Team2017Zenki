@@ -46,6 +46,7 @@ namespace basecross {
 		obj->SetAlphaActive(true);
 
 		SetSharedGameObject(L"Dodai", obj);
+		SetSharedGameObject(L"TitleSE", AddGameObject<SE>());
 
 
 		//AddGameObject<InputCSV>();
@@ -54,9 +55,9 @@ namespace basecross {
 	void TitleScene::OnCreate() {
 		try {
 			////検証するのに重いので一時的に消します Abe20170505
-			//m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
-			//m_AudioObjectPtr->AddAudioResource(L"Title_01_BGM");
-			//m_AudioObjectPtr->Start(L"Title_01_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);
+			m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
+			m_AudioObjectPtr->AddAudioResource(L"Title_01_BGM");
+			m_AudioObjectPtr->Start(L"Title_01_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);
 			
 
 			//ビューとライトの作成
@@ -66,6 +67,8 @@ namespace basecross {
 			//AddGameObject<DimSprite>(true,
 			//	Vector2(1280, 720),
 			//	Vector2(0, 0));
+
+			//AddGameObject<SpriteStudioParent>(L"SS\\Noise\\", L"Noise1.ssae");
 
 			m_time = 0;
 		}
@@ -79,6 +82,7 @@ namespace basecross {
 		m_logocounttime += App::GetApp()->GetElapsedTime();
 		if (m_logocounttime > 30)
 		{
+			//ここ弄るとロゴシーンいかない
 			//シーン切り替え
 			auto ScenePtr = App::GetApp()->GetScene<Scene>();
 			//ロゴシーン
@@ -184,6 +188,11 @@ namespace basecross {
 				//上選択
 				if (CntlVec[0].fThumbLY > 0.5f || KeylVec.m_bPressedKeyTbl[VK_UP])
 				{
+					if (OneSeFlg == true) {
+						GetSharedGameObject<SE>(L"TitleSE", false)->SetSeFlg_CURSORMOVE(false);
+						GetSharedGameObject<SE>(L"TitleSE", false)->StickSe();
+						OneSeFlg = false;
+					}
 					m_selectNum = 0;
 					GetSharedGameObject<GameObject>(L"Dodai", false)->GetComponent<Transform>()->SetPosition(Vector3(0, -190, 0));
 
@@ -202,6 +211,12 @@ namespace basecross {
 				//下選択
 				if (CntlVec[0].fThumbLY < -0.5f || KeylVec.m_bPressedKeyTbl[VK_DOWN])
 				{
+					//ここSE
+					if (OneSeFlg == false) {
+						GetSharedGameObject<SE>(L"TitleSE", false)->SetSeFlg_CURSORMOVE(false);
+						GetSharedGameObject<SE>(L"TitleSE", false)->StickSe();
+						OneSeFlg = true;
+					}
 					m_selectNum = 1;
 					GetSharedGameObject<GameObject>(L"Dodai", false)->GetComponent<Transform>()->SetPosition(Vector3(0, -270, 0));
 
@@ -222,6 +237,8 @@ namespace basecross {
 				//ボタン押された
 				if (KeylVec.m_bPressedKeyTbl['A'] || CntlVec[0].wPressedButtons &XINPUT_GAMEPAD_A)
 				{
+					GetSharedGameObject<SE>(L"TitleSE", false)->ASe();
+
 					//ロゴカウントリセット
 					m_logocounttime = 0;
 
@@ -263,6 +280,11 @@ namespace basecross {
 					GetSharedGameObject<GameObject>(L"PressStart", false)->SetDrawActive(true);
 					GetSharedGameObject<GameObject>(L"GameStart", false)->SetDrawActive(false);
 					GetSharedGameObject<GameObject>(L"Tutorial", false)->SetDrawActive(false);
+
+					//カーソル位置調整
+					m_selectNum = 0;
+					GetSharedGameObject<GameObject>(L"Dodai", false)->GetComponent<Transform>()->SetPosition(Vector3(0, -190, 0));
+
 
 					//ロゴカウントリセット
 					m_logocounttime = 0;
@@ -415,8 +437,44 @@ namespace basecross {
 	}
 	//破棄
 	 TitleScene::~TitleScene() {
-		// m_AudioObjectPtr->Stop(L"Title_01_BGM");
+		 m_AudioObjectPtr->Stop(L"Title_01_BGM");
 	}
+	 SE::SE(const shared_ptr<Stage>& StagePtr) :
+		 GameObject(StagePtr)
+	 {}
+	 void SE::OnCreate() {
+		 //SE//オーディオリソース登録
+		 auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
+		 pMultiSoundEffect->AddAudioResource(L"Decision_01_SE");
+		 pMultiSoundEffect->AddAudioResource(L"CURSORMOVE_SE");
+		 pMultiSoundEffect->AddAudioResource(L"Pause_SE");
+
+	 }
+	 void SE::ASe() {
+		 if (SeFlg_Decision_01 == false) {
+			 auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+			 pMultiSoundEffect->Start(L"Decision_01_SE", 0, 1.0f);
+			 SeFlg_Decision_01 = true;
+		 }
+	 }
+	 void SE::StickSe() {
+
+		 if (SeFlg_CURSORMOVE == false) {
+			 auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+			 pMultiSoundEffect->Start(L"CURSORMOVE_SE", 0, 1.0f);
+			 SeFlg_CURSORMOVE = true;
+		 }
+	 }
+	 void SE::PauseSe() {
+		 auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+		 pMultiSoundEffect->Start(L"Pause_SE", 0, 1.0f);
+		 SeFlg_Pause = true;
+	 }
+	 void SE::PauseCloseSe() {
+		 auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+		 pMultiSoundEffect->Start(L"Pause_SE", 0, 1.0f);
+		 SePauseCloseSe = true;
+	 }
 
 }
 //end basecross

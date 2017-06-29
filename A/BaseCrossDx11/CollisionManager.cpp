@@ -790,9 +790,10 @@ namespace basecross
 		//==============================================
 		if (dynamic_pointer_cast<TackleEnemy>(obj))
 		{
-			dynamic_pointer_cast<TackleEnemy>(obj)->DamagePlayer();
-			//コンボ加算
-			GetStage()->GetSharedGameObject<ComboBonus>(L"ComboBonus", false)->CountUp();
+			if (dynamic_pointer_cast<TackleEnemy>(obj)->GetDrawActive())
+			{
+				dynamic_pointer_cast<TackleEnemy>(obj)->DamagePlayer();
+			}
 		}
 		//==============================================
 
@@ -800,8 +801,6 @@ namespace basecross
 		if (dynamic_pointer_cast<BombEnemy>(obj))
 		{
 			dynamic_pointer_cast<BombEnemy>(obj)->DamagePlayer();
-			//コンボ加算
-			GetStage()->GetSharedGameObject<ComboBonus>(L"ComboBonus", false)->CountUp();
 		}
 		//==============================================
 
@@ -813,19 +812,23 @@ namespace basecross
 		}
 		//==============================================
 		//テレポートエネミー
-		if (dynamic_pointer_cast<TeleportEnemy>(obj)) {
-			//ShotEnemyChildへのフラグ
-			dynamic_pointer_cast<TeleportEnemy>(obj)->DamagePlayer();
-			//コンボ加算
-			GetStage()->GetSharedGameObject<ComboBonus>(L"ComboBonus", false)->CountUp();
+		if (dynamic_pointer_cast<TeleportEnemy>(obj))
+		{
+			if (dynamic_pointer_cast<TeleportEnemy>(obj)->GetDrawActive())
+			{
+				//ShotEnemyChildへのフラグ
+				dynamic_pointer_cast<TeleportEnemy>(obj)->DamagePlayer();
+			}
 		}
 		//==============================================
 		//ミサイルうつエネミー
-		if (dynamic_pointer_cast<ShotEnemy>(obj)) {
-			//ShotEnemyChildへのフラグ
-			dynamic_pointer_cast<ShotEnemy>(obj)->DamagePlayer();
-			//コンボ加算
-			GetStage()->GetSharedGameObject<ComboBonus>(L"ComboBonus", false)->CountUp();
+		if (dynamic_pointer_cast<ShotEnemy>(obj))
+		{
+			if (dynamic_pointer_cast<ShotEnemy>(obj)->GetDrawActive())
+			{
+				//ShotEnemyChildへのフラグ
+				dynamic_pointer_cast<ShotEnemy>(obj)->DamagePlayer();
+			}
 		}
 		//==============================================
 

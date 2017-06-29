@@ -110,9 +110,9 @@ namespace basecross
 
 	void TutorialScene::OnCreate()
 	{
-		/*m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
+		m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
 		m_AudioObjectPtr->AddAudioResource(L"Tutorial_BGM");
-		m_AudioObjectPtr->Start(L"Tutorial_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);*/
+		m_AudioObjectPtr->Start(L"Tutorial_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);
 		try 
 		{
 			//ビューとライトの作成
@@ -212,7 +212,7 @@ namespace basecross
 		//**********************
 		////BGM
 		if (App::GetApp()->GetScene<Scene>()->GetBGMFlg() == false) {
-			//m_AudioObjectPtr->Stop(L"Tutorial_BGM");
+			m_AudioObjectPtr->Stop(L"Tutorial_BGM");
 		}
 	}
 
@@ -321,6 +321,8 @@ namespace basecross
 	//**************************************************************************************
 	void TutorialPlayerS::OnCreate()
 	{
+		auto pMultiSoundEffect = AddComponent<MultiSoundEffect>();
+		pMultiSoundEffect->AddAudioResource(L"Collision_01_SE");
 		//-----------------------------
 		//初期化
 
@@ -603,6 +605,8 @@ namespace basecross
 				//くっついたら
 				if (m_PlayerSDistance < 1.0f)
 				{
+					auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+					pMultiSoundEffect->Start(L"Collision_01_SE", 0, 0.4f);
 					//ターゲット非表示
 					if (m_TargetRing->GetDrawActive())
 					{
