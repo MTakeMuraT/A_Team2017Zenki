@@ -84,9 +84,9 @@ namespace basecross {
 		{
 			//ここ弄るとロゴシーンいかない
 			//シーン切り替え
-			//auto ScenePtr = App::GetApp()->GetScene<Scene>();
+			auto ScenePtr = App::GetApp()->GetScene<Scene>();
 			//ロゴシーン
-			//PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToLogoScene");
+			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"ToLogoScene");
 
 			m_logocounttime = 0;
 		}

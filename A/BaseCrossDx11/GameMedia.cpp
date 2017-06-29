@@ -17,8 +17,15 @@ namespace basecross {
 		wstring DataDir;
 		App::GetApp()->GetDataDirectory(DataDir);
 
-		wstring strTexture = DataDir + L"TestTexture\\trace.png";
-		App::GetApp()->RegisterTexture(L"TRACE_TX", strTexture);
+		//ƒƒS
+		wstring strTexture = DataDir + L"TeamLogo3.png";
+		App::GetApp()->RegisterTexture(L"LOGO1", strTexture);
+		//ƒƒS2
+		strTexture = DataDir + L"TeamLogo2.png";
+		App::GetApp()->RegisterTexture(L"LOGO2", strTexture);
+
+		//wstring strTexture = DataDir + L"TestTexture\\trace.png";
+		//App::GetApp()->RegisterTexture(L"TRACE_TX", strTexture);
 
 		strTexture = DataDir + L"TestTexture\\sky.jpg";
 		App::GetApp()->RegisterTexture(L"SKY_TX", strTexture);
