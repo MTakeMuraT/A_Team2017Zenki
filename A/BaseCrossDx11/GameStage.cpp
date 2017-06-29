@@ -193,7 +193,7 @@ namespace basecross
 			m_AudioObjectPtr->AddAudioResource(L"GameStage_01_BGM");
 			m_AudioObjectPtr->Start(L"GameStage_01_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);
 			m_AudioObjectPtr->AddAudioResource(L"Win_SE");
-
+			m_AudioObjectPtr->AddAudioResource(L"WinBgm_BGM");
 
 			//グループ類作成
 			auto TereportGroup = CreateSharedObjectGroup(L"TereportPointGroup");
@@ -316,6 +316,7 @@ namespace basecross
 
 			throw;
 		}
+		m_WinBgm = true;
 	}
 
 
@@ -324,6 +325,14 @@ namespace basecross
 	// シーン遷移
 	void GameStage::OnUpdate()
 	{
+		if (m_WinBgm == false) {
+			m_CuntTaime += App::GetApp()->GetElapsedTime();
+			if (m_CuntTaime > 7) {
+				m_AudioObjectPtr->Start(L"WinBgm_BGM", XAUDIO2_LOOP_INFINITE, 0.5f);
+				m_CuntTaime = 0.0f;
+				m_WinBgm = true;
+			}
+		}
 
 		//Abe20170622
 		//ショットエネミーのクールタイム一覧
@@ -502,6 +511,10 @@ namespace basecross
 		if (StopBGM == true) {
 			m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
 		}
+		if (m_WinBgm == true) {
+			m_AudioObjectPtr->Stop(L"WinBgm_BGM");
+
+		}
 	}
 
 	//Abe20170529
@@ -570,6 +583,7 @@ namespace basecross
 			GetSharedGameObject<KetsuHunsya>(L"Ketu_L", false)->Stop();
 			m_AudioObjectPtr->Stop(L"GameStage_01_BGM");
 			m_AudioObjectPtr->Start(L"Win_SE", 0, 0.5f);
+			m_WinBgm = false;
 		}
 		
 	}

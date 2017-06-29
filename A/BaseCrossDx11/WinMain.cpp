@@ -9,8 +9,8 @@ using namespace basecross;
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 
 //定数
-const wchar_t* pClassName = L"BaseCrossDx11Class";
-const wchar_t* pWndTitle = L"A";
+const wchar_t* pClassName = L"Robot StrikeClass";
+const wchar_t* pWndTitle = L"Robot Strike";
 
 
 //--------------------------------------------------------------------------------------
@@ -129,7 +129,7 @@ int MainLoop(HINSTANCE hInstance, HWND hWnd, bool isFullScreen, int iClientWidth
 	//例外処理開始
 	try {
 		//マウスを消す処理
-		::ShowCursor(true);
+		::ShowCursor(false);
 		//COMの初期化
 		//サウンドで使用する
 		if (FAILED(CoInitializeEx(nullptr, COINIT_MULTITHREADED))) {

@@ -79,7 +79,8 @@ namespace basecross
 		//ブースト作成
 		void CreateBoost();
 		//Abe20170620
-
+		bool m_WinBgm = true;
+		float m_CuntTaime = 0.0f;
 	public:
 		//構築と破棄
 		GameStage() :Stage() {}

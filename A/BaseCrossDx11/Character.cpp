@@ -224,7 +224,7 @@ namespace basecross {
 		//描画
 		SetDrawActive(true);
 		//表示レイヤー
-		SetDrawLayer(2);
+		SetDrawLayer(7);
 
 	}
 
@@ -3236,7 +3236,7 @@ namespace basecross {
 					//constで宣言しても更新されないunkなので
 					//HPスプライトとTimeの目的座標を再設定
 					m_HpTargetPos = Vector3(30, -220, 0);
-					m_TimeTargetPos = Vector3(-400, -340, 0);
+					m_TimeTargetPos = Vector3(-400, -330, 0);
 					//Abe20170627
 					m_ScoreTargetPos = Vector3(-20, -410, 0);
 					//Abe20170627
@@ -3271,7 +3271,7 @@ namespace basecross {
 					//Abe20170627
 
 					m_HpPos += Vector3(0.3f, -2.2f, 0) * 3;
-					m_TimePos += Vector3(-4, -3.4f, 0) * 3;
+					m_TimePos += Vector3(-4, -3.3f, 0) * 3;
 					m_ScorePos += Vector3(-0.2f, -4.1f, 0) * 3;
 
 					//判定フラグ
@@ -3294,7 +3294,7 @@ namespace basecross {
 					}
 					else
 					{
-						timeptr->MovePos(Vector3(-4, -3.4f, 0) * 3);
+						timeptr->MovePos(Vector3(-4, -3.3f, 0) * 3);
 					}
 
 
@@ -4556,12 +4556,14 @@ namespace basecross {
 				{
 					//戻る
 				case 0:
+					GetStage()->GetSharedGameObject<SE>(L"TitleSE", false)->ASe();
 					Close();
 					break;
 					//リトライ
 				case 1:
 					if (true)
 					{
+						GetStage()->GetSharedGameObject<SE>(L"TitleSE", false)->ASe();
 						//切り替え演出
 						auto ob = GetStage()->AddGameObject<SceneChangeSS>();
 						ob->OnAnim();
@@ -4575,6 +4577,8 @@ namespace basecross {
 				case 2:
 					if (true)
 					{
+						GetStage()->GetSharedGameObject<SE>(L"TitleSE", false)->ASe();
+
 						//切り替え演出
 						auto ob = GetStage()->AddGameObject<SceneChangeSS>();
 						ob->OnAnim();
@@ -4587,7 +4591,9 @@ namespace basecross {
 					//タイトル
 				case 3:
 					if (true)
-					{				
+					{			
+						GetStage()->GetSharedGameObject<SE>(L"TitleSE", false)->ASe();
+
 						//切り替え演出
 						auto ob = GetStage()->AddGameObject<SceneChangeSS>();
 						ob->OnAnim();

@@ -549,7 +549,10 @@ namespace basecross {
 		//負けBGM
 		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Loss\\Loss.wav";
 		App::GetApp()->RegisterWav(L"Loss_BGM", strMusic);
-		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Loss\\Loss2.wav";
+	//	strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Loss\\Loss2.wav";
+		//勝ち
+		strMusic = App::GetApp()->m_wstrRelativeDataPath + L"Sound\\Win\\WinBgm.wav";
+		App::GetApp()->RegisterWav(L"WinBgm_BGM", strMusic);
 		//App::GetApp()->RegisterWav(L"Loss2_BGM", strMusic);
 		//子機投げる(未実装)
 		//子機落下（未実装）
