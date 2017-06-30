@@ -447,9 +447,8 @@ namespace basecross
 		else {
 			//wキーで難易度の移動がしたときに位置更新
 			if (KeylVec.m_bPressedKeyTbl['W'] || KeylVec.m_bPressedKeyTbl['E'] ||
-				CntlVec[0].fThumbLY > 0.5 && m_ModeMoveEnd && m_StageMoveEnd &&
-				m_StickDown || CntlVec[0].fThumbLY < -0.5 && m_ModeMoveEnd && m_StageMoveEnd &&
-				m_StickDown && m_ModeMoveEnd) {
+				CntlVec[0].fThumbLY > 0.5 || CntlVec[0].fThumbLY < -0.5 && m_ModeMoveEnd && m_StageMoveEnd &&
+				m_StickDown) {
 				if (m_OneSE == false) {
 					auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
 					pMultiSoundEffect->Start(L"StageSe_SE", 0, 1.0f);
@@ -493,7 +492,8 @@ namespace basecross
 
 
 
-		if (KeylVec.m_bPressedKeyTbl['Y'] || m_APush) {
+		if (KeylVec.m_bPressedKeyTbl['Y'] || m_APush && m_ModeMoveEnd && m_StageMoveEnd &&
+			m_StickDown && m_ModeMoveEnd) {
 			m_KeepPushing = true;
 			m_KeepApudh = true;
 			m_APush = false;
@@ -607,13 +607,13 @@ namespace basecross
 		auto EasyPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Easy", false);
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto KeylVec = App::GetApp()->GetInputDevice().GetKeyState();
-		if (CntlVec[0].fThumbLY < 0.2 && CntlVec[0].fThumbLY > -0.2 && m_StickDown == false) {
+		if (CntlVec[0].fThumbLY < 0.3 && CntlVec[0].fThumbLY > -0.3 && m_StickDown == false) {
 			m_StickDown = true;
 		}
 		//難易度イージーがセンターにあったらステージ選択が出来る
 		if (EasyPtr->GetCenter()) {
 			StandardEasyPos();
-			if (KeylVec.m_bPressedKeyTbl['R'] || CntlVec[0].fThumbLY > 0.5 &&CntlVec[0].fThumbLX < 0.1 && CntlVec[0].fThumbLX > -0.1
+			if (KeylVec.m_bPressedKeyTbl['R'] || CntlVec[0].fThumbLY > 0.5 &&CntlVec[0].fThumbLX < 0.3 && CntlVec[0].fThumbLX > -0.3
 				&& m_ModeMoveEnd && m_StageMoveEnd && m_StickDown) {
 				m_EasyStageCenter++;
 				m_Flg = true;
@@ -622,7 +622,7 @@ namespace basecross
 				m_StickDown = false;
 				m_StickUpUnder = true;
 			}
-			if (KeylVec.m_bPressedKeyTbl['T'] || CntlVec[0].fThumbLY < -0.5 &&CntlVec[0].fThumbLX < 0.1 && CntlVec[0].fThumbLX > -0.1
+			if (KeylVec.m_bPressedKeyTbl['T'] || CntlVec[0].fThumbLY < -0.5 &&CntlVec[0].fThumbLX < 0.3 && CntlVec[0].fThumbLX > -0.3
 				&& m_ModeMoveEnd && m_StageMoveEnd && m_StickDown) {
 				m_EasyStageCenter--;
 				m_Flg = true;
@@ -673,13 +673,13 @@ namespace basecross
 		auto NormalPtr = GetStage()->GetSharedGameObject<ModeSelect>(L"Normal", false);
 		auto KeylVec = App::GetApp()->GetInputDevice().GetKeyState();
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
-		if (CntlVec[0].fThumbLY < 0.2 && CntlVec[0].fThumbLY > -0.2 && m_StickDown == false) {
+		if (CntlVec[0].fThumbLY < 0.3 && CntlVec[0].fThumbLY > -0.3 && m_StickDown == false) {
 			m_StickDown = true;
 		}
 		//難易度ノーマルがセンターにあったらステージ選択が出来る
 		if (NormalPtr->GetCenter()) {
 			StandardNormalPos();
-			if (KeylVec.m_bPressedKeyTbl['R'] || CntlVec[0].fThumbLY > 0.5 && m_ModeMoveEnd &&CntlVec[0].fThumbLX < 0.1 && CntlVec[0].fThumbLX > -0.1
+			if (KeylVec.m_bPressedKeyTbl['R'] || CntlVec[0].fThumbLY > 0.5 && m_ModeMoveEnd &&CntlVec[0].fThumbLX < 0.3 && CntlVec[0].fThumbLX > -0.3
 				&& m_StageMoveEnd && m_StickDown) {
 				m_NormalStageCenter++;
 				m_Flg = true;
@@ -688,7 +688,7 @@ namespace basecross
 				m_StickDown = false;
 				m_StickUpUnder = true;
 			}
-			if (KeylVec.m_bPressedKeyTbl['T'] || CntlVec[0].fThumbLY < -0.5 &&CntlVec[0].fThumbLX < 0.1 && CntlVec[0].fThumbLX > -0.1
+			if (KeylVec.m_bPressedKeyTbl['T'] || CntlVec[0].fThumbLY < -0.5 &&CntlVec[0].fThumbLX < 0.3 && CntlVec[0].fThumbLX > -0.3
 				&& m_ModeMoveEnd && m_StageMoveEnd && m_StickDown) {
 				m_NormalStageCenter--;
 				m_Flg = true;
@@ -768,11 +768,11 @@ namespace basecross
 		//難易度ハードがセンターにあったらステージ選択が出来る
 		if (HardPtr->GetCenter()) {
 			StandardHardPos();
-			if (CntlVec[0].fThumbLY < 0.2 && CntlVec[0].fThumbLY > -0.2 && m_StickDown == false) {
+			if (CntlVec[0].fThumbLY < 0.3 && CntlVec[0].fThumbLY > -0.3 && m_StickDown == false) {
 				m_StickDown = true;
 			}
 
-			if (KeylVec.m_bPressedKeyTbl['R'] || CntlVec[0].fThumbLY > 0.5 && m_ModeMoveEnd &&CntlVec[0].fThumbLX < 0.1 && CntlVec[0].fThumbLX > -0.1
+			if (KeylVec.m_bPressedKeyTbl['R'] || CntlVec[0].fThumbLY > 0.5 && m_ModeMoveEnd &&CntlVec[0].fThumbLX < 0.3 && CntlVec[0].fThumbLX > -0.3
 				&& m_StageMoveEnd && m_StickDown) {
 				m_HardStageCenter++;
 				m_Flg = true;
@@ -781,7 +781,7 @@ namespace basecross
 				m_StickDown = false;
 				m_StickUpUnder = true;
 			}
-			if (KeylVec.m_bPressedKeyTbl['T'] || CntlVec[0].fThumbLY < -0.5 &&CntlVec[0].fThumbLX < 0.1 && CntlVec[0].fThumbLX > -0.1
+			if (KeylVec.m_bPressedKeyTbl['T'] || CntlVec[0].fThumbLY < -0.5 &&CntlVec[0].fThumbLX < 0.3 && CntlVec[0].fThumbLX > -0.3
 				&& m_ModeMoveEnd && m_StageMoveEnd && m_StickDown) {
 				m_HardStageCenter--;
 				m_Flg = true;
@@ -1703,35 +1703,27 @@ namespace basecross
 
 			if (m_KeepPushing) {
 				if (CntlVec[0].wButtons& XINPUT_GAMEPAD_A) {
-					if (m_OneSE == false) {
-						auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
-						pMultiSoundEffect->Start(L"Pause_SE", 0, 1.0f);
-						m_OneSE = true;
-					}
+					
 					m_KeepApudh = true;
 				}
 				else if (!(CntlVec[0].wButtons& XINPUT_GAMEPAD_A)) {
 					m_KeepApudh = false;
 					m_KeepPushing = false;
-					m_OneSE = true;
+					
 				}
 			}
+			
 
 			if (m_KeepPushing == false && m_KeepApudh == false) {
 				//selectのメニューからAボタンが押されて
 				if (CntlVec[0].wPressedButtons& XINPUT_GAMEPAD_A) {
-					if (m_OneSE2 == false) {
-						auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
-						pMultiSoundEffect->Start(L"Pause_SE", 0, 1.0f);
-						m_OneSE2 = true;
-					}
 					m_APush = true;
 				}
 				else {
 					m_APush = false;
-					m_OneSE2 = false;
 				}
 			}
+			
 
 			if (CntlVec[0].bConnected)
 			{
@@ -1754,15 +1746,19 @@ namespace basecross
 				//AかBボタン押されたら
 				if (m_APush || CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B || KeylVec.m_bPressedKeyTbl['N'])
 				{
+					auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
 
 					switch (m_selectnum)
 					{
 						//No
 					case 0:
+						pMultiSoundEffect->Start(L"Pause_SE", 0, 1.0f);
 						CloseCheck();
 						break;
 						//Yes
 					case 1:
+						GetStage()->GetSharedGameObject<SE>(L"TitleSE", false)->ASe();
+
 						//ステージ番号をScene.cppに渡す
 						//====================================================
 						//	１～４(25,25)　５～１２(50,50)　１３～１６(75,75)
@@ -1866,7 +1862,8 @@ namespace basecross
 		m_APush = false;
 		GetStage()->GetSharedGameObject<GoBackSprite>(L"Go", false)->OnDisp(true);
 		GetStage()->GetSharedGameObject<GoBackSprite>(L"Back", false)->OnDisp(true);
-
+		auto pMultiSoundEffect = GetComponent<MultiSoundEffect>();
+		pMultiSoundEffect->Start(L"Pause_SE", 0, 1.0f);
 
 	}
 

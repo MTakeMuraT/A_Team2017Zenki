@@ -3933,8 +3933,10 @@ namespace basecross {
 
 							//‰¹–Â‚ç‚·
 							m_KetteiSe = ObjectFactory::Create<MultiAudioObject>();
-							m_KetteiSe->AddAudioResource(L"DECIDE_SE");
-							m_KetteiSe->Start(L"DECIDE_SE", 0.5f);
+							GetStage()->GetSharedGameObject<SE>(L"TitleSE", false)->ASe();
+
+							/*m_KetteiSe->AddAudioResource(L"DECIDE_SE");
+							m_KetteiSe->Start(L"DECIDE_SE", 0.5f);*/
 
 							//Ø‚è‘Ö‚¦‰‰o
 							auto ob = GetStage()->AddGameObject<SceneChangeSS>();

@@ -213,14 +213,15 @@ namespace basecross
 		}
 		//**********************
 		////BGM
-		if (App::GetApp()->GetScene<Scene>()->GetBGMFlg() == false) {
+		/*if (App::GetApp()->GetScene<Scene>()->GetBGMFlg() == false) {
 			m_AudioObjectPtr->Stop(L"Tutorial_BGM");
-		}
+		}*/
 	}
 
 	//”jŠü
 	TutorialScene::~TutorialScene() 
 	{
+		m_AudioObjectPtr->Stop(L"Tutorial_BGM");
 
 	}
 
